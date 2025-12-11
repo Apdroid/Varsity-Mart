@@ -1,0 +1,185 @@
+"use client"
+
+import { useState } from "react"
+import Image from "next/image"
+import { Star, BadgeCheck, MessageCircle, Share2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ProductCard } from "@/components/product-card"
+import type { Store, Product } from "@/types/models"
+
+interface StoreDetailContentProps {
+  storeId: string
+  initialStore?: Store
+  initialProducts?: Product[]
+}
+
+export function StoreDetailContent({ storeId, initialStore, initialProducts }: StoreDetailContentProps) {
+  // Transform API response format to component format
+  const store: Store | undefined = initialStore ? {
+    id: initialStore.id,
+    name: initialStore.name,
+    description: initialStore.description,
+    logo: initialStore.logo,
+    banner: initialStore.banner,
+    ownerId: initialStore.owner?.id || "",
+    owner: initialStore.owner || {} as any,
+    rating: initialStore.rating,
+    reviewsCount: initialStore.totalReviews,
+    productsCount: initialStore.totalProducts,
+    isVerified: true,
+    isOpen: initialStore.isOpen,
+    createdAt: initialStore.memberSince || "",
+    updatedAt: "",
+  } : undefined;
+  
+  // Transform products from API format to component format
+  const storeProducts: Product[] = initialProducts?.map((p: any) => ({
+    id: p.id,
+    title: p.title,
+    description: p.description,
+    price: p.price,
+    compareAtPrice: p.originalPrice,
+    images: p.images,
+    category: { id: "", name: p.category, slug: p.category.toLowerCase() },
+    condition: p.condition,
+    quantity: 1,
+    status: "active" as const,
+    sellerId: p.seller?.id || "",
+    seller: {
+      id: p.seller?.id || "",
+      email: "",
+      firstName: p.seller?.name?.split(" ")[0] || "",
+      lastName: p.seller?.name?.split(" ")[1] || "",
+      role: "seller" as const,
+      isEmailVerified: false,
+      isPhoneVerified: false,
+      kycStatus: "pending" as const,
+      createdAt: "",
+      updatedAt: "",
+    },
+    likesCount: p.likes || 0,
+    isLiked: false,
+    storeId: storeId,
+    tags: p.badges || [],
+    createdAt: p.createdAt || "",
+    updatedAt: "",
+  })) || [];
+  
+  const [activeTab, setActiveTab] = useState("products")
+  
+  if (!store) {
+    return <div>Store not found</div>;
+  }
+
+  return (
+    <div>
+      {/* Banner */}
+      <div className="relative h-48 md:h-64 bg-gradient-to-br text-primary text-primary dark:text-primary dark:text-primary">
+        {store.banner && (
+          <Image src={store.banner || "/placeholder.svg"} alt={store.name} fill className="object-cover" />
+        )}
+      </div>
+
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Store Header */}
+        <div className="relative -mt-16 mb-6">
+          <div className="flex flex-col md:flex-row md:items-end gap-4">
+            <div className="w-32 h-32 rounded-xl border-4 border-background bg-background overflow-hidden shrink-0 shadow-lg">
+              <Image
+                src={store.logo || "/placeholder.svg?height=128&width=128&query=store logo"}
+                alt={store.name}
+                width={128}
+                height={128}
+                className="object-cover"
+              />
+            </div>
+
+            <div className="flex-1 pb-2">
+              <div className="flex items-center gap-2 mb-1">
+                <h1 className="text-2xl font-bold text-foreground">{store.name}</h1>
+                {store.isVerified && <BadgeCheck className="h-6 w-6 text-primary" />}
+                <Badge variant={store.isOpen ? "default" : "secondary"} className="ml-2">
+                  {store.isOpen ? "Open" : "Closed"}
+                </Badge>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <span className="font-medium text-foreground">{store.rating}</span>
+                  <span>({store.reviewsCount} reviews)</span>
+                </div>
+                <span>{store.productsCount} products</span>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+                <Share2 className="h-4 w-4" />
+                Share
+              </Button>
+              <Button size="sm" className="gap-2 text-slate-100 hover:text-slate-50">
+                <MessageCircle className="h-4 w-4" />
+                Contact
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="pb-12">
+          <TabsList className="mb-6">
+            <TabsTrigger value="products">Products</TabsTrigger>
+            <TabsTrigger value="about">About</TabsTrigger>
+            <TabsTrigger value="reviews">Reviews</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="products">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {storeProducts.length > 0 ? (
+                storeProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))
+              ) : (
+                <div className="col-span-full text-center py-12">
+                  <p className="text-muted-foreground">No products available in this store.</p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="about">
+            <div className="max-w-2xl space-y-6">
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">About This Store</h3>
+                <p className="text-muted-foreground">{store.description}</p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-foreground mb-3">Operating Hours</h3>
+                <div className="space-y-2">
+                  {Object.entries(store.operatingHours || {}).map(([day, hours]) => (
+                    <div key={day} className="flex justify-between text-sm">
+                      <span className="capitalize text-muted-foreground">{day}</span>
+                      <span className="text-foreground">
+                        {hours.isOpen ? `${hours.open} - ${hours.close}` : "Closed"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="reviews">
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Reviews coming soon...</p>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  )
+}
