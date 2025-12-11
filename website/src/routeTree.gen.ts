@@ -10,10 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as RestaurantsRouteImport } from './routes/restaurants'
 import { Route as LogoutRouteImport } from './routes/logout'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RestaurantsIdRouteImport } from './routes/restaurants.$id'
 import { Route as AuthedPostsRouteRouteImport } from './routes/_authed/posts.route'
 import { Route as AuthedPostsIndexRouteImport } from './routes/_authed/posts.index'
 import { Route as AuthedPostsPostIdRouteImport } from './routes/_authed/posts.$postId'
@@ -21,6 +24,11 @@ import { Route as AuthedPostsPostIdRouteImport } from './routes/_authed/posts.$p
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RestaurantsRoute = RestaurantsRouteImport.update({
+  id: '/restaurants',
+  path: '/restaurants',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LogoutRoute = LogoutRouteImport.update({
@@ -33,6 +41,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
   getParentRoute: () => rootRouteImport,
@@ -41,6 +54,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const RestaurantsIdRoute = RestaurantsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => RestaurantsRoute,
 } as any)
 const AuthedPostsRouteRoute = AuthedPostsRouteRouteImport.update({
   id: '/posts',
@@ -60,18 +78,24 @@ const AuthedPostsPostIdRoute = AuthedPostsPostIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
+  '/restaurants': typeof RestaurantsRouteWithChildren
   '/signup': typeof SignupRoute
   '/posts': typeof AuthedPostsRouteRouteWithChildren
+  '/restaurants/$id': typeof RestaurantsIdRoute
   '/posts/$postId': typeof AuthedPostsPostIdRoute
   '/posts/': typeof AuthedPostsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
+  '/restaurants': typeof RestaurantsRouteWithChildren
   '/signup': typeof SignupRoute
+  '/restaurants/$id': typeof RestaurantsIdRoute
   '/posts/$postId': typeof AuthedPostsPostIdRoute
   '/posts': typeof AuthedPostsIndexRoute
 }
@@ -79,10 +103,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
+  '/checkout': typeof CheckoutRoute
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
+  '/restaurants': typeof RestaurantsRouteWithChildren
   '/signup': typeof SignupRoute
   '/_authed/posts': typeof AuthedPostsRouteRouteWithChildren
+  '/restaurants/$id': typeof RestaurantsIdRoute
   '/_authed/posts/$postId': typeof AuthedPostsPostIdRoute
   '/_authed/posts/': typeof AuthedPostsIndexRoute
 }
@@ -90,22 +117,37 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/checkout'
     | '/login'
     | '/logout'
+    | '/restaurants'
     | '/signup'
     | '/posts'
+    | '/restaurants/$id'
     | '/posts/$postId'
     | '/posts/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/logout' | '/signup' | '/posts/$postId' | '/posts'
+  to:
+    | '/'
+    | '/checkout'
+    | '/login'
+    | '/logout'
+    | '/restaurants'
+    | '/signup'
+    | '/restaurants/$id'
+    | '/posts/$postId'
+    | '/posts'
   id:
     | '__root__'
     | '/'
     | '/_authed'
+    | '/checkout'
     | '/login'
     | '/logout'
+    | '/restaurants'
     | '/signup'
     | '/_authed/posts'
+    | '/restaurants/$id'
     | '/_authed/posts/$postId'
     | '/_authed/posts/'
   fileRoutesById: FileRoutesById
@@ -113,8 +155,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
+  CheckoutRoute: typeof CheckoutRoute
   LoginRoute: typeof LoginRoute
   LogoutRoute: typeof LogoutRoute
+  RestaurantsRoute: typeof RestaurantsRouteWithChildren
   SignupRoute: typeof SignupRoute
 }
 
@@ -125,6 +169,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/restaurants': {
+      id: '/restaurants'
+      path: '/restaurants'
+      fullPath: '/restaurants'
+      preLoaderRoute: typeof RestaurantsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/logout': {
@@ -141,6 +192,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authed': {
       id: '/_authed'
       path: ''
@@ -154,6 +212,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/restaurants/$id': {
+      id: '/restaurants/$id'
+      path: '/$id'
+      fullPath: '/restaurants/$id'
+      preLoaderRoute: typeof RestaurantsIdRouteImport
+      parentRoute: typeof RestaurantsRoute
     }
     '/_authed/posts': {
       id: '/_authed/posts'
@@ -203,11 +268,25 @@ const AuthedRouteChildren: AuthedRouteChildren = {
 const AuthedRouteWithChildren =
   AuthedRoute._addFileChildren(AuthedRouteChildren)
 
+interface RestaurantsRouteChildren {
+  RestaurantsIdRoute: typeof RestaurantsIdRoute
+}
+
+const RestaurantsRouteChildren: RestaurantsRouteChildren = {
+  RestaurantsIdRoute: RestaurantsIdRoute,
+}
+
+const RestaurantsRouteWithChildren = RestaurantsRoute._addFileChildren(
+  RestaurantsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
+  CheckoutRoute: CheckoutRoute,
   LoginRoute: LoginRoute,
   LogoutRoute: LogoutRoute,
+  RestaurantsRoute: RestaurantsRouteWithChildren,
   SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
