@@ -1,0 +1,12 @@
+// Export all services from a single entry point
+export { authService } from "./auth.service"
+export { productsService } from "./products.service"
+export { ordersService } from "./orders.service"
+export { restaurantsService } from "./restaurants.service"
+export { chatService } from "./chat.service"
+export { storesService } from "./stores.service"
+export { paymentsService } from "./payments.service"
+export { kycService } from "./kyc.service"
+export { adminService } from "./admin.service"
+export { notificationsService } from "./notifications.service"
+export { uploadsService } from "./uploads.service"
