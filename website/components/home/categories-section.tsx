@@ -1,86 +1,75 @@
-import Link from "next/link"
-import { Laptop, Shirt, BookOpen, UtensilsCrossed, Sparkles, Dumbbell, Home, Gamepad2 } from "lucide-react"
+"use client";
+import { Backpack, BookOpen, Coffee, Home, Laptop } from "lucide-react";
+import { useEffect, useState } from "react";
+export default function StudentCategories() {
+	const [isDark, setIsDark] = useState(false);
+	useEffect(() => {
+		if (localStorage.getItem("theme") === "dark") {
+			setIsDark(true);
+		} else {
+			setIsDark(false);
+		}
+	}, [isDark]);
+	const categories = [
+		{
+			name: "Textbooks",
+			icon: BookOpen,
+			color: "bg-blue-100",
 
-const categories = [
-  {
-    name: "Electronics",
-    icon: Laptop,
-    href: "/search?category=electronics",
-    color: "bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400",
-  },
-  {
-    name: "Fashion",
-    icon: Shirt,
-    href: "/search?category=fashion",
-    color: "bg-pink-100 text-pink-600 dark:bg-pink-950 dark:text-pink-400",
-  },
-  {
-    name: "Books",
-    icon: BookOpen,
-    href: "/search?category=books",
-    color: "bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400",
-  },
-  {
-    name: "Food",
-    icon: UtensilsCrossed,
-    href: "/food",
-    color: "bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-400",
-  },
-  {
-    name: "Beauty",
-    icon: Sparkles,
-    href: "/search?category=beauty",
-    color: "bg-purple-100 text-purple-600 dark:bg-purple-950 dark:text-purple-400",
-  },
-  {
-    name: "Sports",
-    icon: Dumbbell,
-    href: "/search?category=sports",
-    color: "bg-green-100 text-green-600 dark:bg-green-950 dark:text-green-400",
-  },
-  {
-    name: "Dorm Essentials",
-    icon: Home,
-    href: "/search?category=home",
-    color: "bg-teal-100 text-teal-600 dark:bg-teal-950 dark:text-teal-400",
-  },
-  {
-    name: "Gaming",
-    icon: Gamepad2,
-    href: "/search?category=gaming",
-    color: "bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-400",
-  },
-]
+			dark: "bg-rose-900/20",
 
-export function CategoriesSection() {
-  return (
-    <section className="py-12 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-foreground">Browse Categories</h2>
-          <Link
-            href="/categories"
-            className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
-          >
-            View All
-          </Link>
-        </div>
+			iconColor: "text-blue-600",
+		},
+		{
+			name: "Electronics",
+			icon: Laptop,
+			dark: "bg-rose-900/20",
+			color: "bg-purple-100",
+			iconColor: "text-purple-600",
+		},
+		{
+			name: "Food & Snacks",
+			icon: Coffee,
+			color: "bg-amber-100",
+			dark: "bg-rose-900/20",
+			iconColor: "text-amber-600",
+		},
+		{
+			name: "Supplies",
+			icon: Backpack,
+			color: "bg-green-100",
+			dark: "bg-rose-900/20",
+			iconColor: "text-green-600",
+		},
+		{
+			name: "Dorm & Living",
+			icon: Home,
+			color: "bg-rose-100",
+			dark: "bg-rose-900",
+			iconColor: "text-rose-600",
+		},
+	];
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
-          {categories.map((category) => (
-            <Link
-              key={category.name}
-              href={category.href}
-              className="flex flex-col items-center gap-3 p-4 rounded-xl border border-border bg-card hover:border-emerald-300 hover:shadow-md transition-all"
-            >
-              <div className={`flex items-center justify-center w-12 h-12 rounded-xl ${category.color}`}>
-                <category.icon className="h-6 w-6" />
-              </div>
-              <span className="text-sm font-medium text-foreground text-center">{category.name}</span>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
+	return (
+		<div className="p-8 mx-auto max-w-7xl">
+			<h1 className="text-3xl font-bold  mb-8">Top categories</h1>
+
+			<div className="flex flex-wrap gap-4">
+				{categories.map((category) => (
+					<button
+						type="button"
+						key={category.name}
+						className={`${isDark ? category.dark : category.color} rounded-2xl px-6 py-4 flex items-center justify-between gap-8 min-w-55 hover:opacity-80 transition-opacity`}
+					>
+						<span className="text-gray-800 font-medium text-lg">{category.name}</span>
+						<div
+							className={`${category.iconColor} bg-accent bg-opacity-60 rounded-full p-2.5`}
+						>
+							<category.icon size={24} />
+						</div>
+					</button>
+				))}
+			</div>
+		</div>
+	);
 }

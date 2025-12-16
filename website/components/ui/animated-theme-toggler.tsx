@@ -43,9 +43,9 @@ export const AnimatedThemeToggler = ({
 			flushSync(() => {
 				const newTheme = !isDark;
 				setIsDark(newTheme);
-				// document.documentElement.classList.toggle("dark");
-				// localStorage.setItem("theme", newTheme ? "dark" : "light");
-				setTheme(newTheme ? "dark" : "light");
+				document.documentElement.classList.toggle("dark");
+				localStorage.setItem("theme", newTheme ? "dark" : "light");
+				// setTheme(newTheme ? "dark" : "light");
 			});
 		}).ready;
 
