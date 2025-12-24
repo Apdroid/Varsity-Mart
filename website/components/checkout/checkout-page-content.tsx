@@ -85,7 +85,7 @@ export function CheckoutPageContent() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
         <Link href="/cart" className="hover:text-foreground flex items-center gap-1">
@@ -104,7 +104,7 @@ export function CheckoutPageContent() {
               className={cn(
                 "flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-colors",
                 index <= currentStepIndex
-                  ? "bg-emerald-600 text-white"
+                  ? "bg-primary text-white"
                   : "bg-muted text-muted-foreground border border-border",
               )}
             >
@@ -133,7 +133,7 @@ export function CheckoutPageContent() {
           {currentStep === "address" && (
             <div className="space-y-6">
               <div className="flex items-center gap-2 mb-4">
-                <MapPin className="h-5 w-5 text-emerald-600" />
+                <MapPin className="h-5 w-5 text-primary" />
                 <h2 className="font-semibold text-lg text-foreground">Delivery Address</h2>
               </div>
 
@@ -144,7 +144,7 @@ export function CheckoutPageContent() {
                     className={cn(
                       "flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors",
                       selectedAddress === address.id
-                        ? "border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/20"
+                        ? "text-primary bg-primary/10 dark:bg-primary-80"
                         : "border-border hover:border-muted-foreground",
                     )}
                   >
@@ -165,7 +165,7 @@ export function CheckoutPageContent() {
                 ))}
               </RadioGroup>
 
-              <Button variant="outline" className="w-full bg-transparent">
+              <Button variant="outline" className="w-full bg-accent hover:bg-primary/10">
                 + Add New Address
               </Button>
 
@@ -175,13 +175,14 @@ export function CheckoutPageContent() {
                   id="notes"
                   placeholder="Any special instructions for delivery..."
                   value={orderNotes}
+									className="bg-accent"
                   onChange={(e) => setOrderNotes(e.target.value)}
                   rows={3}
                 />
               </div>
 
               <div className="flex justify-end">
-                <Button className="bg-emerald-600 hover:bg-emerald-700 gap-2" onClick={() => setCurrentStep("payment")}>
+                <Button className="text-slate-200 hover:text-slate-100 gap-2" onClick={() => setCurrentStep("payment")}>
                   Continue to Payment
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -193,7 +194,7 @@ export function CheckoutPageContent() {
           {currentStep === "payment" && (
             <div className="space-y-6">
               <div className="flex items-center gap-2 mb-4">
-                <CreditCard className="h-5 w-5 text-emerald-600" />
+                <CreditCard className="h-5 w-5 text-primary" />
                 <h2 className="font-semibold text-lg text-foreground">Payment Method</h2>
               </div>
 
@@ -204,7 +205,7 @@ export function CheckoutPageContent() {
                     className={cn(
                       "flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors",
                       selectedPayment === method.id
-                        ? "border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/20"
+                        ? "text-primary bg-primary/10 dark:bg-primary/20"
                         : "border-border hover:border-muted-foreground",
                     )}
                   >
@@ -218,10 +219,11 @@ export function CheckoutPageContent() {
               </RadioGroup>
 
               {selectedPayment === "momo" && (
-                <div className="space-y-2 p-4 rounded-xl bg-muted/50">
+                <div className="space-y-2 p-6 rounded-xl bg-muted/90">
                   <Label htmlFor="momoNumber">Mobile Money Number</Label>
                   <Input
                     id="momoNumber"
+										className="bg-background"
                     type="tel"
                     placeholder="024 XXX XXXX"
                     value={momoNumber}
@@ -231,9 +233,9 @@ export function CheckoutPageContent() {
                 </div>
               )}
 
-              <div className="flex items-center gap-2 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900">
-                <Shield className="h-5 w-5 text-emerald-600 shrink-0" />
-                <p className="text-sm text-emerald-800 dark:text-emerald-300">
+              <div className="flex items-center gap-2 p-4 rounded-xl text-primary  border border-primary/20 ">
+                <Shield className="h-5 w-5 text-primary shrink-0" />
+                <p className="text-sm text-primary dark:text-primary">
                   Your payment is protected by escrow. Funds are only released to the seller after you confirm delivery.
                 </p>
               </div>
@@ -243,7 +245,7 @@ export function CheckoutPageContent() {
                   <ChevronLeft className="h-4 w-4" />
                   Back
                 </Button>
-                <Button className="bg-emerald-600 hover:bg-emerald-700 gap-2" onClick={() => setCurrentStep("review")}>
+                <Button className="text-slate-100 hover:text-slate-50 gap-2" onClick={() => setCurrentStep("review")}>
                   Review Order
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -262,7 +264,7 @@ export function CheckoutPageContent() {
                   <span className="text-sm font-medium text-muted-foreground">Delivery Address</span>
                   <Button
                     variant="link"
-                    className="p-0 h-auto text-emerald-600"
+                    className="p-0 h-auto text-primary"
                     onClick={() => setCurrentStep("address")}
                   >
                     Edit
@@ -278,7 +280,7 @@ export function CheckoutPageContent() {
                   <span className="text-sm font-medium text-muted-foreground">Payment Method</span>
                   <Button
                     variant="link"
-                    className="p-0 h-auto text-emerald-600"
+                    className="p-0 h-auto text-primary"
                     onClick={() => setCurrentStep("payment")}
                   >
                     Edit
@@ -321,7 +323,7 @@ export function CheckoutPageContent() {
                   Back
                 </Button>
                 <Button
-                  className="bg-emerald-600 hover:bg-emerald-700 gap-2"
+                  className="text-slate-50 hover:text-slate-100 gap-2"
                   onClick={handlePlaceOrder}
                   disabled={isProcessing}
                 >

@@ -1,5 +1,4 @@
-import { AuthLayout } from "@/components/auth/auth-layout"
-import { RegisterForm } from "@/components/auth/register-form"
+import  RegisterForm  from "@/components/auth/register-form"
 
 export const metadata = {
   title: "Create Account - VarsityMart",
@@ -8,14 +7,6 @@ export const metadata = {
 
 export default function RegisterPage() {
   return (
-    <AuthLayout
-      title="Create your account"
-      description="Join VarsityMart to buy and sell on campus"
-      footerText="Already have an account?"
-      footerLink="/auth/login"
-      footerLinkText="Sign in"
-    >
       <RegisterForm />
-    </AuthLayout>
   )
 }

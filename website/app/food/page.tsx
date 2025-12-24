@@ -1,8 +1,11 @@
+import {
+	mockRestaurants,
+	RestaurantsSectionExample,
+} from "@/components/home/restaurant-section";
 import { MainLayout } from "@/components/layout/main-layout";
-import { FoodRestaurantsPage } from "@/components/food/food-page-content";
-import { mockRestaurants } from "@/components/home/restaurant-section";
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
 	title: "Food & Restaurants - VarsityMart",
 	description: "Order food from campus restaurants on VarsityMart",
 };
@@ -10,7 +13,7 @@ export const metadata = {
 export default function FoodPage() {
 	return (
 		<MainLayout>
-			<FoodRestaurantsPage  restaurants={mockRestaurants} />
+			<RestaurantsSectionExample />
 		</MainLayout>
 	);
 }

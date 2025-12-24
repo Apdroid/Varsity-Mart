@@ -1,10 +1,10 @@
 "use client";
 
+import { Heart, MessageCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, MessageCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types/models";
 
@@ -17,7 +17,8 @@ export function ProductCard({ product, className }: ProductCardProps) {
 	const discount = product.compareAtPrice
 		? Math.round(
 				((product.compareAtPrice - product.price) / product.compareAtPrice) * 100,
-			) : 0;
+			)
+		: 0;
 
 	return (
 		<div

@@ -1,9 +1,9 @@
 "use client"
 
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query"
-import { chatService } from "@/lib/api/services/chat.service"
 import { queryKeys } from "@/lib/api/query-keys"
+import { chatService } from "@/lib/api/services/chat.service"
 import type { SendMessageRequest, StartConversationRequest } from "@/types/api"
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export function useConversations() {
   return useQuery({

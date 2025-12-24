@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import MainLayout from "@/components/layout/main-layout"
 import { Card, CardContent } from "@/components/ui/card"
 import { ShoppingBag, Truck, Shield, GraduationCap, Heart } from "lucide-react"
+import Image from "next/image"
 
 export const metadata: Metadata = {
   title: "About Us | VarsityMart",
@@ -107,9 +108,11 @@ export default function AboutPage() {
             {team.map((member) => (
               <Card key={member.name} className="text-center overflow-hidden">
                 <div className="aspect-square bg-muted">
-                  <img
+                  <Image
                     src={member.image || "/placeholder.svg"}
                     alt={member.name}
+										width = {400}
+										height = {400}
                     className="w-full h-full object-cover"
                   />
                 </div>

@@ -16,8 +16,8 @@ const mockRestaurant: Restaurant = {
   name: "Mama's Kitchen",
   description:
     "Authentic Ghanaian dishes made with love. We use fresh, locally sourced ingredients to bring you the best of home cooking on campus.",
-  logo: "/african-restaurant-logo.png",
-  banner: "/jollof-rice-restaurant.jpg",
+  logo: "/power-bank-black.jpg",
+  banner: "/varsity-products.jpg",
   cuisine: ["Local", "Ghanaian"],
   rating: 4.8,
   reviewsCount: 234,
@@ -250,7 +250,7 @@ export function RestaurantDetailContent({ restaurantId }: RestaurantDetailConten
             <div className="flex-1 pb-2">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-foreground">{mockRestaurant.name}</h1>
-                <Badge variant={mockRestaurant.isOpen ? "default" : "secondary"} className="bg-emerald-600">
+                <Badge variant={mockRestaurant.isOpen ? "default" : "secondary"} className="text-slate">
                   {mockRestaurant.isOpen ? "Open" : "Closed"}
                 </Badge>
               </div>
@@ -285,7 +285,7 @@ export function RestaurantDetailContent({ restaurantId }: RestaurantDetailConten
                 size="sm"
                 className={cn(
                   "rounded-full whitespace-nowrap shrink-0",
-                  activeCategory === section.category && "bg-emerald-100 text-emerald-700 dark:bg-emerald-950",
+                  activeCategory === section.category && "text-primary dark:text-primary",
                 )}
                 onClick={() => setActiveCategory(section.category)}
               >
@@ -333,7 +333,7 @@ export function RestaurantDetailContent({ restaurantId }: RestaurantDetailConten
                                 <span className="w-6 text-center font-medium">{quantity}</span>
                                 <Button
                                   size="icon"
-                                  className="h-8 w-8 rounded-full bg-emerald-600 hover:bg-emerald-700"
+                                  className="h-8 w-8 rounded-full text-slate-100 hover:text-slate-50"
                                   onClick={() => addToCart(item)}
                                 >
                                   <Plus className="h-3 w-3" />
@@ -342,7 +342,7 @@ export function RestaurantDetailContent({ restaurantId }: RestaurantDetailConten
                             ) : (
                               <Button
                                 size="sm"
-                                className="bg-emerald-600 hover:bg-emerald-700 gap-1"
+                                className="text-slate-100 hover:text-slate-50 gap-1"
                                 onClick={() => addToCart(item)}
                               >
                                 <Plus className="h-3 w-3" />
@@ -379,7 +379,7 @@ export function RestaurantDetailContent({ restaurantId }: RestaurantDetailConten
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border md:hidden">
           <Sheet>
             <SheetTrigger asChild>
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 gap-2" size="lg">
+              <Button className="w-full text-primary hover:text-primary gap-2" size="lg">
                 <ShoppingBag className="h-5 w-5" />
                 View Cart ({cartItemsCount}) - GH₵{cartTotal}
               </Button>
@@ -416,7 +416,7 @@ export function RestaurantDetailContent({ restaurantId }: RestaurantDetailConten
                       <span className="w-6 text-center font-medium">{cartItem.quantity}</span>
                       <Button
                         size="icon"
-                        className="h-8 w-8 rounded-full bg-emerald-600 hover:bg-emerald-700"
+                        className="h-8 w-8 rounded-full text-primary hover:text-primary"
                         onClick={() => addToCart(cartItem.item)}
                       >
                         <Plus className="h-3 w-3" />
@@ -443,7 +443,7 @@ export function RestaurantDetailContent({ restaurantId }: RestaurantDetailConten
                 </div>
               </div>
 
-              <Button className="w-full mt-6 bg-emerald-600 hover:bg-emerald-700" size="lg">
+              <Button className="w-full mt-6 text-primary hover:text-primary" size="lg">
                 Checkout - GH₵{cartTotal + mockRestaurant.deliveryFee}
               </Button>
             </SheetContent>

@@ -194,12 +194,12 @@ export function ProductsPageContent() {
 
 			<div className="flex items-center justify-between mb-6">
 				<h1 className="text-2xl font-bold text-foreground">All Products</h1>
-				<Link href="/search" className="text-sm text-emerald-600 hover:underline">
+				<Link href="/search" className="text-sm text-primary hover:underline">
 					Advanced Search
 				</Link>
 			</div>
 
-			<div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+			<div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
 				{mockProducts.map((product) => (
 					<ProductCard key={product.id} product={product} />
 				))}

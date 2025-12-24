@@ -3,14 +3,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { authService } from "@/lib/api/services/auth.service"
-import { useAuthStore } from "@/stores/auth-store"
+import { useAuthStore } from "@/lib/stores/auth-store"
 import { queryKeys } from "@/lib/api/query-keys"
 import type { LoginRequest, RegisterRequest } from "@/types/api"
 
 export function useAuth() {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { user, isAuthenticated, setUser, logout: clearAuth } = useAuthStore()
+  const { user, isAuthenticated, setIsAuthenticated, setUser, logout: clearAuth } = useAuthStore()
 
   // Get current user
   const { isLoading, refetch: refetchUser } = useQuery({
@@ -67,6 +67,7 @@ export function useAuth() {
     user,
     isAuthenticated,
     isLoading,
+		setIsAuthenticated,
     login: loginMutation.mutate,
     loginAsync: loginMutation.mutateAsync,
     isLoggingIn: loginMutation.isPending,

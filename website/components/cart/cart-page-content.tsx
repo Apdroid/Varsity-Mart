@@ -6,7 +6,7 @@ import { ChevronRight, Minus, Plus, Trash2, ShoppingBag, Shield, Truck, ArrowRig
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { useCartStore } from "@/lib/stores/cart.store"
+import { useCartStore } from "@/lib/stores/cart-store"
 import type { Product } from "@/types/models"
 
 // Mock cart items with product details
@@ -86,7 +86,7 @@ export function CartPageContent() {
                 <div className="flex-1 min-w-0">
                   <Link
                     href={`/products/${item.productId}`}
-                    className="font-medium text-foreground hover:text-emerald-600 line-clamp-2 transition-colors"
+                    className="font-medium text-foreground hover:text-primary line-clamp-2 transition-colors"
                   >
                     {item.product.title}
                   </Link>
@@ -137,11 +137,11 @@ export function CartPageContent() {
             {/* Trust Badges */}
             <div className="flex flex-wrap gap-6 py-4 mt-4 border-t border-border">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Shield className="h-5 w-5 text-emerald-600" />
+                <Shield className="h-5 w-5 text-primary" />
                 <span>Secure checkout with escrow protection</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Truck className="h-5 w-5 text-emerald-600" />
+                <Truck className="h-5 w-5 text-primary" />
                 <span>Campus-wide delivery available</span>
               </div>
             </div>
@@ -184,7 +184,7 @@ export function CartPageContent() {
                 <span className="text-foreground">GH₵{total.toLocaleString()}</span>
               </div>
 
-              <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700 gap-2" size="lg">
+              <Button asChild className="w-full bg-primary/80 hover:bg-primary gap-2" size="lg">
                 <Link href="/checkout">
                   Proceed to Checkout
                   <ArrowRight className="h-4 w-4" />
@@ -202,7 +202,7 @@ export function CartPageContent() {
           <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
           <h2 className="text-xl font-semibold text-foreground mb-2">Your cart is empty</h2>
           <p className="text-muted-foreground mb-6">Looks like you haven&apos;t added anything to your cart yet.</p>
-          <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+          <Button asChild className="bg-primary hover:bg-primary/35">
             <Link href="/products">Start Shopping</Link>
           </Button>
         </div>

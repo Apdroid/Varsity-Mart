@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Facebook, Twitter, Instagram, Youtube } from "lucide-react"
+import Logo from "./logo"
 
 const footerLinks = {
   marketplace: [
@@ -42,12 +43,7 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-4 lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600 text-white font-bold">
-                V
-              </div>
-              <span className="text-xl font-bold text-foreground">VarsityMart</span>
-            </Link>
+						<Logo/>
             <p className="text-sm text-muted-foreground mb-4">
               The student marketplace for buying, selling, and discovering campus deals.
             </p>

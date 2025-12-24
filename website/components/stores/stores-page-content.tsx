@@ -134,7 +134,7 @@ export function StoresPageContent() {
             className="group block rounded-xl border border-border bg-card overflow-hidden hover:shadow-lg transition-shadow"
           >
             {/* Banner */}
-            <div className="relative h-32 bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-950 dark:to-emerald-900">
+            <div className="relative h-32 bg-gradient-to-br text-primary text-primary dark:text-primary dark:text-primary">
               {store.banner && (
                 <Image src={store.banner || "/placeholder.svg"} alt={store.name} fill className="object-cover" />
               )}
@@ -159,10 +159,10 @@ export function StoresPageContent() {
                 </div>
                 <div className="pt-8 min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-foreground truncate group-hover:text-emerald-600 transition-colors">
+                    <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
                       {store.name}
                     </h3>
-                    {store.isVerified && <BadgeCheck className="h-4 w-4 text-emerald-600 shrink-0" />}
+                    {store.isVerified && <BadgeCheck className="h-4 w-4 text-primary shrink-0" />}
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2">{store.description}</p>
                 </div>

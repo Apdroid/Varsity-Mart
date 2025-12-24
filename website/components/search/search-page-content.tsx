@@ -519,7 +519,7 @@ export function SearchPageContent() {
 					))}
 					<button
 						onClick={clearAllFilters}
-						className="text-sm text-emerald-600 hover:underline"
+						className="text-sm text-primary hover:underline"
 					>
 						Clear all
 					</button>

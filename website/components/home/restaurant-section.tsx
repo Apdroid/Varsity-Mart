@@ -1,5 +1,9 @@
 "use client";
+import { Clock, DollarSign, MapPin, Star, Truck } from "lucide-react";
+import Image from "next/image";
 import React from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -7,9 +11,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Clock, Star, DollarSign, MapPin } from "lucide-react";
 
 interface Restaurant {
 	id: string;
@@ -36,94 +37,81 @@ interface RestaurantCardProps {
 
 const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 	return (
-		<Card className="group relative overflow-hidden border-border bg-card hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
+		<Card className="group flex justify-between relative overflow-hidden border-border hover:bg-card active:bg-card bg-transparent md:bg-card hover:shadow-xl transition-all duration-500  py-0">
 			{/* Banner with overlay */}
-			<div className="relative h-48 overflow-hidden">
-				<div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/70 to-primary/50 z-10" />
-				<img
+			<div className="relative bg-card h-48 overflow-hidden">
+				<div className="absolute inset-0 z-10 bg-linear-to-r from-black/10 via-black/20 to-black/10 " />
+				<Image
+					width={500}
+					height={500}
 					src={restaurant.banner}
 					alt={restaurant.name}
-					className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+					className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
 				/>
 
 				{/* Status badge */}
 				<div className="absolute top-4 right-4 z-20">
 					<Badge
 						variant={restaurant.isOpen ? "default" : "secondary"}
-						className="bg-background/95 backdrop-blur-sm text-foreground border-border shadow-lg"
+						className="bg-card/95 backdrop-blur-sm text-foreground border-border shadow-lg"
 					>
 						{restaurant.isOpen ? "Open Now" : "Closed"}
 					</Badge>
 				</div>
 
-				{/* Floating rating */}
-				<div className="absolute bottom-4 left-4 z-20 flex items-center gap-2 bg-background/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
-					<Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-					<span className="font-bold text-foreground">{restaurant.rating}</span>
+				<div className="absolute bottom-0 rounded-tr-lg left-0 z-30 flex items-center gap-2 bg-card backdrop-blur-sm px-2 py-1 md:px-4 md:py-2 shadow-lg">
+					<Star className="w-3 h-3 md:w-4 md:h-4 fill-yellow-400 text-yellow-400" />
+					<span className="text-sm font-bold text-foreground">
+						{restaurant.rating}
+					</span>
 					<span className="text-muted-foreground text-sm">
 						({restaurant.reviewsCount})
 					</span>
 				</div>
 			</div>
 
-			<CardHeader className="space-y-3 pb-3">
+			<CardHeader className="relative space-y-1 pb-1 px-2">
 				<div className="flex items-start justify-between gap-2">
-					<CardTitle className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+					<CardTitle className="text-sm md:text-xl capitalize font-bold text-foreground group-hover:text-primary transition-colors">
 						{restaurant.name}
 					</CardTitle>
 				</div>
 
-				<CardDescription className="line-clamp-2 text-muted-foreground leading-relaxed">
-					{restaurant.description}
-				</CardDescription>
-
-				{/* Cuisine tags */}
-				<div className="flex flex-wrap gap-2">
-					{restaurant.cuisine.slice(0, 3).map((item, idx) => (
-						<Badge
-							key={idx}
-							variant="outline"
-							className="border-border text-foreground text-xs font-medium"
-						>
-							{item}
-						</Badge>
-					))}
-				</div>
-			</CardHeader>
-
-			<CardContent className="space-y-4">
-				{/* Info grid */}
-				<div className="grid grid-cols-2 gap-3 text-sm">
-					<div className="flex items-center gap-2 text-muted-foreground">
-						<Clock className="w-4 h-4 text-primary" />
-						<span>{restaurant.deliveryTime}</span>
-					</div>
-					<div className="flex items-center gap-2 text-muted-foreground">
-						<DollarSign className="w-4 h-4 text-primary" />
-						<span>GH₵{restaurant.deliveryFee} fee</span>
-					</div>
-					<div className="flex items-center gap-2 text-muted-foreground col-span-2">
-						<MapPin className="w-4 h-4 text-primary" />
-						<span className="truncate">{restaurant.location.address}</span>
-					</div>
-				</div>
+				{/* <CardDescription className="line-clamp-2 text-muted-foreground leading-relaxed"> */}
+				{/* 	{restaurant.description} */}
+				{/* </CardDescription> */}
 
 				{/* Tags */}
-				<div className="flex flex-wrap gap-2 pt-2 border-t border-border">
+				<div className="flex flex-wrap gap-1 md:gap-2 pt-2 border-t border-border">
 					{restaurant.tags.map((tag, idx) => (
 						<span
 							key={idx}
-							className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary font-medium"
+							className="text-xs px-2 py-1 rounded-full bg-primary/10 font-light md:font-medium"
 						>
 							{tag}
 						</span>
 					))}
 				</div>
 
-				{/* CTA */}
-				<Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
-					Order Now • Min GH₵{restaurant.minOrder}
-				</Button>
+				{/* Cuisine tags */}
+			</CardHeader>
+
+			<CardContent className="space-y-3 px-2">
+				{/* Info grid */}
+				<div className="flex flex-col md:flex-row flex-wrap gap-2 text-xs pb-5 flex-start md:items-center ">
+					<div className="flex items-center gap-2 text-muted-foreground">
+						<Truck className="w-4 h-4 text-primary" />
+						<span className="text-xs">GH₵{restaurant.deliveryFee} fee</span>
+					</div>
+					<div className="flex items-center gap-2 text-muted-foreground ">
+						<MapPin className="w-4 h-4 text-primary" />
+						<span className="truncate text-xs">{restaurant.location.address}</span>
+					</div>
+					<div className="flex items-center gap-2 text-muted-foreground ">
+						<DollarSign className="w-4 h-4 text-primary" />
+						<span className="truncate text-xs">Min GH₵{restaurant.minOrder}</span>
+					</div>
+				</div>
 			</CardContent>
 		</Card>
 	);
@@ -141,8 +129,8 @@ const RestaurantsSection: React.FC<RestaurantsSectionProps> = ({
 	subtitle = "Browse restaurants on campus",
 }) => {
 	return (
-		<section className="w-full py-16 bg-background">
-			<div className="container mx-auto px-4">
+		<section className="w-full py-18 bg-background">
+			<div className="max-w-360 mx-auto my-0 px-4">
 				{/* Hero Banner */}
 				<div className="relative rounded-3xl overflow-hidden mb-12 shadow-2xl">
 					<div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40 z-10" />
@@ -152,16 +140,13 @@ const RestaurantsSection: React.FC<RestaurantsSectionProps> = ({
 						className="w-full h-80 object-cover"
 					/>
 					<div className="absolute inset-0 z-20 flex flex-col items-start justify-center px-12 md:px-20">
-						<h1 className="text-5xl md:text-7xl font-black text-white mb-4 tracking-tight leading-none">
+						<h1 className="text-3xl md:text-6xl font-black text-white mb-4 tracking-tight leading-none">
 							Hungry?
 						</h1>
-						<p className="text-xl md:text-2xl text-white/90 font-medium mb-8 max-w-2xl leading-relaxed">
+						<p className="text-md md:text-xl text-white/90 font-medium mb-8 max-w-2xl leading-relaxed">
 							Your favorite campus restaurants, delivered fresh to your doorstep
 						</p>
-						<Button
-							size="lg"
-							className="bg-white text-black hover:bg-white/90 font-bold text-lg px-8 py-6 shadow-xl"
-						>
+						<Button className="bg-white hover:bg-white/90 text-md font-medium md:font-bold  text-black  md:text-lg px-5 py-4 shadow-xl">
 							Explore Restaurants
 						</Button>
 					</div>
@@ -170,10 +155,10 @@ const RestaurantsSection: React.FC<RestaurantsSectionProps> = ({
 				{/* Section Header */}
 				<div className="flex items-end justify-between mb-8">
 					<div>
-						<h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+						<h2 className="text-2xl md:text-4xl font-bold text-foreground mb-2">
 							{title}
 						</h2>
-						<p className="text-muted-foreground text-lg">{subtitle}</p>
+						<p className="text-muted-foreground text-md md:text-lg">{subtitle}</p>
 					</div>
 					<Button
 						variant="ghost"
@@ -184,7 +169,7 @@ const RestaurantsSection: React.FC<RestaurantsSectionProps> = ({
 				</div>
 
 				{/* Restaurant Grid */}
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+				<div className="grid grid-cols-2 auto-rows-fr md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
 					{restaurants.map((restaurant) => (
 						<RestaurantCard key={restaurant.id} restaurant={restaurant} />
 					))}

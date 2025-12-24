@@ -8,17 +8,17 @@ import {
 	Package,
 	ShoppingCart,
 	Store,
-	User,
 	X,
 } from "lucide-react";
 import { useMotionValueEvent, useScroll } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Activity, useEffect, useState } from "react";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/hooks/use-auth";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -26,9 +26,11 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useCartStore } from "@/lib/stores/cart.store";
+import { useCartStore } from "@/lib/stores/cart-store";
 import { cn } from "@/lib/utils";
 import { PlaceholdersAndVanishInput } from "../ui/placeholders-and-vanish-input";
+import { LoginButton } from "../auth/auth-button";
+import Logo from "./logo";
 
 const navigation = [
 	{ name: "Products", href: "/products", icon: Package },
@@ -54,10 +56,11 @@ export function Header() {
 	const cartCount = items.reduce((acc, item) => acc + item.quantity, 0);
 	const { scrollYProgress } = useScroll();
 	const searchParams = useSearchParams();
+	const { isAuthenticated } = useAuth();
 
 	useMotionValueEvent(scrollYProgress, "change", (current) => {
 		if (typeof current === "number") {
-			let direction = current! - scrollYProgress.getPrevious()!;
+			const direction = current! - scrollYProgress.getPrevious()!;
 
 			if (scrollYProgress.get() < 0.02) {
 				setIsScrolled(false);
@@ -85,6 +88,7 @@ export function Header() {
 		}
 		searchParams.get("query") && setSearchQuery(searchParams.get("query") || "");
 	}, [path, searchParams]);
+	console.log();
 
 	return (
 		<header
@@ -97,14 +101,7 @@ export function Header() {
 					<div className="flex h-16 items-center justify-between gap-4 ">
 						{/* Logo */}
 						<div className="flex gap-4">
-							<Link href="/" className="flex items-center gap-2 shrink-0 ml-2 ">
-								<div className="flex h-9 w-9 items-center justify-center rounded-full font-sans text-primary bg-primary/20  font-extrabold text-2xl">
-									V
-								</div>
-								<span className="text-xl font-black font-mono text-foreground  hidden sm:block">
-									VarsityMart
-								</span>
-							</Link>
+							<Logo />
 							<nav className="hidden md:flex  items-center gap-4">
 								{navigation.map((item) => {
 									return (
@@ -136,29 +133,85 @@ export function Header() {
 
 						{/* Actions */}
 						<div className="flex items-center gap-1 sm:gap-2">
-							<Link href="/wishlist" className="hidden sm:flex">
-								<Button variant="ghost" size="icon" className="h-9 w-9">
-									<Heart className="h-5 w-5" />
-									<span className="sr-only">Wishlist</span>
-								</Button>
-							</Link>
+							<Activity mode={isAuthenticated ? "visible" : "hidden"}>
+								<Link href="/wishlist" className="hidden sm:flex">
+									<Button variant="ghost" size="icon" className="h-9 w-9">
+										<Heart className="h-5 w-5" />
+										<span className="sr-only">Wishlist</span>
+									</Button>
+								</Link>
 
-							<Link href="/messages">
-								<Button variant="ghost" size="icon" className="h-9 w-9 relative">
-									<MessageCircle className="h-5 w-5" />
-									<span className="sr-only">Messages</span>
-								</Button>
-							</Link>
+								<Link href="/messages">
+									<Button variant="ghost" size="icon" className="h-9 w-9 relative">
+										<MessageCircle className="h-5 w-5" />
+										<span className="sr-only">Messages</span>
+									</Button>
+								</Link>
 
-							<Link href="/notifications" className="hidden sm:flex">
-								<Button variant="ghost" size="icon" className="h-9 w-9 relative">
-									<Bell className="h-5 w-5" />
-									<Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-primary border-2 border-background">
-										3
-									</Badge>
-									<span className="sr-only">Notifications</span>
-								</Button>
-							</Link>
+								<Link href="/notifications" className="hidden sm:flex">
+									<Button variant="ghost" size="icon" className="h-9 w-9 relative">
+										<Bell className="h-5 w-5" />
+										<Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-primary border-2 border-background">
+											3
+										</Badge>
+										<span className="sr-only">Notifications</span>
+									</Button>
+								</Link>
+
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Button variant="ghost" size="icon" className="h-9 w-9">
+											<Avatar>
+												<AvatarImage src="https://github.com/shadcn.png" />
+												<AvatarFallback>CN</AvatarFallback>
+											</Avatar>
+											<span className="sr-only">Account</span>
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align="end" className="w-56">
+										<DropdownMenuItem asChild>
+											<Link href="/account" className="cursor-pointer">
+												My Account
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem asChild>
+											<Link href="/account/orders" className="cursor-pointer">
+												My Orders
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem asChild>
+											<Link href="/account/wishlist" className="cursor-pointer">
+												Wishlist
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuSeparator />
+										<DropdownMenuItem asChild>
+											<Link href="/sell" className="cursor-pointer">
+												Start Selling
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem asChild>
+											<Link href="/seller/dashboard" className="cursor-pointer">
+												Seller Dashboard
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuSeparator />
+										<DropdownMenuItem asChild>
+											<Link href="/auth/login" className="cursor-pointer">
+												Sign In
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem asChild>
+											<Link href="/auth/register" className="cursor-pointer">
+												Create Account
+											</Link>
+										</DropdownMenuItem>
+									</DropdownMenuContent>
+								</DropdownMenu>
+							</Activity>
+							<Activity mode={!isAuthenticated ? "visible" : "hidden"}>
+								<LoginButton />
+							</Activity>
 
 							<Link href="/cart">
 								<Button variant="ghost" size="icon" className="h-9 w-9 relative">
@@ -173,56 +226,6 @@ export function Header() {
 							</Link>
 
 							{/* User Menu */}
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button variant="ghost" size="icon" className="h-9 w-9">
-										<Avatar>
-											<AvatarImage src="https://github.com/shadcn.png" />
-											<AvatarFallback>CN</AvatarFallback>
-										</Avatar>
-										<span className="sr-only">Account</span>
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end" className="w-56">
-									<DropdownMenuItem asChild>
-										<Link href="/account" className="cursor-pointer">
-											My Account
-										</Link>
-									</DropdownMenuItem>
-									<DropdownMenuItem asChild>
-										<Link href="/account/orders" className="cursor-pointer">
-											My Orders
-										</Link>
-									</DropdownMenuItem>
-									<DropdownMenuItem asChild>
-										<Link href="/account/wishlist" className="cursor-pointer">
-											Wishlist
-										</Link>
-									</DropdownMenuItem>
-									<DropdownMenuSeparator />
-									<DropdownMenuItem asChild>
-										<Link href="/sell" className="cursor-pointer">
-											Start Selling
-										</Link>
-									</DropdownMenuItem>
-									<DropdownMenuItem asChild>
-										<Link href="/seller/dashboard" className="cursor-pointer">
-											Seller Dashboard
-										</Link>
-									</DropdownMenuItem>
-									<DropdownMenuSeparator />
-									<DropdownMenuItem asChild>
-										<Link href="/auth/login" className="cursor-pointer">
-											Sign In
-										</Link>
-									</DropdownMenuItem>
-									<DropdownMenuItem asChild>
-										<Link href="/auth/register" className="cursor-pointer">
-											Create Account
-										</Link>
-									</DropdownMenuItem>
-								</DropdownMenuContent>
-							</DropdownMenu>
 							<AnimatedThemeToggler />
 							{/* Mobile Menu Button */}
 							<Button

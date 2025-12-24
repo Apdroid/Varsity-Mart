@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { useAuthStore } from "@/lib/stores/auth.store"
+import { useAuthStore } from "@/lib/stores/auth-store"
 import { cn } from "@/lib/utils"
 import type { Product } from "@/types/models"
 
@@ -28,7 +28,7 @@ export function MakeOfferModal({ product, open, onOpenChange, onSubmit }: MakeOf
   const percentageOfAsking = product.price > 0 ? (offerAmount / product.price) * 100 : 0
   const percentageDifference = 100 - percentageOfAsking
 
-  const isValidOffer = offerAmount >= product.price * 0.3 && offerAmount <= product.price * 0.95
+  const isValidOffer = offerAmount >= product.price * 0.7 && offerAmount <= product.price * 0.99
   const canSubmit = isValidOffer && isAuthenticated
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -70,8 +70,8 @@ export function MakeOfferModal({ product, open, onOpenChange, onSubmit }: MakeOf
           {/* Offer Amount */}
           <div className="space-y-2">
             <Label htmlFor="offer-amount">Your Offer Amount</Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">GH₵</span>
+            <div className="relative flex items-center gap-2">
+              <span className=" left-3 top-1/2 text-muted-foreground">GH₵</span>
               <Input
                 id="offer-amount"
                 type="number"
@@ -79,7 +79,7 @@ export function MakeOfferModal({ product, open, onOpenChange, onSubmit }: MakeOf
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 className={cn(
-                  "pl-10 text-lg h-12",
+                  "pl-3 text-lg h-12",
                   offerAmount > 0 && !isValidOffer && "border-red-500 focus-visible:ring-red-500",
                 )}
                 step="0.01"
@@ -131,7 +131,7 @@ export function MakeOfferModal({ product, open, onOpenChange, onSubmit }: MakeOf
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
               Cancel
             </Button>
-            <Button type="submit" disabled={!canSubmit} className="flex-1 bg-emerald-600 hover:bg-emerald-700">
+            <Button type="submit" disabled={!canSubmit} className="flex-1 bg-primary/80 hover:bg-primary/70">
               Submit Offer
             </Button>
           </div>
@@ -139,7 +139,7 @@ export function MakeOfferModal({ product, open, onOpenChange, onSubmit }: MakeOf
           {!isAuthenticated && (
             <p className="text-sm text-center text-muted-foreground">
               Please{" "}
-              <button type="button" className="text-emerald-600 hover:underline">
+              <button type="button" className="text-primary hover:underline">
                 log in
               </button>{" "}
               to make an offer

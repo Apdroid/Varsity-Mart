@@ -5,9 +5,9 @@
 
 :root {
 	--radius: 0.65rem;
-	--background: oklch(1 0 0);
+	--background: oklch(98.7% 0 63.4);
 	--foreground: oklch(0.141 0.005 285.823);
-	--card: oklch(1 0 0);
+	--card: oklch(96.8% 0 0);
 	--card-foreground: oklch(0.141 0.005 285.823);
 	--popover: oklch(1 0 0);
 	--popover-foreground: oklch(0.141 0.005 285.823);
@@ -56,7 +56,7 @@
 	--destructive: oklch(0.7040 0.1910 22.2160);
 	--destructive-foreground: oklch(0.9850 0 0);
 	--border: oklch(0.2648 0.0364 272.4036);
-	--input: oklch(0.9779 0.0107 17.3404);
+	--input: oklch(46.3% 0.1142 281.6);
 	--ring: oklch(0.7346 0.0712 279.0532);
 	--chart-1: oklch(0.8100 0.1000 252);
 	--chart-2: oklch(0.6200 0.1900 260);
@@ -207,7 +207,7 @@
 .hero-swiper .swiper-pagination-bullet-active {
 	width: 48px;
 	border-radius: 6px;
-	background: #2563eb;
+	background: var(--primary);
 }
 
 .hero-swiper .swiper-pagination {

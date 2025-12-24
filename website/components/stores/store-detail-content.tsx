@@ -119,7 +119,7 @@ export function StoreDetailContent({ storeId }: StoreDetailContentProps) {
   return (
     <div>
       {/* Banner */}
-      <div className="relative h-48 md:h-64 bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-950 dark:to-emerald-900">
+      <div className="relative h-48 md:h-64 bg-gradient-to-br text-primary text-primary dark:text-primary dark:text-primary">
         {mockStore.banner && (
           <Image src={mockStore.banner || "/placeholder.svg"} alt={mockStore.name} fill className="object-cover" />
         )}
@@ -142,7 +142,7 @@ export function StoreDetailContent({ storeId }: StoreDetailContentProps) {
             <div className="flex-1 pb-2">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-foreground">{mockStore.name}</h1>
-                {mockStore.isVerified && <BadgeCheck className="h-6 w-6 text-emerald-600" />}
+                {mockStore.isVerified && <BadgeCheck className="h-6 w-6 text-primary" />}
                 <Badge variant={mockStore.isOpen ? "default" : "secondary"} className="ml-2">
                   {mockStore.isOpen ? "Open" : "Closed"}
                 </Badge>
@@ -163,7 +163,7 @@ export function StoreDetailContent({ storeId }: StoreDetailContentProps) {
                 <Share2 className="h-4 w-4" />
                 Share
               </Button>
-              <Button size="sm" className="gap-2 bg-emerald-600 hover:bg-emerald-700">
+              <Button size="sm" className="gap-2 text-slate-100 hover:text-slate-50">
                 <MessageCircle className="h-4 w-4" />
                 Contact
               </Button>

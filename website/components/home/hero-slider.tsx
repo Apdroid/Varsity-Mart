@@ -23,7 +23,7 @@ export default function VarsityMartHeroSlider() {
 			image:
 				"https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&h=600&fit=crop",
 			cta: "Browse Restaurants",
-			accentColor: "bg-blue-600",
+			accentColor: "bg-primary",
 		},
 		{
 			title: "Campus Stores & Boutiques",
@@ -32,7 +32,7 @@ export default function VarsityMartHeroSlider() {
 			image:
 				"https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&h=600&fit=crop",
 			cta: "Explore Stores",
-			accentColor: "bg-blue-600",
+			accentColor: "bg-primary",
 		},
 		{
 			title: "Everything You Need",
@@ -41,7 +41,7 @@ export default function VarsityMartHeroSlider() {
 			image:
 				"https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1200&h=600&fit=crop",
 			cta: "Shop Products",
-			accentColor: "bg-blue-600",
+			accentColor: "bg-primary",
 		},
 		{
 			title: "Make Your Best Offer",
@@ -50,7 +50,7 @@ export default function VarsityMartHeroSlider() {
 			image:
 				"https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1200&h=600&fit=crop",
 			cta: "Start Bidding",
-			accentColor: "bg-blue-600",
+			accentColor: "bg-primary",
 		},
 	];
 
@@ -158,7 +158,7 @@ export default function VarsityMartHeroSlider() {
 			<div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-10">
 				<div
 					ref={progressBar}
-					className="h-full bg-blue-600 transition-all"
+					className="h-full bg-primary transition-all"
 					style={{ width: "0%" }}
 				/>
 			</div>

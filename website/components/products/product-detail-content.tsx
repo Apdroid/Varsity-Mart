@@ -1,27 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import {
-	ChevronRight,
-	Heart,
-	Share2,
-	MessageCircle,
-	Shield,
-	Truck,
-	Star,
-	ChevronLeft,
-	Check,
-	HandCoins,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useCartStore } from "@/lib/stores/cart.store";
 import { MakeOfferModal } from "@/components/offers/make-offer-modal";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useCartStore } from "@/lib/stores/cart-store";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types/models";
+import {
+    Check,
+    ChevronLeft,
+    ChevronRight,
+    HandCoins,
+    Heart,
+    MessageCircle,
+    Share2,
+    Shield,
+    Star,
+    Truck,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
 
 const mockProduct: Product = {
 	id: "1",
@@ -118,7 +118,7 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 	const handleAddToCart = () => {
 		addItem({
 			productId: mockProduct.id,
-			... mockProduct,
+			...mockProduct,
 			quantity: 1,
 			price: mockProduct.price,
 		});
@@ -295,7 +295,7 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 							<div className="flex gap-3">
 								<Button
 									size="lg"
-									className="flex-1 bg-emerald-600 hover:bg-emerald-700 gap-2"
+									className="flex-1 bg-primary/90 hover:bg-primary gap-2"
 									onClick={handleAddToCart}
 								>
 									Buy Now at GH₵{mockProduct.price.toLocaleString()}
@@ -307,7 +307,7 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 							<Button
 								size="lg"
 								variant="outline"
-								className="w-full gap-2 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/20 hover:text-blue-700 bg-transparent"
+								className="w-full gap-2 border-2 border-primary text-primary/80 hover:bg-primary/10 hover:text-primary "
 								onClick={() => setIsMakeOfferOpen(true)}
 							>
 								<HandCoins className="h-5 w-5" />
@@ -318,15 +318,15 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 						{/* Trust Badges */}
 						<div className="flex flex-wrap gap-4 py-4 border-y border-border">
 							<div className="flex items-center gap-2 text-sm text-muted-foreground">
-								<Shield className="h-4 w-4 text-emerald-600" />
+								<Shield className="h-4 w-4 text-primary/90" />
 								<span>Escrow Protection</span>
 							</div>
 							<div className="flex items-center gap-2 text-sm text-muted-foreground">
-								<Truck className="h-4 w-4 text-emerald-600" />
+								<Truck className="h-4 w-4 text-primary/90" />
 								<span>Campus Delivery</span>
 							</div>
 							<div className="flex items-center gap-2 text-sm text-muted-foreground">
-								<Check className="h-4 w-4 text-emerald-600" />
+								<Check className="h-4 w-4 text-primary/90" />
 								<span>Verified Seller</span>
 							</div>
 						</div>
@@ -343,7 +343,7 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 								<div className="flex-1 min-w-0">
 									<Link
 										href={mockProduct.storeId ? `/stores/${mockProduct.storeId}` : "#"}
-										className="font-semibold text-foreground hover:text-emerald-600 transition-colors"
+										className="font-semibold text-foreground hover:text-primary/90 transition-colors"
 									>
 										{mockProduct.store?.name ||
 											`${mockProduct.seller.firstName} ${mockProduct.seller.lastName}`}
@@ -390,7 +390,7 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 									<Link
 										key={tag}
 										href={`/search?q=${tag}`}
-										className="text-sm text-muted-foreground hover:text-emerald-600 transition-colors"
+										className="text-sm text-muted-foreground hover:text-primary/90 transition-colors"
 									>
 										#{tag}
 									</Link>
