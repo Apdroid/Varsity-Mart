@@ -155,6 +155,20 @@ const stepDescriptions = {
 	10: "Review before you confirm",
 };
 
+// Step images mapping
+const stepImages = {
+	1: "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?w=600&h=800&fit=crop",
+	2: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=800&fit=crop",
+	3: "https://images.unsplash.com/photo-1516321318423-f06f70d504f0?w=600&h=800&fit=crop",
+	4: "https://images.unsplash.com/photo-1484807352052-23338112c498?w=600&h=800&fit=crop",
+	5: "https://images.unsplash.com/photo-1526374965328-7f5ae4e8cfb2?w=600&h=800&fit=crop",
+	6: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=800&fit=crop",
+	7: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&h=800&fit=crop",
+	8: "https://images.unsplash.com/photo-1531746790731-6c087fecd65b?w=600&h=800&fit=crop",
+	9: "https://images.unsplash.com/photo-1507238691854-56c5b05ce285?w=600&h=800&fit=crop",
+	10: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=800&fit=crop",
+};
+
 export default function RegisterForm() {
 	const [step, setStep] = useState(1);
 	const [authMethod, setAuthMethod] = useState("");
@@ -308,103 +322,92 @@ export default function RegisterForm() {
 	const profilePic = watch("profile_pic");
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 flex items-center justify-center p-4 overflow-hidden relative">
-			{/* Decorative gradient blobs */}
-			<div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-100 to-transparent rounded-full blur-3xl opacity-40 -z-10"></div>
-			<div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-amber-100 to-transparent rounded-full blur-3xl opacity-40 -z-10"></div>
-
-			<div className="w-full max-w-5xl">
-				<div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-					{/* Left side - Visual showcase */}
-					<div className="lg:col-span-2 hidden lg:flex flex-col justify-between">
-						<div>
-							<h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-3">
-								VarsityMart
-							</h1>
-							<p className="text-slate-600 text-lg leading-relaxed">
-								Africa's #1 student marketplace
-							</p>
+		<div className="min-h-screen bg-white flex items-center justify-center p-4 lg:p-0">
+			<div className="w-full ">
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-0 rounded-2xl lg:rounded-none overflow-hidden shadow-2xl lg:shadow-none">
+					{/* Left side - Image */}
+					<div className="hidden lg:flex flex-col justify-between bg-slate-900 relative overflow-hidden h-screen sticky top-0">
+						{/* Background image */}
+						<div className="absolute inset-0 z-0">
+							<Image
+								src={stepImages[step]}
+								alt="Step illustration"
+								fill
+								className="object-cover opacity-50"
+								priority
+							/>
+							<div className="absolute inset-0 bg-gradient-to-b from-slate-900/30 via-slate-900/50 to-slate-900/70"></div>
 						</div>
 
-						{/* Step indicator card */}
-						<div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/50 shadow-lg">
-							<div className="space-y-4">
-								<div className="flex items-center gap-3">
-									<div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
-										{getCurrentStepNumber()}
-									</div>
-									<div className="flex-1">
-										<p className="text-sm font-semibold text-slate-900">
-											{stepTitles[step]}
-										</p>
-										<p className="text-xs text-slate-500 mt-0.5">
-											{stepDescriptions[step]}
-										</p>
-									</div>
-								</div>
-
-								<div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-									<div
-										className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 ease-out rounded-full"
-										style={{ width: `${progress}%` }}
-									/>
-								</div>
-
-								<p className="text-xs text-slate-500 text-center font-medium">
-									Step {getCurrentStepNumber()} of {getTotalSteps()}
+						{/* Content overlay */}
+						<div className="relative z-10 p-12 space-y-8">
+							<div>
+								<h1 className="text-5xl font-black text-white mb-2">VarsityMart</h1>
+								<p className="text-xl text-slate-200 font-light">
+									Africa's #1 student marketplace
 								</p>
+							</div>
+
+							{/* Stats */}
+							<div className="space-y-4">
+								<div className="border-l-4 border-white pl-4">
+									<p className="text-4xl font-black text-white">50K+</p>
+									<p className="text-slate-300 text-sm mt-1">Active Students</p>
+								</div>
+								<div className="border-l-4 border-white pl-4">
+									<p className="text-4xl font-black text-white">10K+</p>
+									<p className="text-slate-300 text-sm mt-1">Quality Products</p>
+								</div>
+								<div className="border-l-4 border-white pl-4">
+									<p className="text-4xl font-black text-white">Verified</p>
+									<p className="text-slate-300 text-sm mt-1">100% Secure</p>
+								</div>
 							</div>
 						</div>
 
-						{/* Feature highlights */}
-						<div className="space-y-3">
-							{[
-								{ icon: "🛍️", text: "Exclusive student discounts" },
-								{ icon: "🔒", text: "Verified & secure transactions" },
-								{ icon: "🚀", text: "Fast, free delivery" },
-							].map((feature, i) => (
-								<div
-									key={i}
-									className="flex items-center gap-3 text-sm text-slate-700"
-								>
-									<span className="text-lg">{feature.icon}</span>
-									<span>{feature.text}</span>
+						{/* Bottom section */}
+						<div className="relative z-10 p-12">
+							<div className="space-y-4 border-t border-white/20 pt-8">
+								<p className="text-sm text-slate-300">
+									Step {getCurrentStepNumber()} of {getTotalSteps()}
+								</p>
+								<div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
+									<div
+										className="h-full bg-white transition-all duration-700"
+										style={{ width: `${progress}%` }}
+									/>
 								</div>
-							))}
+								<h2 className="text-2xl font-bold text-white">
+									{stepTitles[step]}
+								</h2>
+								<p className="text-slate-300 text-sm">
+									{stepDescriptions[step]}
+								</p>
+							</div>
 						</div>
 					</div>
 
 					{/* Right side - Form */}
-					<div className="lg:col-span-3">
-						<Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-md rounded-3xl overflow-hidden">
-							{/* Header with profile image */}
-							<CardHeader className="pb-6 pt-8 px-8 bg-gradient-to-r from-slate-50 to-blue-50/40 border-b border-slate-100/50">
-								{authMethod === "google" && profilePic && step > 1 && (
-									<div className="flex items-center justify-center mb-4 animate-fade-in">
-										<div className="relative">
-											<Image
-												width={80}
-												height={80}
-												src={profilePic}
-												alt="Profile"
-												className="w-20 h-20 rounded-full border-4 border-blue-100 shadow-md object-cover"
-											/>
-											<div className="absolute bottom-0 right-0 w-6 h-6 bg-gradient-to-br from-green-400 to-green-500 rounded-full border-2 border-white"></div>
-										</div>
-									</div>
-								)}
-
-								<div className="space-y-2">
-									<h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center">
+					<div className="bg-white flex flex-col justify-between min-h-screen lg:min-h-auto lg:h-screen overflow-y-auto lg:overflow-y-auto">
+						<div className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:p-12">
+							<div className="w-full max-w-md">
+								{/* Mobile header */}
+								<div className="lg:hidden mb-8">
+									<h1 className="text-3xl font-black text-slate-900 mb-1">VarsityMart</h1>
+									<p className="text-slate-600 text-sm">
 										{stepTitles[step]}
-									</h2>
-									<p className="text-center text-slate-600 text-sm">
-										{stepDescriptions[step]}
+									</p>
+									<div className="w-full h-1 bg-slate-200 rounded-full mt-4 overflow-hidden">
+										<div
+											className="h-full bg-slate-900 transition-all duration-700"
+											style={{ width: `${progress}%` }}
+										/>
+									</div>
+									<p className="text-xs text-slate-500 mt-2">
+										Step {getCurrentStepNumber()} of {getTotalSteps()}
 									</p>
 								</div>
-							</CardHeader>
 
-							<CardContent className="pt-8 px-8 pb-8 space-y-6">
 								<Form {...form}>
 									<form
 										onSubmit={form.handleSubmit(onSubmit)}
@@ -419,7 +422,7 @@ export default function RegisterForm() {
 													type="button"
 													onClick={handleGoogleAuth}
 													variant="outline"
-													className="w-full h-13 text-base font-semibold border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 transition-all duration-200 rounded-xl"
+													className="w-full h-12 text-base font-semibold border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all rounded-xl"
 												>
 													<svg
 														className="w-5 h-5 mr-2"
@@ -450,7 +453,7 @@ export default function RegisterForm() {
 														<span className="w-full border-t border-slate-200" />
 													</div>
 													<div className="relative flex justify-center">
-														<span className="px-3 bg-white text-xs text-slate-600 font-medium">
+														<span className="px-3 bg-white text-xs text-slate-600 font-semibold">
 															OR
 														</span>
 													</div>
@@ -459,18 +462,11 @@ export default function RegisterForm() {
 												<Button
 													type="button"
 													onClick={handleCredentialsAuth}
-													className="w-full h-13 text-base font-semibold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl text-white"
+													className="w-full h-12 text-base font-semibold bg-slate-900 hover:bg-slate-800 transition-colors rounded-xl text-white"
 												>
 													<Mail className="w-5 h-5 mr-2" />
 													Continue with Email
 												</Button>
-
-												<p className="text-center text-xs text-slate-500 mt-4">
-													Already have an account?{" "}
-													<span className="text-blue-600 font-semibold cursor-pointer hover:text-blue-700">
-														Sign in
-													</span>
-												</p>
 											</div>
 										)}
 
@@ -487,11 +483,11 @@ export default function RegisterForm() {
 															</FormLabel>
 															<FormControl>
 																<div className="relative group">
-																	<UserCircle className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+																	<UserCircle className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
 																	<Input
 																		{...field}
 																		placeholder="John Doe"
-																		className="pl-12 h-12 rounded-xl border-slate-200/80 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
+																		className="pl-12 h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all"
 																		autoFocus
 																	/>
 																</div>
@@ -516,12 +512,12 @@ export default function RegisterForm() {
 															</FormLabel>
 															<FormControl>
 																<div className="relative group">
-																	<Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+																	<Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
 																	<Input
 																		{...field}
 																		type="email"
 																		placeholder="john@university.edu.gh"
-																		className="pl-12 h-12 rounded-xl border-slate-200/80 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
+																		className="pl-12 h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all"
 																		autoFocus
 																	/>
 																</div>
@@ -546,11 +542,11 @@ export default function RegisterForm() {
 															</FormLabel>
 															<FormControl>
 																<div className="relative group">
-																	<Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+																	<Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
 																	<Input
 																		{...field}
 																		placeholder="+233XXXXXXXXX"
-																		className="pl-12 h-12 rounded-xl border-slate-200/80 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
+																		className="pl-12 h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all"
 																		autoFocus
 																	/>
 																</div>
@@ -575,12 +571,12 @@ export default function RegisterForm() {
 															</FormLabel>
 															<FormControl>
 																<div className="relative group">
-																	<Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+																	<Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
 																	<Input
 																		{...field}
 																		type="password"
 																		placeholder="Min. 8 characters"
-																		className="pl-12 h-12 rounded-xl border-slate-200/80 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
+																		className="pl-12 h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all"
 																		autoFocus
 																	/>
 																</div>
@@ -600,12 +596,12 @@ export default function RegisterForm() {
 															</FormLabel>
 															<FormControl>
 																<div className="relative group">
-																	<Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+																	<Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
 																	<Input
 																		{...field}
 																		type="password"
 																		placeholder="Re-enter password"
-																		className="pl-12 h-12 rounded-xl border-slate-200/80 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
+																		className="pl-12 h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all"
 																	/>
 																</div>
 															</FormControl>
@@ -614,9 +610,9 @@ export default function RegisterForm() {
 													)}
 												/>
 
-												<div className="bg-blue-50/50 border border-blue-200/50 rounded-xl p-4 space-y-2">
+												<div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-2">
 													<p className="text-xs font-semibold text-slate-700 flex items-center gap-2">
-														<Sparkles className="w-4 h-4 text-blue-600" />
+														<Sparkles className="w-4 h-4" />
 														Password Requirements
 													</p>
 													<ul className="text-xs text-slate-600 space-y-1">
@@ -637,7 +633,7 @@ export default function RegisterForm() {
 													render={({ field }) => (
 														<FormItem>
 															<FormLabel className="text-slate-700 font-semibold text-sm block mb-4">
-																Are you currently a student?
+																Are you a student?
 															</FormLabel>
 															<FormControl>
 																<RadioGroup
@@ -647,31 +643,23 @@ export default function RegisterForm() {
 																	}
 																	className="space-y-3"
 																>
-																	<div className="flex items-center space-x-3 border-2 border-slate-200 rounded-xl p-4 hover:bg-blue-50/30 hover:border-blue-300 cursor-pointer transition-all duration-200">
-																		<RadioGroupItem
-																			value="true"
-																			id="student-yes"
-																		/>
+																	<div className="flex items-center space-x-3 border-2 border-slate-200 rounded-lg p-4 hover:bg-slate-50 hover:border-slate-900 cursor-pointer transition-all">
+																		<RadioGroupItem value="true" id="student-yes" />
 																		<Label
 																			htmlFor="student-yes"
 																			className="font-semibold cursor-pointer flex-1 text-slate-900"
 																		>
-																			Yes, I'm a student
+																			Yes, I'm a student 🎓
 																		</Label>
-																		<span className="text-2xl">🎓</span>
 																	</div>
-																	<div className="flex items-center space-x-3 border-2 border-slate-200 rounded-xl p-4 hover:bg-blue-50/30 hover:border-blue-300 cursor-pointer transition-all duration-200">
-																		<RadioGroupItem
-																			value="false"
-																			id="student-no"
-																		/>
+																	<div className="flex items-center space-x-3 border-2 border-slate-200 rounded-lg p-4 hover:bg-slate-50 hover:border-slate-900 cursor-pointer transition-all">
+																		<RadioGroupItem value="false" id="student-no" />
 																		<Label
 																			htmlFor="student-no"
 																			className="font-semibold cursor-pointer flex-1 text-slate-900"
 																		>
-																			No, I'm not a student
+																			No, I'm not 💼
 																		</Label>
-																		<span className="text-2xl">💼</span>
 																	</div>
 																</RadioGroup>
 															</FormControl>
@@ -695,11 +683,11 @@ export default function RegisterForm() {
 															</FormLabel>
 															<FormControl>
 																<div className="relative group">
-																	<GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+																	<GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
 																	<Input
 																		{...field}
 																		placeholder="UG12345678"
-																		className="pl-12 h-12 rounded-xl border-slate-200/80 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
+																		className="pl-12 h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all"
 																		autoFocus
 																	/>
 																</div>
@@ -708,11 +696,6 @@ export default function RegisterForm() {
 														</FormItem>
 													)}
 												/>
-
-												<p className="text-xs text-slate-500 bg-amber-50/50 border border-amber-200/50 rounded-lg p-3">
-													📝 Your student ID is required to verify your status and
-													unlock exclusive discounts.
-												</p>
 											</div>
 										)}
 
@@ -735,11 +718,11 @@ export default function RegisterForm() {
 																value={field.value}
 															>
 																<FormControl>
-																	<SelectTrigger className="h-12 rounded-xl border-slate-200/80 focus:border-blue-500 focus:ring-blue-500/20 transition-all">
+																	<SelectTrigger className="h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all">
 																		<SelectValue placeholder="Select your university" />
 																	</SelectTrigger>
 																</FormControl>
-																<SelectContent className="rounded-xl">
+																<SelectContent className="rounded-lg">
 																	{Object.keys(universities).map((uni) => (
 																		<SelectItem key={uni} value={uni}>
 																			{uni}
@@ -771,11 +754,11 @@ export default function RegisterForm() {
 																disabled={!selectedUniversity}
 															>
 																<FormControl>
-																	<SelectTrigger className="h-12 rounded-xl border-slate-200/80 focus:border-blue-500 focus:ring-blue-500/20 transition-all disabled:opacity-50">
+																	<SelectTrigger className="h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all disabled:opacity-50">
 																		<SelectValue placeholder="Select your campus" />
 																	</SelectTrigger>
 																</FormControl>
-																<SelectContent className="rounded-xl">
+																<SelectContent className="rounded-lg">
 																	{availableCampuses.map((campus) => (
 																		<SelectItem key={campus} value={campus}>
 																			{campus}
@@ -793,14 +776,17 @@ export default function RegisterForm() {
 										{/* Step 10: Review & Terms */}
 										{step === 10 && (
 											<div className="space-y-4 animate-fade-in">
-												<div className="bg-gradient-to-br from-blue-50/80 to-slate-50/80 border border-slate-200/50 rounded-2xl p-6 space-y-3">
+												<div className="bg-slate-50 rounded-lg p-4 space-y-3 border border-slate-200">
 													<h3 className="font-semibold text-slate-900 text-sm">
-														Review Your Details
+														Verify Your Details
 													</h3>
 
-													<div className="space-y-3">
+													<div className="space-y-2">
 														{[
-															{ label: "Name", value: watch("fullName") },
+															{
+																label: "Name",
+																value: watch("fullName"),
+															},
 															{ label: "Email", value: watch("email") },
 															{ label: "Phone", value: watch("phone") },
 															{
@@ -832,7 +818,7 @@ export default function RegisterForm() {
 													name="agreeToTerms"
 													render={({ field }) => (
 														<FormItem>
-															<div className="flex items-start space-x-3 p-4 border-2 border-slate-200 rounded-xl hover:bg-blue-50/30 hover:border-blue-300 transition-all cursor-pointer">
+															<div className="flex items-start space-x-3 p-4 border-2 border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-900 transition-all cursor-pointer">
 																<FormControl>
 																	<Checkbox
 																		checked={field.value}
@@ -862,7 +848,7 @@ export default function RegisterForm() {
 													type="button"
 													onClick={handleBack}
 													variant="outline"
-													className="w-full h-12 rounded-xl border-2 border-slate-200 hover:bg-slate-50 font-semibold text-slate-700 transition-all duration-200"
+													className="w-full h-11 rounded-lg border-2 border-slate-200 hover:bg-slate-50 font-semibold text-slate-700 transition-all"
 												>
 													<ArrowLeft className="w-4 h-4 mr-2" />
 													Back
@@ -881,7 +867,7 @@ export default function RegisterForm() {
 												<Button
 													type="button"
 													onClick={handleNext}
-													className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-200"
+													className="w-full h-11 rounded-lg bg-slate-900 hover:bg-slate-800 font-semibold text-white transition-colors"
 												>
 													Continue
 													<ArrowRight className="w-4 h-4 ml-2" />
@@ -896,7 +882,7 @@ export default function RegisterForm() {
 											>
 												<Button
 													type="submit"
-													className="w-full h-12 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+													className="w-full h-11 rounded-lg bg-slate-900 hover:bg-slate-800 font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 													disabled={!watch("agreeToTerms")}
 												>
 													<CheckCircle2 className="w-5 h-5 mr-2" />
@@ -906,36 +892,19 @@ export default function RegisterForm() {
 										</div>
 									</form>
 								</Form>
-							</CardContent>
-						</Card>
+							</div>
+						</div>
 
-						{/* Mobile progress indicator */}
-						<div className="lg:hidden mt-6 bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-slate-200/50">
-							<div className="flex items-center gap-3">
-								<div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
-									{getCurrentStepNumber()}
-								</div>
-								<div className="flex-1">
-									<p className="text-sm font-semibold text-slate-900">
-										{stepTitles[step]}
-									</p>
-									<p className="text-xs text-slate-500">
-										Step {getCurrentStepNumber()} of {getTotalSteps()}
-									</p>
-								</div>
-							</div>
-							<div className="w-full h-1.5 bg-slate-200 rounded-full mt-3 overflow-hidden">
-								<div
-									className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 ease-out"
-									style={{ width: `${progress}%` }}
-								/>
-							</div>
+						{/* Footer */}
+						<div className="p-6 sm:p-8 lg:p-12 border-t border-slate-200">
+							<p className="text-xs text-slate-500 text-center">
+								🔒 Your data is encrypted and secure
+							</p>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			{/* CSS for animations */}
 			<style>{`
 				@keyframes fadeIn {
 					from {
