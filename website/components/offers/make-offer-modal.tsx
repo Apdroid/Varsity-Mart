@@ -90,7 +90,7 @@ export function MakeOfferModal({ product, open, onOpenChange, onSubmit }: MakeOf
             {/* Percentage Display */}
             {offerAmount > 0 && (
               <div className="space-y-1">
-                <p className={cn("text-sm font-medium", isValidOffer ? "text-emerald-600" : "text-red-600")}>
+                <p className={cn("text-sm font-medium", isValidOffer ? "text-primary" : "text-red-600")}>
                   Your offer is {percentageDifference.toFixed(0)}% {percentageDifference > 0 ? "below" : "above"} asking
                   price
                 </p>

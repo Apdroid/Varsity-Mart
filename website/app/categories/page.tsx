@@ -78,7 +78,7 @@ export default function CategoriesPage() {
       name: "Sports & Fitness",
       icon: Dumbbell,
       count: 321,
-      color: "bg-emerald-100 text-emerald-600",
+      color: "bg-primary/10 text-primary",
       href: "/search?category=sports",
     },
     {

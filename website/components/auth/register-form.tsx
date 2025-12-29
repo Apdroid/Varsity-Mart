@@ -1,23 +1,23 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Image from "next/image";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+	ArrowLeft,
+	ArrowRight,
+	CheckCircle2,
+	GraduationCap,
+	Lock,
+	Mail,
+	Phone,
+	Sparkles,
+	UserCircle,
+} from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
 	Form,
 	FormControl,
@@ -26,148 +26,20 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-	UserCircle,
-	Mail,
-	Phone,
-	Lock,
-	GraduationCap,
-	CheckCircle2,
-	ArrowRight,
-	ArrowLeft,
-	Sparkles,
-} from "lucide-react";
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth";
-
-const universities = {
-	"University of Ghana": ["Legon Campus", "Korle Bu Campus", "City Campus"],
-	KNUST: [
-		"Main Campus",
-		"College of Health Sciences",
-		"Institute of Distance Learning",
-	],
-	"University of Cape Coast": [
-		"Main Campus",
-		"Southern Campus",
-		"Northern Campus",
-	],
-	GIMPA: ["Greenhill Campus", "City Campus"],
-	"Ashesi University": ["Berekuso Campus"],
-	Other: ["Main Campus", "Other"],
-};
-
-// Step schemas
-const step1Schema = z.object({
-	auth_method: z.enum(["google", "credentials"]),
-});
-
-const step2Schema = z.object({
-	fullName: z.string().min(2, "Full name must be at least 2 characters"),
-});
-
-const step3Schema = z.object({
-	email: z.string().email("Invalid email address"),
-});
-
-const step4Schema = z.object({
-	phone: z
-		.string()
-		.regex(/^\+233\d{9}$/, "Phone must be in format +233XXXXXXXXX"),
-});
-
-const step5Schema = z
-	.object({
-		password: z.string().min(8, "Password must be at least 8 characters"),
-		confirmPassword: z.string(),
-	})
-	.refine((data) => data.password === data.confirmPassword, {
-		message: "Passwords don't match",
-		path: ["confirmPassword"],
-	});
-
-const step6Schema = z.object({
-	isStudent: z.boolean(),
-});
-
-const step7Schema = z.object({
-	studentId: z.string().min(1, "Student ID is required"),
-});
-
-const step8Schema = z.object({
-	university: z.string().min(1, "Please select a university"),
-});
-
-const step9Schema = z.object({
-	campus: z.string().min(1, "Please select a campus"),
-});
-
-const step10Schema = z.object({
-	agreeToTerms: z.boolean().refine((val) => val === true, {
-		message: "You must agree to the terms",
-	}),
-});
-
-// Full form schema
-const fullFormSchema = z.object({
-	fullName: z.string().min(2, "Full name must be at least 2 characters"),
-	email: z.string().email("Invalid email address"),
-	phone: z
-		.string()
-		.regex(/^\+233\d{9}$/, "Phone must be in format +233XXXXXXXXX"),
-	password: z
-		.string()
-		.min(8, "Password must be at least 8 characters")
-		.optional(),
-	confirmPassword: z.string().optional(),
-	studentId: z.string().optional(),
-	isStudent: z.boolean(),
-	university: z.string().min(1, "Please select a university"),
-	campus: z.string().min(1, "Please select a campus"),
-	agreeToTerms: z.boolean(),
-	role: z.string().default("buyer"),
-	auth_method: z.enum(["google", "credentials"]),
-	profile_pic: z.string().optional(),
-});
-
-const stepTitles = {
-	1: "Welcome to VarsityMart",
-	2: "What's your name?",
-	3: "Your email address",
-	4: "Phone number",
-	5: "Create a secure password",
-	6: "Student verification",
-	7: "Your student ID",
-	8: "Which university?",
-	9: "Select your campus",
-	10: "Verify your details",
-};
-
-const stepDescriptions = {
-	1: "Africa's #1 student marketplace",
-	2: "Help us personalize your experience",
-	3: "We'll use this to secure your account",
-	4: "In Ghana (+233 format)",
-	5: "Keep your account safe",
-	6: "Unlock exclusive VarsityMart benefits",
-	7: "Verify your student status",
-	8: "Access institution-specific offers",
-	9: "For location-based deals",
-	10: "Review before you confirm",
-};
-
-// Step images mapping
-const stepImages = {
-	1: "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?w=600&h=800&fit=crop",
-	2: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=800&fit=crop",
-	3: "https://images.unsplash.com/photo-1516321318423-f06f70d504f0?w=600&h=800&fit=crop",
-	4: "https://images.unsplash.com/photo-1484807352052-23338112c498?w=600&h=800&fit=crop",
-	5: "https://images.unsplash.com/photo-1526374965328-7f5ae4e8cfb2?w=600&h=800&fit=crop",
-	6: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=800&fit=crop",
-	7: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&h=800&fit=crop",
-	8: "https://images.unsplash.com/photo-1531746790731-6c087fecd65b?w=600&h=800&fit=crop",
-	9: "https://images.unsplash.com/photo-1507238691854-56c5b05ce285?w=600&h=800&fit=crop",
-	10: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=800&fit=crop",
-};
+import { universities } from "@/data/auth/universities";
+import { stepTitles, stepDescriptions, stepImages, mockGoogleUserData } from "@/data/auth/register-steps";
+import { fullFormSchema } from "@/data/auth/register-schemas";
 
 export default function RegisterForm() {
 	const [step, setStep] = useState(1);
@@ -201,7 +73,7 @@ export default function RegisterForm() {
 		? universities[selectedUniversity]
 		: [];
 
-	const handleStepChange = (newStep) => {
+	const handleStepChange = (newStep: number) => {
 		setIsAnimating(true);
 		setTimeout(() => {
 			setStep(newStep);
@@ -211,16 +83,10 @@ export default function RegisterForm() {
 
 	const handleGoogleAuth = () => {
 		setAuthMethod("google");
-		const googleUserData = {
-			fullName: "John Mensah",
-			email: "john.mensah@gmail.com",
-			profile_pic: "https://github.com/shadcn.png",
-		};
-
 		setValue("auth_method", "google");
-		setValue("fullName", googleUserData.fullName);
-		setValue("email", googleUserData.email);
-		setValue("profile_pic", googleUserData.profile_pic);
+		setValue("fullName", mockGoogleUserData.fullName);
+		setValue("email", mockGoogleUserData.email);
+		setValue("profile_pic", mockGoogleUserData.profile_pic);
 
 		handleStepChange(4);
 	};
@@ -232,7 +98,7 @@ export default function RegisterForm() {
 	};
 
 	const handleNext = async () => {
-		let fieldsToValidate = [];
+		let fieldsToValidate: string[] = [];
 		let isValid = false;
 
 		switch (step) {
@@ -269,7 +135,7 @@ export default function RegisterForm() {
 				break;
 		}
 
-		isValid = await trigger(fieldsToValidate);
+		isValid = await trigger(fieldsToValidate as any);
 
 		if (isValid) {
 			let nextStep = step + 1;
@@ -298,7 +164,7 @@ export default function RegisterForm() {
 
 	const { setIsAuthenticated } = useAuth();
 
-	const onSubmit = (data) => {
+	const onSubmit = (data: z.infer<typeof fullFormSchema>) => {
 		const { confirmPassword, ...submissionData } = data;
 		console.log("Form Submitted:", submissionData);
 		setIsAuthenticated(true);
@@ -377,12 +243,8 @@ export default function RegisterForm() {
 										style={{ width: `${progress}%` }}
 									/>
 								</div>
-								<h2 className="text-2xl font-bold text-white">
-									{stepTitles[step]}
-								</h2>
-								<p className="text-slate-300 text-sm">
-									{stepDescriptions[step]}
-								</p>
+								<h2 className="text-2xl font-bold text-white">{stepTitles[step]}</h2>
+								<p className="text-slate-300 text-sm">{stepDescriptions[step]}</p>
 							</div>
 						</div>
 					</div>
@@ -393,10 +255,10 @@ export default function RegisterForm() {
 							<div className="w-full max-w-md">
 								{/* Mobile header */}
 								<div className="lg:hidden mb-8">
-									<h1 className="text-3xl font-black text-slate-900 mb-1">VarsityMart</h1>
-									<p className="text-slate-600 text-sm">
-										{stepTitles[step]}
-									</p>
+									<h1 className="text-3xl font-black text-slate-900 mb-1">
+										VarsityMart
+									</h1>
+									<p className="text-slate-600 text-sm">{stepTitles[step]}</p>
 									<div className="w-full h-1 bg-slate-200 rounded-full mt-4 overflow-hidden">
 										<div
 											className="h-full bg-slate-900 transition-all duration-700"
@@ -410,7 +272,7 @@ export default function RegisterForm() {
 
 								<Form {...form}>
 									<form
-										onSubmit={form.handleSubmit(onSubmit)}
+										onSubmit={form.handleSubmit(onSubmit as any)}
 										className={`space-y-6 transition-opacity duration-200 ${
 											isAnimating ? "opacity-50" : "opacity-100"
 										}`}
@@ -424,10 +286,7 @@ export default function RegisterForm() {
 													variant="outline"
 													className="w-full h-12 text-base font-semibold border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all rounded-xl"
 												>
-													<svg
-														className="w-5 h-5 mr-2"
-														viewBox="0 0 24 24"
-													>
+													<svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
 														<path
 															fill="#4285F4"
 															d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -638,9 +497,7 @@ export default function RegisterForm() {
 															<FormControl>
 																<RadioGroup
 																	value={field.value.toString()}
-																	onValueChange={(value) =>
-																		field.onChange(value === "true")
-																	}
+																	onValueChange={(value) => field.onChange(value === "true")}
 																	className="space-y-3"
 																>
 																	<div className="flex items-center space-x-3 border-2 border-slate-200 rounded-lg p-4 hover:bg-slate-50 hover:border-slate-900 cursor-pointer transition-all">
@@ -802,9 +659,7 @@ export default function RegisterForm() {
 																key={i}
 																className="flex items-center justify-between text-sm border-b border-slate-200/50 pb-2"
 															>
-																<span className="text-slate-600">
-																	{item.label}
-																</span>
+																<span className="text-slate-600">{item.label}</span>
 																<span className="font-semibold text-slate-900">
 																	{item.value}
 																</span>
@@ -827,8 +682,8 @@ export default function RegisterForm() {
 																	/>
 																</FormControl>
 																<FormLabel className="text-sm font-medium text-slate-700 cursor-pointer leading-relaxed">
-																	I agree to VarsityMart's Terms and Conditions,
-																	Privacy Policy, and Merchant Agreement
+																	I agree to VarsityMart's Terms and Conditions, Privacy Policy,
+																	and Merchant Agreement
 																</FormLabel>
 															</div>
 															<FormMessage />
@@ -857,10 +712,7 @@ export default function RegisterForm() {
 
 											<div
 												style={{
-													display:
-														step > 1 && step != 10
-															? "block"
-															: "none",
+													display: step > 1 && step != 10 ? "block" : "none",
 												}}
 												className="flex-1"
 											>

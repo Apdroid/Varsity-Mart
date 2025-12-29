@@ -60,7 +60,7 @@ export function CounterOfferModal({ offer, open, onOpenChange, onSubmit }: Count
               <ArrowRight className="h-4 w-4 text-muted-foreground" />
               <div className="text-center">
                 <p className="text-muted-foreground text-xs">Your Counter</p>
-                <p className="font-semibold text-emerald-600">
+                <p className="font-semibold text-primary">
                   {counterAmount > 0 ? `GH₵${counterAmount.toLocaleString()}` : "—"}
                 </p>
               </div>

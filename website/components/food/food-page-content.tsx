@@ -123,7 +123,7 @@ const RestaurantCardEnhanced: React.FC<RestaurantCardEnhancedProps> = ({
 }) => {
 	const [isFavorite, setIsFavorite] = useState(false);
 	const bannerImage = getBannerImage(restaurant.name, restaurant.cuisine);
-	const minOrder = restaurant.minimumOrder || restaurant.minOrder || 0;
+	const minOrder = restaurant.minOrder || 0;
 
 	if (variant === "compact") {
 		return (
@@ -167,7 +167,7 @@ const RestaurantCardEnhanced: React.FC<RestaurantCardEnhancedProps> = ({
 						</div>
 
 						<div className="flex flex-wrap gap-1">
-							{restaurant.tags.slice(0, 2).map((tag, idx) => (
+							{restaurant.tags?.slice(0, 2).map((tag, idx) => (
 								<span
 									key={idx}
 									className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary"
@@ -285,13 +285,13 @@ const RestaurantCardEnhanced: React.FC<RestaurantCardEnhancedProps> = ({
 								<MapPin className="w-5 h-5 text-primary mx-auto mb-1" />
 								<p className="text-xs text-muted-foreground">Location</p>
 								<p className="font-semibold text-foreground text-xs leading-tight">
-									{restaurant.location.address.split(",")[0]}
+									{restaurant.location.street.split(",")[0]}
 								</p>
 							</div>
 						</div>
 
 						<div className="flex flex-wrap gap-2 mb-6">
-							{restaurant.tags.map((tag, idx) => (
+							{restaurant.tags?.map((tag, idx) => (
 								<span
 									key={idx}
 									className="text-sm px-3 py-1.5 rounded-full bg-primary/10 text-primary font-medium"
@@ -392,7 +392,7 @@ const RestaurantCardEnhanced: React.FC<RestaurantCardEnhancedProps> = ({
 					</div>
 					<div className="flex items-center gap-2 text-muted-foreground col-span-2">
 						<MapPin className="w-4 h-4 text-primary" />
-						<span className="truncate">{restaurant.location.address}</span>
+						<span className="truncate">{restaurant.location.street}</span>
 					</div>
 				</div>
 
@@ -438,7 +438,7 @@ const FoodRestaurantsPage: React.FC<FoodRestaurantsPageProps> = ({
 		const matchesSearch =
 			restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
 			restaurant.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			restaurant.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
+			restaurant.tags?.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())) || false;
 		const matchesCategory =
 			selectedCategory === "all" ||
 			restaurant.cuisine.some((c) => c.toLowerCase().includes(selectedCategory));

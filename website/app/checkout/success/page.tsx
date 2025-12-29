@@ -14,8 +14,8 @@ export default function CheckoutSuccessPage() {
       <div className="min-h-[70vh] flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center">
           <div className="flex justify-center mb-6">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950">
-              <CheckCircle className="h-10 w-10 text-emerald-600" />
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20">
+              <CheckCircle className="h-10 w-10 text-primary" />
             </div>
           </div>
 
@@ -30,7 +30,7 @@ export default function CheckoutSuccessPage() {
           </div>
 
           <div className="space-y-3">
-            <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700 gap-2">
+            <Button asChild className="w-full bg-primary hover:bg-primary/90 gap-2">
               <Link href="/account/orders">
                 <Package className="h-4 w-4" />
                 Track Your Order

@@ -12,47 +12,7 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
-const mockCartItems = [
-  {
-    productId: "1",
-    title: 'MacBook Pro 13" M2',
-    image: "/silver-macbook-on-desk.png",
-    seller: "TechDeals GH",
-    price: 4500,
-    quantity: 1,
-  },
-  {
-    productId: "3",
-    title: "Wireless Earbuds - Sony",
-    image: "/wireless-earbuds-sony.jpg",
-    seller: "TechDeals GH",
-    price: 650,
-    quantity: 2,
-  },
-]
-
-const savedAddresses = [
-  {
-    id: "1",
-    label: "Hostel",
-    street: "Room 215, Unity Hall",
-    city: "University of Ghana",
-    isDefault: true,
-  },
-  {
-    id: "2",
-    label: "Off Campus",
-    street: "25 Legon Hills",
-    city: "Accra, Ghana",
-    isDefault: false,
-  },
-]
-
-const paymentMethods = [
-  { id: "momo", name: "Mobile Money", description: "MTN, Vodafone, AirtelTigo" },
-  { id: "card", name: "Card Payment", description: "Visa, Mastercard" },
-  { id: "wallet", name: "VarsityMart Wallet", description: "Balance: GH₵500.00" },
-]
+import { mockCheckoutCartItems as mockCartItems, savedAddresses, paymentMethods } from "@/data/checkout/checkout-items"
 
 type CheckoutStep = "address" | "payment" | "review"
 

@@ -65,8 +65,8 @@ export function SellPageContent() {
         {sellerTypes.map((type) => (
           <Card key={type.id} className="relative group hover:shadow-lg transition-shadow">
             <CardHeader>
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-950 mb-4">
-                <type.icon className="h-6 w-6 text-emerald-600" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 dark:bg-primary/20 mb-4">
+                <type.icon className="h-6 w-6 text-primary" />
               </div>
               <CardTitle>{type.title}</CardTitle>
               <CardDescription>{type.description}</CardDescription>
@@ -75,12 +75,12 @@ export function SellPageContent() {
               <ul className="space-y-2 mb-6">
                 {type.features.map((feature) => (
                   <li key={feature} className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Check className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <Check className="h-4 w-4 text-primary shrink-0" />
                     {feature}
                   </li>
                 ))}
               </ul>
-              <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700 gap-2">
+              <Button asChild className="w-full bg-primary hover:bg-primary/90 gap-2">
                 <Link href={type.href}>
                   Get Started
                   <ArrowRight className="h-4 w-4" />
@@ -97,8 +97,8 @@ export function SellPageContent() {
         <div className="grid md:grid-cols-3 gap-8">
           {benefits.map((benefit) => (
             <div key={benefit.title} className="text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950 mx-auto mb-4">
-                <benefit.icon className="h-7 w-7 text-emerald-600" />
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20 mx-auto mb-4">
+                <benefit.icon className="h-7 w-7 text-primary" />
               </div>
               <h3 className="font-semibold text-foreground mb-2">{benefit.title}</h3>
               <p className="text-sm text-muted-foreground">{benefit.description}</p>

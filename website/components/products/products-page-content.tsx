@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
-
+import { mockProducts } from "@/data/products/products";
 
 export function ProductsPageContent() {
 	return (

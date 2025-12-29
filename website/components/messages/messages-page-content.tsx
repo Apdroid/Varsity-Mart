@@ -8,46 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-const mockConversations = [
-  {
-    id: "1",
-    user: { name: "John M.", avatar: "/male-student-portrait.png", isOnline: true },
-    lastMessage: "Is the MacBook still available?",
-    time: "2m ago",
-    unread: 2,
-    product: { title: 'MacBook Pro 13" M2', image: "/silver-macbook-on-desk.png" },
-  },
-  {
-    id: "2",
-    user: { name: "Sarah L.", avatar: "", isOnline: false },
-    lastMessage: "Thank you! I received the order",
-    time: "1h ago",
-    unread: 0,
-  },
-  {
-    id: "3",
-    user: { name: "Mike J.", avatar: "", isOnline: true },
-    lastMessage: "Can you do GH₵600 for the earbuds?",
-    time: "3h ago",
-    unread: 1,
-    product: { title: "Sony WF-1000XM4", image: "/wireless-earbuds-sony.jpg" },
-  },
-]
-
-const mockMessages = [
-  { id: "1", senderId: "other", content: "Hi! Is the MacBook still available?", time: "10:30 AM" },
-  { id: "2", senderId: "me", content: "Yes, it is! Are you interested?", time: "10:32 AM" },
-  { id: "3", senderId: "other", content: "Yes! What's the battery health?", time: "10:33 AM" },
-  {
-    id: "4",
-    senderId: "me",
-    content: "Battery health is at 98%. Only 45 cycles. Been very careful with it.",
-    time: "10:35 AM",
-  },
-  { id: "5", senderId: "other", content: "That's great! Can I see it tomorrow on campus?", time: "10:36 AM" },
-  { id: "6", senderId: "me", content: "I'm usually at the library. We can meet there around 2pm?", time: "10:38 AM" },
-  { id: "7", senderId: "other", content: "Is the MacBook still available?", time: "Just now" },
-]
+import { mockConversations } from "@/data/messages/conversations"
+import { mockMessages } from "@/data/messages/messages"
 
 export function MessagesPageContent() {
   const [selectedConversation, setSelectedConversation] = useState(mockConversations[0])
@@ -92,7 +54,7 @@ export function MessagesPageContent() {
                   <AvatarFallback>{conversation.user.name[0]}</AvatarFallback>
                 </Avatar>
                 {conversation.user.isOnline && (
-                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-background rounded-full" />
+                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-primary border-2 border-background rounded-full" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
@@ -117,7 +79,7 @@ export function MessagesPageContent() {
                 )}
               </div>
               {conversation.unread > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-xs text-white shrink-0">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-white shrink-0">
                   {conversation.unread}
                 </span>
               )}
@@ -190,7 +152,7 @@ export function MessagesPageContent() {
                     className={cn(
                       "max-w-[75%] rounded-2xl px-4 py-2",
                       message.senderId === "me"
-                        ? "bg-emerald-600 text-white rounded-br-sm"
+                        ? "bg-primary text-white rounded-br-sm"
                         : "bg-muted text-foreground rounded-bl-sm",
                     )}
                   >
@@ -198,7 +160,7 @@ export function MessagesPageContent() {
                     <p
                       className={cn(
                         "text-xs mt-1",
-                        message.senderId === "me" ? "text-emerald-200" : "text-muted-foreground",
+                        message.senderId === "me" ? "text-primary/70" : "text-muted-foreground",
                       )}
                     >
                       {message.time}
@@ -229,7 +191,7 @@ export function MessagesPageContent() {
                 <Button
                   type="submit"
                   size="icon"
-                  className="bg-emerald-600 hover:bg-emerald-700"
+                  className="bg-primary hover:bg-primary/90"
                   disabled={!newMessage.trim()}
                 >
                   <Send className="h-4 w-4" />

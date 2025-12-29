@@ -12,24 +12,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 
-interface Restaurant {
-	id: string;
-	name: string;
-	description: string;
-	logo: string;
-	banner: string;
-	cuisine: string[];
-	rating: number;
-	reviewsCount: number;
-	deliveryTime: string;
-	deliveryFee: number;
-	minOrder: number;
-	isOpen: boolean;
-	tags: string[];
-	location: {
-		address: string;
-	};
-}
+import type { Restaurant } from "@/types/models";
 
 interface RestaurantCardProps {
 	restaurant: Restaurant;
@@ -82,18 +65,18 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 				{/* </CardDescription> */}
 
 				{/* Tags */}
-				<div className="flex flex-wrap gap-1 md:gap-2 pt-2 border-t border-border">
-					{restaurant.tags.map((tag, idx) => (
-						<span
-							key={idx}
-							className="text-xs px-2 py-1 rounded-full bg-primary/10 font-light md:font-medium"
-						>
-							{tag}
-						</span>
-					))}
-				</div>
-
-				{/* Cuisine tags */}
+				{restaurant.tags && restaurant.tags.length > 0 && (
+					<div className="flex flex-wrap gap-1 md:gap-2 pt-2 border-t border-border">
+						{restaurant.tags.map((tag, idx) => (
+							<span
+								key={idx}
+								className="text-xs px-2 py-1 rounded-full bg-primary/10 font-light md:font-medium"
+							>
+								{tag}
+							</span>
+						))}
+					</div>
+				)}
 			</CardHeader>
 
 			<CardContent className="space-y-3 px-2">
@@ -105,7 +88,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 					</div>
 					<div className="flex items-center gap-2 text-muted-foreground ">
 						<MapPin className="w-4 h-4 text-primary" />
-						<span className="truncate text-xs">{restaurant.location.address}</span>
+						<span className="truncate text-xs">{restaurant.location.street}</span>
 					</div>
 					<div className="flex items-center gap-2 text-muted-foreground ">
 						<DollarSign className="w-4 h-4 text-primary" />
@@ -179,89 +162,7 @@ const RestaurantsSection: React.FC<RestaurantsSectionProps> = ({
 	);
 };
 
-// Example usage with the mock data
-export const mockRestaurants: Restaurant[] = [
-	{
-		id: "1",
-		name: "Campus Bites Cafe",
-		description:
-			"Quick bites and fresh sandwiches. Popular spot for breakfast and lunch between classes.",
-		logo: "/placeholder-logo.png",
-		banner:
-			"https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=80",
-		cuisine: ["Cafe", "Sandwiches", "Breakfast"],
-		rating: 4.5,
-		reviewsCount: 234,
-		deliveryTime: "15-25 min",
-		deliveryFee: 5,
-		minOrder: 20,
-		isOpen: true,
-		tags: ["Fast", "Popular", "Breakfast"],
-		location: {
-			address: "Building A, Ground Floor",
-		},
-	},
-	{
-		id: "2",
-		name: "Waakye Junction",
-		description:
-			"Traditional Ghanaian waakye served with your choice of protein and sides. Student favorites!",
-		logo: "/placeholder-logo.png",
-		banner:
-			"https://images.unsplash.com/photo-1596797038530-2c107229654b?w=800&q=80",
-		cuisine: ["Ghanaian", "Local", "Rice"],
-		rating: 4.7,
-		reviewsCount: 456,
-		deliveryTime: "20-30 min",
-		deliveryFee: 8,
-		minOrder: 15,
-		isOpen: true,
-		tags: ["Local", "Affordable", "Traditional"],
-		location: {
-			address: "Near Main Gate",
-		},
-	},
-	{
-		id: "3",
-		name: "Pizza Palace",
-		description:
-			"Fresh pizzas made to order. Late-night delivery available for those study sessions!",
-		logo: "/placeholder-logo.png",
-		banner:
-			"https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80",
-		cuisine: ["Italian", "Pizza", "Fast Food"],
-		rating: 4.3,
-		reviewsCount: 189,
-		deliveryTime: "25-35 min",
-		deliveryFee: 10,
-		minOrder: 30,
-		isOpen: true,
-		tags: ["Late Night", "Pizza", "Popular"],
-		location: {
-			address: "Student Center, 2nd Floor",
-		},
-	},
-	{
-		id: "4",
-		name: "Jollof Express",
-		description:
-			"Best jollof rice on campus! Authentic Ghanaian recipes with generous portions.",
-		logo: "/placeholder-logo.png",
-		banner:
-			"https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=800&q=80",
-		cuisine: ["Ghanaian", "West African", "Rice"],
-		rating: 4.8,
-		reviewsCount: 523,
-		deliveryTime: "20-30 min",
-		deliveryFee: 7,
-		minOrder: 20,
-		isOpen: true,
-		tags: ["Popular", "Jollof", "Authentic"],
-		location: {
-			address: "Hostel Area, Block C",
-		},
-	},
-];
+import { mockRestaurants } from "@/data/food/restaurants";
 
 // Export both the section and individual card
 export { RestaurantsSection, RestaurantCard };

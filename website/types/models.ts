@@ -160,7 +160,8 @@ export interface Restaurant {
   reviewsCount: number
   deliveryTime: string
   deliveryFee: number
-  minimumOrder: number
+  minOrder: number
+  tags?: string[]
   isOpen: boolean
   operatingHours?: OperatingHours
   location: Address
