@@ -23,7 +23,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
 	return (
 		<div
 			className={cn(
-				"group relative rounded-xl border border-border bg-transparent overflow-hidden p-2 hover:bg-card",
+				"group relative rounded-xl border border-border bg-card overflow-hidden p-2 hover:shadow-md transition-shadow",
 				className,
 			)}
 		>

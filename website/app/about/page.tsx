@@ -19,7 +19,7 @@ export default function AboutPage() {
 				<div className="text-center max-w-3xl mx-auto mb-16">
 					<h1 className="text-4xl md:text-5xl font-bold mb-6">About VarsityMart</h1>
 					<p className="text-xl text-muted-foreground">
-						VarsityMart is Ghanaian&apos; leading student marketplace, connecting
+						VarsityMart is a Ghanaian&apos; leading student marketplace, connecting
 						university students to buy, sell, and discover products and services
 						within their campus community.
 					</p>
@@ -44,7 +44,7 @@ export default function AboutPage() {
 					<div className="max-w-3xl mx-auto text-center">
 						<h2 className="text-2xl md:text-3xl font-bold mb-4">Our Mission</h2>
 						<p className="text-lg opacity-90">
-							To empower university students across Nigeria by creating a trusted,
+							To empower university students across the world by creating a trusted,
 							convenient, and affordable marketplace that makes campus life easier. We
 							believe every student deserves access to quality products and the
 							opportunity to earn while they learn.

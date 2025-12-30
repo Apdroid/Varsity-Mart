@@ -4,6 +4,7 @@ import type { Viewport } from "next";
 import { Inter, Manrope, Raleway } from "next/font/google";
 import type React from "react";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { UniversityProvider } from "@/components/providers/university-provider";
 import "./globals.css";
 import { ThemeProvider } from "../components/theme-provider";
 
@@ -73,7 +74,9 @@ export default function RootLayout({
 					disableTransitionOnChange
 				>
 					<QueryProvider>
-						{children}
+						<UniversityProvider>
+							{children}
+						</UniversityProvider>
 					</QueryProvider>
 					<Analytics />
 				</ThemeProvider>

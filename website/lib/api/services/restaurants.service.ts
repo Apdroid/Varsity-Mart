@@ -14,7 +14,7 @@ export const restaurantsService = {
     return response.data
   },
 
-  async getMenu(restaurantId: string): Promise<ApiResponse<MenuItem[]>> {
+  async getMenu(restaurantId: string): Promise<ApiResponse<{ categories: { id: string; name: string; items: MenuItem[] }[] }>> {
     const response = await apiClient.get(ENDPOINTS.RESTAURANTS.MENU(restaurantId))
     return response.data
   },

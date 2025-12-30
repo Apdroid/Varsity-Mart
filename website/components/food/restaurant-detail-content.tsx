@@ -1,294 +1,410 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { ChevronLeft, Star, Clock, MapPin, Plus, Minus, ShoppingBag } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
-import type { Restaurant, MenuItem } from "@/types/models"
-import { mockRestaurant, mockMenu } from "@/data/food/restaurant-detail"
+import {
+	ChevronLeft,
+	Clock,
+	MapPin,
+	Minus,
+	Plus,
+	ShoppingBag,
+	Star,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import {
+	Sheet,
+	SheetContent,
+	SheetHeader,
+	SheetTitle,
+	SheetTrigger,
+} from "@/components/ui/sheet";
+import { mockMenu } from "@/data/food/restaurant-detail";
+import { mockRestaurants } from "@/data/food/restaurants";
+import { cn } from "@/lib/utils";
+import type { MenuItem, Restaurant } from "@/types/models";
 
 interface CartItem {
-  item: MenuItem
-  quantity: number
+	item: MenuItem;
+	quantity: number;
 }
 
 interface RestaurantDetailContentProps {
-  restaurantId: string
+	restaurantId: string;
+	initialRestaurant?: any; // API response format
+	initialMenu?: any; // API response format
 }
 
-export function RestaurantDetailContent({ restaurantId }: RestaurantDetailContentProps) {
-  const [cart, setCart] = useState<CartItem[]>([])
-  const [activeCategory, setActiveCategory] = useState(mockMenu[0].category)
+export function RestaurantDetailContent({
+	restaurantId,
+	initialRestaurant,
+	initialMenu,
+}: RestaurantDetailContentProps) {
+	const [cart, setCart] = useState<CartItem[]>([]);
+	
+	// Use initial data if provided, otherwise fallback to mock
+	const restaurant = initialRestaurant 
+		? {
+			id: initialRestaurant.id,
+			name: initialRestaurant.name,
+			description: initialRestaurant.description,
+			logo: initialRestaurant.logo,
+			banner: initialRestaurant.banner,
+			cuisine: [initialRestaurant.category],
+			rating: initialRestaurant.rating,
+			reviewsCount: initialRestaurant.totalReviews,
+			deliveryTime: initialRestaurant.deliveryTime,
+			deliveryFee: initialRestaurant.deliveryFee,
+			minOrder: initialRestaurant.minOrder,
+			isOpen: initialRestaurant.isOpen,
+			tags: [],
+			ownerId: initialRestaurant.owner?.id || "",
+			owner: initialRestaurant.owner || {},
+			location: {
+				id: "",
+				userId: "",
+				label: "",
+				street: initialRestaurant.location || "",
+				city: "",
+				state: "",
+				country: "",
+				postalCode: "",
+				isDefault: false,
+			},
+			createdAt: initialRestaurant.memberSince || "",
+			updatedAt: "",
+		}
+		: mockRestaurants.find((r) => r.id === restaurantId) || mockRestaurants[0];
+	
+	// Transform menu from API format to component format
+	const menu = initialMenu?.categories 
+	
+		? initialMenu.categories.map((cat: any) => ({
+			category: cat.name,
+			items: cat.items.map((item: any) => ({
+				id: item.id,
+				name: item.name,
+				description: item.description,
+				price: item.price,
+				image: item.image,
+				isAvailable: item.isAvailable,
+				preparationTime: item.preparationTime,
+				restaurantId: restaurantId,
+			})),
+		}))
+		: mockMenu;
+	
+	const [activeCategory, setActiveCategory] = useState(menu[0]?.category || "");
+	const menuCategories = menu.map((m) => ({ id: m.category.toLowerCase().replace(/\s+/g, "-"), name: m.category }));
 
-  const addToCart = (item: MenuItem) => {
-    setCart((prev) => {
-      const existing = prev.find((c) => c.item.id === item.id)
-      if (existing) {
-        return prev.map((c) => (c.item.id === item.id ? { ...c, quantity: c.quantity + 1 } : c))
-      }
-      return [...prev, { item, quantity: 1 }]
-    })
-  }
+	const addToCart = (item: MenuItem) => {
+		setCart((prev) => {
+			const existing = prev.find((c) => c.item.id === item.id);
+			if (existing) {
+				return prev.map((c) =>
+					c.item.id === item.id ? { ...c, quantity: c.quantity + 1 } : c,
+				);
+			}
+			return [...prev, { item, quantity: 1 }];
+		});
+	};
 
-  const removeFromCart = (itemId: string) => {
-    setCart((prev) => {
-      const existing = prev.find((c) => c.item.id === itemId)
-      if (existing && existing.quantity > 1) {
-        return prev.map((c) => (c.item.id === itemId ? { ...c, quantity: c.quantity - 1 } : c))
-      }
-      return prev.filter((c) => c.item.id !== itemId)
-    })
-  }
+	const removeFromCart = (itemId: string) => {
+		setCart((prev) => {
+			const existing = prev.find((c) => c.item.id === itemId);
+			if (existing && existing.quantity > 1) {
+				return prev.map((c) =>
+					c.item.id === itemId ? { ...c, quantity: c.quantity - 1 } : c,
+				);
+			}
+			return prev.filter((c) => c.item.id !== itemId);
+		});
+	};
 
-  const getItemQuantity = (itemId: string) => {
-    return cart.find((c) => c.item.id === itemId)?.quantity || 0
-  }
+	const getItemQuantity = (itemId: string) => {
+		return cart.find((c) => c.item.id === itemId)?.quantity || 0;
+	};
 
-  const cartTotal = cart.reduce((acc, c) => acc + c.item.price * c.quantity, 0)
-  const cartItemsCount = cart.reduce((acc, c) => acc + c.quantity, 0)
+	const cartTotal = cart.reduce((acc, c) => acc + c.item.price * c.quantity, 0);
+	const cartItemsCount = cart.reduce((acc, c) => acc + c.quantity, 0);
 
-  return (
-    <div className="relative">
-      {/* Banner */}
-      <div className="relative h-48 md:h-64">
-        <Image
-          src={mockRestaurant.banner || "/placeholder.svg"}
-          alt={mockRestaurant.name}
-          fill
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-        <Link
-          href="/food"
-          className="absolute top-4 left-4 flex items-center gap-1 bg-background/80 backdrop-blur-sm rounded-full px-3 py-1.5 text-sm font-medium text-foreground hover:bg-background transition-colors"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Back
-        </Link>
-      </div>
+	return (
+		<div className="relative">
+			{/* Banner */}
+			<div className="relative h-48 md:h-64">
+			<Image
+				src={restaurant.banner || "/placeholder.svg"}
+				alt={restaurant.name}
+				fill
+				className="object-cover"
+			/>
+			<div className="absolute inset-0 bg-linear-to-t from-background/80 to-transparent" />
+			<Link
+				href="/restaurants"
+				className="absolute top-4 left-4 flex items-center gap-1 bg-background/80 backdrop-blur-sm rounded-full px-3 py-1.5 text-sm font-medium text-foreground hover:bg-background transition-colors"
+			>
+				<ChevronLeft className="h-4 w-4" />
+				Back
+			</Link>
+		</div>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Restaurant Info */}
-        <div className="relative -mt-16 mb-6">
-          <div className="flex flex-col md:flex-row md:items-end gap-4">
-            <div className="w-24 h-24 rounded-xl border-4 border-background bg-background overflow-hidden shrink-0 shadow-lg">
-              <Image
-                src={mockRestaurant.logo || "/placeholder.svg"}
-                alt={mockRestaurant.name}
-                width={96}
-                height={96}
-                className="object-cover"
-              />
-            </div>
+		<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+			{/* Restaurant Info */}
+			<div className="relative -mt-16 mb-6">
+				<div className="flex flex-col md:flex-row md:items-end gap-4">
+					<div className="w-24 h-24 rounded-xl border-4 border-background bg-background overflow-hidden shrink-0 shadow-lg">
+						<Image
+							src={restaurant.logo || "/placeholder.svg"}
+							alt={restaurant.name}
+							width={96}
+							height={96}
+							className="object-cover"
+						/>
+					</div>
 
-            <div className="flex-1 pb-2">
-              <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold text-foreground">{mockRestaurant.name}</h1>
-                <Badge variant={mockRestaurant.isOpen ? "default" : "secondary"} className="text-slate">
-                  {mockRestaurant.isOpen ? "Open" : "Closed"}
-                </Badge>
-              </div>
-              <p className="text-muted-foreground mb-2">{mockRestaurant.description}</p>
+					<div className="flex-1 pb-2">
+						<div className="flex items-center gap-2 mb-1">
+							<h1 className="text-2xl font-bold text-foreground">
+								{restaurant.name}
+							</h1>
+							<Badge
+								variant={restaurant.isOpen ? "default" : "secondary"}
+								className="text-slate"
+							>
+								{restaurant.isOpen ? "Open" : "Closed"}
+							</Badge>
+						</div>
+						<p className="text-muted-foreground mb-2">
+							{restaurant.description}
+						</p>
 
-              <div className="flex flex-wrap items-center gap-4 text-sm">
-                <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span className="font-medium text-foreground">{mockRestaurant.rating}</span>
-                  <span className="text-muted-foreground">({mockRestaurant.reviewsCount})</span>
-                </div>
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>{mockRestaurant.deliveryTime}</span>
-                </div>
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
-                  <span>{mockRestaurant.location.street}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+						<div className="flex flex-wrap items-center gap-4 text-sm">
+							<div className="flex items-center gap-1">
+								<Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+								<span className="font-medium text-foreground">
+									{restaurant.rating}
+								</span>
+								<span className="text-muted-foreground">
+									({restaurant.reviewsCount})
+								</span>
+							</div>
+							<div className="flex items-center gap-1 text-muted-foreground">
+								<Clock className="h-4 w-4" />
+								<span>{restaurant.deliveryTime}</span>
+							</div>
+							<div className="flex items-center gap-1 text-muted-foreground">
+								<MapPin className="h-4 w-4" />
+								<span>{restaurant.location.street}</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
-        {/* Category Tabs */}
-        <div className="sticky top-16 z-10 bg-background border-b border-border -mx-4 px-4 md:mx-0 md:px-0">
-          <div className="flex gap-2 overflow-x-auto py-3">
-            {mockMenu.map((section) => (
-              <Button
-                key={section.category}
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  "rounded-full whitespace-nowrap shrink-0",
-                  activeCategory === section.category && "text-primary dark:text-primary",
-                )}
-                onClick={() => setActiveCategory(section.category)}
-              >
-                {section.category}
-              </Button>
-            ))}
-          </div>
-        </div>
+				{/* Category Tabs */}
+				<div className="sticky top-16 z-10 bg-background border-b border-border -mx-4 px-4 md:mx-0 md:px-0">
+					<div className="flex gap-2 overflow-x-auto py-3">
+						{menuCategories.map((category) => (
+							<Button
+								key={category.id}
+								variant="ghost"
+								size="sm"
+								className={cn(
+									"rounded-full whitespace-nowrap shrink-0",
+									activeCategory === category.name &&
+										"text-primary dark:text-primary",
+								)}
+								onClick={() => setActiveCategory(category.name)}
+							>
+								{category.name}
+							</Button>
+						))}
+					</div>
+				</div>
 
-        {/* Menu */}
-        <div className="py-6 pb-32 md:pb-6">
-          {mockMenu.map((section) => (
-            <div
-              key={section.category}
-              className={cn("mb-8", activeCategory !== section.category && "hidden md:block")}
-            >
-              <h2 className="text-lg font-semibold text-foreground mb-4">{section.category}</h2>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {section.items.map((item) => {
-                  const quantity = getItemQuantity(item.id)
-                  return (
-                    <div
-                      key={item.id}
-                      className={cn(
-                        "flex gap-4 p-4 rounded-xl border border-border bg-card",
-                        !item.isAvailable && "opacity-60",
-                      )}
-                    >
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-foreground">{item.name}</h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{item.description}</p>
-                        <div className="flex items-center justify-between mt-3">
-                          <span className="font-semibold text-foreground">GH₵{item.price}</span>
-                          {item.isAvailable ? (
-                            quantity > 0 ? (
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  size="icon"
-                                  variant="outline"
-                                  className="h-8 w-8 rounded-full bg-transparent"
-                                  onClick={() => removeFromCart(item.id)}
-                                >
-                                  <Minus className="h-3 w-3" />
-                                </Button>
-                                <span className="w-6 text-center font-medium">{quantity}</span>
-                                <Button
-                                  size="icon"
-                                  className="h-8 w-8 rounded-full text-slate-100 hover:text-slate-50"
-                                  onClick={() => addToCart(item)}
-                                >
-                                  <Plus className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            ) : (
-                              <Button
-                                size="sm"
-                                className="text-slate-100 hover:text-slate-50 gap-1"
-                                onClick={() => addToCart(item)}
-                              >
-                                <Plus className="h-3 w-3" />
-                                Add
-                              </Button>
-                            )
-                          ) : (
-                            <Badge variant="secondary">Unavailable</Badge>
-                          )}
-                        </div>
-                      </div>
-                      {item.image && (
-                        <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted shrink-0">
-                          <Image
-                            src={item.image || "/placeholder.svg"}
-                            alt={item.name}
-                            width={96}
-                            height={96}
-                            className="object-cover w-full h-full"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+				{/* Menu */}
+				<div className="py-6 pb-32 md:pb-6">
+					{menuCategories.map((category) => (
+						<div
+							key={category.id}
+							className={cn(
+								"mb-8",
+								activeCategory !== category.name && "hidden md:block",
+							)}
+						>
+							<h2 className="text-lg font-semibold text-foreground mb-4">
+								{category.name}
+							</h2>
+							<div className="grid sm:grid-cols-2 gap-4">
+								{category.items.map((item) => {
+									const quantity = getItemQuantity(item.id);
+									return (
+										<div
+											key={item.id}
+											className={cn(
+												"flex gap-4 p-4 rounded-xl border border-border bg-card",
+												!item.isAvailable && "opacity-60",
+											)}
+										>
+											<div className="flex-1 min-w-0">
+												<h3 className="font-medium text-foreground">{item.name}</h3>
+												<p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+													{item.description}
+												</p>
+												<div className="flex items-center justify-between mt-3">
+													<span className="font-semibold text-foreground">
+														GH₵{item.price}
+													</span>
+													{item.isAvailable ? (
+														quantity > 0 ? (
+															<div className="flex items-center gap-2">
+																<Button
+																	size="icon"
+																	variant="outline"
+																	className="h-8 w-8 rounded-full bg-transparent"
+																	onClick={() => removeFromCart(item.id)}
+																>
+																	<Minus className="h-3 w-3" />
+																</Button>
+																<span className="w-6 text-center font-medium">{quantity}</span>
+																<Button
+																	size="icon"
+																	className="h-8 w-8 rounded-full text-slate-100 hover:text-slate-50"
+																	onClick={() => addToCart(item)}
+																>
+																	<Plus className="h-3 w-3" />
+																</Button>
+															</div>
+														) : (
+															<Button
+																size="sm"
+																className="text-slate-100 hover:text-slate-50 gap-1"
+																onClick={() => addToCart(item)}
+															>
+																<Plus className="h-3 w-3" />
+																Add
+															</Button>
+														)
+													) : (
+														<Badge variant="secondary">Unavailable</Badge>
+													)}
+												</div>
+											</div>
+											{item.image && (
+												<div className="w-24 h-24 rounded-lg overflow-hidden bg-muted shrink-0">
+													<Image
+														src={item.image || "/placeholder.svg"}
+														alt={item.name}
+														width={96}
+														height={96}
+														className="object-cover w-full h-full"
+													/>
+												</div>
+											)}
+										</div>
+									);
+								})}
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
 
-      {/* Cart Sheet (Mobile) */}
-      {cartItemsCount > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border md:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button className="w-full text-primary hover:text-primary gap-2" size="lg">
-                <ShoppingBag className="h-5 w-5" />
-                View Cart ({cartItemsCount}) - GH₵{cartTotal}
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="h-[80vh]">
-              <SheetHeader>
-                <SheetTitle>Your Order</SheetTitle>
-              </SheetHeader>
-              <div className="mt-6 space-y-4 overflow-y-auto flex-1">
-                {cart.map((cartItem) => (
-                  <div key={cartItem.item.id} className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted shrink-0">
-                      <Image
-                        src={cartItem.item.image || "/placeholder.svg"}
-                        alt={cartItem.item.name}
-                        width={64}
-                        height={64}
-                        className="object-cover w-full h-full"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground truncate">{cartItem.item.name}</p>
-                      <p className="text-sm text-muted-foreground">GH₵{cartItem.item.price}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        className="h-8 w-8 rounded-full bg-transparent"
-                        onClick={() => removeFromCart(cartItem.item.id)}
-                      >
-                        <Minus className="h-3 w-3" />
-                      </Button>
-                      <span className="w-6 text-center font-medium">{cartItem.quantity}</span>
-                      <Button
-                        size="icon"
-                        className="h-8 w-8 rounded-full text-primary hover:text-primary"
-                        onClick={() => addToCart(cartItem.item)}
-                      >
-                        <Plus className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+			{/* Cart Sheet (Mobile) */}
+			{cartItemsCount > 0 && (
+				<div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border md:hidden">
+					<Sheet>
+						<SheetTrigger asChild>
+							<Button
+								className="w-full text-primary hover:text-primary gap-2"
+								size="lg"
+							>
+								<ShoppingBag className="h-5 w-5" />
+								View Cart ({cartItemsCount}) - GH₵{cartTotal}
+							</Button>
+						</SheetTrigger>
+						<SheetContent side="bottom" className="h-[80vh]">
+							<SheetHeader>
+								<SheetTitle>Your Order</SheetTitle>
+							</SheetHeader>
+							<div className="mt-6 space-y-4 overflow-y-auto flex-1">
+								{cart.map((cartItem) => (
+									<div key={cartItem.item.id} className="flex items-center gap-4">
+										<div className="w-16 h-16 rounded-lg overflow-hidden bg-muted shrink-0">
+											<Image
+												src={cartItem.item.image || "/placeholder.svg"}
+												alt={cartItem.item.name}
+												width={64}
+												height={64}
+												className="object-cover w-full h-full"
+											/>
+										</div>
+										<div className="flex-1 min-w-0">
+											<p className="font-medium text-foreground truncate">
+												{cartItem.item.name}
+											</p>
+											<p className="text-sm text-muted-foreground">
+												GH₵{cartItem.item.price}
+											</p>
+										</div>
+										<div className="flex items-center gap-2">
+											<Button
+												size="icon"
+												variant="outline"
+												className="h-8 w-8 rounded-full bg-transparent"
+												onClick={() => removeFromCart(cartItem.item.id)}
+											>
+												<Minus className="h-3 w-3" />
+											</Button>
+											<span className="w-6 text-center font-medium">
+												{cartItem.quantity}
+											</span>
+											<Button
+												size="icon"
+												className="h-8 w-8 rounded-full text-primary hover:text-primary"
+												onClick={() => addToCart(cartItem.item)}
+											>
+												<Plus className="h-3 w-3" />
+											</Button>
+										</div>
+									</div>
+								))}
+							</div>
 
-              <Separator className="my-4" />
+							<Separator className="my-4" />
 
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span className="text-foreground">GH₵{cartTotal}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Delivery Fee</span>
-                  <span className="text-foreground">GH₵{mockRestaurant.deliveryFee}</span>
-                </div>
-                <div className="flex justify-between font-semibold text-lg pt-2">
-                  <span className="text-foreground">Total</span>
-                  <span className="text-foreground">GH₵{cartTotal + mockRestaurant.deliveryFee}</span>
-                </div>
-              </div>
+							<div className="space-y-2 text-sm">
+								<div className="flex justify-between">
+									<span className="text-muted-foreground">Subtotal</span>
+									<span className="text-foreground">GH₵{cartTotal}</span>
+								</div>
+								<div className="flex justify-between">
+									<span className="text-muted-foreground">Delivery Fee</span>
+									<span className="text-foreground">
+										GH₵{restaurant.deliveryFee}
+									</span>
+								</div>
+								<div className="flex justify-between font-semibold text-lg pt-2">
+									<span className="text-foreground">Total</span>
+									<span className="text-foreground">
+										GH₵{cartTotal + restaurant.deliveryFee}
+									</span>
+								</div>
+							</div>
 
-              <Button className="w-full mt-6 text-primary hover:text-primary" size="lg">
-                Checkout - GH₵{cartTotal + mockRestaurant.deliveryFee}
-              </Button>
-            </SheetContent>
-          </Sheet>
-        </div>
-      )}
-    </div>
-  )
+							<Button
+								className="w-full mt-6 text-primary hover:text-primary"
+								size="lg"
+							>
+								Checkout - GH₵{cartTotal + restaurant.deliveryFee}
+							</Button>
+						</SheetContent>
+					</Sheet>
+				</div>
+			)}
+		</div>
+	);
 }

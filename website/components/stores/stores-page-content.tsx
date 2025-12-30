@@ -22,7 +22,7 @@ export function StoresPageContent() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-foreground mb-1">Campus Stores</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">Campus Stores</h1>
           <p className="text-muted-foreground">Discover verified student-run businesses on campus</p>
         </div>
         <div className="relative w-full md:w-80">

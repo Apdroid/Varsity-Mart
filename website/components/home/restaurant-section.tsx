@@ -1,6 +1,7 @@
 "use client";
 import { Clock, DollarSign, MapPin, Star, Truck } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,83 +21,85 @@ interface RestaurantCardProps {
 
 const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 	return (
-		<Card className="group flex justify-between relative overflow-hidden border-border hover:bg-card active:bg-card bg-transparent md:bg-card hover:shadow-xl transition-all duration-500  py-0">
-			{/* Banner with overlay */}
-			<div className="relative bg-card h-48 overflow-hidden">
-				<div className="absolute inset-0 z-10 bg-linear-to-r from-black/10 via-black/20 to-black/10 " />
-				<Image
-					width={500}
-					height={500}
-					src={restaurant.banner}
-					alt={restaurant.name}
-					className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-				/>
+		<Link href={`/restaurants/${restaurant.id}`}>
+			<Card className=" cursor-pointer group flex justify-between relative overflow-hidden border-border bg-card hover:shadow-xl transition-all duration-500  py-0">
+				{/* Banner with overlay */}
+				<div className="relative bg-card h-48 overflow-hidden">
+					<div className="absolute inset-0 z-10 bg-linear-to-r from-black/10 via-black/20 to-black/10 " />
+					<Image
+						width={500}
+						height={500}
+						src={restaurant.banner}
+						alt={restaurant.name}
+						className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+					/>
 
-				{/* Status badge */}
-				<div className="absolute top-4 right-4 z-20">
-					<Badge
-						variant={restaurant.isOpen ? "default" : "secondary"}
-						className="bg-card/95 backdrop-blur-sm text-foreground border-border shadow-lg"
-					>
-						{restaurant.isOpen ? "Open Now" : "Closed"}
-					</Badge>
-				</div>
-
-				<div className="absolute bottom-0 rounded-tr-lg left-0 z-30 flex items-center gap-2 bg-card backdrop-blur-sm px-2 py-1 md:px-4 md:py-2 shadow-lg">
-					<Star className="w-3 h-3 md:w-4 md:h-4 fill-yellow-400 text-yellow-400" />
-					<span className="text-sm font-bold text-foreground">
-						{restaurant.rating}
-					</span>
-					<span className="text-muted-foreground text-sm">
-						({restaurant.reviewsCount})
-					</span>
-				</div>
-			</div>
-
-			<CardHeader className="relative space-y-1 pb-1 px-2">
-				<div className="flex items-start justify-between gap-2">
-					<CardTitle className="text-sm md:text-xl capitalize font-bold text-foreground group-hover:text-primary transition-colors">
-						{restaurant.name}
-					</CardTitle>
-				</div>
-
-				{/* <CardDescription className="line-clamp-2 text-muted-foreground leading-relaxed"> */}
-				{/* 	{restaurant.description} */}
-				{/* </CardDescription> */}
-
-				{/* Tags */}
-				{restaurant.tags && restaurant.tags.length > 0 && (
-					<div className="flex flex-wrap gap-1 md:gap-2 pt-2 border-t border-border">
-						{restaurant.tags.map((tag, idx) => (
-							<span
-								key={idx}
-								className="text-xs px-2 py-1 rounded-full bg-primary/10 font-light md:font-medium"
-							>
-								{tag}
-							</span>
-						))}
+					{/* Status badge */}
+					<div className="absolute top-4 right-4 z-20">
+						<Badge
+							variant={restaurant.isOpen ? "default" : "secondary"}
+							className="bg-card/95 backdrop-blur-sm text-foreground border-border shadow-lg"
+						>
+							{restaurant.isOpen ? "Open Now" : "Closed"}
+						</Badge>
 					</div>
-				)}
-			</CardHeader>
 
-			<CardContent className="space-y-3 px-2">
-				{/* Info grid */}
-				<div className="flex flex-col md:flex-row flex-wrap gap-2 text-xs pb-5 flex-start md:items-center ">
-					<div className="flex items-center gap-2 text-muted-foreground">
-						<Truck className="w-4 h-4 text-primary" />
-						<span className="text-xs">GH₵{restaurant.deliveryFee} fee</span>
-					</div>
-					<div className="flex items-center gap-2 text-muted-foreground ">
-						<MapPin className="w-4 h-4 text-primary" />
-						<span className="truncate text-xs">{restaurant.location.street}</span>
-					</div>
-					<div className="flex items-center gap-2 text-muted-foreground ">
-						<DollarSign className="w-4 h-4 text-primary" />
-						<span className="truncate text-xs">Min GH₵{restaurant.minOrder}</span>
+					<div className="absolute bottom-0 rounded-tr-lg left-0 z-30 flex items-center gap-2 bg-card backdrop-blur-sm px-2 py-1 md:px-4 md:py-2 shadow-lg">
+						<Star className="w-3 h-3 md:w-4 md:h-4 fill-yellow-400 text-yellow-400" />
+						<span className="text-sm font-bold text-foreground">
+							{restaurant.rating}
+						</span>
+						<span className="text-muted-foreground text-sm">
+							({restaurant.reviewsCount})
+						</span>
 					</div>
 				</div>
-			</CardContent>
-		</Card>
+
+				<CardHeader className="relative space-y-1 pb-1 px-2">
+					<div className="flex items-start justify-between gap-2">
+						<CardTitle className="text-sm md:text-xl capitalize font-bold text-foreground group-hover:text-primary transition-colors">
+							{restaurant.name}
+						</CardTitle>
+					</div>
+
+					{/* <CardDescription className="line-clamp-2 text-muted-foreground leading-relaxed"> */}
+					{/* 	{restaurant.description} */}
+					{/* </CardDescription> */}
+
+					{/* Tags */}
+					{restaurant.tags && restaurant.tags.length > 0 && (
+						<div className="flex flex-wrap gap-1 md:gap-2 pt-2 border-t border-border">
+							{restaurant.tags.map((tag, idx) => (
+								<span
+									key={idx}
+									className="text-xs px-2 py-1 rounded-full bg-primary/10 font-light md:font-medium"
+								>
+									{tag}
+								</span>
+							))}
+						</div>
+					)}
+				</CardHeader>
+
+				<CardContent className="space-y-3 px-2">
+					{/* Info grid */}
+					<div className="flex flex-col md:flex-row flex-wrap gap-2 text-xs pb-5 flex-start md:items-center ">
+						<div className="flex items-center gap-2 text-muted-foreground">
+							<Truck className="w-4 h-4 text-primary" />
+							<span className="text-xs">GH₵{restaurant.deliveryFee} fee</span>
+						</div>
+						<div className="flex items-center gap-2 text-muted-foreground ">
+							<MapPin className="w-4 h-4 text-primary" />
+							<span className="truncate text-xs">{restaurant.location.street}</span>
+						</div>
+						<div className="flex items-center gap-2 text-muted-foreground ">
+							<DollarSign className="w-4 h-4 text-primary" />
+							<span className="truncate text-xs">Min GH₵{restaurant.minOrder}</span>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+		</Link>
 	);
 };
 
@@ -152,7 +155,7 @@ const RestaurantsSection: React.FC<RestaurantsSectionProps> = ({
 				</div>
 
 				{/* Restaurant Grid */}
-				<div className="grid grid-cols-2 auto-rows-fr md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
+				<div className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))]  gap-3 md:gap-6">
 					{restaurants.map((restaurant) => (
 						<RestaurantCard key={restaurant.id} restaurant={restaurant} />
 					))}
@@ -164,11 +167,13 @@ const RestaurantsSection: React.FC<RestaurantsSectionProps> = ({
 
 import { mockRestaurants } from "@/data/food/restaurants";
 
-// Export both the section and individual card
 export { RestaurantsSection, RestaurantCard };
 export default RestaurantsSection;
 
-// Example implementation
 export const RestaurantsSectionExample = () => {
-	return <RestaurantsSection restaurants={mockRestaurants} />;
+	return (
+		<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+			<RestaurantsSection restaurants={mockRestaurants} />
+		</div>
+	);
 };

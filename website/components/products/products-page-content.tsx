@@ -18,8 +18,11 @@ export function ProductsPageContent() {
 			</nav>
 
 			<div className="flex items-center justify-between mb-6">
-				<h1 className="text-2xl font-bold text-foreground">All Products</h1>
-				<Link href="/search" className="text-sm text-primary hover:underline">
+				<div>
+					<h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">All Products</h1>
+					<p className="text-muted-foreground text-sm">Browse thousands of items from verified sellers</p>
+				</div>
+				<Link href="/search" className="text-sm text-primary hover:underline hidden md:block">
 					Advanced Search
 				</Link>
 			</div>

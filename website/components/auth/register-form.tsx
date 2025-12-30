@@ -15,7 +15,7 @@ import {
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+import type * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -36,10 +36,15 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { useAuth } from "@/hooks/use-auth";
-import { universities } from "@/data/auth/universities";
-import { stepTitles, stepDescriptions, stepImages, mockGoogleUserData } from "@/data/auth/register-steps";
 import { fullFormSchema } from "@/data/auth/register-schemas";
+import {
+	mockGoogleUserData,
+	stepDescriptions,
+	stepImages,
+	stepTitles,
+} from "@/data/auth/register-steps";
+import { universities } from "@/data/auth/universities";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function RegisterForm() {
 	const [step, setStep] = useState(1);
@@ -188,11 +193,11 @@ export default function RegisterForm() {
 	const profilePic = watch("profile_pic");
 
 	return (
-		<div className="min-h-screen bg-white flex items-center justify-center p-4 lg:p-0">
-			<div className="w-full ">
+		<div className="min-h-screen bg-background flex items-center justify-center p-4 lg:p-0">
+			<div className="max-w-6xl w-full">
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-0 rounded-2xl lg:rounded-none overflow-hidden shadow-2xl lg:shadow-none">
 					{/* Left side - Image */}
-					<div className="hidden lg:flex flex-col justify-between bg-slate-900 relative overflow-hidden h-screen sticky top-0">
+					<div className="hidden lg:flex flex-col justify-between bg-card dark:bg-card relative overflow-hidden h-screen sticky top-0">
 						{/* Background image */}
 						<div className="absolute inset-0 z-0">
 							<Image
@@ -202,70 +207,78 @@ export default function RegisterForm() {
 								className="object-cover opacity-50"
 								priority
 							/>
-							<div className="absolute inset-0 bg-gradient-to-b from-slate-900/30 via-slate-900/50 to-slate-900/70"></div>
+							<div className="absolute inset-0 dark:bg-gradient-to-b dark:from-slate-900/30 dark:via-slate-900/50 dark:to-slate-900/70 bg-gradient-to-b from-foreground/30 via-foreground/50 to-foreground/70 "></div>
 						</div>
 
 						{/* Content overlay */}
 						<div className="relative z-10 p-12 space-y-8">
 							<div>
-								<h1 className="text-5xl font-black text-white mb-2">VarsityMart</h1>
-								<p className="text-xl text-slate-200 font-light">
+								<h1 className="text-5xl font-black text-card-foreground mb-2">
+									VarsityMart
+								</h1>
+								<p className="text-xl text-card-foreground/80 font-light">
 									Africa's #1 student marketplace
 								</p>
 							</div>
 
 							{/* Stats */}
 							<div className="space-y-4">
-								<div className="border-l-4 border-white pl-4">
-									<p className="text-4xl font-black text-white">50K+</p>
-									<p className="text-slate-300 text-sm mt-1">Active Students</p>
+								<div className="border-l-4 border-card-foreground pl-4">
+									<p className="text-4xl font-black text-card-foreground">50K+</p>
+									<p className="text-card-foreground/70 text-sm mt-1">Active Students</p>
 								</div>
-								<div className="border-l-4 border-white pl-4">
-									<p className="text-4xl font-black text-white">10K+</p>
-									<p className="text-slate-300 text-sm mt-1">Quality Products</p>
+								<div className="border-l-4 border-card-foreground pl-4">
+									<p className="text-4xl font-black text-card-foreground">10K+</p>
+									<p className="text-card-foreground/70 text-sm mt-1">
+										Quality Products
+									</p>
 								</div>
-								<div className="border-l-4 border-white pl-4">
-									<p className="text-4xl font-black text-white">Verified</p>
-									<p className="text-slate-300 text-sm mt-1">100% Secure</p>
+								<div className="border-l-4 border-card-foreground pl-4">
+									<p className="text-4xl font-black text-card-foreground">Verified</p>
+									<p className="text-card-foreground/70 text-sm mt-1">100% Secure</p>
 								</div>
 							</div>
 						</div>
 
 						{/* Bottom section */}
 						<div className="relative z-10 p-12">
-							<div className="space-y-4 border-t border-white/20 pt-8">
-								<p className="text-sm text-slate-300">
+							<div className="space-y-4 border-t border-card-foreground/20 pt-8">
+								<p className="text-sm text-card-foreground/70">
 									Step {getCurrentStepNumber()} of {getTotalSteps()}
 								</p>
-								<div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
+								<div className="w-full h-1.5 bg-card-foreground/20 rounded-full overflow-hidden">
 									<div
-										className="h-full bg-white transition-all duration-700"
+										className="h-full bg-card-foreground transition-all duration-700"
 										style={{ width: `${progress}%` }}
 									/>
 								</div>
-								<h2 className="text-2xl font-bold text-white">{stepTitles[step]}</h2>
-								<p className="text-slate-300 text-sm">{stepDescriptions[step]}</p>
+								<h2 className="text-2xl font-bold text-card-foreground">
+									{stepTitles[step]}
+								</h2>
+								<p className="text-card-foreground/70 text-sm">
+									{stepDescriptions[step]}
+								</p>
 							</div>
 						</div>
 					</div>
 
 					{/* Right side - Form */}
-					<div className="bg-white flex flex-col justify-between min-h-screen lg:min-h-auto lg:h-screen overflow-y-auto lg:overflow-y-auto">
+					<div className=" flex flex-col justify-between min-h-screen lg:min-h-auto lg:h-screen overflow-y-auto lg:overflow-y-auto">
 						<div className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:p-12">
 							<div className="w-full max-w-md">
 								{/* Mobile header */}
 								<div className="lg:hidden mb-8">
-									<h1 className="text-3xl font-black text-slate-900 mb-1">
+									<h1 className="text-3xl font-black text-foreground mb-1">
 										VarsityMart
 									</h1>
-									<p className="text-slate-600 text-sm">{stepTitles[step]}</p>
-									<div className="w-full h-1 bg-slate-200 rounded-full mt-4 overflow-hidden">
+									<p className="text-muted-foreground text-sm">{stepTitles[step]}</p>
+									<div className="w-full h-1 bg-muted rounded-full mt-4 overflow-hidden">
 										<div
-											className="h-full bg-slate-900 transition-all duration-700"
+											className="h-full bg-primary transition-all duration-700"
 											style={{ width: `${progress}%` }}
 										/>
 									</div>
-									<p className="text-xs text-slate-500 mt-2">
+									<p className="text-xs text-muted-foreground mt-2">
 										Step {getCurrentStepNumber()} of {getTotalSteps()}
 									</p>
 								</div>
@@ -284,7 +297,7 @@ export default function RegisterForm() {
 													type="button"
 													onClick={handleGoogleAuth}
 													variant="outline"
-													className="w-full h-12 text-base font-semibold border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all rounded-xl"
+													className="w-full h-12 text-base font-semibold border-2 border-border hover:border-primary/50 hover:bg-accent transition-all rounded-xl"
 												>
 													<svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
 														<path
@@ -309,10 +322,10 @@ export default function RegisterForm() {
 
 												<div className="relative my-6">
 													<div className="absolute inset-0 flex items-center">
-														<span className="w-full border-t border-slate-200" />
+														<span className="w-full border-t border-border" />
 													</div>
 													<div className="relative flex justify-center">
-														<span className="px-3 bg-white text-xs text-slate-600 font-semibold">
+														<span className="px-3 bg-background text-xs text-muted-foreground font-semibold">
 															OR
 														</span>
 													</div>
@@ -321,7 +334,7 @@ export default function RegisterForm() {
 												<Button
 													type="button"
 													onClick={handleCredentialsAuth}
-													className="w-full h-12 text-base font-semibold bg-slate-900 hover:bg-slate-800 transition-colors rounded-xl text-white"
+													className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 transition-colors rounded-xl text-primary-foreground"
 												>
 													<Mail className="w-5 h-5 mr-2" />
 													Continue with Email
@@ -337,16 +350,16 @@ export default function RegisterForm() {
 													name="fullName"
 													render={({ field }) => (
 														<FormItem>
-															<FormLabel className="text-slate-700 font-semibold text-sm">
+															<FormLabel className="text-foreground font-semibold text-sm">
 																Full Name
 															</FormLabel>
 															<FormControl>
 																<div className="relative group">
-																	<UserCircle className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+																	<UserCircle className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
 																	<Input
 																		{...field}
 																		placeholder="John Doe"
-																		className="pl-12 h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all"
+																		className="pl-12 h-11 rounded-lg border-border focus:border-primary focus:ring-primary/20 transition-all"
 																		autoFocus
 																	/>
 																</div>
@@ -366,17 +379,17 @@ export default function RegisterForm() {
 													name="email"
 													render={({ field }) => (
 														<FormItem>
-															<FormLabel className="text-slate-700 font-semibold text-sm">
+															<FormLabel className="text-foreground font-semibold text-sm">
 																Email Address
 															</FormLabel>
 															<FormControl>
 																<div className="relative group">
-																	<Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+																	<Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
 																	<Input
 																		{...field}
 																		type="email"
 																		placeholder="john@university.edu.gh"
-																		className="pl-12 h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all"
+																		className="pl-12 h-11 rounded-lg border-border focus:border-primary focus:ring-primary/20 transition-all"
 																		autoFocus
 																	/>
 																</div>
@@ -396,16 +409,16 @@ export default function RegisterForm() {
 													name="phone"
 													render={({ field }) => (
 														<FormItem>
-															<FormLabel className="text-slate-700 font-semibold text-sm">
+															<FormLabel className="text-foreground font-semibold text-sm">
 																Phone Number
 															</FormLabel>
 															<FormControl>
 																<div className="relative group">
-																	<Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+																	<Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
 																	<Input
 																		{...field}
 																		placeholder="+233XXXXXXXXX"
-																		className="pl-12 h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all"
+																		className="pl-12 h-11 rounded-lg border-border focus:border-primary focus:ring-primary/20 transition-all"
 																		autoFocus
 																	/>
 																</div>
@@ -425,17 +438,17 @@ export default function RegisterForm() {
 													name="password"
 													render={({ field }) => (
 														<FormItem>
-															<FormLabel className="text-slate-700 font-semibold text-sm">
+															<FormLabel className="text-foreground font-semibold text-sm">
 																Password
 															</FormLabel>
 															<FormControl>
 																<div className="relative group">
-																	<Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+																	<Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
 																	<Input
 																		{...field}
 																		type="password"
 																		placeholder="Min. 8 characters"
-																		className="pl-12 h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all"
+																		className="pl-12 h-11 rounded-lg border-border focus:border-primary focus:ring-primary/20 transition-all"
 																		autoFocus
 																	/>
 																</div>
@@ -450,17 +463,17 @@ export default function RegisterForm() {
 													name="confirmPassword"
 													render={({ field }) => (
 														<FormItem>
-															<FormLabel className="text-slate-700 font-semibold text-sm">
+															<FormLabel className="text-foreground font-semibold text-sm">
 																Confirm Password
 															</FormLabel>
 															<FormControl>
 																<div className="relative group">
-																	<Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+																	<Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
 																	<Input
 																		{...field}
 																		type="password"
 																		placeholder="Re-enter password"
-																		className="pl-12 h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all"
+																		className="pl-12 h-11 rounded-lg border-border focus:border-primary focus:ring-primary/20 transition-all"
 																	/>
 																</div>
 															</FormControl>
@@ -469,12 +482,12 @@ export default function RegisterForm() {
 													)}
 												/>
 
-												<div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-2">
-													<p className="text-xs font-semibold text-slate-700 flex items-center gap-2">
+												<div className="bg-muted border border-border rounded-lg p-4 space-y-2">
+													<p className="text-xs font-semibold text-foreground flex items-center gap-2">
 														<Sparkles className="w-4 h-4" />
 														Password Requirements
 													</p>
-													<ul className="text-xs text-slate-600 space-y-1">
+													<ul className="text-xs text-muted-foreground space-y-1">
 														<li>✓ At least 8 characters</li>
 														<li>✓ Mix of letters and numbers</li>
 														<li>✓ Easy to remember</li>
@@ -491,7 +504,7 @@ export default function RegisterForm() {
 													name="isStudent"
 													render={({ field }) => (
 														<FormItem>
-															<FormLabel className="text-slate-700 font-semibold text-sm block mb-4">
+															<FormLabel className="text-foreground font-semibold text-sm block mb-4">
 																Are you a student?
 															</FormLabel>
 															<FormControl>
@@ -500,20 +513,20 @@ export default function RegisterForm() {
 																	onValueChange={(value) => field.onChange(value === "true")}
 																	className="space-y-3"
 																>
-																	<div className="flex items-center space-x-3 border-2 border-slate-200 rounded-lg p-4 hover:bg-slate-50 hover:border-slate-900 cursor-pointer transition-all">
+																	<div className="flex items-center space-x-3 border-2 border-border rounded-lg p-4 hover:bg-accent hover:border-primary cursor-pointer transition-all">
 																		<RadioGroupItem value="true" id="student-yes" />
 																		<Label
 																			htmlFor="student-yes"
-																			className="font-semibold cursor-pointer flex-1 text-slate-900"
+																			className="font-semibold cursor-pointer flex-1 text-foreground"
 																		>
 																			Yes, I'm a student 🎓
 																		</Label>
 																	</div>
-																	<div className="flex items-center space-x-3 border-2 border-slate-200 rounded-lg p-4 hover:bg-slate-50 hover:border-slate-900 cursor-pointer transition-all">
+																	<div className="flex items-center space-x-3 border-2 border-border rounded-lg p-4 hover:bg-accent hover:border-primary cursor-pointer transition-all">
 																		<RadioGroupItem value="false" id="student-no" />
 																		<Label
 																			htmlFor="student-no"
-																			className="font-semibold cursor-pointer flex-1 text-slate-900"
+																			className="font-semibold cursor-pointer flex-1 text-foreground"
 																		>
 																			No, I'm not 💼
 																		</Label>
@@ -535,16 +548,16 @@ export default function RegisterForm() {
 													name="studentId"
 													render={({ field }) => (
 														<FormItem>
-															<FormLabel className="text-slate-700 font-semibold text-sm">
+															<FormLabel className="text-foreground font-semibold text-sm">
 																Student ID Number
 															</FormLabel>
 															<FormControl>
 																<div className="relative group">
-																	<GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+																	<GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
 																	<Input
 																		{...field}
 																		placeholder="UG12345678"
-																		className="pl-12 h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all"
+																		className="pl-12 h-11 rounded-lg border-border focus:border-primary focus:ring-primary/20 transition-all"
 																		autoFocus
 																	/>
 																</div>
@@ -564,7 +577,7 @@ export default function RegisterForm() {
 													name="university"
 													render={({ field }) => (
 														<FormItem>
-															<FormLabel className="text-slate-700 font-semibold text-sm">
+															<FormLabel className="text-foreground font-semibold text-sm">
 																Your University
 															</FormLabel>
 															<Select
@@ -575,7 +588,7 @@ export default function RegisterForm() {
 																value={field.value}
 															>
 																<FormControl>
-																	<SelectTrigger className="h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all">
+																	<SelectTrigger className="h-11 rounded-lg border-border focus:border-primary focus:ring-primary/20 transition-all">
 																		<SelectValue placeholder="Select your university" />
 																	</SelectTrigger>
 																</FormControl>
@@ -602,7 +615,7 @@ export default function RegisterForm() {
 													name="campus"
 													render={({ field }) => (
 														<FormItem>
-															<FormLabel className="text-slate-700 font-semibold text-sm">
+															<FormLabel className="text-foreground font-semibold text-sm">
 																Your Campus
 															</FormLabel>
 															<Select
@@ -611,7 +624,7 @@ export default function RegisterForm() {
 																disabled={!selectedUniversity}
 															>
 																<FormControl>
-																	<SelectTrigger className="h-11 rounded-lg border-slate-200 focus:border-slate-900 focus:ring-slate-900/20 transition-all disabled:opacity-50">
+																	<SelectTrigger className="h-11 rounded-lg border-border focus:border-primary focus:ring-primary/20 transition-all disabled:opacity-50">
 																		<SelectValue placeholder="Select your campus" />
 																	</SelectTrigger>
 																</FormControl>
@@ -633,8 +646,8 @@ export default function RegisterForm() {
 										{/* Step 10: Review & Terms */}
 										{step === 10 && (
 											<div className="space-y-4 animate-fade-in">
-												<div className="bg-slate-50 rounded-lg p-4 space-y-3 border border-slate-200">
-													<h3 className="font-semibold text-slate-900 text-sm">
+												<div className="bg-muted rounded-lg p-4 space-y-3 border border-border">
+													<h3 className="font-semibold text-foreground text-sm">
 														Verify Your Details
 													</h3>
 
@@ -657,10 +670,10 @@ export default function RegisterForm() {
 														].map((item, i) => (
 															<div
 																key={i}
-																className="flex items-center justify-between text-sm border-b border-slate-200/50 pb-2"
+																className="flex items-center justify-between text-sm border-b border-border/50 pb-2"
 															>
-																<span className="text-slate-600">{item.label}</span>
-																<span className="font-semibold text-slate-900">
+																<span className="text-muted-foreground">{item.label}</span>
+																<span className="font-semibold text-foreground">
 																	{item.value}
 																</span>
 															</div>
@@ -673,7 +686,7 @@ export default function RegisterForm() {
 													name="agreeToTerms"
 													render={({ field }) => (
 														<FormItem>
-															<div className="flex items-start space-x-3 p-4 border-2 border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-900 transition-all cursor-pointer">
+															<div className="flex items-start space-x-3 p-4 border-2 border-border rounded-lg hover:bg-accent hover:border-primary transition-all cursor-pointer">
 																<FormControl>
 																	<Checkbox
 																		checked={field.value}
@@ -681,7 +694,7 @@ export default function RegisterForm() {
 																		className="mt-1"
 																	/>
 																</FormControl>
-																<FormLabel className="text-sm font-medium text-slate-700 cursor-pointer leading-relaxed">
+																<FormLabel className="text-sm font-medium text-foreground cursor-pointer leading-relaxed">
 																	I agree to VarsityMart's Terms and Conditions, Privacy Policy,
 																	and Merchant Agreement
 																</FormLabel>
@@ -703,7 +716,7 @@ export default function RegisterForm() {
 													type="button"
 													onClick={handleBack}
 													variant="outline"
-													className="w-full h-11 rounded-lg border-2 border-slate-200 hover:bg-slate-50 font-semibold text-slate-700 transition-all"
+													className="w-full h-11 rounded-lg border-2 border-border hover:bg-accent font-semibold text-foreground transition-all"
 												>
 													<ArrowLeft className="w-4 h-4 mr-2" />
 													Back
@@ -719,7 +732,7 @@ export default function RegisterForm() {
 												<Button
 													type="button"
 													onClick={handleNext}
-													className="w-full h-11 rounded-lg bg-slate-900 hover:bg-slate-800 font-semibold text-white transition-colors"
+													className="w-full h-11 rounded-lg bg-primary hover:bg-primary/90 font-semibold text-primary-foreground transition-colors"
 												>
 													Continue
 													<ArrowRight className="w-4 h-4 ml-2" />
@@ -734,7 +747,7 @@ export default function RegisterForm() {
 											>
 												<Button
 													type="submit"
-													className="w-full h-11 rounded-lg bg-slate-900 hover:bg-slate-800 font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+													className="w-full h-11 rounded-lg bg-primary hover:bg-primary/90 font-semibold text-primary-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 													disabled={!watch("agreeToTerms")}
 												>
 													<CheckCircle2 className="w-5 h-5 mr-2" />
@@ -748,8 +761,8 @@ export default function RegisterForm() {
 						</div>
 
 						{/* Footer */}
-						<div className="p-6 sm:p-8 lg:p-12 border-t border-slate-200">
-							<p className="text-xs text-slate-500 text-center">
+						<div className="p-6 sm:p-8 lg:p-12 border-t border-border">
+							<p className="text-xs text-muted-foreground text-center">
 								🔒 Your data is encrypted and secure
 							</p>
 						</div>
@@ -774,7 +787,7 @@ export default function RegisterForm() {
 				}
 
 				input::placeholder {
-					color: rgb(148, 163, 184);
+					color: hsl(var(--muted-foreground));
 				}
 			`}</style>
 		</div>
