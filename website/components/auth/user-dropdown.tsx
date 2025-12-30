@@ -47,8 +47,7 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "start" }: Props) => {
 					<div className="relative">
 						<Avatar className="size-9">
 							<AvatarImage
-								src={user?.avatar || "https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png"}
-								alt={user?.fullName || "User"}
+								src={user?.avatar || "https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png"} alt={user?.fullName || "User"}
 							/>
 							<AvatarFallback>
 								{user?.fullName?.charAt(0) || "U"}

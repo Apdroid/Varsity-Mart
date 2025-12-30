@@ -219,7 +219,7 @@ export function Header() {
 					</div>
 
 					{/* Search Bar - Using PlaceholdersAndVanishInput */}
-					<div className="flex-1 max-w-2xl hidden md:flex">
+					<div className="flex-1 hidden md:flex">
 						<PlaceholdersAndVanishInput
 							placeholders={searchPlaceholders}
 							className="max-w-full"
