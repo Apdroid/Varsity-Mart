@@ -295,6 +295,7 @@ export function Header() {
 						{/* Category Type Selector */}
 						<div className="flex items-center gap-1 border-r border-border pr-6">
 							<button
+								type="button"
 								onClick={() => setActiveCategoryType("products")}
 								className={cn(
 									"px-3 py-1.5 text-xs font-semibold rounded-md transition-colors",
@@ -306,6 +307,7 @@ export function Header() {
 								Products
 							</button>
 							<button
+								type="button"
 								onClick={() => setActiveCategoryType("stores")}
 								className={cn(
 									"px-3 py-1.5 text-xs font-semibold rounded-md transition-colors",
@@ -317,6 +319,7 @@ export function Header() {
 								Stores
 							</button>
 							<button
+								type="button"
 								onClick={() => setActiveCategoryType("food")}
 								className={cn(
 									"px-3 py-1.5 text-xs font-semibold rounded-md transition-colors",

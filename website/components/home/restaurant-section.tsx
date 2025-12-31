@@ -155,7 +155,8 @@ const RestaurantsSection: React.FC<RestaurantsSectionProps> = ({
 				</div>
 
 				{/* Restaurant Grid */}
-				<div className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))]  gap-3 md:gap-6">
+				<div className="grid  grid-cols-[repeat(auto-fit,minmax(min(170px,100%),1fr))]  gap-3 md:gap-6">
+				
 					{restaurants.map((restaurant) => (
 						<RestaurantCard key={restaurant.id} restaurant={restaurant} />
 					))}

@@ -164,8 +164,16 @@
 
 @layer components {
 	.w-section {
-		@apply max-w-360 ;
+		@apply max-w-360;
 	}
+	.auto-grid{
+		display: grid;
+		grid-template-columns: repeat(auto-fit,minmax(min(150px,100%),1fr));
+	};
+
+	/* .auto-grid { */
+	/* 	@apply grid grid-cols-[repeat(auto-fit, minmax(min(150px, 100%), 1fr))]; */
+	/* } */
 }
 
 .swiper-pagination-bullet {

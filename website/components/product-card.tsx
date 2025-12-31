@@ -23,7 +23,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
 	return (
 		<div
 			className={cn(
-				"group relative rounded-xl border border-border bg-card overflow-hidden p-2 hover:shadow-md transition-shadow",
+				"group relative border border-border bg-transparent hover:bg-card  overflow-hidden  hover:shadow-md transition-normal transition-shadow",
 				className,
 			)}
 		>
@@ -38,7 +38,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
 					}
 					alt={product.title}
 					fill
-					className="object-cover transition-transform duration-300  rounded-lg"
+					className="object-cover transition-transform duration-300 "
 				/>
 				{discount > 0 && (
 					<Badge className="absolute top-2 left-2 bg-red-500 text-white">
