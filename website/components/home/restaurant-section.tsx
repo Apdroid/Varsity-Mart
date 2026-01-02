@@ -21,8 +21,8 @@ interface RestaurantCardProps {
 
 const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 	return (
-		<Link href={`/restaurants/${restaurant.id}`}>
-			<Card className=" cursor-pointer group flex justify-between relative overflow-hidden border-border bg-card hover:shadow-xl transition-all duration-500  py-0">
+		<Card className="rounded-none cursor-pointer group flex justify-between relative overflow-hidden border-border bg-white dark:bg-card hover:shadow-xl transition-all duration-500  py-0">
+			<Link href={`/restaurants/${restaurant.id}`} className=" flex-col flex justify-between relative">	
 				{/* Banner with overlay */}
 				<div className="relative bg-card h-48 overflow-hidden">
 					<div className="absolute inset-0 z-10 bg-linear-to-r from-black/10 via-black/20 to-black/10 " />
@@ -98,8 +98,8 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 						</div>
 					</div>
 				</CardContent>
-			</Card>
-		</Link>
+			</Link>
+		</Card>
 	);
 };
 
@@ -155,8 +155,7 @@ const RestaurantsSection: React.FC<RestaurantsSectionProps> = ({
 				</div>
 
 				{/* Restaurant Grid */}
-				<div className="grid  grid-cols-[repeat(auto-fit,minmax(min(170px,100%),1fr))]  gap-3 md:gap-6">
-				
+				<div className="grid  grid-cols-[repeat(auto-fit,minmax(min(170px,100%),1fr))] items-stretch gap-3 md:gap-6">
 					{restaurants.map((restaurant) => (
 						<RestaurantCard key={restaurant.id} restaurant={restaurant} />
 					))}
@@ -173,7 +172,7 @@ export default RestaurantsSection;
 
 export const RestaurantsSectionExample = () => {
 	return (
-		<div className="mx-auto w-section px-4 sm:px-6 lg:px-8 py-8">
+		<div className="mx-auto w-section sm:px-2  lg:px-8 py-8">
 			<RestaurantsSection restaurants={mockRestaurants} />
 		</div>
 	);

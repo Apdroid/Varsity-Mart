@@ -18,7 +18,6 @@ import {
 	ShoppingCart,
 	Smartphone,
 	Store,
-	Utensils,
 	X,
 } from "lucide-react";
 import { useMotionValueEvent, useScroll } from "motion/react";
@@ -293,7 +292,7 @@ export function Header() {
 				<div className="px-4 sm:px-6 lg:px-8">
 					<div className="flex items-center gap-8 h-12">
 						{/* Category Type Selector */}
-						<div className="flex items-center gap-1 border-r border-border pr-6">
+					<div className="flex items-center gap-1 border-r border-border pr-6">
 							<button
 								type="button"
 								onClick={() => setActiveCategoryType("products")}
@@ -331,7 +330,6 @@ export function Header() {
 								Food
 							</button>
 						</div>
-
 						{/* Category Links */}
 						<div className="flex items-center gap-6 overflow-x-auto scrollbar-hide">
 							{currentCategories.map((category, idx) => (
