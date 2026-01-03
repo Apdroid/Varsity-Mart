@@ -22,7 +22,7 @@ interface RestaurantCardProps {
 const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 	return (
 		<Card className="rounded-none cursor-pointer group flex justify-between relative overflow-hidden border-border bg-white dark:bg-card hover:shadow-xl transition-all duration-500  py-0">
-			<Link href={`/restaurants/${restaurant.id}`} className=" flex-col flex justify-between relative">	
+			<Link href={`/restaurants/${restaurant.id}`} className="flex flex-col justify-between relative">	
 				{/* Banner with overlay */}
 				<div className="relative bg-card h-48 overflow-hidden">
 					<div className="absolute inset-0 z-10 bg-linear-to-r from-black/10 via-black/20 to-black/10 " />

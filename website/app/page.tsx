@@ -8,8 +8,8 @@ export default function Home() {
 		<MainLayout>
 			<CampusMarketSlider />
 			<FeaturedProducts />
-			<CategoriesCarousel />
 			<RestaurantsSectionExample />
+			<CategoriesCarousel />
 		</MainLayout>
 
 	);

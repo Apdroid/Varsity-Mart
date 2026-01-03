@@ -1,4 +1,3 @@
-// Organized query keys for cache management
 export const queryKeys = {
   // Auth
   auth: {

@@ -15,11 +15,8 @@ export function useWebSocket() {
   useEffect(() => {
     if (!isAuthenticated || typeof window === "undefined") return
 
-    const token = localStorage.getItem("accessToken")
-    if (!token) return
-
-    // Connect to WebSocket
-    wsClient.connect(token)
+    // Connect to WebSocket. Server should authenticate via httpOnly cookies (sent automatically).
+    wsClient.connect()
 
     // Handle new messages
     const handleNewMessage = (data: WebSocketEvents["new_message"]) => {

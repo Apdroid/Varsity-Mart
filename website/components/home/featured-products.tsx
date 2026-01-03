@@ -19,7 +19,7 @@ export function FeaturedProducts() {
 				</div>
 
 				<div className=" auto-grid gap-4">
-					{mockProducts.map((product) => (
+					{mockProducts.slice(0,16).map((product) => (
 						<ProductCard key={product.id} product={product} />
 					))}
 				</div>

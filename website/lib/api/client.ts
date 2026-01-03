@@ -14,22 +14,10 @@ const apiClient: AxiosInstance = axios.create({
 	headers: {
 		"Content-Type": "application/json",
 	},
+	withCredentials: true,
 });
-
-// Request interceptor for auth tokens
-apiClient.interceptors.request.use(
-	(config) => {
-		// Get token from localStorage (client-side only)
-		if (typeof window !== "undefined") {
-			const token = localStorage.getItem("accessToken");
-			if (token) {
-				config.headers.Authorization = `Bearer ${token}`;
-			}
-		}
-		return config;
-	},
-	(error) => Promise.reject(error),
-);
+// No client-side token injection for httpOnly cookie flows.
+// Cookies will be sent automatically by the browser when `withCredentials: true`.
 
 // Response interceptor for error handling
 apiClient.interceptors.response.use(
@@ -44,26 +32,14 @@ apiClient.interceptors.response.use(
 			originalRequest._retry = true;
 
 			try {
-				const refreshToken = localStorage.getItem("refreshToken");
-				if (refreshToken) {
-					const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-						refreshToken,
-					});
+				// Attempt silent refresh. Server should read refresh token from httpOnly cookie
+				const response = await axios.post(`${API_BASE_URL}/auth/refresh`, undefined, { withCredentials: true });
 
-					const { accessToken, refreshToken: newRefreshToken } = response.data.data;
-					localStorage.setItem("accessToken", accessToken);
-					localStorage.setItem("refreshToken", newRefreshToken);
-
-					if (originalRequest.headers) {
-						originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-					}
-
-					return apiClient(originalRequest);
-				}
+				// After a successful refresh the server should set new httpOnly cookies.
+				// Retry the original request; cookies will be sent automatically.
+				return apiClient(originalRequest);
 			} catch (refreshError) {
-				// Clear tokens and redirect to login
-				localStorage.removeItem("accessToken");
-				localStorage.removeItem("refreshToken");
+				// Refresh failed: redirect to login
 				if (typeof window !== "undefined") {
 					window.location.href = "/login";
 				}
