@@ -14,11 +14,11 @@ export default function StructureProvider({
 	announcement?: boolean;
 }) {
 	return (
-		<div className="container flex flex-col w-full justify-between  min-h-dvh max-w-full my-0">
+		<div className=" flex flex-col  min-h-dvh ">
 			<Activity mode={header ? "visible" : "hidden"}>
 				<Header />
 			</Activity>
-			<main className="mx-auto my-0 flex-1 max-w-global bg-slate-700 ">
+			<main className=" mx-auto flex-1 max-w-global ">
 				{children}
 			</main>
 			<Activity mode={footer ? "visible" : "hidden"}>

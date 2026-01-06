@@ -1,11 +1,14 @@
-import { Activity } from "react";
-import Announcements from "../main/announcements";
-import Logo from "./logo";
-import { SearchBar } from "../main/header-search";
+import { ShoppingBagIcon } from "lucide-react";
 import Link from "next/link";
-import { UniversityPicker } from "../main/university-picker";
-import { CountryPicker } from "../main/country-picker";
-import UserDropdown from "../main/user-dropdown";
+import { Activity } from "react";
+import Announcements from "../header/announcements";
+import { CountryPicker } from "../header/country-picker";
+import { SearchBar } from "../header/header-search";
+import { UniversityPicker } from "../header/university-picker";
+import UserDropdown from "../header/user-dropdown";
+import { HeaderCategories } from "./header-categories";
+import Logo from "./logo";
+import { ThemeToggle } from "./theme-button";
 
 const Links = [
 	{
@@ -14,11 +17,9 @@ const Links = [
 	{
 		name: "Stores",
 	},
-
 	{
 		name: "Restaurants",
 	},
-
 	{
 		name: "Food Stalls",
 	},
@@ -34,7 +35,7 @@ export default function Header({
 			<Activity mode={showAnnouncement ? "visible" : "hidden"}>
 				<Announcements />
 			</Activity>
-			<nav className="bg-transparent max-w-global p-4 mx-auto my-0 flex gap-6 items-center ">
+			<nav className="bg-transparent max-w-global p-4 mx-auto my-0 flex gap-6 justify-between items-center border-b-accent border-b-2 ">
 				<Logo />
 				<SearchBar />
 				<ul className="nav-links flex gap-6">
@@ -51,7 +52,10 @@ export default function Header({
 					<CountryPicker />
 				</div>
 				<UserDropdown />
+				<ShoppingBagIcon className="text-foreground/60" />
+				<ThemeToggle />
 			</nav>
+			<HeaderCategories />
 		</header>
 	);
 }
