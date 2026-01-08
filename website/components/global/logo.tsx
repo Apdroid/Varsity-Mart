@@ -6,10 +6,9 @@ export default function Logo() {
 			href="/"
 			className="logo flex leading-tight font-bold items-center space-x-2 "
 		>
-			<CartIcon className="text-primary text-4xl" size={40}/>
-			<span className="logo-text hidden">
-				Varsity{" "}
-				<strong className="text-primary font-bold -leading-1.5">Mart</strong>
+			<CartIcon className="text-primary text-4xl" />
+			<span className="logo-text hidden  items-center text-xl md:flex">
+				Varsity<strong className="text-primary font-bold -leading-1.5">Mart</strong>
 			</span>
 		</Link>
 	);

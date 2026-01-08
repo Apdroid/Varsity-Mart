@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import Image from "next/image"
+import Image from "next/image";
 import { Heart, ShoppingCart, User } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,17 +16,17 @@ const ProductCard = ({ product }) => {
 
 	return (
 		<Card
-			className="group relative overflow-hidden border-gray-200 hover:shadow-xl transition-all duration-300 cursor-pointer max-w-sm"
+			className="group relative overflow-hidden border-none ring-0 hover:bg-card bg-transparent  hover:shadow-xl transition-all duration-300 cursor-pointer max-w-sm"
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
 		>
-			<div className="relative aspect-square overflow-hidden bg-gray-100">
+			<div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
 				<Image
 					width={300}
 					height={300}
 					src={product.images[0]}
 					alt={product.title}
-					className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+					className="w-full h-full object-cover rounded-lg  transition-transform duration-500"
 				/>
 
 				{product.compareAtPrice && (
@@ -68,30 +68,31 @@ const ProductCard = ({ product }) => {
 			</div>
 
 			<CardContent className="p-4">
-				<div className="flex items-center gap-2 mb-2">
-					<div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-						<User className="w-4 h-4 text-gray-600" />
-					</div>
-					<span className="text-sm text-gray-600">
-						{product.seller.firstName} {product.seller.lastName}
-					</span>
-				</div>
-
-				<h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-blue-600 transition-colors">
+				<h3 className="font-bold text-md mb-2 line-clamp-2 hover:text-primary transition-colors">
 					{product.title}
 				</h3>
 
 				<div className="flex items-center gap-2">
-					<span className="text-2xl font-bold text-gray-900">
+					<span className="text-xl font-bold">
 						GH₵{product.price.toLocaleString()}
 					</span>
 					{product.compareAtPrice && (
-						<span className="text-sm text-gray-500 line-through">
+						<span className="text-sm  line-through">
 							GH₵{product.compareAtPrice.toLocaleString()}
 						</span>
 					)}
 				</div>
 			</CardContent>
+			<CardFooter className="border-none">
+				<div className="flex items-center gap-2 ">
+					<div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
+						<User className="w-4 h-4 text-gray-600" />
+					</div>
+					<span className="text-sm ">
+						{product.seller.firstName} {product.seller.lastName}
+					</span>
+				</div>
+			</CardFooter>
 		</Card>
 	);
 };

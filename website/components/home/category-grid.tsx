@@ -49,7 +49,7 @@ const CATEGORIES: Category[] = [
 
 export function CategoryGrid() {
 	return (
-		<div className=" relative max-w-460 h-120 mx-auto my-4  ">
+		<div className=" relative max-w-460 h-full md:h-120 mx-auto my-4  ">
 			<div className="relative grid grid-cols-1  md:grid-cols-4 md:grid-rows-2 gap-2 h-full">
 				{CATEGORIES.map((category) => (
 					<div

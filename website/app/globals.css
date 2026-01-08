@@ -71,7 +71,7 @@
 	--chart-3: oklch(0.646 0.222 41.116);
 	--chart-4: oklch(0.553 0.195 38.402);
 	--chart-5: oklch(0.47 0.157 37.304);
-	--radius: 0.45rem;
+	--radius: 1rem;
 	--sidebar: oklch(0.985 0 0);
 	--sidebar-foreground: oklch(0.141 0.005 285.823);
 	--sidebar-primary: oklch(0.646 0.222 41.116);
@@ -118,17 +118,17 @@
 
 @layer base {
 	* {
-		@apply border-border outline-ring/50;
+		@apply border-border outline-ring/50 leading-loose;
 	}
 
 	body {
-		@apply bg-background text-foreground;
+		@apply bg-background text-foreground overflow-x-hidden;
 	}
 
 }
 
 @layer components {
 	.max-w-global {
-		max-width: 98%;
+		max-width: 90%;
 	}
 }

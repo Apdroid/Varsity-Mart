@@ -231,13 +231,13 @@ export const HeaderCategories = () => {
 	];
 
 	return (
-		<div className="bg-transparent  flex">
-			<div className="px-10 ">
+		<div className="bg-transparent max-w-global mx-auto md:py-3 flex border-b-2 border-accent">
+			<div className="md:px-10 ">
 				<NavigationMenu className="py-2">
 					<NavigationMenuList className="gap-2">
 						{categories.map((category) => (
 							<NavigationMenuItem key={category.id}>
-								<NavigationMenuTrigger className="text-base font-medium">
+								<NavigationMenuTrigger className="text-[0.6rem] font-medium">
 									{category.name}
 								</NavigationMenuTrigger>
 								<NavigationMenuContent className="data-[state=open]:animate-in data-[state=closed]:animate-out">
@@ -246,16 +246,16 @@ export const HeaderCategories = () => {
 											<div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-8">
 												{category.subcategories.map((subcategory, idx) => (
 													<div key={idx}>
-														<h3 className="font-bold  mb-4 text-sm">
+														<h3 className="font-bold  mb-4 text-[0.6rem]">
 															{subcategory.title}
 														</h3>
-														<ul className="space-y-2">
+														<ul className="space-y-0">
 															{subcategory.items.map((item, itemIdx) => (
 																<li key={itemIdx}>
 																	<NavigationMenuLink asChild>
 																		<a
 																			href="#"
-																			className="block text-sm rounded px-2 py-1.5 transition-colors"
+																			className="block text-[0.6rem] rounded px-2 py-1.5  transition-colors"
 																		>
 																			{item}
 																		</a>
@@ -267,7 +267,7 @@ export const HeaderCategories = () => {
 												))}
 											</div>
 
-											<div className="w-96 space-y-4">
+											<div className="max-w-96 space-y-4">
 												{category.featured.map((featured, idx) => (
 													<Card
 														key={idx}

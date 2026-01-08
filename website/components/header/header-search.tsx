@@ -120,7 +120,7 @@ export function SearchBar() {
 	};
 
 	return (
-		<div ref={containerRef} className="relative w-full max-w-4xl">
+		<div ref={containerRef} className="relative w-full px-4 max-w-xl ">
 			{isOpen && (
 				<div
 					className="fixed inset-0 bg-black/50 z-40"
@@ -137,7 +137,7 @@ export function SearchBar() {
 						value={searchQuery}
 						onChange={handleInputChange}
 						onFocus={() => searchQuery && setIsOpen(true)}
-						className="pl-4 pr-10 py-5 text-base active:outline-primary focus-visible:border-primary focus-visible:bg-background focus-visible:ring-primary hover:border-primary"
+						className="pl-4 pr-10 py-1 text-xs active:outline-primary focus-visible:border-primary focus-visible:bg-background focus-visible:ring-primary hover:border-primary"
 					/>
 					{searchQuery && (
 						<button
