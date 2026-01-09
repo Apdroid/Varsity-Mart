@@ -1,5 +1,11 @@
 "use client";
 import {
+	Card,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import {
 	NavigationMenu,
 	NavigationMenuContent,
 	NavigationMenuItem,
@@ -7,12 +13,6 @@ import {
 	NavigationMenuList,
 	NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import {
-	Card,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
 
 export const HeaderCategories = () => {
 	const categories = [
@@ -231,22 +231,24 @@ export const HeaderCategories = () => {
 	];
 
 	return (
-		<div className="bg-transparent max-w-global mx-auto md:py-3 flex border-b-2 border-accent">
-			<div className="md:px-10 ">
-				<NavigationMenu className="py-2">
-					<NavigationMenuList className="gap-2">
+		<div className="bg-inherit  my-2 flex border-b-2 border-accent">
+			<div className=" flex justify-between w-full">
+				<NavigationMenu className=" items-center mx-6 p-2 w-full">
+					<NavigationMenuList className="gap-2 flex w-full justify-between">
 						{categories.map((category) => (
 							<NavigationMenuItem key={category.id}>
-								<NavigationMenuTrigger className="text-[0.6rem] font-medium">
+								<NavigationMenuTrigger className="text-[0.8rem] md:text-base font-medium">
 									{category.name}
 								</NavigationMenuTrigger>
 								<NavigationMenuContent className="data-[state=open]:animate-in data-[state=closed]:animate-out">
 									<div className="w-screen bg-background  shadow-xl border-t">
-										<div className="max-w-7xl mx-auto px-8 py-12 flex flex-col md:flex-row gap-8">
-											<div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-8">
+										<div className=" max-w-7xl px-8 py-12 flex flex-col md:flex-row gap-4 align-items ">
+											<div className=" flex-1 grid grid-cols-2 md:grid-cols-3 gap-4">
+
+
 												{category.subcategories.map((subcategory, idx) => (
 													<div key={idx}>
-														<h3 className="font-bold  mb-4 text-[0.6rem]">
+														<h3 className="font-bold  mb-4 text-[0.8rem] md:text-base">
 															{subcategory.title}
 														</h3>
 														<ul className="space-y-0">
@@ -255,7 +257,8 @@ export const HeaderCategories = () => {
 																	<NavigationMenuLink asChild>
 																		<a
 																			href="#"
-																			className="block text-[0.6rem] rounded px-2 py-1.5  transition-colors"
+																			className="block text-[0.8rem] md:text-base text-foreground/90 rounded px-2 py-1.5  transition-colors"
+
 																		>
 																			{item}
 																		</a>
@@ -267,11 +270,11 @@ export const HeaderCategories = () => {
 												))}
 											</div>
 
-											<div className="max-w-96 space-y-4">
+											<div className="space-y-4 flex-1">
 												{category.featured.map((featured, idx) => (
 													<Card
-														key={idx}
-														className={`${featured.bg} text-white border-0 cursor-pointer hover:scale-105 transition-transform overflow-hidden`}
+														key={`${featured}${idx}`}
+														className={`${featured.bg} max-w-3/4 text-white border-0 cursor-pointer hover:scale-105 transition-transform overflow-hidden`}
 													>
 														<CardHeader className="relative pb-2">
 															<CardTitle className="text-lg">
