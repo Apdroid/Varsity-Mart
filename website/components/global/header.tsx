@@ -6,7 +6,7 @@ import { CountryPicker } from "../header/country-picker";
 import { SearchBar } from "../header/header-search";
 import { UniversityPicker } from "../header/university-picker";
 import UserDropdown from "../header/user-dropdown";
-import { HeaderCategories } from "./header-categories";
+import { HeaderCategories } from "../header/header-categories";
 import Logo from "./logo";
 import { ThemeToggle } from "./theme-button";
 
