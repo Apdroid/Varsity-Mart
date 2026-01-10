@@ -1,20 +1,19 @@
 "use client";
-import React, { useState } from "react";
-import Image from "next/image";
 import {
-	Heart,
-	ShoppingCart,
-	Flame,
-	UtensilsCrossed,
-	Star,
 	Clock,
 	DollarSign,
+	Flame,
+	Heart,
+	ShoppingCart,
+	Star,
+	UtensilsCrossed,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { motion } from "motion/react";
-import type { Establishment } from "@/lib/establishments-data";
+import Image from "next/image";
+import React, { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 const EstablishmentCardSideOverlay = ({
 	product,
@@ -52,7 +51,10 @@ const EstablishmentCardSideOverlay = ({
 		`${product.seller.firstName[0]}${product.seller.lastName[0]}`.toUpperCase();
 
 	return (
-		<div className="relative w-full max-w-sm h-125" style={{ perspective: "1000px" }}>
+		<div
+			className="relative w-full max-w-sm h-86"
+			style={{ perspective: "1000px" }}
+		>
 			<div
 				className="relative w-full h-full cursor-pointer transition-transform duration-700"
 				style={{
@@ -69,8 +71,8 @@ const EstablishmentCardSideOverlay = ({
 						WebkitBackfaceVisibility: "hidden",
 					}}
 				>
-					<Card className="group relative bg-transparent overflow-hidden border-none ring-0 hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
-						<div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
+					<Card className="p-0 group relative bg-transparent overflow-hidden border-none ring-0 hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
+						<div className="relative aspect-square overflow-hidden rounded-xs bg-gray-100">
 							<Image
 								width={500}
 								height={500}
@@ -102,10 +104,11 @@ const EstablishmentCardSideOverlay = ({
 								className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all shadow-lg hover:shadow-xl"
 							>
 								<Heart
-									className={`w-5 h-5 transition-all ${isLiked
+									className={`w-5 h-5 transition-all ${
+										isLiked
 											? "fill-red-500 text-red-500 scale-110"
 											: "text-gray-700"
-										}`}
+									}`}
 								/>
 							</motion.button>
 
@@ -115,7 +118,7 @@ const EstablishmentCardSideOverlay = ({
 									{Math.round(
 										((product.compareAtPrice - product.price) /
 											product.compareAtPrice) *
-										100,
+											100,
 									)}
 									% OFF
 								</Badge>
@@ -123,7 +126,7 @@ const EstablishmentCardSideOverlay = ({
 						</div>
 
 						<CardContent className="p-4 flex-1">
-							<h3 className="font-bold text-md md:text-xl mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+							<h3 className=" font-bold leading-tight text-base mb-2 line-clamp-2 group-hover:text-primary transition-colors">
 								{product.name}
 							</h3>
 
@@ -132,7 +135,9 @@ const EstablishmentCardSideOverlay = ({
 								<div className="flex items-center gap-2 mb-2">
 									<div className="flex items-center gap-1">
 										<Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-										<span className="text-sm font-semibold">{product.rating}</span>
+										<span className="text-sm font-semibold">
+											{product.rating}
+										</span>
 									</div>
 									{product.reviewsCount && (
 										<span className="text-xs">
@@ -143,23 +148,20 @@ const EstablishmentCardSideOverlay = ({
 							)}
 
 							{/* Delivery Info */}
-							{product.deliveryTime && (
-								<div className="flex flex-col md:flex-row md:gap-3 gap-1 text-xs mb-3">
-									<div className="flex items-center gap-1">
-										<Clock className="w-3.5 h-3.5" />
-										{product.deliveryTime}
-									</div>
-									{product.deliveryFee !== undefined && (
-										<>
-											<span className="hidden md:flex">•</span>
-											<div className="flex items-center gap-1">
-												<DollarSign className="w-3.5 h-3.5" />
-												GH₵{product.deliveryFee} delivery
-											</div>
-										</>
-									)}
-								</div>
-							)}
+							{/* {product.deliveryTime && ( */}
+							{/* 	<div className="flex flex-col  md:gap-1 gap-1 text-xs mb-3"> */}
+							{/* 		<div className="flex items-center gap-1"> */}
+							{/* 			<Clock className="w-3.5 h-3.5" /> */}
+							{/* 			{product.deliveryTime} */}
+							{/* 		</div> */}
+							{/* 		{product.deliveryFee !== undefined && ( */}
+							{/* 				<div className="flex items-center gap-1"> */}
+							{/* 					<DollarSign className="w-3.5 h-3.5" /> */}
+							{/* 					GH₵{product.deliveryFee} delivery */}
+							{/* 				</div> */}
+							{/* 		)} */}
+							{/* 	</div> */}
+							{/* )} */}
 
 							{/* Hover hint on desktop */}
 							<p className="text-xs text-muted-foreground italic mt-auto hidden lg:block">
@@ -179,47 +181,20 @@ const EstablishmentCardSideOverlay = ({
 					}}
 				>
 					<Card className="relative overflow-hidden shadow-2xl h-full flex flex-col">
-						{/* Header */}
-						<div className="p-5 border-b bg-card">
-							<div className="flex items-start justify-between flex-col-reverse gap-2 mb-2">
-								<h3 className="font-bold text-xl line-clamp-2 flex-1">
-									{product.name}
-								</h3>
-								<Badge
-									className={`${badgeConfig.bg} flex items-center gap-1 whitespace-nowrap shadow-md`}
-								>
-									{badgeConfig.icon}
-									<span className="text-xs font-semibold">
-										{badgeConfig.label}
-									</span>
-								</Badge>
-							</div>
-
-							<div className="flex items-center gap-2 text-sm">
-								<div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-sm">
-									<span className="text-xs font-bold text-white">{sellerInitials}</span>
-								</div>
-								<div>
-									<p className="text-xs font-medium">
-										{product.seller.firstName} {product.seller.lastName}
-									</p>
-								</div>
-							</div>
-						</div>
 
 						{/* Menu List */}
-						<div className="flex-1 overflow-y-auto p-5 bg-background/30">
-							<div className="mb-3 flex items-center gap-2">
+						<div className="flex-1 overflow-y-auto px-3 py-3 bg-background/30">
+							<div className="align-center mb-3 flex items-center gap-2">
 								<UtensilsCrossed className="w-4 h-4" />
 								<h4 className="font-bold text-sm">Popular Meals</h4>
 							</div>
 
 							{product.meals && product.meals.length > 0 ? (
-								<ul className="space-y-2">
+								<ul className="">
 									{product.meals.map((meal) => (
 										<li
 											key={meal.id}
-											className="flex items-center gap-2 text-sm py-2 px-3 bg-card/80 rounded-lg hover:bg-card transition-colors"
+											className="flex items-center gap-2 text-sm px-1 px-3 bg-card/80 rounded-lg hover:bg-card transition-colors"
 										>
 											<div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
 											<span className="line-clamp-1">{meal.name}</span>
@@ -237,13 +212,13 @@ const EstablishmentCardSideOverlay = ({
 						</div>
 
 						{/* Footer Button */}
-						<div className="p-5 border-t bg-card">
+						<div className="p-5  bg-card">
 							<Button
 								onClick={(e) => {
 									e.stopPropagation();
 									// Handle order action
 								}}
-								className="w-full bg-primary text-white hover:bg-primary/90 font-semibold shadow-lg h-12 text-base"
+								className="w-full bg-primary text-white hover:bg-primary/90 font-semibold shadow-lg h-6 p-4 text-base"
 							>
 								<ShoppingCart className="w-5 h-5 mr-2" />
 								Order Now

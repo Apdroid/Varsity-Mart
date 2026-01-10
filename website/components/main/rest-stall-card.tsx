@@ -26,19 +26,19 @@ const EstablishmentCard = ({ product }: { product: Establishment }) => {
 
 	const badgeConfig = isRestaurant
 		? {
-				bg: "bg-amber-500 hover:bg-amber-600",
-				icon: <UtensilsCrossed className="w-3.5 h-3.5" />,
-				label: "Restaurant",
-			}
+			bg: "bg-amber-500 hover:bg-amber-600",
+			icon: <UtensilsCrossed className="w-3.5 h-3.5" />,
+			label: "Restaurant",
+		}
 		: {
-				bg: "bg-emerald-500 hover:bg-emerald-600",
-				icon: <Flame className="w-3.5 h-3.5" />,
-				label: "Food Stall",
-			};
+			bg: "bg-emerald-500 hover:bg-emerald-600",
+			icon: <Flame className="w-3.5 h-3.5" />,
+			label: "Food Stall",
+		};
 
 	return (
 		<Card
-			className="group relative overflow-hidden border-none ring-0 hover:bg-card bg-transparent hover:shadow-xl transition-all duration-300 cursor-pointer max-w-sm"
+			className="group relative overflow-hidden border-none ring-0 hover:bg-card bg-transparent hover:shadow-xl transition-all duration-300 cursor-pointer max-w-sm p-3"
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
 		>
@@ -66,17 +66,15 @@ const EstablishmentCard = ({ product }: { product: Establishment }) => {
 					className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all shadow-md"
 				>
 					<Heart
-						className={`w-5 h-5 ${
-							isLiked ? "fill-red-500 text-red-500" : "text-gray-700"
-						}`}
+						className={`w-5 h-5 ${isLiked ? "fill-red-500 text-red-500" : "text-gray-700"
+							}`}
 					/>
 				</button>
 				<div
-					className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 transition-all duration-300 ${
-						isHovered
+					className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 transition-all duration-300 ${isHovered
 							? "translate-y-0 opacity-100"
 							: "translate-y-full opacity-0"
-					}`}
+						}`}
 				>
 					<Button
 						className="w-full bg-primary text-white hover:text-primary hover:bg-gray-100 font-semibold"

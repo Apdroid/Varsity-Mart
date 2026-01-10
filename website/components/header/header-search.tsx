@@ -120,7 +120,7 @@ export function SearchBar() {
 	};
 
 	return (
-		<div ref={containerRef} className="relative w-full px-4 max-w-xl ">
+		<div ref={containerRef} className="relative w-full max-w-xl border-input border bg-input ">
 			{isOpen && (
 				<div
 					className="fixed inset-0 bg-black/50 z-40"
@@ -128,7 +128,7 @@ export function SearchBar() {
 				/>
 			)}
 
-			<div className="relative z-50 flex items-center gap-2">
+			<div className="relative max-w-xl  w-full z-50 flex items-center gap-2">
 				<div className="relative flex-1 group ">
 					<Input
 						ref={inputRef}
@@ -149,6 +149,7 @@ export function SearchBar() {
 						</button>
 					)}
 					<button
+						type="button"
 						onClick={handleSearch}
 						className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
 						disabled={!searchQuery.trim()}
@@ -161,12 +162,12 @@ export function SearchBar() {
 
 			{isOpen && (
 				<div
-					className={`absolute top-full  left-0 right-0 bg-card border border-primary shadow-lg z-50 overflow-hidden ${searchQuery.trim() === "" ? "" : "max-h-96"
+					className={`absolute top-full max-w-xl left-0 right-0 bg-card border border-primary shadow-lg z-50 overflow-hidden ${searchQuery.trim() === "" ? "" : "max-h-96"
 						}`}
 				>
 					{searchQuery.trim() === "" ? (
 						<div className="p-6">
-							<div className="grid grid-cols-2 gap-6 lg:grid-cols-3">
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
 								{Object.entries(ECOMMERCE_SUGGESTIONS).map(
 									([category, items]) => (
 										<div key={category} className="flex flex-col gap-3">
@@ -176,11 +177,14 @@ export function SearchBar() {
 											<div className="space-y-2 grid gap-3 grid-cols-3">
 												{items.slice(0, 3).map((item) => (
 													<button
+														type="button"
 														key={item.name}
 														onClick={() => handleSuggestionClick(item)}
 														className="w-full text-left rounded-md hover:bg-accent transition-colors flex flex-col items-start gap-2"
 													>
-														<img
+														<Image
+															width={200}
+															height={200}
 															src={item.image || "/placeholder.svg"}
 															alt={item.name}
 															className="w-full h-24 object-cover rounded-md"
@@ -202,7 +206,7 @@ export function SearchBar() {
 							</div>
 						</div>
 					) : filteredSuggestions.length > 0 ? (
-						<div className="p-2 overflow-y-auto">
+						<div className="p-2 overflow-y-auto w-full max-w-xl">
 							{filteredSuggestions.map((suggestion) => (
 								<button
 									type="button"

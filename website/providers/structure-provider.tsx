@@ -18,7 +18,7 @@ export default function StructureProvider({
 			<Activity mode={header ? "visible" : "hidden"}>
 				<Header />
 			</Activity>
-			<main className=" mx-auto flex-1 max-w-global ">
+			<main className=" mx-auto flex-1 md:max-w-global ">
 				{children}
 			</main>
 			<Activity mode={footer ? "visible" : "hidden"}>

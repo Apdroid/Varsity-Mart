@@ -231,21 +231,20 @@ export const HeaderCategories = () => {
 	];
 
 	return (
-		<div className="bg-inherit  my-2 flex border-b-2 border-accent">
-			<div className=" flex justify-between w-full">
-				<NavigationMenu className=" items-center mx-6 p-2 w-full">
-					<NavigationMenuList className="gap-2 flex w-full justify-between">
+		<div className="bg-background max-w-global md:mx-auto  my-2 flex md:border-b-2 px-4 md:border-accent">
+			<div
+				className=" flex justify-between w-full">
+				<NavigationMenu className=" items-center mx-6 p-2 w-full bg-background">
+					<NavigationMenuList className="gap-2 flex w-full flex-none gap-none">
 						{categories.map((category) => (
 							<NavigationMenuItem key={category.id}>
-								<NavigationMenuTrigger className="text-[0.8rem] md:text-base font-medium">
+								<NavigationMenuTrigger className="text-[0.7rem] md:text-base font-medium">
 									{category.name}
 								</NavigationMenuTrigger>
-								<NavigationMenuContent className="data-[state=open]:animate-in data-[state=closed]:animate-out">
-									<div className="w-screen bg-background  shadow-xl border-t">
-										<div className=" max-w-7xl px-8 py-12 flex flex-col md:flex-row gap-4 align-items ">
+								<NavigationMenuContent className="bg-background data-[state=open]:animate-in data-[state=closed]:animate-out">
+									<div className="w-screen bg-background  shadow-xl ">
+										<div className=" w-global px-8 py-12 flex flex-col md:flex-row gap-4 align-items ">
 											<div className=" flex-1 grid grid-cols-2 md:grid-cols-3 gap-4">
-
-
 												{category.subcategories.map((subcategory, idx) => (
 													<div key={idx}>
 														<h3 className="font-bold  mb-4 text-[0.8rem] md:text-base">

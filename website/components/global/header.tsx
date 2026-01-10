@@ -31,37 +31,37 @@ export default function Header({
 	showAnnouncement?: boolean;
 }) {
 	return (
-		<header>
+		<header className="bg-background">
 			<Activity mode={showAnnouncement ? "visible" : "hidden"}>
 				<Announcements />
 			</Activity>
-			<nav className="bg-transparent max-w-global py-6 mx-auto my-0 flex gap-6 justify-between items-center border-b-primary/20 border-b-2 ">
+			<nav className="bg-transparent max-w-global px-4 py-6 mx-auto my-0 flex gap-6 justify-between items-center md:border-b-primary/10 md:border-b-2">
 				<Logo />
 				<div className="hidden md:flex w-full items-center justify-between">
 					<SearchBar />
-					<ul className="nav-links flex gap-6">
+					<ul className="nav-links flex gap-8 px-4">
 						{Links.map((item) => (
-							<li key={item.name}>
-								<Link href="/link">
+							<li key={item.name} className="py-2">
+								<Link href="/link" className="font-medium text-foreground/70 hover:text-primary transition-colors">
 									<small>{item.name}</small>
 								</Link>
 							</li>
 						))}
 					</ul>
 
-				<div className="pickers items-center flex">
-					<UniversityPicker />
-					<CountryPicker />
+					<div className="pickers items-center flex gap-4 px-2">
+						<UniversityPicker />
+						<CountryPicker />
+					</div>
 				</div>
-				</div>
-				<div className="end items-center flex gap-6">
+				<div className="end items-center flex gap-6 px-2">
 					<UserDropdown />
 					<ShoppingCart className="text-foreground/60" />
 					<ThemeToggle />
 				</div>
 			</nav>
-			<div className="md:hidden">
-			<SearchBar/>
+			<div className="md:hidden px-4">
+				<SearchBar />
 			</div>
 			<HeaderCategories />
 		</header>

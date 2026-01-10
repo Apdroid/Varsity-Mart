@@ -1,9 +1,9 @@
 "use client";
 
+import { LogIn } from "lucide-react";
 import React from "react";
-import { Edit3Icon, EyeIcon, LogIn, Redo2Icon, Trash2Icon } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -23,7 +23,9 @@ export default function UserDropdown() {
 			<DropdownMenuTrigger>
 				<Avatar>
 					{/* <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" /> */}
-					<AvatarFallback><UserIcon size={20}/></AvatarFallback>
+					<AvatarFallback>
+						<UserIcon size={20} />
+					</AvatarFallback>
 				</Avatar>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="center" className="w-56">

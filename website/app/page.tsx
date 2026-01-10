@@ -1,6 +1,9 @@
 import { CategoryGrid } from "@/components/home/category-grid";
-import Newproducts from "@/components/home/new-products";
-import RestStalls from "@/components/home/rest-stalls";
+import EstablishmentCardSideOverlay from "@/components/home/overlay-card";
+import PreviewSection from "@/components/home/preview-section";
+import ProductCard from "@/components/main/product-card";
+import { establishments } from "@/data/food/establishment-data";
+import { mockProducts } from "@/data/products/products";
 
 export default function Page() {
 	return (
@@ -9,10 +12,28 @@ export default function Page() {
 				<CategoryGrid />
 			</section>
 			<section className="my-20 mx-auto">
-			<Newproducts />
+				<PreviewSection
+					title="Featured Products"
+					description="Bringing together products from your peers and also from the famous stores around you for easy access"
+				>
+					{mockProducts.slice(0, 14).map((product) => (
+						<ProductCard key={product.id} product={product} />
+					))}
+				</PreviewSection>
 			</section>
 			<section className="my-20 mx-auto">
-			<RestStalls/>
+				<PreviewSection
+					title="Featured Restaurants and Fast Food Joints"
+					description="
+					Bringing together restaurants from your surroundings and also from the
+					famous stores around you for easy access"
+				>
+					{establishments.map((item) => (
+						<div key={item.name}>
+							<EstablishmentCardSideOverlay product={item} />
+						</div>
+					))}
+				</PreviewSection>
 			</section>
 		</div>
 	);

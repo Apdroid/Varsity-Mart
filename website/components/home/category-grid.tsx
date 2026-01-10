@@ -16,7 +16,7 @@ const CATEGORIES: Category[] = [
 		id: "products",
 		title: "Products",
 		description: "Shop electronics, fashion, and more",
-		image: "/e-commerce-products-shopping-online-store.jpg",
+		image: "/rgb-mechanical-keyboard.jpg",
 		colSpan: "md:col-span-2",
 		rowSpan: "md:row-span-2",
 	},
@@ -25,7 +25,7 @@ const CATEGORIES: Category[] = [
 		id: "restaurants",
 		title: "Restaurants",
 		description: "Discover dining experiences",
-		image: "/restaurant-fine-dining-food-service.jpg",
+		image: "https://images.unsplash.com/photo-1525351484163-7529414344d8",
 		colSpan: "",
 		rowSpan: "md:row-span-2",
 	},
@@ -33,7 +33,7 @@ const CATEGORIES: Category[] = [
 		id: "stores",
 		title: "Stores",
 		description: "Browse nearby retail stores",
-		image: "/retail-store-shopping-mall-storefront.jpg",
+		image: "/tech-store-banner.png",
 		colSpan: "",
 		rowSpan: "",
 	},
@@ -49,8 +49,8 @@ const CATEGORIES: Category[] = [
 
 export function CategoryGrid() {
 	return (
-		<div className=" relative max-w-460 h-full md:h-120 mx-auto my-4  ">
-			<div className="relative grid grid-cols-1  md:grid-cols-4 md:grid-rows-2 gap-2 h-full">
+		<div className="relative max-w-460 h-full md:h-120 mx-auto my-4 px-4">
+			<div className="relative grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 h-full">
 				{CATEGORIES.map((category) => (
 					<div
 						key={category.id}

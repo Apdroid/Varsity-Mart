@@ -83,7 +83,7 @@
 }
 
 .dark {
-	--background: oklch(0.141 0.005 285.823);
+	--background: oklch(19.5% 0.0069 285.8);
 	--foreground: oklch(0.985 0 0);
 	--card: oklch(0.21 0.006 285.885);
 	--card-foreground: oklch(0.985 0 0);
@@ -117,8 +117,14 @@
 }
 
 @layer base {
-	* {
-		@apply border-border outline-ring/50 leading-loose;
+
+	*,
+	*::before,
+	*::after {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+		line-height: 1.75rem;
 	}
 
 	body {
@@ -127,8 +133,13 @@
 
 }
 
+
 @layer components {
 	.max-w-global {
 		max-width: 90%;
+	}
+
+	.w-global {
+		width: 90vw;
 	}
 }

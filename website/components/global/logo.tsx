@@ -4,7 +4,7 @@ export default function Logo() {
 	return (
 		<Link
 			href="/"
-			className="logo flex leading-tight font-bold items-center space-x-2 "
+			className="logo flex leading-tight font-bold items-center gap-3 px-2"
 		>
 			<CartIcon className="text-primary text-4xl" />
 			<span className="logo-text hidden  items-center text-xl md:flex">

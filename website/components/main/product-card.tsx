@@ -16,7 +16,7 @@ const ProductCard = ({ product }) => {
 
 	return (
 		<Card
-			className="group relative overflow-hidden border-none ring-0 hover:bg-card bg-transparent  hover:shadow-xl transition-all duration-300 cursor-pointer max-w-sm"
+			className="group relative overflow-hidden border-none ring-0 hover:bg-card bg-transparent hover:shadow-xl transition-all duration-300 cursor-pointer max-w-sm p-3"
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
 		>
@@ -50,8 +50,8 @@ const ProductCard = ({ product }) => {
 
 				<div
 					className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-4 transition-all duration-300 ${isHovered
-							? "translate-y-0 opacity-100"
-							: "translate-y-full opacity-0"
+						? "translate-y-0 opacity-100"
+						: "translate-y-full opacity-0"
 						}`}
 				>
 					<Button
@@ -68,12 +68,12 @@ const ProductCard = ({ product }) => {
 			</div>
 
 			<CardContent className="p-4">
-				<h3 className="font-bold text-md mb-2 line-clamp-2 hover:text-primary transition-colors">
+				<h3 className="font-bold text-sm md:text-base mb-2 line-clamp-2  text-foreground/90 leading-tight hover:text-primary transition-colors">
 					{product.title}
 				</h3>
 
 				<div className="flex items-center gap-2">
-					<span className="text-xl font-bold">
+					<span className="text-base ">
 						GH₵{product.price.toLocaleString()}
 					</span>
 					{product.compareAtPrice && (
