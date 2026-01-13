@@ -1,6 +1,9 @@
+import { use } from "react";
 export default function Login() {
-	function handleSubmit(){
-
+	const handleSubmit = use(handleSubmitFunction());
+	function handleSubmitFunction(e: React.FormEvent) {
+		e.preventDefault();
 	}
-  return <div>login</div>;
-};
+
+	return <div>login</div>;
+}
