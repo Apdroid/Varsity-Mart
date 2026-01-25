@@ -17,13 +17,13 @@ export default function SettingsPage() {
             <div className="space-y-6">
                 {/* Header */}
                 <div>
-                    <h1 className="text-3xl font-bold">Settings</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold">Settings</h1>
                     <p className="text-muted-foreground mt-1">Manage platform settings and preferences</p>
                 </div>
 
                 {/* Settings Tabs */}
                 <Tabs defaultValue="general" className="space-y-6">
-                    <TabsList className="grid w-full grid-cols-4">
+                    <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
                         <TabsTrigger value="general">General</TabsTrigger>
                         <TabsTrigger value="notifications">Notifications</TabsTrigger>
                         <TabsTrigger value="security">Security</TabsTrigger>
@@ -32,7 +32,7 @@ export default function SettingsPage() {
 
                     {/* General Settings */}
                     <TabsContent value="general" className="space-y-4">
-                        <Card className="p-6">
+                        <Card className="p-4 sm:p-6">
                             <h3 className="text-lg font-semibold mb-4">Platform Information</h3>
                             <div className="space-y-4">
                                 <div>
@@ -71,9 +71,9 @@ export default function SettingsPage() {
                             </div>
                         </Card>
 
-                        <Card className="p-6">
+                        <Card className="p-4 sm:p-6">
                             <h3 className="text-lg font-semibold mb-4">Commission Settings</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div>
                                     <Label htmlFor="seller-commission">Seller Commission (%)</Label>
                                     <Input
@@ -107,7 +107,7 @@ export default function SettingsPage() {
 
                     {/* Notification Settings */}
                     <TabsContent value="notifications" className="space-y-4">
-                        <Card className="p-6">
+                        <Card className="p-4 sm:p-6">
                             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                                 <Bell className="h-5 w-5"/>
                                 Notification Preferences
@@ -151,7 +151,7 @@ export default function SettingsPage() {
 
                     {/* Security Settings */}
                     <TabsContent value="security" className="space-y-4">
-                        <Card className="p-6">
+                        <Card className="p-4 sm:p-6">
                             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                                 <Shield className="h-5 w-5"/>
                                 Security Settings
@@ -181,11 +181,11 @@ export default function SettingsPage() {
                                         className="mt-2"
                                     />
                                 </div>
-                                <Button className="w-full md:w-auto">Update Password</Button>
+                                <Button className="w-full sm:w-auto">Update Password</Button>
                             </div>
                         </Card>
 
-                        <Card className="p-6">
+                        <Card className="p-4 sm:p-6">
                             <h3 className="text-lg font-semibold mb-4">Two-Factor Authentication</h3>
                             <div className="flex items-center justify-between">
                                 <div>
@@ -200,7 +200,7 @@ export default function SettingsPage() {
 
                     {/* Advanced Settings */}
                     <TabsContent value="advanced" className="space-y-4">
-                        <Card className="p-6">
+                        <Card className="p-4 sm:p-6">
                             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                                 <Database className="h-5 w-5"/>
                                 Database Settings
@@ -220,23 +220,23 @@ export default function SettingsPage() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <Button variant="outline" className="w-full md:w-auto bg-transparent">
+                                <Button variant="outline" className="w-full sm:w-auto bg-transparent">
                                     Create Backup Now
                                 </Button>
                             </div>
                         </Card>
 
-                        <Card className="p-6">
+                        <Card className="p-4 sm:p-6">
                             <h3 className="text-lg font-semibold mb-4">Cache Settings</h3>
                             <div className="space-y-2">
                                 <p className="text-sm text-muted-foreground">Clear cache to refresh all data</p>
-                                <Button variant="outline" className="w-full md:w-auto bg-transparent">
+                                <Button variant="outline" className="w-full sm:w-auto bg-transparent">
                                     Clear Cache
                                 </Button>
                             </div>
                         </Card>
 
-                        <Card className="p-6">
+                        <Card className="p-4 sm:p-6">
                             <h3 className="text-lg font-semibold mb-4">API Settings</h3>
                             <div>
                                 <Label htmlFor="api-key">API Key</Label>
@@ -244,9 +244,9 @@ export default function SettingsPage() {
                                     id="api-key"
                                     value="sk_live_51234567890abcdefghijklmnop"
                                     readOnly
-                                    className="mt-2 font-mono text-sm"
+                                    className="mt-2 font-mono text-xs sm:text-sm"
                                 />
-                                <Button variant="outline" className="mt-3 w-full md:w-auto bg-transparent">
+                                <Button variant="outline" className="mt-3 w-full sm:w-auto bg-transparent">
                                     Regenerate Key
                                 </Button>
                             </div>
@@ -255,9 +255,9 @@ export default function SettingsPage() {
                 </Tabs>
 
                 {/* Save Button */}
-                <div className="flex justify-end gap-2">
-                    <Button variant="outline">Cancel</Button>
-                    <Button className="gap-2">
+                <div className="flex flex-col sm:flex-row justify-end gap-2">
+                    <Button variant="outline" className="w-full sm:w-auto">Cancel</Button>
+                    <Button className="w-full sm:w-auto gap-2">
                         <Save className="h-4 w-4"/>
                         Save Changes
                     </Button>
