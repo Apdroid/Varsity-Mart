@@ -1,6 +1,7 @@
 "use client";
 
 import { MakeOfferModal } from "@/components/offers/make-offer-modal";
+import { RelatedProducts, MoreFromSeller } from "@/components/products/related-products";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,22 +9,25 @@ import { useCartStore } from "@/lib/stores/cart-store";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types/models";
 import {
-    Check,
+    BadgeCheck,
     ChevronLeft,
     ChevronRight,
     HandCoins,
     Heart,
     MessageCircle,
+    Package,
     Share2,
     Shield,
+    ShoppingCart,
     Star,
+    Tag,
     Truck,
+    Zap,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { mockProducts } from "@/data/products/products";
-import type { Product } from "@/types/models";
 
 interface ProductDetailContentProps {
 	productId: string;
@@ -31,43 +35,9 @@ interface ProductDetailContentProps {
 }
 
 export function ProductDetailContent({ productId, initialProduct }: ProductDetailContentProps) {
-	// Transform API response format to component format
-	const product: Product = initialProduct ? {
-		id: initialProduct.id,
-		title: initialProduct.title,
-		description: initialProduct.description,
-		price: initialProduct.price,
-		compareAtPrice: initialProduct.originalPrice,
-		images: initialProduct.images,
-		category: { 
-			id: "", 
-			name: initialProduct.category, 
-			slug: initialProduct.category.toLowerCase() 
-		},
-		condition: initialProduct.condition,
-		quantity: initialProduct.stock || 1,
-		status: "active" as const,
-		sellerId: initialProduct.seller?.id || "",
-		seller: {
-			id: initialProduct.seller?.id || "",
-			email: "",
-			firstName: initialProduct.seller?.name?.split(" ")[0] || "",
-			lastName: initialProduct.seller?.name?.split(" ")[1] || "",
-			role: "seller" as const,
-			isEmailVerified: false,
-			isPhoneVerified: false,
-			kycStatus: "pending" as const,
-			createdAt: "",
-			updatedAt: "",
-		},
-		likesCount: initialProduct.likes || 0,
-		isLiked: initialProduct.isLiked || false,
-		storeId: "",
-		tags: initialProduct.badges || [],
-		createdAt: initialProduct.createdAt || "",
-		updatedAt: initialProduct.updatedAt || "",
-	} : mockProducts.find((p) => p.id === productId) || mockProducts[0];
-	
+	// Use initial product or fallback to mock data
+	const product: Product = initialProduct || mockProducts.find((p) => p.id === productId) || mockProducts[0];
+
 	const [selectedImage, setSelectedImage] = useState(0);
 	const [isLiked, setIsLiked] = useState(product.isLiked || false);
 	const [isMakeOfferOpen, setIsMakeOfferOpen] = useState(false);
@@ -83,10 +53,8 @@ export function ProductDetailContent({ productId, initialProduct }: ProductDetai
 
 	const handleAddToCart = () => {
 		addItem({
-			productId: product.id,
 			...product,
 			quantity: 1,
-			price: product.price,
 		});
 	};
 
@@ -261,39 +229,73 @@ export function ProductDetailContent({ productId, initialProduct }: ProductDetai
 							<div className="flex gap-3">
 								<Button
 									size="lg"
-									className="flex-1 bg-primary/90 hover:bg-primary gap-2"
+									className="flex-1 bg-primary hover:bg-primary/90 gap-2 h-12 text-base font-semibold shadow-lg shadow-primary/20"
 									onClick={handleAddToCart}
 								>
-									Buy Now at GH₵{product.price.toLocaleString()}
+									<ShoppingCart className="h-5 w-5" />
+									Buy Now
 								</Button>
-								<Button size="lg" variant="outline" className="gap-2 bg-transparent">
+								<Button size="lg" variant="outline" className="gap-2 bg-transparent h-12 w-12" title="Message Seller">
 									<MessageCircle className="h-5 w-5" />
 								</Button>
 							</div>
+
+							{/* Enhanced Make Offer Button */}
 							<Button
 								size="lg"
 								variant="outline"
-								className="w-full gap-2 border-2 border-primary text-primary/80 hover:bg-primary/10 hover:text-primary "
+								className="w-full gap-3 h-14 border-2 border-dashed border-primary/50 text-primary hover:border-primary hover:bg-primary/5 group relative overflow-hidden"
 								onClick={() => setIsMakeOfferOpen(true)}
 							>
-								<HandCoins className="h-5 w-5" />
-								Make an Offer
+								<div className="absolute inset-0 bg-linear-to-r from-primary/5 via-primary/10 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+								<div className="relative flex items-center gap-3">
+									<div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+										<HandCoins className="h-5 w-5" />
+									</div>
+									<div className="text-left">
+										<p className="font-semibold text-sm">Make an Offer</p>
+										<p className="text-[10px] text-muted-foreground">Negotiate a better price</p>
+									</div>
+								</div>
+								<Tag className="h-4 w-4 ml-auto opacity-50 group-hover:opacity-100 transition-opacity" />
 							</Button>
 						</div>
 
+						{/* Quick Info */}
+						<div className="grid grid-cols-2 gap-3">
+							<div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/50">
+								<div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-500/10">
+									<Package className="h-5 w-5 text-green-500" />
+								</div>
+								<div>
+									<p className="text-xs text-muted-foreground">Stock</p>
+									<p className="text-sm font-semibold text-foreground">{product.quantity} available</p>
+								</div>
+							</div>
+							<div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/50">
+								<div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500/10">
+									<Zap className="h-5 w-5 text-blue-500" />
+								</div>
+								<div>
+									<p className="text-xs text-muted-foreground">Condition</p>
+									<p className="text-sm font-semibold text-foreground capitalize">{product.condition.replace("-", " ")}</p>
+								</div>
+							</div>
+						</div>
+
 						{/* Trust Badges */}
-						<div className="flex flex-wrap gap-4 py-4 border-y border-border">
-							<div className="flex items-center gap-2 text-sm text-muted-foreground">
-								<Shield className="h-4 w-4 text-primary/90" />
-								<span>Escrow Protection</span>
+						<div className="grid grid-cols-3 gap-2">
+							<div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-center">
+								<Shield className="h-5 w-5 text-emerald-500" />
+								<span className="text-[10px] font-medium text-muted-foreground">Escrow Protection</span>
 							</div>
-							<div className="flex items-center gap-2 text-sm text-muted-foreground">
-								<Truck className="h-4 w-4 text-primary/90" />
-								<span>Campus Delivery</span>
+							<div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-blue-500/5 border border-blue-500/20 text-center">
+								<Truck className="h-5 w-5 text-blue-500" />
+								<span className="text-[10px] font-medium text-muted-foreground">Campus Delivery</span>
 							</div>
-							<div className="flex items-center gap-2 text-sm text-muted-foreground">
-								<Check className="h-4 w-4 text-primary/90" />
-								<span>Verified Seller</span>
+							<div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-primary/5 border border-primary/20 text-center">
+								<BadgeCheck className="h-5 w-5 text-primary" />
+								<span className="text-[10px] font-medium text-muted-foreground">Verified Seller</span>
 							</div>
 						</div>
 
@@ -304,7 +306,7 @@ export function ProductDetailContent({ productId, initialProduct }: ProductDetai
 									<AvatarImage
 										src={product.store?.logo || product.seller.avatar}
 									/>
-									<AvatarFallback>{product.seller.firstName[0]}</AvatarFallback>
+									<AvatarFallback>{product.seller?.firstName[0]}</AvatarFallback>
 								</Avatar>
 								<div className="flex-1 min-w-0">
 									<Link
@@ -365,6 +367,20 @@ export function ProductDetailContent({ productId, initialProduct }: ProductDetai
 						)}
 					</div>
 				</div>
+			</div>
+
+			{/* Related Products Sections */}
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+				{/* More from same seller */}
+				<MoreFromSeller
+					sellerId={product.sellerId}
+					storeId={product.storeId}
+					currentProductId={product.id}
+					storeName={product.store?.name}
+				/>
+
+				{/* Related products by category */}
+				<RelatedProducts currentProduct={product} />
 			</div>
 
 			<MakeOfferModal

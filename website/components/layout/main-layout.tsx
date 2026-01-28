@@ -11,8 +11,8 @@ export function MainLayout({ children, showFooter = true }: MainLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-      {/* Header is fixed: h-16 (64px) + h-12 (48px) = 112px total */}
-      <main className="flex-1 pt-[112px]">{children}</main>
+      {/* Header: promo banner (28px on md+) + main nav (56-64px) + categories (44px on lg) */}
+      <main className="flex-1 pt-[104px] md:pt-[128px] lg:pt-[139px]">{children}</main>
       {showFooter && <Footer />}
     </div>
   )

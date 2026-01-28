@@ -47,17 +47,17 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "start" }: Props) => {
 					<div className="relative">
 						<Avatar className="size-9">
 							<AvatarImage
-								src={user?.avatar || "https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png"} alt={user?.fullName || "User"}
+								src={user?.avatar || "https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png"} alt={user ? `${user.firstName} ${user.lastName}` : "User"}
 							/>
 							<AvatarFallback>
-								{user?.fullName?.charAt(0) || "U"}
+								{user?.firstName?.charAt(0) || "U"}
 							</AvatarFallback>
 						</Avatar>
 						<span className="ring-card absolute right-0 bottom-0 block size-2 rounded-full bg-green-600 ring-2" />
 					</div>
 					<div className="flex flex-1 flex-col items-start min-w-0">
 						<span className="text-foreground text-sm font-semibold truncate w-full">
-							{user?.fullName || "User"}
+							{user ? `${user.firstName} ${user.lastName}` : "User"}
 						</span>
 						<span className="text-muted-foreground text-xs truncate w-full">
 							{user?.email || "user@example.com"}

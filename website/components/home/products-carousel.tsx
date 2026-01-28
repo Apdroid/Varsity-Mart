@@ -1,0 +1,92 @@
+"use client";
+
+import { ArrowRight, TrendingUp } from "lucide-react";
+import Link from "next/link";
+import { ProductCard } from "@/components/product-card";
+import {
+	Carousel,
+	CarouselContent,
+	CarouselItem,
+} from "@/components/ui/carousel";
+import type { Product } from "@/types/models";
+
+interface ProductsCarouselProps {
+	products: Product[];
+	title?: string;
+	subtitle?: string;
+	badge?: string;
+	viewAllLink?: string;
+	viewAllText?: string;
+	className?: string;
+}
+
+export function ProductsCarousel({
+	products,
+	title = "Featured Products",
+	subtitle = "Discover popular items from verified campus sellers",
+	badge = "Trending Now",
+	viewAllLink = "/products",
+	viewAllText = "View All",
+	className,
+}: ProductsCarouselProps) {
+	return (
+		<section className={className}>
+			{/* Section Header */}
+			<div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+				<div>
+					{badge && (
+						<div className="flex items-center gap-2 mb-2">
+							<span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-semibold">
+								<TrendingUp className="h-3 w-3" />
+								{badge}
+							</span>
+						</div>
+					)}
+					<h2 className="text-xl md:text-2xl font-bold text-foreground">{title}</h2>
+					{subtitle && (
+						<p className="text-muted-foreground mt-1 text-sm">{subtitle}</p>
+					)}
+				</div>
+				<Link
+					href={viewAllLink}
+					className="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary hover:text-primary/80 bg-primary/5 hover:bg-primary/10 rounded-lg transition-colors group"
+				>
+					{viewAllText}
+					<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+				</Link>
+			</div>
+
+			{/* Products Carousel */}
+			<Carousel
+				opts={{
+					align: "start",
+					loop: false,
+					dragFree: true,
+				}}
+				className="w-full"
+			>
+				<CarouselContent className="-ml-3 md:-ml-4">
+					{products.map((product) => (
+						<CarouselItem
+							key={product.id}
+							className="pl-3 md:pl-4 basis-[45%] sm:basis-[30%] md:basis-[22%] lg:basis-[18%] xl:basis-[14%]"
+						>
+							<ProductCard product={product} />
+						</CarouselItem>
+					))}
+				</CarouselContent>
+			</Carousel>
+
+			{/* Mobile View All */}
+			<div className="mt-4 text-center sm:hidden">
+				<Link
+					href={viewAllLink}
+					className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+				>
+					{viewAllText}
+					<ArrowRight className="h-4 w-4" />
+				</Link>
+			</div>
+		</section>
+	);
+}

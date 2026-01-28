@@ -1,7 +1,4 @@
-import {
-	mockRestaurants,
-	RestaurantsSectionExample,
-} from "@/components/home/restaurant-section";
+import { RestaurantsPageContent } from "@/components/food/restaurants-page-content";
 import { RestaurantsHero } from "@/components/home/restaurants-hero";
 import { MainLayout } from "@/components/layout/main-layout";
 import type { Metadata } from "next";
@@ -17,7 +14,7 @@ export default function FoodPage() {
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<RestaurantsHero />
 			</div>
-			<RestaurantsSectionExample />
+			<RestaurantsPageContent />
 		</MainLayout>
 	);
 }

@@ -48,7 +48,7 @@ export const authService = {
   },
 
   async getMe(): Promise<ApiResponse<User>> {
-    const response = await apiClient.get(ENDPOINTS.USER.ME)
+    const response = await apiClient.get(ENDPOINTS.AUTH.CHECK_STATUS)
     return response.data
   },
 

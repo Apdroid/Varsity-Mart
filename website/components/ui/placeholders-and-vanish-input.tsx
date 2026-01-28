@@ -5,18 +5,21 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
 
+interface PlaceholdersAndVanishInputProps {
+	placeholders: string[];
+	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+	onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+	newValue?: string;
+	className?: string;
+}
+
 export function PlaceholdersAndVanishInput({
 	placeholders,
 	onChange,
 	className,
 	onSubmit,
 	newValue,
-}: React.HTMLAttributes<HTMLInputElement> & {
-	placeholders: string[];
-	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-	onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-	newValue?: string;
-}) {
+}: PlaceholdersAndVanishInputProps) {
 	const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
 
 	const intervalRef = useRef<NodeJS.Timeout | null>(null);

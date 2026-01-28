@@ -5,6 +5,7 @@ import {
 	BookOpen,
 	Camera,
 	ChefHat,
+	CircleUser,
 	Dumbbell,
 	Headphones,
 	Heart,
@@ -17,13 +18,14 @@ import {
 	ShoppingBag,
 	ShoppingCart,
 	Smartphone,
+	Sparkles,
 	Store,
 	X,
 } from "lucide-react";
 import { useMotionValueEvent, useScroll } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +39,7 @@ import ProfileDropdown from "../auth/user-dropdown";
 import { LocationSelector } from "./location-selector";
 import Logo from "./logo";
 import { UniversityDisplay } from "./university-display";
+import type { LucideIcon } from "lucide-react";
 
 const navigation = [
 	{ name: "Products", href: "/products", icon: Package },
@@ -45,7 +48,7 @@ const navigation = [
 ];
 
 // Product categories
-const productCategories = [
+const productCategories: { name: string; icon?: LucideIcon; href: string }[] = [
 	{ name: "Textbooks", icon: BookOpen, href: "/search?category=textbooks" },
 	{ name: "Electronics", icon: Laptop, href: "/search?category=electronics" },
 	{ name: "Fashion", icon: Shirt, href: "/search?category=fashion" },
@@ -72,7 +75,7 @@ const productCategories = [
 ];
 
 // Food categories
-const foodCategories = [
+const foodCategories: { name: string; href: string }[] = [
 	{ name: "Ghanaian", href: "/restaurants?category=ghanaian" },
 	{ name: "Fast Food", href: "/restaurants?category=fast-food" },
 	{ name: "Cafe", href: "/restaurants?category=cafe" },
@@ -82,7 +85,7 @@ const foodCategories = [
 ];
 
 // Store categories
-const storeCategories = [
+const storeCategories: { name: string; href: string }[] = [
 	{ name: "Electronics", href: "/stores?category=electronics" },
 	{ name: "Fashion", href: "/stores?category=fashion" },
 	{ name: "Books", href: "/stores?category=books" },
@@ -117,7 +120,7 @@ export function Header() {
 	const cartCount = items.reduce((acc, item) => acc + item.quantity, 0);
 	const { scrollY } = useScroll();
 	const searchParams = useSearchParams();
-	const { isAuthenticated } = useAuth();
+	const { isAuthenticated, user} = useAuth();
 
 	// Handle scroll direction for header visibility
 	useMotionValueEvent(scrollY, "change", (current) => {
@@ -182,15 +185,24 @@ export function Header() {
 	return (
 		<header
 			className={cn(
-				"fixed top-0 left-0 right-0 z-50 w-full bg-card border-b border-border/80 transition-transform duration-300",
+				"fixed top-0 left-0 right-0 z-50 w-full bg-background/95 backdrop-blur-md border-b border-border/50 transition-all duration-300 shadow-sm",
 				isVisible ? "translate-y-0" : "-translate-y-full",
 			)}
 		>
+			{/* Promotional Banner - Optional */}
+			<div className="hidden md:block bg-primary text-primary-foreground text-center py-1.5 text-xs font-medium">
+				<span className="inline-flex items-center gap-2">
+					<Sparkles className="h-3 w-3" />
+					Free delivery on orders over GH₵100 • Use code CAMPUS10 for 10% off
+					<Sparkles className="h-3 w-3" />
+				</span>
+			</div>
+
 			{/* First Deck - Main Navigation */}
 			<div className="px-4 sm:px-6 lg:px-8">
-				<div className="flex h-16 items-center justify-between gap-4">
+				<div className="flex h-14 lg:h-16 items-center justify-between gap-4">
 					{/* Logo and Main Nav */}
-					<div className="flex items-center gap-6">
+					<div className="flex items-center gap-4 lg:gap-8">
 						<Logo />
 						<nav className="hidden lg:flex items-center gap-1">
 							{navigation.map((item) => {
@@ -200,16 +212,20 @@ export function Header() {
 										key={item.name}
 										href={item.href}
 										className={cn(
-											"relative flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors rounded-md",
+											"relative flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all duration-200 rounded-lg group",
 											isActive
-												? "text-primary"
-												: "text-muted-foreground hover:text-foreground",
+												? "text-primary bg-primary/5"
+												: "text-muted-foreground hover:text-foreground hover:bg-accent/50",
 										)}
 									>
-										<item.icon className="h-4 w-4" />
+										<item.icon className={cn(
+											"h-4 w-4 transition-transform duration-200",
+											isActive && "text-primary",
+											"group-hover:scale-110"
+										)} />
 										{item.name}
 										{isActive && (
-											<div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+											<div className="absolute bottom-0 left-2 right-2 h-0.5 bg-primary rounded-full" />
 										)}
 									</Link>
 								);
@@ -217,15 +233,17 @@ export function Header() {
 						</nav>
 					</div>
 
-					{/* Search Bar - Using PlaceholdersAndVanishInput */}
-					<div className="flex-1 hidden md:flex">
-						<PlaceholdersAndVanishInput
-							placeholders={searchPlaceholders}
-							className="max-w-full"
-							onChange={(e) => setSearchQuery(e.target.value)}
-							onSubmit={handleSearch}
-							newValue={searchQuery}
-						/>
+					{/* Search Bar - Enhanced styling */}
+					<div className="flex-1 hidden md:flex max-w-xl">
+						<div className="relative w-full">
+							<PlaceholdersAndVanishInput
+								placeholders={searchPlaceholders}
+								className="max-w-full"
+								onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+								onSubmit={(e: React.FormEvent<HTMLFormElement>) => handleSearch(e)}
+								newValue={searchQuery}
+							/>
+						</div>
 					</div>
 
 					{/* Location Selector */}
@@ -235,18 +253,17 @@ export function Header() {
 					{!isAuthenticated && <UniversityDisplay />}
 
 					{/* Actions */}
-					<div className="flex items-center gap-1 sm:gap-2">
+					<div className="flex items-center gap-2 sm:gap-3">
 						{isAuthenticated ? (
 							<ProfileDropdown
 								align="end"
 								trigger={
-									<button className="rounded-full" type="button">
+									<button className="rounded-full ring-2 ring-primary/20 hover:ring-primary/40 transition-all" type="button">
 										<Avatar className="size-9 cursor-pointer">
 											<AvatarImage
-												src="https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png"
-												alt="User"
-											/>
-											<AvatarFallback>JD</AvatarFallback>
+												src={user!?.avatar}
+												alt="User"/>
+                                            <AvatarFallback className="bg-primary/10 text-primary font-semibold">{user!?.fullName || <CircleUser size="28" color="white"/>}</AvatarFallback>
 										</Avatar>
 									</button>
 								}
@@ -256,11 +273,11 @@ export function Header() {
 						)}
 
 						<Link href="/cart">
-							<Button variant="ghost" size="icon" className="h-9 w-9 relative">
+							<Button variant="ghost" size="icon" className="h-10 w-10 relative hover:bg-primary/10 transition-colors">
 								<ShoppingCart className="h-5 w-5" />
 								{cartCount > 0 && (
-									<Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-primary border-2 border-background">
-										{cartCount}
+									<Badge className="absolute -top-1 -right-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs bg-primary text-primary-foreground border-2 border-background animate-in zoom-in-50 duration-200">
+										{cartCount > 99 ? '99+' : cartCount}
 									</Badge>
 								)}
 								<span className="sr-only">Cart</span>
@@ -288,19 +305,19 @@ export function Header() {
 			</div>
 
 			{/* Second Deck - Categories */}
-			<div className="hidden lg:block border-t border-border/80 bg-card">
+			<div className="hidden lg:block border-t border-border/50 bg-background/80">
 				<div className="px-4 sm:px-6 lg:px-8">
-					<div className="flex items-center gap-8 h-12">
+					<div className="flex items-center gap-6 h-11">
 						{/* Category Type Selector */}
-					<div className="flex items-center gap-1 border-r border-border pr-6">
+						<div className="flex items-center gap-1 border-r border-border/50 pr-6">
 							<button
 								type="button"
 								onClick={() => setActiveCategoryType("products")}
 								className={cn(
-									"px-3 py-1.5 text-xs font-semibold rounded-md transition-colors",
+									"px-3 py-1.5 text-xs font-semibold rounded-full transition-all duration-200",
 									activeCategoryType === "products"
-										? "bg-primary text-primary-foreground"
-										: "text-muted-foreground hover:text-foreground",
+										? "bg-primary text-primary-foreground shadow-sm"
+										: "text-muted-foreground hover:text-foreground hover:bg-accent",
 								)}
 							>
 								Products
@@ -309,10 +326,10 @@ export function Header() {
 								type="button"
 								onClick={() => setActiveCategoryType("stores")}
 								className={cn(
-									"px-3 py-1.5 text-xs font-semibold rounded-md transition-colors",
+									"px-3 py-1.5 text-xs font-semibold rounded-full transition-all duration-200",
 									activeCategoryType === "stores"
-										? "bg-primary text-primary-foreground"
-										: "text-muted-foreground hover:text-foreground",
+										? "bg-primary text-primary-foreground shadow-sm"
+										: "text-muted-foreground hover:text-foreground hover:bg-accent",
 								)}
 							>
 								Stores
@@ -321,29 +338,32 @@ export function Header() {
 								type="button"
 								onClick={() => setActiveCategoryType("food")}
 								className={cn(
-									"px-3 py-1.5 text-xs font-semibold rounded-md transition-colors",
+									"px-3 py-1.5 text-xs font-semibold rounded-full transition-all duration-200",
 									activeCategoryType === "food"
-										? "bg-primary text-primary-foreground"
-										: "text-muted-foreground hover:text-foreground",
+										? "bg-primary text-primary-foreground shadow-sm"
+										: "text-muted-foreground hover:text-foreground hover:bg-accent",
 								)}
 							>
 								Food
 							</button>
 						</div>
 						{/* Category Links */}
-						<div className="flex items-center gap-6 overflow-x-auto scrollbar-hide">
-							{currentCategories.map((category, idx) => (
-								<Link
-									key={idx}
-									href={category.href}
-									className="flex items-center gap-2 text-xs font-medium text-foreground hover:text-foreground transition-colors whitespace-nowrap shrink-0"
-								>
-									{"icon" in category && (
-										<category.icon className="h-3.5 w-3.5 text-primary" />
-									)}
-									{category.name}
-								</Link>
-							))}
+						<div className="flex items-center gap-5 overflow-x-auto scrollbar-hide">
+							{currentCategories.map((category, idx) => {
+								const IconComponent = category.icon;
+								return (
+									<Link
+										key={idx}
+										href={category.href}
+										className="flex items-center gap-2 text-xs font-medium text-muted-foreground hover:text-primary transition-colors whitespace-nowrap shrink-0 group"
+									>
+										{IconComponent && (
+											<IconComponent className="h-3.5 w-3.5 text-primary/70 group-hover:text-primary transition-colors" />
+										)}
+										<span className="group-hover:underline underline-offset-2">{category.name}</span>
+									</Link>
+								);
+							})}
 						</div>
 					</div>
 				</div>
@@ -353,8 +373,8 @@ export function Header() {
 			<div className="md:hidden px-4 pb-3 border-t border-border">
 				<PlaceholdersAndVanishInput
 					placeholders={searchPlaceholders}
-					onChange={(e) => setSearchQuery(e.target.value)}
-					onSubmit={handleSearch}
+					onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+					onSubmit={(e: React.FormEvent<HTMLFormElement>) => handleSearch(e)}
 					newValue={searchQuery}
 				/>
 			</div>

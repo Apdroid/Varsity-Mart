@@ -33,11 +33,11 @@ export const APP_CONFIG = {
 
 export const ROUTE_PATHS = {
   home: "/",
-  login: "/login",
-  register: "/register",
-  verifyEmail: "/verify-email",
-  forgotPassword: "/forgot-password",
-  resetPassword: "/reset-password",
+  login: "/auth/login",
+  register: "/auth/register",
+  verifyEmail: "/auth/verify-email",
+  forgotPassword: "/auth/forgot-password",
+  resetPassword: "/auth/reset-password",
 
   // Products
   products: "/products",

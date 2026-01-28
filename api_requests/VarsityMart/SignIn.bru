@@ -1,0 +1,23 @@
+meta {
+  name: SignIn
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/auth/login/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email":"vision060607@gmail.com",
+    "password":"test@123"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

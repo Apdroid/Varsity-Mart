@@ -34,6 +34,7 @@ export function useAuth() {
 	const loginMutation = useMutation({
 		mutationFn: (data: LoginRequest) => authService.login(data),
 		onSuccess: (response) => {
+			console.log(response);
 			setUser(response.data.user);
 			queryClient.invalidateQueries({ queryKey: queryKeys.auth.all });
 			router.push("/");
@@ -54,14 +55,14 @@ export function useAuth() {
 		mutationFn: () => authService.logout(),
 		onSuccess: () => {
 			clearAuth();
-			queryClient.clear();
-			router.push("/login");
+		queryClient.clear();
+			router.push("/auth/login");
 		},
 		onError: () => {
 			// Still clear local state even if API call fails
 			clearAuth();
 			queryClient.clear();
-			router.push("/login");
+			router.push("/auth/login");
 		},
 	});
 

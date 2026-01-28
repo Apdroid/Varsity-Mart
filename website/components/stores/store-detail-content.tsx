@@ -16,69 +16,24 @@ interface StoreDetailContentProps {
 }
 
 export function StoreDetailContent({ storeId, initialStore, initialProducts }: StoreDetailContentProps) {
-  // Transform API response format to component format
-  const store: Store | undefined = initialStore ? {
-    id: initialStore.id,
-    name: initialStore.name,
-    description: initialStore.description,
-    logo: initialStore.logo,
-    banner: initialStore.banner,
-    ownerId: initialStore.owner?.id || "",
-    owner: initialStore.owner || {} as any,
-    rating: initialStore.rating,
-    reviewsCount: initialStore.totalReviews,
-    productsCount: initialStore.totalProducts,
-    isVerified: true,
-    isOpen: initialStore.isOpen,
-    createdAt: initialStore.memberSince || "",
-    updatedAt: "",
-  } : undefined;
-  
-  // Transform products from API format to component format
-  const storeProducts: Product[] = initialProducts?.map((p: any) => ({
-    id: p.id,
-    title: p.title,
-    description: p.description,
-    price: p.price,
-    compareAtPrice: p.originalPrice,
-    images: p.images,
-    category: { id: "", name: p.category, slug: p.category.toLowerCase() },
-    condition: p.condition,
-    quantity: 1,
-    status: "active" as const,
-    sellerId: p.seller?.id || "",
-    seller: {
-      id: p.seller?.id || "",
-      email: "",
-      firstName: p.seller?.name?.split(" ")[0] || "",
-      lastName: p.seller?.name?.split(" ")[1] || "",
-      role: "seller" as const,
-      isEmailVerified: false,
-      isPhoneVerified: false,
-      kycStatus: "pending" as const,
-      createdAt: "",
-      updatedAt: "",
-    },
-    likesCount: p.likes || 0,
-    isLiked: false,
-    storeId: storeId,
-    tags: p.badges || [],
-    createdAt: p.createdAt || "",
-    updatedAt: "",
-  })) || [];
-  
+  // Use initial data directly
+  const store = initialStore;
+  const storeProducts = initialProducts || [];
+
   const [activeTab, setActiveTab] = useState("products")
   
   if (!store) {
-    return <div>Store not found</div>;
+    return <div className="flex items-center justify-center py-20">
+      <p className="text-muted-foreground">Store not found</p>
+    </div>;
   }
 
   return (
     <div>
       {/* Banner */}
-      <div className="relative h-48 md:h-64 bg-gradient-to-br text-primary text-primary dark:text-primary dark:text-primary">
+      <div className="relative h-48 md:h-64 bg-linear-to-br from-primary/20 to-primary/5">
         {store.banner && (
-          <Image src={store.banner || "/placeholder.svg"} alt={store.name} fill className="object-cover" />
+          <Image src={store.banner} alt={store.name} fill className="object-cover" />
         )}
       </div>
 
@@ -99,83 +54,69 @@ export function StoreDetailContent({ storeId, initialStore, initialProducts }: S
             <div className="flex-1 pb-2">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-foreground">{store.name}</h1>
-                {store.isVerified && <BadgeCheck className="h-6 w-6 text-primary" />}
-                <Badge variant={store.isOpen ? "default" : "secondary"} className="ml-2">
+                {store.isVerified && <BadgeCheck className="h-5 w-5 text-primary" />}
+                <Badge variant={store.isOpen ? "default" : "secondary"}>
                   {store.isOpen ? "Open" : "Closed"}
                 </Badge>
               </div>
+              <p className="text-muted-foreground mb-3">{store.description}</p>
 
-              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-4 text-sm">
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   <span className="font-medium text-foreground">{store.rating}</span>
-                  <span>({store.reviewsCount} reviews)</span>
+                  <span className="text-muted-foreground">({store.reviewsCount} reviews)</span>
                 </div>
-                <span>{store.productsCount} products</span>
+                <span className="text-muted-foreground">{store.productsCount} products</span>
+                <span className="text-muted-foreground">Member since {new Date(store.createdAt).getFullYear()}</span>
               </div>
             </div>
 
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-                <Share2 className="h-4 w-4" />
-                Share
-              </Button>
-              <Button size="sm" className="gap-2 text-slate-100 hover:text-slate-50">
+              <Button variant="outline" size="sm" className="gap-2">
                 <MessageCircle className="h-4 w-4" />
                 Contact
+              </Button>
+              <Button variant="outline" size="sm" className="gap-2">
+                <Share2 className="h-4 w-4" />
+                Share
               </Button>
             </div>
           </div>
         </div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="pb-12">
-          <TabsList className="mb-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+          <TabsList>
             <TabsTrigger value="products">Products</TabsTrigger>
-            <TabsTrigger value="about">About</TabsTrigger>
             <TabsTrigger value="reviews">Reviews</TabsTrigger>
+            <TabsTrigger value="about">About</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="products">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {storeProducts.length > 0 ? (
-                storeProducts.map((product) => (
+          <TabsContent value="products" className="mt-6">
+            {storeProducts.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {storeProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
-                ))
-              ) : (
-                <div className="col-span-full text-center py-12">
-                  <p className="text-muted-foreground">No products available in this store.</p>
-                </div>
-              )}
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                No products available yet
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="reviews" className="mt-6">
+            <div className="text-center py-12 text-muted-foreground">
+              No reviews yet
             </div>
           </TabsContent>
 
-          <TabsContent value="about">
-            <div className="max-w-2xl space-y-6">
-              <div>
-                <h3 className="font-semibold text-foreground mb-2">About This Store</h3>
-                <p className="text-muted-foreground">{store.description}</p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-foreground mb-3">Operating Hours</h3>
-                <div className="space-y-2">
-                  {Object.entries(store.operatingHours || {}).map(([day, hours]) => (
-                    <div key={day} className="flex justify-between text-sm">
-                      <span className="capitalize text-muted-foreground">{day}</span>
-                      <span className="text-foreground">
-                        {hours.isOpen ? `${hours.open} - ${hours.close}` : "Closed"}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="reviews">
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Reviews coming soon...</p>
+          <TabsContent value="about" className="mt-6">
+            <div className="max-w-2xl">
+              <h3 className="font-semibold text-foreground mb-2">About {store.name}</h3>
+              <p className="text-muted-foreground">{store.description}</p>
             </div>
           </TabsContent>
         </Tabs>

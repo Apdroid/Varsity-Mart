@@ -1,0 +1,34 @@
+meta {
+  name: Register-Student
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/auth/register/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "full_name": "Maajao",
+    "email": "maajao@st.knust.edu.gh",
+    "phone": "+233200616236",
+    "password": "maajao@123",
+    "confirm_password": "maajao@123",
+    "student_id": "21xxxxx",
+    "is_student": true,
+    "university": "KNUST",
+    "campus": "Kumasi",
+    "agree_to_terms": true,
+    "role": "buyer",
+    "auth_method": "credentials",
+    "profile_pic": "http://example.com"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
