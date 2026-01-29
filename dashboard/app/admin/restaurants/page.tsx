@@ -150,15 +150,15 @@ export default function RestaurantsPage() {
 
     return (
         <AdminLayout>
-            <div className="space-y-6">
+            <div className="space-y-8">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold">Restaurants Management</h1>
-                        <p className="text-muted-foreground mt-1">Manage all restaurant partners</p>
+                        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">Restaurants Management</h1>
+                        <p className="text-muted-foreground mt-1.5">Manage all restaurant partners</p>
                     </div>
                     <Link href="/admin/restaurants/new">
-                        <Button className="w-full sm:w-auto gap-2">
+                        <Button className="w-full sm:w-auto gap-2 shadow-lg shadow-primary/20">
                             <Plus className="h-4 w-4"/>
                             Add Restaurant
                         </Button>
@@ -166,32 +166,35 @@ export default function RestaurantsPage() {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Restaurants</CardTitle>
-                            <UtensilsCrossed className="h-4 w-4 text-muted-foreground"/>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Total Restaurants</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                                <UtensilsCrossed className="h-4 w-4 text-orange-400"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{totalRestaurants}</div>
+                            <div className="text-3xl font-bold tracking-tight">{totalRestaurants}</div>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Active Partners</CardTitle>
-                            <Store className="h-4 w-4 text-green-500"/>
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Active Partners</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-green-500/10 border border-green-500/20">
+                                <Store className="h-4 w-4 text-green-400"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div
-                                className="text-2xl font-bold text-green-600 dark:text-green-400">{activeRestaurants}</div>
+                            <div className="text-3xl font-bold tracking-tight text-green-400">{activeRestaurants}</div>
                         </CardContent>
                     </Card>
                 </div>
 
                 {/* Restaurants Table */}
-                <Card>
+                <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                     <CardHeader>
-                        <CardTitle>All Restaurants</CardTitle>
+                        <CardTitle className="text-lg font-semibold">All Restaurants</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <DataTable

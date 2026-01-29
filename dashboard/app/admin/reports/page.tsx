@@ -43,30 +43,32 @@ export default function ReportsPage() {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold">Reports & Analytics</h1>
-                        <p className="text-muted-foreground mt-1">Comprehensive platform analytics and insights</p>
+                        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">Reports & Analytics</h1>
+                        <p className="text-muted-foreground mt-1.5">Comprehensive platform analytics and insights</p>
                     </div>
-                    <Button className="w-full sm:w-auto gap-2">
+                    <Button className="w-full sm:w-auto gap-2 shadow-lg shadow-primary/20">
                         <Download className="h-4 w-4"/>
                         Export Report
                     </Button>
                 </div>
 
                 {/* Date Range Filter */}
-                <Card className="p-4">
+                <Card className="p-4 border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <Calendar className="h-5 w-5 text-muted-foreground hidden sm:block"/>
+                        <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                            <Calendar className="h-5 w-5 text-primary"/>
+                        </div>
                         <div className="flex gap-2 flex-wrap w-full sm:w-auto">
-                            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                            <Button variant="outline" size="sm" className="flex-1 sm:flex-none border-border/50">
                                 Last 7 Days
                             </Button>
-                            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                            <Button variant="outline" size="sm" className="flex-1 sm:flex-none border-border/50">
                                 Last 30 Days
                             </Button>
-                            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                            <Button variant="outline" size="sm" className="flex-1 sm:flex-none border-border/50">
                                 Last Quarter
                             </Button>
-                            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                            <Button variant="outline" size="sm" className="flex-1 sm:flex-none border-border/50">
                                 Custom Range
                             </Button>
                         </div>
@@ -74,47 +76,47 @@ export default function ReportsPage() {
                 </Card>
 
                 {/* Summary Stats */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     {statsLoading ? (
                         [...Array(3)].map((_, i) => <Skeleton key={i} className="h-24"/>)
                     ) : (
                         <>
-                            <Card>
-                                <CardHeader className="pb-2">
-                                    <CardTitle className="text-sm font-medium text-muted-foreground">Total
+                            <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-sm font-medium text-muted-foreground/80">Total
                                         Revenue</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-2xl sm:text-3xl font-bold">
+                                    <p className="text-3xl font-bold tracking-tight">
                                         ${(stats?.totalRevenue || 0).toLocaleString('en-US', {maximumFractionDigits: 0})}
                                     </p>
-                                    <p className="text-xs text-green-600 dark:text-green-400 mt-2">+15% from last
+                                    <p className="text-xs text-green-400 mt-2">+15% from last
                                         month</p>
                                 </CardContent>
                             </Card>
-                            <Card>
-                                <CardHeader className="pb-2">
-                                    <CardTitle className="text-sm font-medium text-muted-foreground">Total
+                            <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-sm font-medium text-muted-foreground/80">Total
                                         Orders</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-2xl sm:text-3xl font-bold">{stats?.totalOrders.toLocaleString()}</p>
-                                    <p className="text-xs text-green-600 dark:text-green-400 mt-2">+8% from last
+                                    <p className="text-3xl font-bold tracking-tight">{stats?.totalOrders.toLocaleString()}</p>
+                                    <p className="text-xs text-green-400 mt-2">+8% from last
                                         month</p>
                                 </CardContent>
                             </Card>
-                            <Card>
-                                <CardHeader className="pb-2">
-                                    <CardTitle className="text-sm font-medium text-muted-foreground">Average Order
+                            <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-sm font-medium text-muted-foreground/80">Average Order
                                         Value</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-2xl sm:text-3xl font-bold">
+                                    <p className="text-3xl font-bold tracking-tight">
                                         ${(
                                         (stats?.totalRevenue || 0) / (stats?.totalOrders || 1)
                                     ).toLocaleString('en-US', {maximumFractionDigits: 0})}
                                     </p>
-                                    <p className="text-xs text-green-600 dark:text-green-400 mt-2">+3% from last
+                                    <p className="text-xs text-green-400 mt-2">+3% from last
                                         month</p>
                                 </CardContent>
                             </Card>
@@ -125,7 +127,7 @@ export default function ReportsPage() {
                 {/* Charts Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Revenue Trend */}
-                    <Card>
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                         <CardHeader>
                             <CardTitle>Revenue Trend</CardTitle>
                         </CardHeader>
@@ -154,7 +156,7 @@ export default function ReportsPage() {
                     </Card>
 
                     {/* Category Distribution */}
-                    <Card>
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                         <CardHeader>
                             <CardTitle>Products by Category</CardTitle>
                         </CardHeader>
@@ -183,7 +185,7 @@ export default function ReportsPage() {
                 </div>
 
                 {/* Weekly Activity */}
-                <Card>
+                <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                     <CardHeader>
                         <CardTitle>Weekly Activity</CardTitle>
                     </CardHeader>
@@ -215,19 +217,19 @@ export default function ReportsPage() {
 
                 {/* Key Metrics */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Card className="p-4">
+                    <Card className="p-4 border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                         <p className="text-xs text-muted-foreground uppercase">Conversion Rate</p>
                         <p className="text-xl sm:text-2xl font-bold mt-2">3.24%</p>
                     </Card>
-                    <Card className="p-4">
+                    <Card className="p-4 border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                         <p className="text-xs text-muted-foreground uppercase">Avg Order Value</p>
                         <p className="text-xl sm:text-2xl font-bold mt-2">$27.45</p>
                     </Card>
-                    <Card className="p-4">
+                    <Card className="p-4 border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                         <p className="text-xs text-muted-foreground uppercase">Customer Retention</p>
                         <p className="text-xl sm:text-2xl font-bold mt-2">67.8%</p>
                     </Card>
-                    <Card className="p-4">
+                    <Card className="p-4 border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                         <p className="text-xs text-muted-foreground uppercase">Platform Growth</p>
                         <p className="text-xl sm:text-2xl font-bold mt-2">+12.5%</p>
                     </Card>

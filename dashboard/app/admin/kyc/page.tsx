@@ -37,46 +37,52 @@ export default function KYCPage() {
 
     return (
         <AdminLayout>
-            <div className="space-y-6">
+            <div className="space-y-8">
                 {/* Header */}
                 <div>
-                    <h1 className="text-3xl font-bold">KYC Verification</h1>
-                    <p className="text-muted-foreground mt-1">Review and manage user KYC submissions</p>
+                    <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">KYC Verification</h1>
+                    <p className="text-muted-foreground mt-1.5">Review and manage user KYC submissions</p>
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Pending Verifications</CardTitle>
-                            <Clock className="h-4 w-4 text-yellow-500"/>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Pending Verifications</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                                <Clock className="h-4 w-4 text-yellow-400"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{kyc?.total || 0}</p>
+                            <p className="text-3xl font-bold tracking-tight text-yellow-400">{kyc?.total || 0}</p>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Verified Today</CardTitle>
-                            <CheckCheck className="h-4 w-4 text-green-500"/>
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Verified Today</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-green-500/10 border border-green-500/20">
+                                <CheckCheck className="h-4 w-4 text-green-400"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-2xl font-bold text-green-600 dark:text-green-400">12</p>
+                            <p className="text-3xl font-bold tracking-tight text-green-400">12</p>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Rejected</CardTitle>
-                            <XCircle className="h-4 w-4 text-red-500"/>
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Rejected</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20">
+                                <XCircle className="h-4 w-4 text-red-400"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-2xl font-bold text-red-600 dark:text-red-400">3</p>
+                            <p className="text-3xl font-bold tracking-tight text-red-400">3</p>
                         </CardContent>
                     </Card>
                 </div>
 
                 {/* KYC Table */}
-                <Card>
+                <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                     <Table>
                         <TableHeader>
                             <TableRow className="hover:bg-transparent">

@@ -128,15 +128,15 @@ export default function AmbassadorsPage() {
 
     return (
         <AdminLayout>
-            <div className="space-y-6">
+            <div className="space-y-8">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Ambassadors</h1>
-                        <p className="text-muted-foreground mt-1">Manage student ambassadors and track performance</p>
+                        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">Ambassadors</h1>
+                        <p className="text-muted-foreground mt-1.5">Manage student ambassadors and track performance</p>
                     </div>
                     <Link href="/admin/ambassadors/new">
-                        <Button className="w-full sm:w-auto gap-2">
+                        <Button className="w-full sm:w-auto gap-2 shadow-lg shadow-primary/20">
                             <Plus className="h-4 w-4"/>
                             Add Ambassador
                         </Button>
@@ -144,56 +144,64 @@ export default function AmbassadorsPage() {
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Ambassadors</CardTitle>
-                            <Trophy className="h-4 w-4 text-muted-foreground"/>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Total Ambassadors</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                                <Trophy className="h-4 w-4 text-purple-400"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{isLoading ?
+                            <div className="text-3xl font-bold tracking-tight">{isLoading ?
                                 <Skeleton className="h-8 w-12"/> : totalAmbassadors}</div>
-                            <p className="text-xs text-muted-foreground mt-1">Across all campuses</p>
+                            <p className="text-xs text-muted-foreground/80 mt-2">Across all campuses</p>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Active This Month</CardTitle>
-                            <Users className="h-4 w-4 text-green-500"/>
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Active This Month</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-green-500/10 border border-green-500/20">
+                                <Users className="h-4 w-4 text-green-400"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{isLoading ?
+                            <div className="text-3xl font-bold tracking-tight text-green-400">{isLoading ?
                                 <Skeleton className="h-8 w-12"/> : activeAmbassadors}</div>
-                            <p className="text-xs text-muted-foreground mt-1">85% participation rate</p>
+                            <p className="text-xs text-muted-foreground/80 mt-2">85% participation rate</p>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Campus King/Queens</CardTitle>
-                            <Award className="h-4 w-4 text-purple-500"/>
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Campus King/Queens</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-pink-500/10 border border-pink-500/20">
+                                <Award className="h-4 w-4 text-pink-400"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">3</div>
-                            <p className="text-xs text-muted-foreground mt-1">Elite ambassadors</p>
+                            <div className="text-3xl font-bold tracking-tight text-pink-400">3</div>
+                            <p className="text-xs text-muted-foreground/80 mt-2">Elite ambassadors</p>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Payouts</CardTitle>
-                            <DollarSign className="h-4 w-4 text-yellow-500"/>
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Total Payouts</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                                <DollarSign className="h-4 w-4 text-yellow-400"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">GHS 8,450</div>
-                            <p className="text-xs text-muted-foreground mt-1">Commission paid</p>
+                            <div className="text-3xl font-bold tracking-tight">GHS 8,450</div>
+                            <p className="text-xs text-muted-foreground/80 mt-2">Commission paid</p>
                         </CardContent>
                     </Card>
                 </div>
 
                 {/* Ambassadors Table */}
-                <Card>
+                <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                     <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                        <CardTitle>Manage Ambassadors</CardTitle>
-                        <Button variant="outline" size="sm" className="gap-2">
+                        <CardTitle className="text-lg font-semibold">Manage Ambassadors</CardTitle>
+                        <Button variant="outline" size="sm" className="gap-2 border-border/50">
                             <FileDown className="h-4 w-4"/>
                             Export
                         </Button>

@@ -165,65 +165,70 @@ export default function OrdersPage() {
 
     return (
         <AdminLayout>
-            <div className="space-y-6">
+            <div className="space-y-8">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold">Orders Management</h1>
-                        <p className="text-muted-foreground mt-1">Manage all platform orders</p>
+                        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">Orders Management</h1>
+                        <p className="text-muted-foreground mt-1.5">Manage all platform orders</p>
                     </div>
-                    <Button variant="outline" className="w-full sm:w-auto">
+                    <Button variant="outline" className="w-full sm:w-auto border-border/50">
                         Export Orders
                     </Button>
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-                            <ShoppingCart className="h-4 w-4 text-muted-foreground"/>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Total Orders</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-primary/10 border border-primary/20">
+                                <ShoppingCart className="h-4 w-4 text-primary"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{totalOrders}</div>
+                            <div className="text-3xl font-bold tracking-tight">{totalOrders}</div>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Pending</CardTitle>
-                            <Clock className="h-4 w-4 text-yellow-500"/>
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Pending</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                                <Clock className="h-4 w-4 text-yellow-400"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div
-                                className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{pendingOrders}</div>
+                            <div className="text-3xl font-bold tracking-tight text-yellow-400">{pendingOrders}</div>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Processing</CardTitle>
-                            <Truck className="h-4 w-4 text-blue-500"/>
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Processing</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                                <Truck className="h-4 w-4 text-blue-400"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div
-                                className="text-2xl font-bold text-blue-600 dark:text-blue-400">{processingOrders}</div>
+                            <div className="text-3xl font-bold tracking-tight text-blue-400">{processingOrders}</div>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Delivered</CardTitle>
-                            <CheckCircle className="h-4 w-4 text-green-500"/>
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Delivered</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-green-500/10 border border-green-500/20">
+                                <CheckCircle className="h-4 w-4 text-green-400"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div
-                                className="text-2xl font-bold text-green-600 dark:text-green-400">{deliveredOrders}</div>
+                            <div className="text-3xl font-bold tracking-tight text-green-400">{deliveredOrders}</div>
                         </CardContent>
                     </Card>
                 </div>
 
                 {/* Orders Table */}
-                <Card>
+                <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                     <CardHeader>
-                        <CardTitle>All Orders</CardTitle>
+                        <CardTitle className="text-lg font-semibold">All Orders</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <DataTable

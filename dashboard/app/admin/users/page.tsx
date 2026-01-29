@@ -175,15 +175,15 @@ export default function UsersPage() {
 
     return (
         <AdminLayout>
-            <div className="space-y-6">
+            <div className="space-y-8">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold">Users Management</h1>
-                        <p className="text-muted-foreground mt-1">Manage all platform users</p>
+                        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">Users Management</h1>
+                        <p className="text-muted-foreground mt-1.5">Manage all platform users</p>
                     </div>
                     <Link href="/admin/users/new">
-                        <Button className="w-full sm:w-auto gap-2">
+                        <Button className="w-full sm:w-auto gap-2 shadow-lg shadow-primary/20">
                             <Plus className="h-4 w-4"/>
                             Add New User
                         </Button>
@@ -191,40 +191,46 @@ export default function UsersPage() {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-                            <Users className="h-4 w-4 text-muted-foreground"/>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Total Users</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                                <Users className="h-4 w-4 text-blue-400"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{totalUsers}</div>
+                            <div className="text-3xl font-bold tracking-tight">{totalUsers}</div>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-                            <UserCheck className="h-4 w-4 text-green-500"/>
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Active Users</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-green-500/10 border border-green-500/20">
+                                <UserCheck className="h-4 w-4 text-green-400"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{activeUsers}</div>
+                            <div className="text-3xl font-bold tracking-tight text-green-400">{activeUsers}</div>
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Suspended</CardTitle>
-                            <UserX className="h-4 w-4 text-red-500"/>
+                    <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                            <CardTitle className="text-sm font-medium text-muted-foreground/80">Suspended</CardTitle>
+                            <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20">
+                                <UserX className="h-4 w-4 text-red-400"/>
+                            </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-red-600 dark:text-red-400">{suspendedUsers}</div>
+                            <div className="text-3xl font-bold tracking-tight text-red-400">{suspendedUsers}</div>
                         </CardContent>
                     </Card>
                 </div>
 
                 {/* Users Table with TanStack */}
-                <Card>
+                <Card className="border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                     <CardHeader>
-                        <CardTitle>All Users</CardTitle>
+                        <CardTitle className="text-lg font-semibold">All Users</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <DataTable

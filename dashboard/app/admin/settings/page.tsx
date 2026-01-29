@@ -14,16 +14,16 @@ import {Bell, Database, Save, Shield} from 'lucide-react';
 export default function SettingsPage() {
     return (
         <AdminLayout>
-            <div className="space-y-6">
+            <div className="space-y-8">
                 {/* Header */}
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold">Settings</h1>
-                    <p className="text-muted-foreground mt-1">Manage platform settings and preferences</p>
+                    <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">Settings</h1>
+                    <p className="text-muted-foreground mt-1.5">Manage platform settings and preferences</p>
                 </div>
 
                 {/* Settings Tabs */}
                 <Tabs defaultValue="general" className="space-y-6">
-                    <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+                    <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-muted/20">
                         <TabsTrigger value="general">General</TabsTrigger>
                         <TabsTrigger value="notifications">Notifications</TabsTrigger>
                         <TabsTrigger value="security">Security</TabsTrigger>
@@ -31,8 +31,8 @@ export default function SettingsPage() {
                     </TabsList>
 
                     {/* General Settings */}
-                    <TabsContent value="general" className="space-y-4">
-                        <Card className="p-4 sm:p-6">
+                    <TabsContent value="general" className="space-y-6">
+                        <Card className="p-4 sm:p-6 border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                             <h3 className="text-lg font-semibold mb-4">Platform Information</h3>
                             <div className="space-y-4">
                                 <div>
@@ -71,7 +71,7 @@ export default function SettingsPage() {
                             </div>
                         </Card>
 
-                        <Card className="p-4 sm:p-6">
+                        <Card className="p-4 sm:p-6 border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                             <h3 className="text-lg font-semibold mb-4">Commission Settings</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div>
@@ -107,7 +107,7 @@ export default function SettingsPage() {
 
                     {/* Notification Settings */}
                     <TabsContent value="notifications" className="space-y-4">
-                        <Card className="p-4 sm:p-6">
+                        <Card className="p-4 sm:p-6 border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                                 <Bell className="h-5 w-5"/>
                                 Notification Preferences
@@ -151,7 +151,7 @@ export default function SettingsPage() {
 
                     {/* Security Settings */}
                     <TabsContent value="security" className="space-y-4">
-                        <Card className="p-4 sm:p-6">
+                        <Card className="p-4 sm:p-6 border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                                 <Shield className="h-5 w-5"/>
                                 Security Settings
@@ -185,7 +185,7 @@ export default function SettingsPage() {
                             </div>
                         </Card>
 
-                        <Card className="p-4 sm:p-6">
+                        <Card className="p-4 sm:p-6 border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                             <h3 className="text-lg font-semibold mb-4">Two-Factor Authentication</h3>
                             <div className="flex items-center justify-between">
                                 <div>
@@ -200,7 +200,7 @@ export default function SettingsPage() {
 
                     {/* Advanced Settings */}
                     <TabsContent value="advanced" className="space-y-4">
-                        <Card className="p-4 sm:p-6">
+                        <Card className="p-4 sm:p-6 border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                                 <Database className="h-5 w-5"/>
                                 Database Settings
@@ -226,7 +226,7 @@ export default function SettingsPage() {
                             </div>
                         </Card>
 
-                        <Card className="p-4 sm:p-6">
+                        <Card className="p-4 sm:p-6 border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                             <h3 className="text-lg font-semibold mb-4">Cache Settings</h3>
                             <div className="space-y-2">
                                 <p className="text-sm text-muted-foreground">Clear cache to refresh all data</p>
@@ -236,7 +236,7 @@ export default function SettingsPage() {
                             </div>
                         </Card>
 
-                        <Card className="p-4 sm:p-6">
+                        <Card className="p-4 sm:p-6 border-border/50 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
                             <h3 className="text-lg font-semibold mb-4">API Settings</h3>
                             <div>
                                 <Label htmlFor="api-key">API Key</Label>
