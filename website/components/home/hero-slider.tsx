@@ -69,7 +69,9 @@ export default function VarsityMartHeroSlider() {
 	return (
 		<div className="relative max-w-360 my-4 mx-auto w-full h-[320px] md:h-[420px] overflow-hidden md:rounded-2xl rounded-lg bg-neutral-900 shadow-xl">
 			<Swiper
-				ref={swiperRef}
+				onSwiper={(swiper) => {
+					swiperRef.current = swiper;
+				}}
 				modules={[Autoplay, Navigation, Pagination, EffectFade]}
 				spaceBetween={0}
 				slidesPerView={1}

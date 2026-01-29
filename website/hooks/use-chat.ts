@@ -25,8 +25,8 @@ export function useMessages(conversationId: string) {
     queryKey: queryKeys.chat.messages(conversationId),
     queryFn: ({ pageParam = 1 }) => chatService.getMessages(conversationId, pageParam),
     getNextPageParam: (lastPage) => {
-      if (lastPage.meta.page < lastPage.meta.totalPages) {
-        return lastPage.meta.page + 1
+      if (lastPage.page < lastPage.totalPages) {
+        return lastPage.page + 1
       }
       return undefined
     },

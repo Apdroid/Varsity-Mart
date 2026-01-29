@@ -306,7 +306,9 @@ export function ProductDetailContent({ productId, initialProduct }: ProductDetai
 									<AvatarImage
 										src={product.store?.logo || product.seller.avatar}
 									/>
-									<AvatarFallback>{product.seller?.firstName[0]}</AvatarFallback>
+									<AvatarFallback>
+										{product.seller?.firstName?.[0] || product.seller.fullName?.[0] || "S"}
+									</AvatarFallback>
 								</Avatar>
 								<div className="flex-1 min-w-0">
 									<Link
@@ -314,7 +316,9 @@ export function ProductDetailContent({ productId, initialProduct }: ProductDetai
 										className="font-semibold text-foreground hover:text-primary/90 transition-colors"
 									>
 										{product.store?.name ||
-											`${product.seller.firstName} ${product.seller.lastName}`}
+											(product.seller.firstName && product.seller.lastName
+												? `${product.seller.firstName} ${product.seller.lastName}`
+												: product.seller.fullName || "Unknown Seller")}
 									</Link>
 									{product.store && (
 										<div className="flex items-center gap-2 text-sm text-muted-foreground">

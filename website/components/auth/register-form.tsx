@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Upload, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -31,10 +31,12 @@ import {
 } from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth";
 import { universities } from "@/data/auth/universities";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const registerSchema = z.object({
 	firstName: z.string().min(2, "First name is required"),
 	lastName: z.string().min(2, "Last name is required"),
+	avatar: z.any().optional(),
 	email: z.string().email("Please enter a valid email"),
 	phone: z.string().min(10, "Please enter a valid phone number"),
 	role: z.enum(["buyer", "seller"], {
@@ -65,12 +67,14 @@ export default function RegisterForm() {
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+	const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
 	const form = useForm<RegisterFormValues>({
 		resolver: zodResolver(registerSchema),
 		defaultValues: {
 			firstName: "",
 			lastName: "",
+			avatar: undefined,
 			email: "",
 			phone: "",
 			role: "buyer",
@@ -87,6 +91,18 @@ export default function RegisterForm() {
 	const isStudent = form.watch("isStudent");
 	const selectedUniversity = form.watch("university");
 	const availableCampuses = selectedUniversity ? universities[selectedUniversity] || [] : [];
+
+	const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (file) {
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				setAvatarPreview(reader.result as string);
+			};
+			reader.readAsDataURL(file);
+			form.setValue("avatar", file);
+		}
+	};
 
 	const onSubmit = async (data: RegisterFormValues) => {
 		setIsLoading(true);
@@ -181,6 +197,47 @@ export default function RegisterForm() {
 							)}
 						/>
 					</div>
+
+					{/* Profile Picture */}
+					<FormField
+						control={form.control}
+						name="avatar"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Profile Picture (Optional)</FormLabel>
+								<FormControl>
+									<div className="flex items-center gap-4">
+										<Avatar className="h-20 w-20 border-2 border-border">
+											<AvatarImage src={avatarPreview || undefined} alt="Profile preview" />
+											<AvatarFallback className="bg-muted">
+												<User className="h-10 w-10 text-muted-foreground" />
+											</AvatarFallback>
+										</Avatar>
+										<div className="flex-1">
+											<Label htmlFor="avatar-upload" className="cursor-pointer">
+												<div className="flex items-center justify-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors">
+													<Upload className="h-4 w-4" />
+													<span className="text-sm">Upload Photo</span>
+												</div>
+												<Input
+													id="avatar-upload"
+													type="file"
+													accept="image/*"
+													className="hidden"
+													disabled={isLoading}
+													onChange={handleAvatarChange}
+												/>
+											</Label>
+											<p className="text-xs text-muted-foreground mt-2">
+												JPG, PNG or GIF (max. 5MB)
+											</p>
+										</div>
+									</div>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
 					{/* Email */}
 					<FormField

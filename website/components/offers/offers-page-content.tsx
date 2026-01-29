@@ -150,13 +150,15 @@ export function OffersPageContent() {
                           <Avatar className="h-10 w-10">
                             <AvatarImage src={offer.buyer.avatar || "/placeholder.svg"} />
                             <AvatarFallback>
-                              {offer.buyer.firstName[0]}
-                              {offer.buyer.lastName[0]}
+                              {offer.buyer.firstName?.[0] || offer.buyer.fullName?.[0] || "U"}
+                              {offer.buyer.lastName?.[0] || ""}
                             </AvatarFallback>
                           </Avatar>
                           <div>
                             <p className="font-medium text-sm">
-                              {offer.buyer.firstName} {offer.buyer.lastName}
+                              {offer.buyer.firstName && offer.buyer.lastName 
+                                ? `${offer.buyer.firstName} ${offer.buyer.lastName}`
+                                : offer.buyer.fullName || "Anonymous"}
                             </p>
                             <p className="text-xs text-muted-foreground">Verified Student</p>
                           </div>

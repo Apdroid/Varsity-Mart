@@ -6,7 +6,7 @@ const footerLinks = {
   marketplace: [
     { name: "Browse Products", href: "/products" },
     { name: "Stores", href: "/stores" },
-    { name: "Food & Restaurants", href: "/food" },
+    { name: "Food & Restaurants", href: "/restaurants" },
     { name: "Categories", href: "/categories" },
   ],
   selling: [
@@ -30,10 +30,10 @@ const footerLinks = {
 }
 
 const socialLinks = [
-  { name: "Facebook", href: "#", icon: Facebook },
-  { name: "Twitter", href: "#", icon: Twitter },
-  { name: "Instagram", href: "#", icon: Instagram },
-  { name: "YouTube", href: "#", icon: Youtube },
+  { name: "Facebook", href: "https://facebook.com", icon: Facebook, external: true },
+  { name: "Twitter", href: "https://twitter.com", icon: Twitter, external: true },
+  { name: "Instagram", href: "https://instagram.com", icon: Instagram, external: true },
+  { name: "YouTube", href: "https://youtube.com", icon: Youtube, external: true },
 ]
 
 export function Footer() {
@@ -52,9 +52,11 @@ export function Footer() {
                 <Link
                   key={social.name}
                   href={social.href}
-                  className="flex items-center justify-center h-9 w-9 rounded-full bg-muted hover:bg-accent transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center h-9 w-9 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
                 >
-                  <social.icon className="h-4 w-4 text-muted-foreground" />
+                  <social.icon className="h-4 w-4" />
                   <span className="sr-only">{social.name}</span>
                 </Link>
               ))}

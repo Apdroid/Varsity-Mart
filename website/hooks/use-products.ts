@@ -17,8 +17,8 @@ export function useInfiniteProducts(filters: ProductFilters = {}) {
     queryKey: queryKeys.products.list(filters),
     queryFn: ({ pageParam = 1 }) => productsService.getProducts({ ...filters, page: pageParam }),
     getNextPageParam: (lastPage) => {
-      if (lastPage.meta.page < lastPage.meta.totalPages) {
-        return lastPage.meta.page + 1
+      if (lastPage.page < lastPage.totalPages) {
+        return lastPage.page + 1
       }
       return undefined
     },

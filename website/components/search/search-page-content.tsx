@@ -323,6 +323,18 @@ export function SearchPageContent() {
 	return (
 		<div className="mx-auto max-w-[97%] px-4 sm:px-6 lg:px-8 py-6">
 			{/* Search Bar */}
+			<form onSubmit={handleSearch} className="mb-6">
+				<div className="relative max-w-3xl mx-auto">
+					<Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+					<Input
+						type="text"
+						placeholder="Search for products, stores, or food..."
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+						className="pl-12 pr-4 h-14 text-base border-2 focus-visible:ring-primary rounded-xl"
+					/>
+				</div>
+			</form>
 
 			{/* Active Filters */}
 			{(selectedCategory || selectedConditions.length > 0) && (

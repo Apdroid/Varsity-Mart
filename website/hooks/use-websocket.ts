@@ -3,8 +3,8 @@
 import { useEffect, useCallback } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { wsClient, type WebSocketEvents } from "@/lib/utils/websocket"
-import { useAuthStore } from "@/stores/auth-store"
-import { useNotificationStore } from "@/stores/notification-store"
+import { useAuthStore } from "@/lib/stores/auth-store"
+import { useNotificationStore } from "@/lib/stores/notification-store"
 import { queryKeys } from "@/lib/api/query-keys"
 
 export function useWebSocket() {

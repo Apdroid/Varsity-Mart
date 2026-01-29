@@ -1,30 +1,30 @@
 "use client"
 
-import { useCartStore, type CartItem } from "@/lib/stores/cart.store"
+import { useCartStore, type CartItem } from "@/lib/stores/cart-store"
 
 export function useCart() {
-  const { items, addItem, removeItem, updateQuantity, clearCart, getTotal, getItemCount } = useCartStore()
+  const { items, addItem, removeItem, updateQuantity, clearCart, totalItems, subtotal, getItem } = useCartStore()
 
-  const isInCart = (productId: string) => items.some((item) => item.productId === productId)
+  const isInCart = (productId: string) => items.some((item) => item.product.id === productId)
 
   const getQuantity = (productId: string) => {
-    const item = items.find((i) => i.productId === productId)
+    const item = items.find((i) => i.product.id === productId)
     return item?.quantity ?? 0
   }
 
-  const getItem = (productId: string) => items.find((i) => i.productId === productId)
+  const getItemByProductId = (productId: string) => items.find((i) => i.product.id === productId)
 
   return {
     items,
-    totalItems: getItemCount(),
-    subtotal: getTotal(),
+    totalItems,
+    subtotal,
     addItem,
     removeItem,
     updateQuantity,
     clearCart,
     isInCart,
     getQuantity,
-    getItem,
+    getItem: getItemByProductId,
   }
 }
 

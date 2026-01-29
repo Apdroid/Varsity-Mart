@@ -242,7 +242,7 @@ const RestaurantCardEnhanced: React.FC<RestaurantCardEnhancedProps> = ({
 								<MapPin className="w-5 h-5 text-primary mx-auto mb-1" />
 								<p className="text-xs text-muted-foreground">Location</p>
 								<p className="font-semibold text-foreground text-xs leading-tight">
-									{restaurant.location.street.split(",")[0]}
+									{restaurant.location.address}
 								</p>
 							</div>
 						</div>
@@ -343,7 +343,7 @@ const RestaurantCardEnhanced: React.FC<RestaurantCardEnhancedProps> = ({
 					</div>
 					<div className="flex items-center gap-2 text-muted-foreground col-span-2">
 						<MapPin className="w-4 h-4 text-primary" />
-						<span className="truncate">{restaurant.location.street}</span>
+						<span className="truncate">{restaurant.location.address}</span>
 					</div>
 				</div>
 
