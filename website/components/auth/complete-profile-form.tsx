@@ -1,10 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, Loader2, ShoppingBag, Store, Upload, User } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, GraduationCap, Loader2, ShoppingBag, Store, Upload, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { cn } from "@/lib/utils";
@@ -31,13 +31,9 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { universities } from "@/data/auth/universities";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { authService } from "@/lib/api/services/auth.service";
+import { userService } from "@/lib/api/services/user.service";
 
-const registerSchema = z.object({
-	firstName: z.string().min(2, "First name is required"),
-	lastName: z.string().min(2, "Last name is required"),
-	avatar: z.any().optional(),
-	email: z.string().email("Please enter a valid email"),
+const completeProfileSchema = z.object({
 	phone: z.string().min(10, "Please enter a valid phone number"),
 	role: z.enum(["buyer", "seller"], {
 		required_error: "Please select how you want to use VarsityMart",
@@ -46,52 +42,37 @@ const registerSchema = z.object({
 	studentId: z.string().optional(),
 	university: z.string().min(1, "Please select your university"),
 	campus: z.string().min(1, "Please select your campus"),
-	password: z.string().min(8, "Password must be at least 8 characters"),
-	confirmPassword: z.string(),
 	agreeToTerms: z.boolean().refine((val) => val, {
 		message: "You must agree to the terms and conditions",
 	}),
-}).refine((data) => data.password === data.confirmPassword, {
-	message: "Passwords don't match",
-	path: ["confirmPassword"],
 }).refine((data) => !data.isStudent || (data.isStudent && data.studentId && data.studentId.length > 0), {
 	message: "Student ID is required for students",
 	path: ["studentId"],
 });
 
-type RegisterFormValues = z.infer<typeof registerSchema>;
+type CompleteProfileFormValues = z.infer<typeof completeProfileSchema>;
 
 const STEPS = [
 	{ id: 1, title: "Account Type", description: "How will you use VarsityMart?" },
-	{ id: 2, title: "Personal Info", description: "Tell us about yourself" },
-	{ id: 3, title: "University", description: "Where do you study?" },
-	{ id: 4, title: "Security", description: "Secure your account" },
+	{ id: 2, title: "University", description: "Where do you study or work?" },
+	{ id: 3, title: "Verification", description: "Complete your KYC" },
 ];
 
-export default function RegisterForm() {
+export default function CompleteProfileForm() {
 	const router = useRouter();
-	const { registerAsync, isRegistering } = useAuth();
+	const { user, refetchUser } = useAuth();
 	const [currentStep, setCurrentStep] = useState(1);
-	const [showPassword, setShowPassword] = useState(false);
-	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
-	const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-	const form = useForm<RegisterFormValues>({
-		resolver: zodResolver(registerSchema),
+	const form = useForm<CompleteProfileFormValues>({
+		resolver: zodResolver(completeProfileSchema),
 		defaultValues: {
-			firstName: "",
-			lastName: "",
-			avatar: undefined,
-			email: "",
 			phone: "",
 			role: "buyer",
 			isStudent: true,
 			studentId: "",
 			university: "",
 			campus: "",
-			password: "",
-			confirmPassword: "",
 			agreeToTerms: false,
 		},
 		mode: "onChange",
@@ -102,39 +83,35 @@ export default function RegisterForm() {
 	const selectedRole = form.watch("role");
 	const availableCampuses = selectedUniversity ? universities[selectedUniversity] || [] : [];
 
-	const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (file) {
-			const reader = new FileReader();
-			reader.onloadend = () => {
-				setAvatarPreview(reader.result as string);
-			};
-			reader.readAsDataURL(file);
-			form.setValue("avatar", file);
+	// Redirect if user hasn't signed in with OAuth
+	useEffect(() => {
+		// If no user or user already has complete profile, redirect
+		if (!user) {
+			// Allow access for OAuth flow - user data might be loading
+			return;
 		}
-	};
+
+		// Profile completion check removed - fields not in User model
+	}, [user, router]);
 
 	// Validate current step before proceeding
 	const validateStep = async (step: number): Promise<boolean> => {
-		let fieldsToValidate: (keyof RegisterFormValues)[] = [];
-		
+		let fieldsToValidate: (keyof CompleteProfileFormValues)[] = [];
+
 		switch (step) {
 			case 1:
-				fieldsToValidate = ["role"];
+				fieldsToValidate = ["role", "phone"];
 				break;
 			case 2:
-				fieldsToValidate = ["firstName", "lastName", "email", "phone"];
-				break;
-			case 3:
-				fieldsToValidate = isStudent 
-					? ["university", "campus", "studentId"] 
+				fieldsToValidate = isStudent
+					? ["university", "campus", "studentId"]
 					: ["university", "campus"];
 				break;
-			case 4:
-				fieldsToValidate = ["password", "confirmPassword", "agreeToTerms"];
+			case 3:
+				fieldsToValidate = ["agreeToTerms"];
 				break;
 		}
-		
+
 		const result = await form.trigger(fieldsToValidate);
 		return result;
 	};
@@ -152,13 +129,11 @@ export default function RegisterForm() {
 		}
 	};
 
-	const onSubmit = async (data: RegisterFormValues) => {
+	const onSubmit = async (data: CompleteProfileFormValues) => {
 		setIsLoading(true);
 		try {
-			const response = await registerAsync({
-				email: data.email,
-				password: data.password,
-				fullName: `${data.firstName} ${data.lastName}`,
+			// Update user profile with KYC data
+			await userService.updateProfile({
 				phone: data.phone,
 				role: data.role,
 				university: data.university,
@@ -166,25 +141,16 @@ export default function RegisterForm() {
 				studentId: data.isStudent ? data.studentId : undefined,
 			});
 
-			if (response.success && data.avatar instanceof File) {
-				try {
-					const { userService } = await import("@/lib/api/services/user.service");
-					await userService.uploadAvatar(data.avatar);
-				} catch (uploadError) {
-					console.error("Avatar upload failed:", uploadError);
-				}
-			}
+			// Refetch user data to update the store
+			await refetchUser();
+
+			// Redirect to home or dashboard after completion
+			router.push("/");
 		} catch (error) {
-			console.error("Registration failed:", error);
+			console.error("Profile update failed:", error);
 		} finally {
 			setIsLoading(false);
 		}
-	};
-
-	const handleGoogleAuth = () => {
-		setIsLoading(true);
-		// Redirect to backend Google OAuth endpoint
-		window.location.href = authService.getGoogleAuthUrl();
 	};
 
 	return (
@@ -204,53 +170,55 @@ export default function RegisterForm() {
 					{/* Center Content */}
 					<div className="space-y-6">
 						<div className="space-y-4">
+							<div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
+								<Check className="h-4 w-4" />
+								Google Sign-in Successful
+							</div>
 							<h2 className="text-4xl font-bold text-foreground">
-								{selectedRole === "seller" ? "Start Selling Today" : "Shop Smart on Campus"}
+								Almost There!
 							</h2>
 							<p className="text-lg text-muted-foreground max-w-md">
-								{selectedRole === "seller" 
-									? "Turn your items into cash. Join thousands of student sellers on VarsityMart."
-									: "Discover amazing deals from fellow students. Buy and sell with confidence."
-								}
+								Complete your profile to unlock all features of VarsityMart and start {selectedRole === "seller" ? "selling" : "shopping"}.
 							</p>
 						</div>
 
-						{/* Features */}
+						{/* Why Complete Profile */}
 						<div className="space-y-3">
-							{(selectedRole === "seller" ? [
-								"Zero listing fees for students",
-								"Instant campus-wide reach",
-								"Secure payments guaranteed",
-							] : [
-								"Verified student sellers",
-								"Campus-exclusive deals",
-								"Safe meetup locations",
-							]).map((feature, i) => (
+							<p className="text-sm font-medium text-foreground">Why complete your profile?</p>
+							{[
+								"Verify your identity for secure transactions",
+								"Connect with your campus community",
+								"Access exclusive student deals",
+								"Build trust with other users",
+							].map((reason, i) => (
 								<div key={i} className="flex items-center gap-3">
 									<div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/20 text-primary">
 										<Check className="h-4 w-4" />
 									</div>
-									<span className="text-foreground">{feature}</span>
+									<span className="text-foreground text-sm">{reason}</span>
 								</div>
 							))}
 						</div>
 					</div>
 
-					{/* Bottom Quote */}
-					<div className="bg-card/80 backdrop-blur-sm rounded-xl p-6 border border-border/50">
-						<p className="text-foreground italic">
-							"VarsityMart made it so easy to sell my textbooks. Made over $200 in my first week!"
-						</p>
-						<div className="mt-4 flex items-center gap-3">
-							<div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-								<User className="h-5 w-5 text-primary" />
-							</div>
-							<div>
-								<p className="font-medium text-sm">Sarah K.</p>
-								<p className="text-xs text-muted-foreground">University of Ghana</p>
+					{/* User Info Card */}
+					{user && (
+						<div className="bg-card/80 backdrop-blur-sm rounded-xl p-6 border border-border/50">
+							<p className="text-xs text-muted-foreground mb-3">Signed in as</p>
+							<div className="flex items-center gap-3">
+								<Avatar className="h-12 w-12">
+									<AvatarImage src={user.avatar || undefined} alt={user.fullName} />
+									<AvatarFallback className="bg-primary/10">
+										<User className="h-6 w-6 text-primary" />
+									</AvatarFallback>
+								</Avatar>
+								<div>
+									<p className="font-medium">{user.fullName}</p>
+									<p className="text-sm text-muted-foreground">{user.email}</p>
+								</div>
 							</div>
 						</div>
-					</div>
+					)}
 				</div>
 			</div>
 
@@ -271,12 +239,12 @@ export default function RegisterForm() {
 					<div className="w-full max-w-md">
 						{/* Progress Indicator */}
 						<div className="mb-8">
-							<div className="flex items-center justify-between mb-2">
+							<div className="flex items-center justify-center mb-2">
 								{STEPS.map((step, index) => (
 									<div key={step.id} className="flex items-center">
 										<div
 											className={cn(
-												"w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
+												"w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
 												currentStep > step.id
 													? "bg-primary text-primary-foreground"
 													: currentStep === step.id
@@ -285,7 +253,7 @@ export default function RegisterForm() {
 											)}
 										>
 											{currentStep > step.id ? (
-												<Check className="h-4 w-4" />
+												<Check className="h-5 w-5" />
 											) : (
 												step.id
 											)}
@@ -293,7 +261,7 @@ export default function RegisterForm() {
 										{index < STEPS.length - 1 && (
 											<div
 												className={cn(
-													"w-12 sm:w-16 h-1 mx-1",
+													"w-16 sm:w-20 h-1 mx-2",
 													currentStep > step.id ? "bg-primary" : "bg-muted"
 												)}
 											/>
@@ -301,15 +269,15 @@ export default function RegisterForm() {
 									</div>
 								))}
 							</div>
-							<div className="text-center mt-4">
-								<h1 className="text-xl font-semibold">{STEPS[currentStep - 1].title}</h1>
-								<p className="text-sm text-muted-foreground">{STEPS[currentStep - 1].description}</p>
+							<div className="text-center mt-6">
+								<h1 className="text-2xl font-bold">{STEPS[currentStep - 1].title}</h1>
+								<p className="text-sm text-muted-foreground mt-1">{STEPS[currentStep - 1].description}</p>
 							</div>
 						</div>
 
 						<Form {...form}>
 							<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-								{/* Step 1: Account Type */}
+								{/* Step 1: Account Type & Phone */}
 								{currentStep === 1 && (
 									<div className="space-y-6">
 										<FormField
@@ -317,6 +285,7 @@ export default function RegisterForm() {
 											name="role"
 											render={({ field }) => (
 												<FormItem>
+													<FormLabel className="text-base">I want to</FormLabel>
 													<FormControl>
 														<div className="grid grid-cols-2 gap-4">
 															<button
@@ -369,106 +338,6 @@ export default function RegisterForm() {
 											)}
 										/>
 
-										<div className="relative">
-											<div className="absolute inset-0 flex items-center">
-												<span className="w-full border-t border-border" />
-											</div>
-											<div className="relative flex justify-center text-xs uppercase">
-												<span className="bg-background px-2 text-muted-foreground">or continue with</span>
-											</div>
-										</div>
-
-										<Button
-											type="button"
-											variant="outline"
-											className="w-full h-11"
-											onClick={handleGoogleAuth}
-											disabled={isLoading}
-										>
-											<svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-												<path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-												<path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-												<path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-												<path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-											</svg>
-											Continue with Google
-										</Button>
-									</div>
-								)}
-
-								{/* Step 2: Personal Info */}
-								{currentStep === 2 && (
-									<div className="space-y-4">
-										{/* Avatar Upload */}
-										<div className="flex justify-center mb-2">
-											<div className="relative">
-												<Avatar className="h-24 w-24 border-4 border-background shadow-lg">
-													<AvatarImage src={avatarPreview || undefined} alt="Profile preview" />
-													<AvatarFallback className="bg-primary/10">
-														<User className="h-10 w-10 text-primary" />
-													</AvatarFallback>
-												</Avatar>
-												<Label htmlFor="avatar-upload" className="absolute bottom-0 right-0 cursor-pointer">
-													<div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors">
-														<Upload className="h-4 w-4" />
-													</div>
-													<Input
-														id="avatar-upload"
-														type="file"
-														accept="image/*"
-														className="hidden"
-														disabled={isLoading || isRegistering}
-														onChange={handleAvatarChange}
-													/>
-												</Label>
-											</div>
-										</div>
-										<p className="text-xs text-center text-muted-foreground mb-4">Upload a profile photo (optional)</p>
-
-										<div className="grid grid-cols-2 gap-3">
-											<FormField
-												control={form.control}
-												name="firstName"
-												render={({ field }) => (
-													<FormItem>
-														<FormLabel>First name</FormLabel>
-														<FormControl>
-															<Input placeholder="John" autoComplete="given-name" disabled={isLoading || isRegistering} {...field} />
-														</FormControl>
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
-											<FormField
-												control={form.control}
-												name="lastName"
-												render={({ field }) => (
-													<FormItem>
-														<FormLabel>Last name</FormLabel>
-														<FormControl>
-															<Input placeholder="Doe" autoComplete="family-name" disabled={isLoading || isRegistering} {...field} />
-														</FormControl>
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
-										</div>
-
-										<FormField
-											control={form.control}
-											name="email"
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Email</FormLabel>
-													<FormControl>
-														<Input type="email" placeholder="you@university.edu" autoComplete="email" disabled={isLoading || isRegistering} {...field} />
-													</FormControl>
-													<FormDescription className="text-xs">Use your university email for faster verification</FormDescription>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-
 										<FormField
 											control={form.control}
 											name="phone"
@@ -476,8 +345,18 @@ export default function RegisterForm() {
 												<FormItem>
 													<FormLabel>Phone number</FormLabel>
 													<FormControl>
-														<Input type="tel" placeholder="+233 XX XXX XXXX" autoComplete="tel" disabled={isLoading || isRegistering} {...field} />
+														<Input
+															type="tel"
+															placeholder="+233 XX XXX XXXX"
+															autoComplete="tel"
+															disabled={isLoading || isLoading}
+															className="h-12"
+															{...field}
+														/>
 													</FormControl>
+													<FormDescription className="text-xs">
+														We'll use this for order notifications and verification
+													</FormDescription>
 													<FormMessage />
 												</FormItem>
 											)}
@@ -485,23 +364,28 @@ export default function RegisterForm() {
 									</div>
 								)}
 
-								{/* Step 3: University */}
-								{currentStep === 3 && (
+								{/* Step 2: University */}
+								{currentStep === 2 && (
 									<div className="space-y-4">
 										<FormField
 											control={form.control}
 											name="isStudent"
 											render={({ field }) => (
 												<FormItem className="flex items-center justify-between rounded-xl border-2 border-muted p-4 hover:border-primary/50 transition-colors">
-													<div className="space-y-0.5">
-														<FormLabel className="text-base font-medium">I'm a student</FormLabel>
-														<FormDescription className="text-xs">Student accounts get verified faster</FormDescription>
+													<div className="space-y-0.5 flex items-center gap-3">
+														<div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+															<GraduationCap className="h-5 w-5 text-primary" />
+														</div>
+														<div>
+															<FormLabel className="text-base font-medium">I'm a student</FormLabel>
+															<FormDescription className="text-xs">Student accounts get verified faster</FormDescription>
+														</div>
 													</div>
 													<FormControl>
 														<Checkbox
 															checked={field.value}
 															onCheckedChange={field.onChange}
-															disabled={isLoading || isRegistering}
+															disabled={isLoading || isLoading}
 															className="h-6 w-6 rounded-md border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
 														/>
 													</FormControl>
@@ -521,10 +405,10 @@ export default function RegisterForm() {
 															form.setValue("campus", "");
 														}}
 														defaultValue={field.value}
-														disabled={isLoading || isRegistering}
+														disabled={isLoading || isLoading}
 													>
 														<FormControl>
-															<SelectTrigger className="h-11">
+															<SelectTrigger className="h-12">
 																<SelectValue placeholder="Select your university" />
 															</SelectTrigger>
 														</FormControl>
@@ -548,9 +432,13 @@ export default function RegisterForm() {
 												render={({ field }) => (
 													<FormItem>
 														<FormLabel>Campus</FormLabel>
-														<Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading || isRegistering}>
+														<Select
+															onValueChange={field.onChange}
+															defaultValue={field.value}
+															disabled={isLoading || isLoading}
+														>
 															<FormControl>
-																<SelectTrigger className="h-11">
+																<SelectTrigger className="h-12">
 																	<SelectValue placeholder="Select your campus" />
 																</SelectTrigger>
 															</FormControl>
@@ -576,9 +464,14 @@ export default function RegisterForm() {
 													<FormItem>
 														<FormLabel>Student ID</FormLabel>
 														<FormControl>
-															<Input placeholder="e.g. PS/CSC/20/0001" disabled={isLoading || isRegistering} {...field} />
+															<Input
+																placeholder="e.g. PS/CSC/20/0001"
+																disabled={isLoading || isLoading}
+																className="h-12"
+																{...field}
+															/>
 														</FormControl>
-														<FormDescription className="text-xs">Required for KYC verification</FormDescription>
+														<FormDescription className="text-xs">Required for student verification</FormDescription>
 														<FormMessage />
 													</FormItem>
 												)}
@@ -587,69 +480,38 @@ export default function RegisterForm() {
 									</div>
 								)}
 
-								{/* Step 4: Security */}
-								{currentStep === 4 && (
-									<div className="space-y-4">
-										<FormField
-											control={form.control}
-											name="password"
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Password</FormLabel>
-													<FormControl>
-														<div className="relative">
-															<Input
-																type={showPassword ? "text" : "password"}
-																placeholder="••••••••"
-																autoComplete="new-password"
-																disabled={isLoading || isRegistering}
-																className="h-11 pr-10"
-																{...field}
-															/>
-															<button
-																type="button"
-																onClick={() => setShowPassword(!showPassword)}
-																className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-															>
-																{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-															</button>
-														</div>
-													</FormControl>
-													<FormDescription className="text-xs">Minimum 8 characters</FormDescription>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
+								{/* Step 3: Terms & Complete */}
+								{currentStep === 3 && (
+									<div className="space-y-6">
+										{/* Summary Card */}
+										<div className="rounded-xl border-2 border-muted p-5 space-y-4">
+											<h3 className="font-semibold text-lg">Profile Summary</h3>
 
-										<FormField
-											control={form.control}
-											name="confirmPassword"
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Confirm password</FormLabel>
-													<FormControl>
-														<div className="relative">
-															<Input
-																type={showConfirmPassword ? "text" : "password"}
-																placeholder="••••••••"
-																autoComplete="new-password"
-																disabled={isLoading || isRegistering}
-																className="h-11 pr-10"
-																{...field}
-															/>
-															<button
-																type="button"
-																onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-																className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-															>
-																{showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-															</button>
-														</div>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
+											<div className="space-y-3">
+												<div className="flex justify-between items-center py-2 border-b border-border/50">
+													<span className="text-sm text-muted-foreground">Account Type</span>
+													<span className="text-sm font-medium capitalize">{form.watch("role")}</span>
+												</div>
+												<div className="flex justify-between items-center py-2 border-b border-border/50">
+													<span className="text-sm text-muted-foreground">Phone</span>
+													<span className="text-sm font-medium">{form.watch("phone")}</span>
+												</div>
+												<div className="flex justify-between items-center py-2 border-b border-border/50">
+													<span className="text-sm text-muted-foreground">University</span>
+													<span className="text-sm font-medium">{form.watch("university")}</span>
+												</div>
+												<div className="flex justify-between items-center py-2 border-b border-border/50">
+													<span className="text-sm text-muted-foreground">Campus</span>
+													<span className="text-sm font-medium">{form.watch("campus")}</span>
+												</div>
+												{isStudent && (
+													<div className="flex justify-between items-center py-2">
+														<span className="text-sm text-muted-foreground">Student ID</span>
+														<span className="text-sm font-medium">{form.watch("studentId")}</span>
+													</div>
+												)}
+											</div>
+										</div>
 
 										<FormField
 											control={form.control}
@@ -660,7 +522,7 @@ export default function RegisterForm() {
 														<Checkbox
 															checked={field.value}
 															onCheckedChange={field.onChange}
-															disabled={isLoading || isRegistering}
+															disabled={isLoading || isLoading}
 															className="mt-0.5 h-5 w-5 rounded border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
 														/>
 													</FormControl>
@@ -673,6 +535,10 @@ export default function RegisterForm() {
 												</FormItem>
 											)}
 										/>
+
+										<p className="text-xs text-muted-foreground text-center">
+											By completing your profile, you confirm that the information provided is accurate.
+										</p>
 									</div>
 								)}
 
@@ -683,20 +549,20 @@ export default function RegisterForm() {
 											type="button"
 											variant="outline"
 											onClick={prevStep}
-											disabled={isLoading || isRegistering}
-											className="flex-1 h-11"
+											disabled={isLoading || isLoading}
+											className="flex-1 h-12"
 										>
 											<ArrowLeft className="h-4 w-4 mr-2" />
 											Back
 										</Button>
 									)}
-									
+
 									{currentStep < STEPS.length ? (
 										<Button
 											type="button"
 											onClick={nextStep}
-											disabled={isLoading || isRegistering}
-											className="flex-1 h-11"
+											disabled={isLoading || isLoading}
+											className="flex-1 h-12"
 										>
 											Continue
 											<ArrowRight className="h-4 w-4 ml-2" />
@@ -704,16 +570,19 @@ export default function RegisterForm() {
 									) : (
 										<Button
 											type="submit"
-											disabled={isLoading || isRegistering}
-											className="flex-1 h-11"
+											disabled={isLoading || isLoading}
+											className="flex-1 h-12"
 										>
-											{(isLoading || isRegistering) ? (
+											{(isLoading || isLoading) ? (
 												<>
 													<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-													Creating account...
+													Completing profile...
 												</>
 											) : (
-												"Create account"
+												<>
+													<Check className="mr-2 h-4 w-4" />
+													Complete Profile
+												</>
 											)}
 										</Button>
 									)}
@@ -721,11 +590,11 @@ export default function RegisterForm() {
 							</form>
 						</Form>
 
-						{/* Sign in link */}
+						{/* Skip for now link */}
 						<p className="mt-6 text-center text-sm text-muted-foreground">
-							Already have an account?{" "}
-							<Link href="/auth/login" className="text-primary font-medium hover:underline">
-								Sign in
+							Want to explore first?{" "}
+							<Link href="/" className="text-primary font-medium hover:underline">
+								Skip for now
 							</Link>
 						</p>
 					</div>

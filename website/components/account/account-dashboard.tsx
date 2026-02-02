@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Shield, Store } from "lucide-react";
+import { ChevronRight, Shield, Store, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -14,30 +14,50 @@ import {
 } from "@/components/ui/card";
 import {
 	menuItems,
-	mockUser,
 	recentOrders,
 	statusColors,
 } from "@/data/account/account";
+import { useAuth } from "@/hooks/use-auth";
 
 export function AccountDashboard() {
+	const { user, isLoading } = useAuth();
+
+	if (isLoading) {
+		return (
+			<div className="flex h-[400px] items-center justify-center">
+				<Loader2 className="h-8 w-8 animate-spin text-primary" />
+			</div>
+		);
+	}
+
+	if (!user) {
+		return (
+			<div className="flex h-[400px] flex-col items-center justify-center gap-4 text-center">
+				<p className="text-muted-foreground text-lg">You must be logged in to view your account.</p>
+				<Button asChild>
+					<Link href="/auth/login">Login</Link>
+				</Button>
+			</div>
+		);
+	}
+
 	return (
 		<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
 			{/* Header */}
 			<div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
 				<div className="flex items-center gap-4">
 					<Avatar className="h-20 w-20">
-						<AvatarImage src={mockUser.avatar || "/placeholder.svg"} />
+						<AvatarImage src={user.avatar || "/placeholder.svg"} />
 						<AvatarFallback className="text-2xl">
-							{mockUser.firstName[0]}
-							{mockUser.lastName[0]}
+							{user.fullName?.[0] || user.email[0].toUpperCase()}
 						</AvatarFallback>
 					</Avatar>
 					<div>
 						<h1 className="text-2xl font-bold text-foreground">
-							{mockUser.firstName} {mockUser.lastName}
+							{user.fullName || "User"}
 						</h1>
-						<p className="text-muted-foreground">{mockUser.email}</p>
-						{mockUser.kycStatus === "approved" && (
+						<p className="text-muted-foreground">{user.email}</p>
+						{user.kycStatus === "approved" && (
 							<Badge className="mt-1 bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary">
 								<Shield className="h-3 w-3 mr-1" />
 								Verified Student

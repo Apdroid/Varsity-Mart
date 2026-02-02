@@ -17,6 +17,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authService } from "@/lib/api/services/auth.service";
 
 const forgotPasswordSchema = z.object({
 	email: z.string().email("Please enter a valid email"),
@@ -38,8 +39,7 @@ export function ForgotPasswordForm() {
 	const onSubmit = async (data: ForgotPasswordFormValues) => {
 		setIsLoading(true);
 		try {
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 1500));
+			await authService.forgotPassword(data.email);
 			setIsSubmitted(true);
 		} catch (error) {
 			console.error(error);

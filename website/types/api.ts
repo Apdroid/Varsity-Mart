@@ -10,6 +10,10 @@ export interface RegisterRequest {
   fullName: string
   phone?: string
   avatar?: string
+  role: "buyer" | "seller"
+  university: string
+  campus: string
+  studentId?: string
 }
 
 export interface AuthResponse {
@@ -85,6 +89,26 @@ export interface OrderFilters extends PaginationParams {
   status?: string
   buyerId?: string
   sellerId?: string
+  search?: string
+}
+
+export interface StoreFilters extends PaginationParams {
+  search?: string
+  isVerified?: boolean
+  isOpen?: boolean
+}
+
+export interface CreateStoreRequest {
+  name: string
+  description: string
+  logo?: string
+  banner?: string
+  locationId?: string
+}
+
+export interface UpdateStoreRequest extends Partial<CreateStoreRequest> {
+  id: string
+  isOpen?: boolean
 }
 
 export interface CreateOrderRequest {
@@ -118,4 +142,56 @@ export interface ResolveDisputeRequest {
   disputeId: string
   resolution: string
   action: "resolve" | "close"
+}
+
+
+export interface SubmitStudentKYCRequest {
+  studentId: string
+  documents: Array<{
+    type: string
+    url: string
+  }>
+}
+
+export interface SubmitBusinessKYCRequest {
+  businessName: string
+  registrationNumber: string
+  documents: Array<{
+    type: string
+    url: string
+  }>
+}
+
+export interface UpdateOrderStatusRequest {
+  status: string
+  notes?: string
+}
+
+export interface InitiatePaymentRequest {
+  orderId: string
+  paymentMethodId: string
+}
+
+export interface PaymentResponse {
+  paymentId: string
+  status: string
+  paymentUrl?: string
+}
+
+export interface RestaurantFilters extends PaginationParams {
+  cuisine?: string
+  search?: string
+  isOpen?: boolean
+}
+
+export interface CreateFoodOrderRequest {
+  restaurantId: string
+  items: Array<{
+    menuItemId: string
+    quantity: number
+    selectedOptions?: Record<string, string[]>
+    specialInstructions?: string
+  }>
+  deliveryAddressId: string
+  notes?: string
 }

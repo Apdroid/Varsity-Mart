@@ -5,12 +5,14 @@ export const ENDPOINTS = {
     LOGIN: "/auth/login/",
     REGISTER: "/auth/register/",
     LOGOUT: "/auth/logout/",
-    REFRESH: "/auth/token/refresh/",
+    REFRESH: "/auth/refresh-token/",
     VERIFY_EMAIL: "/auth/verify-email/",
     RESEND_VERIFICATION: "/auth/resend-verification/",
-    FORGOT_PASSWORD: "/auth/password-reset/",
-    RESET_PASSWORD: "/auth/password-reset/confirm/",
+    FORGOT_PASSWORD: "/auth/forgot-password/",
+    RESET_PASSWORD: "/auth/reset-password/",
     CHANGE_PASSWORD: "/auth/change-password/",
+    GOOGLE: "/auth/google/",
+    GOOGLE_CALLBACK: "/auth/google/callback/",
   },
 
   // User Profile
@@ -20,6 +22,7 @@ export const ENDPOINTS = {
     UPLOAD_AVATAR: "/users/me/avatar/",
     ADDRESSES: "/users/me/addresses/",
     ADDRESS: (id: string) => `/users/me/addresses/${id}/`,
+    DETAIL: (id: string) => `/users/${id}/`,
   },
 
   // Products
@@ -30,9 +33,11 @@ export const ENDPOINTS = {
     UPDATE: (id: string) => `/products/${id}/`,
     DELETE: (id: string) => `/products/${id}/`,
     LIKE: (id: string) => `/products/${id}/like/`,
-    CATEGORIES: "/products/categories/",
+    CATEGORIES: "/product-categories/",
     MY_PRODUCTS: "/products/my-products/",
     SEARCH: "/products/search/",
+    UPLOAD_IMAGES: (id: string) => `/products/${id}/upload_images/`,
+    REVIEWS: (id: string) => `/products/${id}/reviews/`,
   },
 
   // Stores
@@ -43,6 +48,8 @@ export const ENDPOINTS = {
     UPDATE: (id: string) => `/stores/${id}/`,
     PRODUCTS: (id: string) => `/stores/${id}/products/`,
     MY_STORE: "/stores/my-store/",
+    CATEGORIES: "/store-categories/",
+    REVIEWS: (id: string) => `/stores/${id}/reviews/`,
   },
 
   // Orders
@@ -65,6 +72,11 @@ export const ENDPOINTS = {
     MENU: (id: string) => `/restaurants/${id}/menu/`,
     CREATE: "/restaurants/",
     UPDATE: (id: string) => `/restaurants/${id}/`,
+    FEATURED: "/restaurants/featured/",
+    MY_RESTAURANT: "/restaurants/my-restaurant/",
+    CATEGORIES: "/restaurant-categories/",
+    DASHBOARD: (id: string) => `/restaurants/${id}/dashboard/`,
+    REVIEWS: (id: string) => `/restaurants/${id}/reviews/`,
   },
 
   // Food Orders
@@ -78,12 +90,12 @@ export const ENDPOINTS = {
 
   // Chat
   CHAT: {
-    CONVERSATIONS: "/chat/conversations/",
-    CONVERSATION: (id: string) => `/chat/conversations/${id}/`,
-    MESSAGES: (conversationId: string) => `/chat/conversations/${conversationId}/messages/`,
-    SEND_MESSAGE: (conversationId: string) => `/chat/conversations/${conversationId}/messages/`,
-    MARK_READ: (conversationId: string) => `/chat/conversations/${conversationId}/read/`,
-    START_CONVERSATION: "/chat/conversations/start/",
+    CONVERSATIONS: "/conversations/",
+    CONVERSATION: (id: string) => `/conversations/${id}/`,
+    MESSAGES: (conversationId: string) => `/conversations/${conversationId}/messages/`,
+    SEND_MESSAGE: (conversationId: string) => `/conversations/${conversationId}/send_message/`,
+    MARK_READ: (conversationId: string) => `/conversations/${conversationId}/mark_read/`,
+    START_CONVERSATION: "/conversations/start_conversation/",
   },
 
   // Payments

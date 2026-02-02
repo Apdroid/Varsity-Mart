@@ -3,20 +3,24 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronRight, Package, Search } from "lucide-react";
+import { ChevronRight, Package, Search, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { mockOrders, statusColors } from "@/data/account/orders";
+import { statusColors } from "@/data/account/orders";
+import { useMyOrders } from "@/hooks/use-orders";
 
 export function OrdersPageContent() {
 	const [activeTab, setActiveTab] = useState("all");
+	const [search, setSearch] = useState("");
+	
+	const { data: ordersResponse, isLoading } = useMyOrders({
+		status: activeTab === "all" ? undefined : activeTab,
+		search: search || undefined,
+	});
 
-	const filteredOrders =
-		activeTab === "all"
-			? mockOrders
-			: mockOrders.filter((order) => order.status === activeTab);
+	const orders = ordersResponse?.data || [];
 
 	return (
 		<div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
@@ -34,7 +38,13 @@ export function OrdersPageContent() {
 				<h1 className="text-2xl font-bold text-foreground">My Orders</h1>
 				<div className="relative w-full sm:w-64">
 					<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-					<Input type="search" placeholder="Search orders..." className="pl-10" />
+					<Input 
+						type="search" 
+						placeholder="Search orders..." 
+						className="pl-10" 
+						value={search}
+						onChange={(e) => setSearch(e.target.value)}
+					/>
 				</div>
 			</div>
 
@@ -49,8 +59,13 @@ export function OrdersPageContent() {
 				</TabsList>
 
 				<TabsContent value={activeTab} className="space-y-4">
-					{filteredOrders.length > 0 ? (
-						filteredOrders.map((order) => (
+					{isLoading ? (
+						<div className="flex flex-col items-center justify-center py-16">
+							<Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+							<p className="text-muted-foreground">Loading orders...</p>
+						</div>
+					) : orders.length > 0 ? (
+						orders.map((order) => (
 							<div
 								key={order.id}
 								className="border border-border rounded-xl overflow-hidden bg-card"
@@ -64,7 +79,9 @@ export function OrdersPageContent() {
 										</div>
 										<div>
 											<p className="text-sm text-muted-foreground">Date</p>
-											<p className="font-medium text-foreground">{order.date}</p>
+											<p className="font-medium text-foreground">
+												{new Date(order.createdAt).toLocaleDateString()}
+											</p>
 										</div>
 										<div>
 											<p className="text-sm text-muted-foreground">Total</p>
@@ -87,15 +104,17 @@ export function OrdersPageContent() {
 										<div key={index} className="flex items-center gap-4">
 											<div className="w-16 h-16 rounded-lg overflow-hidden bg-muted shrink-0">
 												<Image
-													src={item.image || "/placeholder.svg"}
-													alt={item.name}
+													src={item.product?.images?.[0] || "/placeholder.svg"}
+													alt={item.product?.title || "Product"}
 													width={64}
 													height={64}
 													className="object-cover w-full h-full"
 												/>
 											</div>
 											<div className="flex-1 min-w-0">
-												<p className="font-medium text-foreground truncate">{item.name}</p>
+												<p className="font-medium text-foreground truncate">
+													{item.product?.title}
+												</p>
 												<p className="text-sm text-muted-foreground">
 													Qty: {item.quantity} × GH₵{item.price.toLocaleString()}
 												</p>

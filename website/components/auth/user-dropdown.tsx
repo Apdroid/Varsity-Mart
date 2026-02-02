@@ -34,6 +34,7 @@ type Props = {
 
 const ProfileDropdown = ({ trigger, defaultOpen, align = "start" }: Props) => {
 	const { user, logout } = useAuth();
+	console.log(user);
 
 	const handleLogout = () => {
 		logout();

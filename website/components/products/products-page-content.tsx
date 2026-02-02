@@ -3,9 +3,28 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
-import { mockProducts } from "@/data/products/products";
+import { useProducts } from "@/hooks/use-products";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
 
 export function ProductsPageContent() {
+	const { data, isLoading, error } = useProducts();
+	const products = data?.data || [];
+
+	if (error) {
+		return (
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+				<Alert className="mb-6">
+					<AlertTriangle className="h-4 w-4" />
+					<AlertDescription>
+						Unable to load products. Please try again later.
+					</AlertDescription>
+				</Alert>
+			</div>
+		);
+	}
+
 	return (
 		<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
 			{/* Breadcrumb */}
@@ -27,11 +46,23 @@ export function ProductsPageContent() {
 				</Link>
 			</div>
 
-			<div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-				{mockProducts.map((product) => (
-					<ProductCard key={product.id} product={product} />
-				))}
-			</div>
+			{isLoading ? (
+				<div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+					{Array.from({ length: 12 }).map((_, i) => (
+						<div key={i} className="space-y-2">
+							<Skeleton className="aspect-square rounded-md" />
+							<Skeleton className="h-4 w-full" />
+							<Skeleton className="h-4 w-3/4" />
+						</div>
+					))}
+				</div>
+			) : (
+				<div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+					{products.map((product) => (
+						<ProductCard key={product.id} product={product} />
+					))}
+				</div>
+			)}
 		</div>
 	);
 }

@@ -5,26 +5,33 @@ export const queryKeys = {
     user: () => [...queryKeys.auth.all, "user"] as const,
   },
 
+  // User Profile
+  user: {
+    all: ["user"] as const,
+    profile: () => [...queryKeys.user.all, "profile"] as const,
+    addresses: () => [...queryKeys.user.all, "addresses"] as const,
+  },
+
   // Products
   products: {
     all: ["products"] as const,
     lists: () => [...queryKeys.products.all, "list"] as const,
-    list: (filters: Record<string, unknown>) => [...queryKeys.products.lists(), filters] as const,
+    list: (filters: unknown) => [...queryKeys.products.lists(), filters] as const,
     details: () => [...queryKeys.products.all, "detail"] as const,
     detail: (id: string) => [...queryKeys.products.details(), id] as const,
     categories: () => [...queryKeys.products.all, "categories"] as const,
     myProducts: () => [...queryKeys.products.all, "my-products"] as const,
-    search: (query: string) => [...queryKeys.products.all, "search", query] as const,
+    search: (query: string, filters?: unknown) => [...queryKeys.products.all, "search", query, filters] as const,
   },
 
   // Stores
   stores: {
     all: ["stores"] as const,
     lists: () => [...queryKeys.stores.all, "list"] as const,
-    list: (filters: Record<string, unknown>) => [...queryKeys.stores.lists(), filters] as const,
+    list: (filters: unknown) => [...queryKeys.stores.lists(), filters] as const,
     details: () => [...queryKeys.stores.all, "detail"] as const,
     detail: (id: string) => [...queryKeys.stores.details(), id] as const,
-    products: (storeId: string) => [...queryKeys.stores.detail(storeId), "products"] as const,
+    products: (storeId: string, filters?: unknown) => [...queryKeys.stores.detail(storeId), "products", filters] as const,
     myStore: () => [...queryKeys.stores.all, "my-store"] as const,
   },
 
@@ -32,7 +39,7 @@ export const queryKeys = {
   orders: {
     all: ["orders"] as const,
     lists: () => [...queryKeys.orders.all, "list"] as const,
-    list: (filters: Record<string, unknown>) => [...queryKeys.orders.lists(), filters] as const,
+    list: (filters: unknown) => [...queryKeys.orders.lists(), filters] as const,
     details: () => [...queryKeys.orders.all, "detail"] as const,
     detail: (id: string) => [...queryKeys.orders.details(), id] as const,
     myOrders: () => [...queryKeys.orders.all, "my-orders"] as const,
@@ -43,7 +50,7 @@ export const queryKeys = {
   restaurants: {
     all: ["restaurants"] as const,
     lists: () => [...queryKeys.restaurants.all, "list"] as const,
-    list: (filters: Record<string, unknown>) => [...queryKeys.restaurants.lists(), filters] as const,
+    list: (filters: unknown) => [...queryKeys.restaurants.lists(), filters] as const,
     details: () => [...queryKeys.restaurants.all, "detail"] as const,
     detail: (id: string) => [...queryKeys.restaurants.details(), id] as const,
     menu: (restaurantId: string) => [...queryKeys.restaurants.detail(restaurantId), "menu"] as const,
@@ -53,7 +60,7 @@ export const queryKeys = {
   foodOrders: {
     all: ["food-orders"] as const,
     lists: () => [...queryKeys.foodOrders.all, "list"] as const,
-    list: (filters: Record<string, unknown>) => [...queryKeys.foodOrders.lists(), filters] as const,
+    list: (filters: unknown) => [...queryKeys.foodOrders.lists(), filters] as const,
     details: () => [...queryKeys.foodOrders.all, "detail"] as const,
     detail: (id: string) => [...queryKeys.foodOrders.details(), id] as const,
   },
@@ -90,8 +97,8 @@ export const queryKeys = {
   admin: {
     all: ["admin"] as const,
     dashboard: () => [...queryKeys.admin.all, "dashboard"] as const,
-    users: (filters: Record<string, unknown>) => [...queryKeys.admin.all, "users", filters] as const,
-    listings: (filters: Record<string, unknown>) => [...queryKeys.admin.all, "listings", filters] as const,
-    disputes: (filters: Record<string, unknown>) => [...queryKeys.admin.all, "disputes", filters] as const,
+    users: (filters: unknown) => [...queryKeys.admin.all, "users", filters] as const,
+    listings: (filters: unknown) => [...queryKeys.admin.all, "listings", filters] as const,
+    disputes: (filters: unknown) => [...queryKeys.admin.all, "disputes", filters] as const,
   },
 }

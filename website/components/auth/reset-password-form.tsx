@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, CheckCircle2, KeyRound, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -17,6 +18,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authService } from "@/lib/api/services/auth.service";
 
 const resetPasswordSchema = z.object({
 	password: z.string().min(8, "Password must be at least 8 characters"),
@@ -29,8 +31,11 @@ const resetPasswordSchema = z.object({
 type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
 export function ResetPasswordForm() {
+	const searchParams = useSearchParams();
+	const token = searchParams.get("token");
 	const [isLoading, setIsLoading] = useState(false);
 	const [isSubmitted, setIsSubmitted] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 	const form = useForm<ResetPasswordFormValues>({
 		resolver: zodResolver(resetPasswordSchema),
@@ -41,13 +46,19 @@ export function ResetPasswordForm() {
 	});
 
 	const onSubmit = async (data: ResetPasswordFormValues) => {
+		if (!token) {
+			setError("Reset token is missing. Please check your email link.");
+			return;
+		}
+
 		setIsLoading(true);
+		setError(null);
 		try {
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 1500));
+			await authService.resetPassword(token, data.password);
 			setIsSubmitted(true);
-		} catch (error) {
-			console.error(error);
+		} catch (err: any) {
+			setError(err?.response?.data?.message || "Failed to reset password. The link may have expired.");
+			console.error(err);
 		} finally {
 			setIsLoading(false);
 		}
@@ -80,6 +91,11 @@ export function ResetPasswordForm() {
 		<AuthLayout title="Reset Password" description="Enter your new password below">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+					{error && (
+						<div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
+							{error}
+						</div>
+					)}
 					<FormField
 						control={form.control}
 						name="password"

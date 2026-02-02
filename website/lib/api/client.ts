@@ -3,9 +3,10 @@ import axios, {
 	type AxiosInstance,
 	type AxiosRequestConfig,
 } from "axios";
+import { ENDPOINTS } from "./endpoints";
 
 const API_BASE_URL =
-	process.env.NEXT_PUBLIC_API_BASE_URL || "https://varsitymart.onrender.com/api/v1";
+	process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.varsitymart.org/api/v1";
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
@@ -16,10 +17,7 @@ const apiClient: AxiosInstance = axios.create({
 	},
 	withCredentials: true,
 });
-// No client-side token injection for httpOnly cookie flows.
-// Cookies will be sent automatically by the browser when `withCredentials: true`.
 
-// Response interceptor for error handling
 apiClient.interceptors.response.use(
 	(response) => response,
 	async (error: AxiosError) => {
@@ -31,7 +29,7 @@ apiClient.interceptors.response.use(
 			originalRequest._retry = true;
 			try {
 				// Attempt silent refresh. Server should read refresh token from httpOnly cookie
-				const response = await axios.post(`${API_BASE_URL}/auth/refresh`, undefined, { withCredentials: true });
+				await axios.post(`${API_BASE_URL}${ENDPOINTS.AUTH.REFRESH}`, undefined, { withCredentials: true });
 				// After a successful refresh the server should set new httpOnly cookies.
 				// Retry the original request; cookies will be sent automatically.
 				return apiClient(originalRequest);

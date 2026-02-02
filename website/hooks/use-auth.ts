@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { queryKeys } from "@/lib/api/query-keys";
 import { authService } from "@/lib/api/services/auth.service";
 import { useAuthStore } from "@/lib/stores/auth-store";
@@ -16,36 +17,68 @@ export function useAuth() {
 		setIsAuthenticated,
 		setUser,
 		logout: clearAuth,
+		setLoading,
 	} = useAuthStore();
 
-	// Get current user
-	const { isLoading, refetch: refetchUser } = useQuery({
+	// Get current user - this should run on mount to check if user is already logged in
+	const { isLoading: isCheckingAuth, refetch: refetchUser } = useQuery({
 		queryKey: queryKeys.auth.user(),
 		queryFn: async () => {
-			const response = await authService.getMe();
-			setUser(response.data);
-			return response.data;
+			try {
+				const response = await authService.getMe();
+				setUser(response.data);
+				console.log(response.data);
+				return response.data;
+			} catch (error) {
+				// If getMe fails, user is not authenticated
+				clearAuth();
+				throw error;
+			}
 		},
 		enabled: typeof window !== "undefined",
 		retry: false,
+		staleTime: 1000 * 60 * 5, // 5 minutes
 	});
+
+	// Initialize auth state on mount
+	useEffect(() => {
+		if (!isCheckingAuth) {
+			setLoading(false);
+		}
+	}, [isCheckingAuth, setLoading]);
 
 	// Login mutation
 	const loginMutation = useMutation({
 		mutationFn: (data: LoginRequest) => authService.login(data),
-		onSuccess: (response) => {
-			console.log(response);
-			setUser(response.data.user);
-			queryClient.invalidateQueries({ queryKey: queryKeys.auth.all });
+		onSuccess: async (response) => {
+			const userData = response.data.user;
+			// Update Zustand store immediately
+			setUser(userData);
+			setIsAuthenticated(true);
+			
+			// Update React Query cache
+			queryClient.setQueryData(queryKeys.auth.user(), userData);
+
+			// Refetch to ensure we have the latest data
+		await refetchUser();
 			router.push("/");
+		},
+		onError: (error) => {
+			console.error("Login failed:", error);
 		},
 	});
 
 	// Register mutation
 	const registerMutation = useMutation({
 		mutationFn: (data: RegisterRequest) => authService.register(data),
-		onSuccess: (response) => {
-			setUser(response.data.user);
+		onSuccess: async (response) => {
+			const userData = response.data.user;
+			setUser(userData);
+			setIsAuthenticated(true);
+			
+			// Update the query cache for the user
+			queryClient.setQueryData(queryKeys.auth.user(), userData);
+			
 			router.push("/verify-email");
 		},
 	});
@@ -55,7 +88,7 @@ export function useAuth() {
 		mutationFn: () => authService.logout(),
 		onSuccess: () => {
 			clearAuth();
-		queryClient.clear();
+			queryClient.clear();
 			router.push("/auth/login");
 		},
 		onError: () => {
@@ -69,7 +102,7 @@ export function useAuth() {
 	return {
 		user,
 		isAuthenticated,
-		isLoading,
+		isLoading: isCheckingAuth,
 		setIsAuthenticated,
 		login: loginMutation.mutate,
 		loginAsync: loginMutation.mutateAsync,

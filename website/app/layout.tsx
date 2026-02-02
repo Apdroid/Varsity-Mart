@@ -5,6 +5,7 @@ import { Inter, Manrope, Raleway } from "next/font/google";
 import type React from "react";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { UniversityProvider } from "@/components/providers/university-provider";
+import { AuthGuard } from "@/lib/api/auth-guard";
 import "./globals.css";
 import { ThemeProvider } from "../components/theme-provider";
 
@@ -75,7 +76,9 @@ export default function RootLayout({
 				>
 					<QueryProvider>
 						<UniversityProvider>
-							{children}
+							<AuthGuard>
+								{children}
+							</AuthGuard>
 						</UniversityProvider>
 					</QueryProvider>
 					<Analytics />

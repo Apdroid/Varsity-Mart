@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -8,15 +8,75 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, Bell, Lock, CreditCard, Camera } from "lucide-react"
+import { User, Bell, Lock, CreditCard, Camera, Loader2 } from "lucide-react"
+import { useAuth } from "@/hooks/use-auth"
+import { useProfile } from "@/hooks/use-user"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+
+const settingsProfileSchema = z.object({
+  firstName: z.string().min(2, "First name is required"),
+  lastName: z.string().min(2, "Last name is required"),
+  email: z.string().email("Please enter a valid email"),
+  phone: z.string().optional(),
+  address: z.string().optional(),
+})
+
+type SettingsProfileValues = z.infer<typeof settingsProfileSchema>
 
 export default function SettingsPageContent() {
+  const { user, isLoading: isAuthLoading } = useAuth()
+  const { profile, isLoading: isProfileLoading, updateProfile, isUpdating, uploadAvatar, isUploadingAvatar } = useProfile()
+  
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<SettingsProfileValues>({
+    resolver: zodResolver(settingsProfileSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      address: "",
+    }
+  })
+
+  useEffect(() => {
+    if (profile) {
+      reset({
+        firstName: profile.firstName || profile.fullName?.split(" ")[0] || "",
+        lastName: profile.lastName || profile.fullName?.split(" ").slice(1).join(" ") || "",
+        email: profile.email || "",
+        phone: profile.phone || "",
+        address: "",
+      })
+    }
+  }, [profile, reset])
+
+  const onProfileSubmit = (data: SettingsProfileValues) => {
+    updateProfile(data)
+  }
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      uploadAvatar(file)
+    }
+  }
+
   const [notifications, setNotifications] = useState({
     email: true,
     push: true,
     orders: true,
     promotions: false,
   })
+
+  if (isAuthLoading || isProfileLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 flex justify-center items-center h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -52,47 +112,67 @@ export default function SettingsPageContent() {
               <div className="flex items-center gap-6">
                 <div className="relative">
                   <Avatar className="h-24 w-24">
-                    <AvatarImage src="/student-avatar.png" />
-                    <AvatarFallback>JD</AvatarFallback>
+                    <AvatarImage src={profile?.avatar} />
+                    <AvatarFallback>
+                      {profile?.fullName?.charAt(0) || profile?.email?.charAt(0) || "U"}
+                    </AvatarFallback>
                   </Avatar>
-                  <Button size="icon" variant="secondary" className="absolute bottom-0 right-0 h-8 w-8 rounded-full">
-                    <Camera className="h-4 w-4" />
+                  <input
+                    type="file"
+                    id="settings-avatar-upload"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    disabled={isUploadingAvatar}
+                  />
+                  <Button 
+                    size="icon" 
+                    variant="secondary" 
+                    className="absolute bottom-0 right-0 h-8 w-8 rounded-full"
+                    onClick={() => document.getElementById("settings-avatar-upload")?.click()}
+                    disabled={isUploadingAvatar}
+                  >
+                    {isUploadingAvatar ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
                   </Button>
                 </div>
                 <div>
                   <h3 className="font-semibold">Profile Photo</h3>
-                  <p className="text-sm text-muted-foreground">JPG, PNG or GIF. Max 2MB</p>
+                  <p className="text-sm text-muted-foreground">JPG, PNG or GIF. Max 5MB</p>
                 </div>
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" defaultValue="John" />
+              <form onSubmit={handleSubmit(onProfileSubmit)} className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input id="firstName" {...register("firstName")} disabled={isUpdating} />
+                    {errors.firstName && <p className="text-xs text-destructive">{errors.firstName.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input id="lastName" {...register("lastName")} disabled={isUpdating} />
+                    {errors.lastName && <p className="text-xs text-destructive">{errors.lastName.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" {...register("email")} disabled={isUpdating} />
+                    {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input id="phone" {...register("phone")} disabled={isUpdating} />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="address">Hostel/Address</Label>
+                    <Input id="address" {...register("address")} disabled={isUpdating} />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" defaultValue="Doe" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" defaultValue="john@university.edu" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input id="phone" defaultValue="+234 801 234 5678" />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="university">University</Label>
-                  <Input id="university" defaultValue="University of Lagos" />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="address">Hostel/Address</Label>
-                  <Input id="address" defaultValue="Block A, Room 203, Moremi Hall" />
-                </div>
-              </div>
 
-              <Button className="bg-blue-600 hover:bg-blue-700">Save Changes</Button>
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={isUpdating}>
+                  {isUpdating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                  Save Changes
+                </Button>
+              </form>
             </CardContent>
           </Card>
         </TabsContent>

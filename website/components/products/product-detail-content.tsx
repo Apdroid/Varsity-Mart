@@ -5,50 +5,91 @@ import { RelatedProducts, MoreFromSeller } from "@/components/products/related-p
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useCartStore } from "@/lib/stores/cart-store";
+import { useProduct, useLikeProduct } from "@/hooks/use-products";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types/models";
 import {
-    BadgeCheck,
-    ChevronLeft,
-    ChevronRight,
-    HandCoins,
-    Heart,
-    MessageCircle,
-    Package,
-    Share2,
-    Shield,
-    ShoppingCart,
-    Star,
-    Tag,
-    Truck,
-    Zap,
+	BadgeCheck,
+	ChevronLeft,
+	ChevronRight,
+	HandCoins,
+	Heart,
+	MessageCircle,
+	Package,
+	Share2,
+	Shield,
+	ShoppingCart,
+	Star,
+	Tag,
+	Truck,
+	Zap,
+	AlertTriangle,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { mockProducts } from "@/data/products/products";
 
 interface ProductDetailContentProps {
 	productId: string;
-	initialProduct?: Product;
 }
 
-export function ProductDetailContent({ productId, initialProduct }: ProductDetailContentProps) {
-	// Use initial product or fallback to mock data
-	const product: Product = initialProduct || mockProducts.find((p) => p.id === productId) || mockProducts[0];
+export function ProductDetailContent({ productId }: ProductDetailContentProps) {
+	const { data: productResponse, isLoading, error } = useProduct(productId);
+	const { mutate: likeProduct, isPending: isLiking } = useLikeProduct();
+	const { addItem } = useCartStore();
 
 	const [selectedImage, setSelectedImage] = useState(0);
-	const [isLiked, setIsLiked] = useState(product.isLiked || false);
 	const [isMakeOfferOpen, setIsMakeOfferOpen] = useState(false);
-	const { addItem } = useCartStore();
+
+	// Show loading skeleton
+	if (isLoading) {
+		return (
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+				<div className="grid lg:grid-cols-2 gap-8">
+					<div className="space-y-4">
+						<Skeleton className="aspect-square rounded-xl" />
+						<div className="flex gap-2">
+							{Array.from({ length: 4 }).map((_, i) => (
+								<Skeleton key={i} className="w-20 h-20 rounded-lg" />
+							))}
+						</div>
+					</div>
+					<div className="space-y-6">
+						<Skeleton className="h-8 w-3/4" />
+						<Skeleton className="h-6 w-1/2" />
+						<Skeleton className="h-12 w-full" />
+						<Skeleton className="h-32 w-full" />
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	// Show error
+	if (error || !productResponse?.data) {
+		return (
+			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+				<Alert>
+					<AlertTriangle className="h-4 w-4" />
+					<AlertDescription>
+						Unable to load product details. Please try again later.
+					</AlertDescription>
+				</Alert>
+			</div>
+		);
+	}
+
+	const product = productResponse.data;
 
 	const discount = product.compareAtPrice
 		? Math.round(
-				((product.compareAtPrice - product.price) /
-					product.compareAtPrice) *
-					100,
-			)
+			((product.compareAtPrice - product.price) /
+				product.compareAtPrice) *
+			100,
+		)
 		: 0;
 
 	const handleAddToCart = () => {
@@ -56,6 +97,10 @@ export function ProductDetailContent({ productId, initialProduct }: ProductDetai
 			...product,
 			quantity: 1,
 		});
+	};
+
+	const handleLikeProduct = () => {
+		likeProduct(product.id);
 	};
 
 	const handleSubmitOffer = (amount: number, message?: string) => {
@@ -183,11 +228,12 @@ export function ProductDetailContent({ productId, initialProduct }: ProductDetai
 										size="icon"
 										className={cn(
 											"h-10 w-10 bg-transparent",
-											isLiked && "text-red-500 border-red-500",
+											product.isLiked && "text-red-500 border-red-500",
 										)}
-										onClick={() => setIsLiked(!isLiked)}
+										onClick={handleLikeProduct}
+										disabled={isLiking}
 									>
-										<Heart className={cn("h-5 w-5", isLiked && "fill-current")} />
+										<Heart className={cn("h-5 w-5", product.isLiked && "fill-current")} />
 									</Button>
 									<Button
 										variant="outline"

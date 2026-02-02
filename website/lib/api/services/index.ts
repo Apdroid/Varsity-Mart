@@ -1,5 +1,6 @@
 // Export all services from a single entry point
 export { authService } from "./auth.service"
+export { userService } from "./user.service"
 export { productsService } from "./products.service"
 export { ordersService } from "./orders.service"
 export { restaurantsService } from "./restaurants.service"

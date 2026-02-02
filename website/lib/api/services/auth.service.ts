@@ -19,6 +19,17 @@ export const authService = {
     return response.data
   },
 
+  // Google OAuth - initiates the OAuth flow
+  getGoogleAuthUrl(): string {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
+    return `${apiUrl}${ENDPOINTS.AUTH.GOOGLE}`
+  },
+
+  async googleCallback(code: string): Promise<ApiResponse<LoginResponse>> {
+    const response = await apiClient.post(ENDPOINTS.AUTH.GOOGLE_CALLBACK, { code })
+    return response.data
+  },
+
   async verifyEmail(code: string): Promise<ApiResponse<User>> {
     const response = await apiClient.post(ENDPOINTS.AUTH.VERIFY_EMAIL, { code })
     return response.data
@@ -49,6 +60,7 @@ export const authService = {
 
   async getMe(): Promise<ApiResponse<User>> {
     const response = await apiClient.get(ENDPOINTS.AUTH.CHECK_STATUS)
+    console.log(response)
     return response.data
   },
 

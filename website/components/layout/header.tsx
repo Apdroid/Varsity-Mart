@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useMotionValueEvent, useScroll } from "motion/react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -48,8 +48,9 @@ export function Header() {
 	const { items } = useCartStore();
 	const cartCount = items.reduce((acc, item) => acc + item.quantity, 0);
 	const { scrollY } = useScroll();
-	const searchParams = useSearchParams();
-	const { isAuthenticated, user} = useAuth();
+	const { isAuthenticated, user } = useAuth();
+
+
 
 	// Handle scroll direction for header visibility
 	useMotionValueEvent(scrollY, "change", (current) => {
@@ -79,7 +80,7 @@ export function Header() {
 				break;
 			}
 		}
-	}, [path, searchParams]);
+	}, [path]);
 
 	// Keyboard shortcut for search (Cmd+K / Ctrl+K)
 	useEffect(() => {
@@ -169,7 +170,7 @@ export function Header() {
 											<Avatar className="size-9 cursor-pointer">
 												<AvatarImage src={user!?.avatar} alt="User"/>
 												<AvatarFallback className="bg-primary/10 text-primary font-semibold">
-													{user!?.fullName || <CircleUser size="28" />}
+													{user!?.fullName?.charAt(0) || <CircleUser size="28" />}
 												</AvatarFallback>
 											</Avatar>
 										</button>

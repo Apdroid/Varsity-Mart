@@ -104,9 +104,9 @@ export function SearchModal({ open, onOpenChange, initialQuery = "" }: SearchMod
 	if (!open) return null;
 
 	return (
-		<div className="fixed inset-0 z-50 bg-background">
+		<div className="fixed inset-0 z-50 bg-background/40">
 			{/* Header */}
-			<div className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+			<div className="border-b border-border bg-background backdrop-blur supports-[backdrop-filter]:bg-background/60">
 				<div className="container mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="flex items-center gap-4 h-16">
 						{/* Search Input */}
@@ -144,7 +144,7 @@ export function SearchModal({ open, onOpenChange, initialQuery = "" }: SearchMod
 			</div>
 
 			{/* Content */}
-			<div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 overflow-y-auto h-[calc(100vh-4rem)]">
+			<div className=" bg-background container mx-auto px-4 sm:px-6 lg:px-8 py-6 overflow-y-auto h-[calc(100vh-4rem)]">
 				{isSearching ? (
 					// Search Results - Products
 					<div>
