@@ -28,12 +28,15 @@ interface AuthGuardProps {
 }
 
 export function AuthGuard({ children }: AuthGuardProps) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
+  // AUTH GUARD DISABLED FOR TESTING PURPOSES
+  const DISABLE_AUTH_GUARD = true;
+
   useEffect(() => {
-    if (isLoading) return; // Wait for auth check to complete
+    if (DISABLE_AUTH_GUARD || isLoading) return; // Wait for auth check to complete
 
     const isProtectedRoute = PROTECTED_ROUTES.some(route => 
       pathname.startsWith(route)
@@ -47,15 +50,15 @@ export function AuthGuard({ children }: AuthGuardProps) {
     }
 
     // Redirect authenticated users from auth pages  
-    if (isAuthenticated && isAuthRoute) {
+    if (isAuthenticated && user && isAuthRoute) {
       const redirectTo = new URLSearchParams(window.location.search).get('redirect');
-      router.push(redirectTo || '/');
+      router.replace(redirectTo || '/');
       return;
     }
-  }, [isAuthenticated, isLoading, pathname, router]);
+  }, [isAuthenticated, isLoading, user, pathname, router]);
 
   // Show loading while checking auth status
-  if (isLoading) {
+  if (!DISABLE_AUTH_GUARD && isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

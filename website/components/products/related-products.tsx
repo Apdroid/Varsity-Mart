@@ -3,6 +3,8 @@
 import { ProductsCarousel } from "@/components/home/products-carousel";
 import { mockProducts } from "@/data/products/products";
 import type { Product } from "@/types/models";
+import { useProducts } from "@/hooks/use-products";
+import { Loader2 } from "lucide-react";
 
 interface RelatedProductsProps {
 	currentProduct: Product;
@@ -10,31 +12,22 @@ interface RelatedProductsProps {
 }
 
 export function RelatedProducts({ currentProduct, className }: RelatedProductsProps) {
-	// Get related products from the same category, excluding current product
-	const relatedByCategory = mockProducts.filter(
-		(p) => p.category.id === currentProduct.category.id && p.id !== currentProduct.id
-	);
+	const { data: response, isLoading } = useProducts({ 
+		category: currentProduct.category.id,
+		limit: 12 
+	});
 
-	// Get products from the same seller/store
-	const relatedBySeller = mockProducts.filter(
-		(p) =>
-			(p.storeId === currentProduct.storeId || p.sellerId === currentProduct.sellerId) &&
-			p.id !== currentProduct.id
-	);
-
-	// Combine and deduplicate
-	const relatedProducts = [
-		...relatedByCategory.slice(0, 8),
-		...relatedBySeller.filter((p) => !relatedByCategory.find((r) => r.id === p.id)).slice(0, 4),
-	].slice(0, 12);
-
-	// If not enough related products, add random products
-	if (relatedProducts.length < 6) {
-		const additionalProducts = mockProducts
-			.filter((p) => p.id !== currentProduct.id && !relatedProducts.find((r) => r.id === p.id))
-			.slice(0, 6 - relatedProducts.length);
-		relatedProducts.push(...additionalProducts);
+	if (isLoading) {
+		return (
+			<div className="flex justify-center py-12">
+				<Loader2 className="h-8 w-8 animate-spin text-primary" />
+			</div>
+		);
 	}
+
+	const relatedProducts = Array.isArray(response?.data)
+		? response.data.filter(p => p.id !== currentProduct.id)
+		: [];
 
 	if (relatedProducts.length === 0) return null;
 
@@ -67,10 +60,22 @@ export function MoreFromSeller({
 	storeName,
 	className,
 }: MoreFromSellerProps) {
-	const sellerProducts = mockProducts.filter(
-		(p) =>
-			(p.storeId === storeId || p.sellerId === sellerId) && p.id !== currentProductId
-	);
+	const { data: response, isLoading } = useProducts({ 
+		sellerId: sellerId,
+		limit: 12 
+	});
+
+	if (isLoading) {
+		return (
+			<div className="flex justify-center py-12">
+				<Loader2 className="h-8 w-8 animate-spin text-primary" />
+			</div>
+		);
+	}
+
+	const sellerProducts = Array.isArray(response?.data)
+		? response.data.filter(p => p.id !== currentProductId)
+		: [];
 
 	if (sellerProducts.length === 0) return null;
 

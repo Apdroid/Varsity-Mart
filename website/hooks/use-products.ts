@@ -10,25 +10,10 @@ export function useProducts(filters: ProductFilters = {}) {
   return useQuery({
     queryKey: queryKeys.products.list(filters),
     queryFn: async () => {
-      try {
-        return await productsService.getProducts(filters)
-      } catch (error) {
-        // Fallback to mock data if API fails
-        console.warn("Products API failed, using mock data:", error)
-        return {
-          success: true,
-          data: mockProducts,
-          meta: {
-            page: 1,
-            limit: 50,
-            total: mockProducts.length,
-            totalPages: 1,
-          },
-        }
-      }
+      return await productsService.getProducts(filters)
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
-    retry: 1, // Only retry once before falling back
+    retry: 1, // Only retry once
   })
 }
 
@@ -36,30 +21,11 @@ export function useInfiniteProducts(filters: ProductFilters = {}) {
   return useInfiniteQuery({
     queryKey: queryKeys.products.list(filters),
     queryFn: async ({ pageParam = 1 }) => {
-      try {
-        return await productsService.getProducts({ ...filters, page: pageParam })
-      } catch (error) {
-        // Fallback to mock data for infinite queries
-        console.warn("Infinite products API failed, using mock data:", error)
-        const startIndex = (pageParam - 1) * (filters.limit || 20)
-        const endIndex = startIndex + (filters.limit || 20)
-        const paginatedMockData = mockProducts.slice(startIndex, endIndex)
-        
-        return {
-          success: true,
-          data: paginatedMockData,
-          meta: {
-            page: pageParam,
-            limit: filters.limit || 20,
-            total: mockProducts.length,
-            totalPages: Math.ceil(mockProducts.length / (filters.limit || 20)),
-          },
-        }
-      }
+      return await productsService.getProducts({ ...filters, page: pageParam })
     },
     getNextPageParam: (lastPage) => {
-      const page = 'meta' in lastPage ? lastPage.meta.page : lastPage.page
-      const totalPages = 'meta' in lastPage ? lastPage.meta.totalPages : lastPage.totalPages
+      const page = 'meta' in lastPage ? (lastPage.meta as any).page : (lastPage as any).page
+      const totalPages = 'meta' in lastPage ? (lastPage.meta as any).totalPages : (lastPage as any).totalPages
       if (page < totalPages) {
         return page + 1
       }
@@ -73,18 +39,7 @@ export function useProduct(id: string) {
   return useQuery({
     queryKey: queryKeys.products.detail(id),
     queryFn: async () => {
-      try {
-        return await productsService.getProductById(id)
-      } catch (error) {
-        // Fallback to mock data for single product
-        console.warn(`Product ${id} API failed, using mock data:`, error)
-        const mockProduct = mockProducts.find(p => p.id === id)
-        if (!mockProduct) throw error
-        return {
-          success: true,
-          data: mockProduct,
-        }
-      }
+      return await productsService.getProductById(id)
     },
     enabled: !!id,
     retry: 1,

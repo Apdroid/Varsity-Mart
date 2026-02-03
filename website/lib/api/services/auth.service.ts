@@ -21,7 +21,7 @@ export const authService = {
 
   // Google OAuth - initiates the OAuth flow
   getGoogleAuthUrl(): string {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http:///api.varsitymart.org/v1"
     return `${apiUrl}${ENDPOINTS.AUTH.GOOGLE}`
   },
 
@@ -60,7 +60,6 @@ export const authService = {
 
   async getMe(): Promise<ApiResponse<User>> {
     const response = await apiClient.get(ENDPOINTS.AUTH.CHECK_STATUS)
-    console.log(response)
     return response.data
   },
 

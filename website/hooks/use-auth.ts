@@ -21,15 +21,18 @@ export function useAuth() {
 	} = useAuthStore();
 
 	// Get current user - this should run on mount to check if user is already logged in
-	const { isLoading: isCheckingAuth, refetch: refetchUser } = useQuery({
+	const { isLoading: isCheckingAuth, isFetched: isAuthFetched, refetch: refetchUser } = useQuery({
 		queryKey: queryKeys.auth.user(),
 		queryFn: async () => {
 			try {
+				console.log("🔐 Fetching user from /auth/check-status/...");
 				const response = await authService.getMe();
+				console.log("✅ Auth check response:", response);
+				console.log("👤 User data:", response.data);
 				setUser(response.data);
-				console.log(response.data);
 				return response.data;
 			} catch (error) {
+				console.error("❌ Auth check failed:", error);
 				// If getMe fails, user is not authenticated
 				clearAuth();
 				throw error;
@@ -42,10 +45,11 @@ export function useAuth() {
 
 	// Initialize auth state on mount
 	useEffect(() => {
-		if (!isCheckingAuth) {
+		if (isAuthFetched) {
+			setIsAuthenticated(!!user);
 			setLoading(false);
 		}
-	}, [isCheckingAuth, setLoading]);
+	}, [isAuthFetched, user, setIsAuthenticated, setLoading]);
 
 	// Login mutation
 	const loginMutation = useMutation({
@@ -102,7 +106,7 @@ export function useAuth() {
 	return {
 		user,
 		isAuthenticated,
-		isLoading: isCheckingAuth,
+		isLoading: !isAuthFetched,
 		setIsAuthenticated,
 		login: loginMutation.mutate,
 		loginAsync: loginMutation.mutateAsync,

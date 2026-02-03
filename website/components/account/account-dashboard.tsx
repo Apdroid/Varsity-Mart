@@ -14,29 +14,24 @@ import {
 } from "@/components/ui/card";
 import {
 	menuItems,
-	recentOrders,
 	statusColors,
 } from "@/data/account/account";
 import { useAuth } from "@/hooks/use-auth";
+import { useMyOrders } from "@/hooks/use-orders";
 
 export function AccountDashboard() {
 	const { user, isLoading } = useAuth();
+	const { data: ordersResponse, isLoading: isLoadingOrders } = useMyOrders({ limit: 3 });
+
+	console.log("📊 Account Dashboard - User:", user);
+	console.log("📊 Account Dashboard - isLoading:", isLoading);
+
+	const recentOrders = ordersResponse?.data || [];
 
 	if (isLoading) {
 		return (
 			<div className="flex h-[400px] items-center justify-center">
 				<Loader2 className="h-8 w-8 animate-spin text-primary" />
-			</div>
-		);
-	}
-
-	if (!user) {
-		return (
-			<div className="flex h-[400px] flex-col items-center justify-center gap-4 text-center">
-				<p className="text-muted-foreground text-lg">You must be logged in to view your account.</p>
-				<Button asChild>
-					<Link href="/auth/login">Login</Link>
-				</Button>
 			</div>
 		);
 	}
@@ -47,17 +42,17 @@ export function AccountDashboard() {
 			<div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
 				<div className="flex items-center gap-4">
 					<Avatar className="h-20 w-20">
-						<AvatarImage src={user.avatar || "/placeholder.svg"} />
+						<AvatarImage src={user?.avatar} />
 						<AvatarFallback className="text-2xl">
-							{user.fullName?.[0] || user.email[0].toUpperCase()}
+							{user?.fullName?.[0] || user?.email?.[0]?.toUpperCase() || "?"}
 						</AvatarFallback>
 					</Avatar>
 					<div>
 						<h1 className="text-2xl font-bold text-foreground">
-							{user.fullName || "User"}
+							{user?.fullName || "Loading..."}
 						</h1>
-						<p className="text-muted-foreground">{user.email}</p>
-						{user.kycStatus === "approved" && (
+						<p className="text-muted-foreground">{user?.email || ""}</p>
+						{user?.kycStatus === "approved" && (
 							<Badge className="mt-1 bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary">
 								<Shield className="h-3 w-3 mr-1" />
 								Verified Student
@@ -131,32 +126,40 @@ export function AccountDashboard() {
 							</div>
 						</CardHeader>
 						<CardContent className="space-y-4">
-							{recentOrders.map((order) => (
-								<Link
-									key={order.id}
-									href={`/account/orders/${order.id}`}
-									className="block p-3 rounded-lg border border-border hover:bg-muted transition-colors"
-								>
-									<div className="flex items-center justify-between mb-2">
-										<span className="text-sm font-medium text-foreground">
-											{order.id}
-										</span>
-										<Badge
-											className={statusColors[order.status as keyof typeof statusColors]}
-											variant="secondary"
-										>
-											{order.status}
-										</Badge>
-									</div>
-									<p className="text-sm text-muted-foreground truncate">
-										{order.product}
-									</p>
-									<div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-										<span>{order.date}</span>
-										<span className="font-medium text-foreground">GH₵{order.total}</span>
-									</div>
-								</Link>
-							))}
+							{isLoadingOrders ? (
+								<div className="flex justify-center py-8">
+									<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+								</div>
+							) : recentOrders.length > 0 ? (
+								recentOrders.map((order) => (
+									<Link
+										key={order.id}
+										href={`/account/orders/${order.id}`}
+										className="block p-3 rounded-lg border border-border hover:bg-muted transition-colors"
+									>
+										<div className="flex items-center justify-between mb-2">
+											<span className="text-sm font-medium text-foreground">
+												#{order.orderNumber}
+											</span>
+											<Badge
+												className={statusColors[order.status as keyof typeof statusColors]}
+												variant="secondary"
+											>
+												{order.status}
+											</Badge>
+										</div>
+										<p className="text-sm text-muted-foreground truncate">
+											{order.items.length} item{order.items.length !== 1 ? 's' : ''}
+										</p>
+										<div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
+											<span>{new Date(order.createdAt).toLocaleDateString()}</span>
+											<span className="font-medium text-foreground">GH₵{order.total.toFixed(2)}</span>
+										</div>
+									</Link>
+								))
+							) : (
+								<p className="text-center text-muted-foreground py-8">No orders yet</p>
+							)}
 						</CardContent>
 					</Card>
 				</div>

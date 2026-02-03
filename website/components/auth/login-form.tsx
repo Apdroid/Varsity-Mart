@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, Eye, EyeOff, Loader2, ShoppingBag, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -49,10 +49,7 @@ export function LoginForm() {
 
 	const onSubmit = async (data: LoginFormValues) => {
 		try {
-			await login(data);
-			if (redirectTo) {
-				router.push(redirectTo);
-			}
+			login(data);
 		} catch (error) {
 			// Error handling is managed by the useAuth hook
 		}

@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -34,7 +33,9 @@ type Props = {
 
 const ProfileDropdown = ({ trigger, defaultOpen, align = "start" }: Props) => {
 	const { user, logout } = useAuth();
-	console.log(user);
+
+	// Debug log to see what user data we have
+	console.log("👤 ProfileDropdown - User data:", user);
 
 	const handleLogout = () => {
 		logout();
@@ -47,21 +48,19 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "start" }: Props) => {
 				<DropdownMenuLabel className="flex items-center gap-3 px-3 py-2.5 font-normal">
 					<div className="relative">
 						<Avatar className="size-9">
-							<AvatarImage
-								src={user?.avatar || "https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png"} alt={user ? user.fullName : "User"}
-							/>
+							<AvatarImage src={user?.avatar} alt={user?.fullName || "User"} />
 							<AvatarFallback>
-								{user?.fullName?.charAt(0) || "U"}
+								{user?.fullName?.charAt(0) || "?"}
 							</AvatarFallback>
 						</Avatar>
 						<span className="ring-card absolute right-0 bottom-0 block size-2 rounded-full bg-green-600 ring-2" />
 					</div>
 					<div className="flex flex-1 flex-col items-start min-w-0">
 						<span className="text-foreground text-sm font-semibold truncate w-full">
-							{user?.fullName || "User"}
+							{user?.fullName || "Loading..."}
 						</span>
 						<span className="text-muted-foreground text-xs truncate w-full">
-							{user?.email || "user@example.com"}
+							{user?.email || ""}
 						</span>
 					</div>
 				</DropdownMenuLabel>
@@ -97,9 +96,6 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "start" }: Props) => {
 						<Link href="/notifications" className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer">
 							<Bell className="h-4 w-4" />
 							<span>Notifications</span>
-							<Badge className="ml-auto h-5 w-5 flex items-center justify-center p-0 text-xs bg-primary">
-								3
-							</Badge>
 						</Link>
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
