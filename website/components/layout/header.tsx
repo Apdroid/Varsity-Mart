@@ -13,24 +13,23 @@ import {
 	Store,
 } from "lucide-react";
 import { useMotionValueEvent, useScroll } from "motion/react";
+import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
+import { AuthAwareLocation } from "@/components/auth/auth-aware-location";
+import { AuthAwareMobileMenu } from "@/components/auth/auth-aware-mobile-menu";
+import { AuthAwareProfile } from "@/components/auth/auth-aware-profile";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SearchModal } from "@/components/ui/search-modal";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
-import { useAuth } from "@/hooks/use-auth";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { mockProducts } from "@/data/products/products";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { cn } from "@/lib/utils";
-import { LoginButton } from "../auth/auth-button";
-import ProfileDropdown from "../auth/user-dropdown";
-import { LocationSelector } from "./location-selector";
 import Logo from "./logo";
-import { UniversityDisplay } from "./university-display";
 
 const navigation = [
 	{ name: "Products", href: "/products", icon: Package },
@@ -45,10 +44,13 @@ export function Header() {
 	const [lastScrollY, setLastScrollY] = useState(0);
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 	const [searchModalOpen, setSearchModalOpen] = useState(false);
+	const [searchQuery, setSearchQuery] = useState("");
+	const [showAutocomplete, setShowAutocomplete] = useState(false);
+	const [searchResults, setSearchResults] = useState<any[]>([]);
 	const { items } = useCartStore();
 	const cartCount = items.reduce((acc, item) => acc + item.quantity, 0);
 	const { scrollY } = useScroll();
-	const { isAuthenticated, user } = useAuth();
+	const router = useRouter();
 
 
 
@@ -82,18 +84,53 @@ export function Header() {
 		}
 	}, [path]);
 
-	// Keyboard shortcut for search (Cmd+K / Ctrl+K)
+	// Search autocomplete effect
+	useEffect(() => {
+		if (searchQuery.trim().length > 1) {
+			const filtered = mockProducts.filter((product) =>
+				product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				product.category.name.toLowerCase().includes(searchQuery.toLowerCase())
+			).slice(0, 8);
+			setSearchResults(filtered);
+			setShowAutocomplete(filtered.length > 0);
+		} else {
+			setShowAutocomplete(false);
+			setSearchResults([]);
+		}
+	}, [searchQuery]);
+
+	// Click outside to close autocomplete
+	const searchRef = useRef<HTMLDivElement>(null);
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+				setShowAutocomplete(false);
+			}
+		};
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => document.removeEventListener("mousedown", handleClickOutside);
+	}, []);
+
+	// Keyboard shortcut for search focus (Cmd+K / Ctrl+K)
+	const searchInputRef = useRef<HTMLInputElement>(null);
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if ((e.metaKey || e.ctrlKey) && e.key === "k") {
 				e.preventDefault();
-				setSearchModalOpen(true);
+				searchInputRef.current?.focus();
 			}
 		};
 
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, []);
+
+	const handleSearch = (query: string) => {
+		if (query.trim()) {
+			router.push(`/search?query=${encodeURIComponent(query)}`);
+			setShowAutocomplete(false);
+		}
+	};
 
 	return (
 		<>
@@ -113,10 +150,10 @@ export function Header() {
 				</div>
 
 				{/* Main Header */}
-				<div className="container mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="flex h-16 items-center justify-between gap-4">
+				<div className="container mx-auto px-3 sm:px-4 lg:px-8">
+					<div className="flex h-16 items-center justify-between gap-2 sm:gap-4">
 						{/* Left: Logo and Navigation */}
-						<div className="flex items-center gap-6 lg:gap-8">
+						<div className="flex items-center gap-3 sm:gap-6 lg:gap-8">
 							<Logo />
 							<nav className="hidden lg:flex items-center gap-1">
 								{navigation.map((item) => {
@@ -140,49 +177,112 @@ export function Header() {
 							</nav>
 						</div>
 
-						{/* Center: Search Bar */}
-						<div className="flex-1 max-w-xl hidden md:block">
-							<button
-								type="button"
-								onClick={() => setSearchModalOpen(true)}
-								className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground bg-accent/50 hover:bg-accent border border-border rounded-lg transition-colors"
-							>
-								<Search className="h-4 w-4" />
-								<span>Search for products, stores, or food...</span>
-								<kbd className="ml-auto hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+						{/* Center: Search Bar with Autocomplete */}
+						<div className="flex-1 max-w-2xl hidden md:block relative" ref={searchRef}>
+							<div className="relative">
+								<Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+								<input
+									ref={searchInputRef}
+									type="text"
+									placeholder="Search for products, stores, or food..."
+									value={searchQuery}
+									onChange={(e) => setSearchQuery(e.target.value)}
+									onKeyDown={(e) => {
+										if (e.key === "Enter") {
+											handleSearch(searchQuery);
+										}
+										if (e.key === "Escape") {
+											setShowAutocomplete(false);
+											setSearchQuery("");
+										}
+									}}
+									onFocus={() => {
+										if (searchQuery.trim().length > 1 && searchResults.length > 0) {
+											setShowAutocomplete(true);
+										}
+									}}
+									className="w-full flex items-center gap-2 sm:gap-3 px-12 sm:px-12 py-2 sm:py-2.5 text-sm bg-accent/50 hover:bg-accent border border-border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+								/>
+								<kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden lg:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground shrink-0">
 									<span className="text-xs">⌘</span>K
 								</kbd>
-							</button>
+							</div>
+
+							{/* Autocomplete Dropdown */}
+							{showAutocomplete && searchResults.length > 0 && (
+								<div className="absolute top-full left-0 right-0 mt-2 bg-card border-2 border-border rounded-xl shadow-2xl shadow-black/20 z-[100] overflow-hidden max-h-[500px] overflow-y-auto">
+									{searchResults.map((product) => (
+										<Link
+											key={product.id}
+											href={`/products/${product.id}`}
+											onClick={() => {
+												setShowAutocomplete(false);
+												setSearchQuery("");
+											}}
+											className="flex items-center gap-4 p-3 hover:bg-accent transition-colors border-b border-border last:border-b-0"
+										>
+											<div className="relative w-12 h-12 rounded-lg overflow-hidden bg-accent shrink-0">
+												<Image
+													src={product.images[0] || "/placeholder.svg"}
+													alt={product.title}
+													fill
+													className="object-cover"
+												/>
+											</div>
+											<div className="flex-1 min-w-0">
+												<h4 className="text-sm font-semibold line-clamp-1 mb-0.5">
+													{product.title}
+												</h4>
+												<div className="flex items-center gap-2">
+													<span className="text-sm font-bold text-primary">
+														GH₵{product.price}
+													</span>
+													{product.compareAtPrice && (
+														<span className="text-xs text-muted-foreground line-through">
+															GH₵{product.compareAtPrice}
+														</span>
+													)}
+												</div>
+											</div>
+										</Link>
+									))}
+									{searchResults.length > 0 && (
+										<button
+											type="button"
+											onClick={() => handleSearch(searchQuery)}
+											className="w-full p-3 text-sm font-medium text-primary hover:bg-accent transition-colors flex items-center justify-center gap-2"
+										>
+											View all results for "{searchQuery}"
+											<Search className="h-4 w-4" />
+										</button>
+									)}
+								</div>
+							)}
 						</div>
 
 						{/* Right: Actions */}
-						<div className="flex items-center gap-2 lg:gap-3">
-							{/* Location Selector */}
-							{isAuthenticated && <LocationSelector />}
-							{!isAuthenticated && <UniversityDisplay />}
+						<div className="flex items-center gap-1 sm:gap-2 lg:gap-3">
+							{/* Mobile Search Button */}
+							<Button
+								variant="ghost"
+								size="icon"
+								className="h-9 w-9 md:hidden"
+								onClick={() => setSearchModalOpen(true)}
+							>
+								<Search className="h-5 w-5" />
+							</Button>
 
-							{/* User Profile or Login */}
-							{isAuthenticated ? (
-								<ProfileDropdown
-									align="end"
-									trigger={
-										<button className="rounded-full ring-2 ring-primary/20 hover:ring-primary/40 transition-all" type="button">
-											<Avatar className="size-9 cursor-pointer">
-												<AvatarImage src={user!?.avatar} alt="User"/>
-												<AvatarFallback className="bg-primary/10 text-primary font-semibold">
-													{user!?.fullName?.charAt(0) || <CircleUser size="28" />}
-												</AvatarFallback>
-											</Avatar>
-										</button>
-									}
-								/>
-							) : (
-								<LoginButton />
-							)}
+							{/* Location Selector - Activity based */}
+							<div className="hidden sm:block">
+								<AuthAwareLocation />
+							</div>
+
+							{/* User Profile or Login - Activity based */}
+							<AuthAwareProfile />
 
 							{/* Cart */}
 							<Link href="/cart">
-								<Button variant="ghost" size="icon" className="h-10 w-10 relative hover:bg-primary/10">
+								<Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 relative hover:bg-primary/10">
 									<ShoppingCart className="h-5 w-5" />
 									{cartCount > 0 && (
 										<Badge className="absolute -top-1 -right-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs bg-primary text-primary-foreground border-2 border-background">
@@ -193,7 +293,9 @@ export function Header() {
 							</Link>
 
 							{/* Theme Toggle */}
-							<AnimatedThemeToggler />
+							<div className="hidden sm:block">
+								<AnimatedThemeToggler />
+							</div>
 
 							{/* Mobile Menu */}
 							<Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -227,41 +329,10 @@ export function Header() {
 
 										<Separator />
 
-										{/* Quick Links */}
-										{isAuthenticated && (
-											<>
-												<div>
-													<h3 className="text-sm font-semibold text-muted-foreground mb-3 px-2">Your Account</h3>
-													<nav className="flex flex-col gap-1">
-														<Link
-															href="/wishlist"
-															className="flex items-center gap-3 px-3 py-3 text-sm font-medium text-foreground hover:bg-accent rounded-lg transition-colors"
-															onClick={() => setMobileMenuOpen(false)}
-														>
-															<Heart className="h-5 w-5 text-primary" />
-															Wishlist
-														</Link>
-														<Link
-															href="/notifications"
-															className="flex items-center gap-3 px-3 py-3 text-sm font-medium text-foreground hover:bg-accent rounded-lg transition-colors"
-															onClick={() => setMobileMenuOpen(false)}
-														>
-															<Bell className="h-5 w-5 text-primary" />
-															Notifications
-														</Link>
-														<Link
-															href="/account"
-															className="flex items-center gap-3 px-3 py-3 text-sm font-medium text-foreground hover:bg-accent rounded-lg transition-colors"
-															onClick={() => setMobileMenuOpen(false)}
-														>
-															<CircleUser className="h-5 w-5 text-primary" />
-															My Account
-														</Link>
-													</nav>
-												</div>
-												<Separator />
-											</>
-										)}
+										{/* Quick Links - Activity based */}
+										<AuthAwareMobileMenu onLinkClickAction={() => setMobileMenuOpen(false)} />
+
+										<Separator />
 
 										{/* Quick Categories */}
 										<div>

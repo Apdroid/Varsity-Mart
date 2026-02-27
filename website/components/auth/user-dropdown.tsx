@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
 	User,
@@ -32,14 +33,39 @@ type Props = {
 };
 
 const ProfileDropdown = ({ trigger, defaultOpen, align = "start" }: Props) => {
-	const { user, logout } = useAuth();
+	const { user, logout, isAuthenticated } = useAuth();
+  const [userData, setUser] = useState({});  
+	const [mounted, setMounted] = useState(false);
 
-	// Debug log to see what user data we have
-	console.log("👤 ProfileDropdown - User data:", user);
+	// Ensure component is mounted on client
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	// Debug logs
+	useEffect(() => {
+    setUser({ user }); 
+		console.log("👤 ProfileDropdown - Mounted:", mounted);
+		console.log("👤 ProfileDropdown - User data:", user);
+		console.log("👤 ProfileDropdown - isAuthenticated:", isAuthenticated);
+	}, [user, isAuthenticated, mounted]);
 
 	const handleLogout = () => {
+		console.log("🚪 ProfileDropdown - Logout clicked");
 		logout();
 	};
+
+	// Don't render dropdown until mounted and user is available
+	if (!mounted || !user) {
+		return <>{trigger}</>;
+	}
+	
+	
+
+	const userInitial = user.fullName?.charAt(0)?.toUpperCase() ||
+	                    user.email?.charAt(0)?.toUpperCase() ||
+	                    "U";
+  console.log(user);
 
 	return (
 		<DropdownMenu defaultOpen={defaultOpen}>
@@ -48,19 +74,19 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "start" }: Props) => {
 				<DropdownMenuLabel className="flex items-center gap-3 px-3 py-2.5 font-normal">
 					<div className="relative">
 						<Avatar className="size-9">
-							<AvatarImage src={user?.avatar} alt={user?.fullName || "User"} />
-							<AvatarFallback>
-								{user?.fullName?.charAt(0) || "?"}
+							<AvatarImage src={user.avatar || undefined} alt={user.fullName || "User"} />
+							<AvatarFallback className="bg-primary/10 text-primary font-semibold">
+								{userInitial}
 							</AvatarFallback>
 						</Avatar>
 						<span className="ring-card absolute right-0 bottom-0 block size-2 rounded-full bg-green-600 ring-2" />
 					</div>
 					<div className="flex flex-1 flex-col items-start min-w-0">
 						<span className="text-foreground text-sm font-semibold truncate w-full">
-							{user?.fullName || "Loading..."}
+							{user.fullName || "User"}
 						</span>
 						<span className="text-muted-foreground text-xs truncate w-full">
-							{user?.email || ""}
+							{user.email || ""}
 						</span>
 					</div>
 				</DropdownMenuLabel>

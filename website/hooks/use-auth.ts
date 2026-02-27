@@ -30,6 +30,7 @@ export function useAuth() {
 				console.log("✅ Auth check response:", response);
 				console.log("👤 User data:", response.data);
 				setUser(response.data);
+				setIsAuthenticated(true);
 				return response.data;
 			} catch (error) {
 				console.error("❌ Auth check failed:", error);
@@ -55,20 +56,23 @@ export function useAuth() {
 	const loginMutation = useMutation({
 		mutationFn: (data: LoginRequest) => authService.login(data),
 		onSuccess: async (response) => {
+			console.log("✅ Login successful:", response);
 			const userData = response.data.user;
+
 			// Update Zustand store immediately
 			setUser(userData);
 			setIsAuthenticated(true);
-			
+
 			// Update React Query cache
 			queryClient.setQueryData(queryKeys.auth.user(), userData);
 
 			// Refetch to ensure we have the latest data
-		await refetchUser();
+			await refetchUser();
+
 			router.push("/");
 		},
 		onError: (error) => {
-			console.error("Login failed:", error);
+			console.error("❌ Login failed:", error);
 		},
 	});
 
@@ -76,13 +80,14 @@ export function useAuth() {
 	const registerMutation = useMutation({
 		mutationFn: (data: RegisterRequest) => authService.register(data),
 		onSuccess: async (response) => {
+			console.log("✅ Registration successful:", response);
 			const userData = response.data.user;
 			setUser(userData);
 			setIsAuthenticated(true);
-			
+
 			// Update the query cache for the user
 			queryClient.setQueryData(queryKeys.auth.user(), userData);
-			
+
 			router.push("/verify-email");
 		},
 	});
@@ -107,7 +112,6 @@ export function useAuth() {
 		user,
 		isAuthenticated,
 		isLoading: !isAuthFetched,
-		setIsAuthenticated,
 		login: loginMutation.mutate,
 		loginAsync: loginMutation.mutateAsync,
 		isLoggingIn: loginMutation.isPending,

@@ -1,9 +1,6 @@
-"use client";
-
-import { ArrowRight, Loader2, TrendingUp } from "lucide-react";
+import { ArrowRight, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { ProductCard } from "@/components/product-card";
-import { useProducts } from "@/hooks/use-products";
 import {
 	Carousel,
 	CarouselContent,
@@ -12,8 +9,8 @@ import {
 import { mockProducts } from "@/data/products/products";
 
 export function FeaturedProducts() {
-	const { data: response, isLoading } = useProducts({ limit: 12 });
-	const products = Array.isArray(response?.data) ? response.data : [];
+	// Use mock products directly - first 12 products
+	const products = mockProducts.slice(0, 12);
 
 	return (
 		<section className="py-10 md:py-16 px-4 sm:px-6 lg:px-8 bg-background">
@@ -42,31 +39,25 @@ export function FeaturedProducts() {
 				</div>
 
 				{/* Products Carousel - Mobile friendly with swipe */}
-				{isLoading ? (
-					<div className="flex justify-center py-12">
-						<Loader2 className="h-8 w-8 animate-spin text-primary" />
-					</div>
-				) : (
-					<Carousel
-						opts={{
-							align: "start",
-							loop: false,
-							dragFree: true,
-						}}
-						className="w-full"
-					>
-						<CarouselContent className="-ml-3 md:-ml-4">
-							{products.map((product) => (
-								<CarouselItem
-									key={product.id}
-									className="pl-3 md:pl-4 basis-[45%] sm:basis-[30%] md:basis-[22%] lg:basis-[18%] xl:basis-[14%]"
-								>
-									<ProductCard product={product} />
-								</CarouselItem>
-							))}
-						</CarouselContent>
-					</Carousel>
-				)}
+				<Carousel
+					opts={{
+						align: "start",
+						loop: false,
+						dragFree: true,
+					}}
+					className="w-full"
+				>
+					<CarouselContent className="-ml-3 md:-ml-4">
+						{products.map((product) => (
+							<CarouselItem
+								key={product.id}
+								className="pl-3 md:pl-4 basis-[45%] sm:basis-[30%] md:basis-[22%] lg:basis-[18%] xl:basis-[14%]"
+							>
+								<ProductCard product={product} />
+							</CarouselItem>
+						))}
+					</CarouselContent>
+				</Carousel>
 
 				{/* Mobile View All Button */}
 				<div className="mt-6 text-center sm:hidden">

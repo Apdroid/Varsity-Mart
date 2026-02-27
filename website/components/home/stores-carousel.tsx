@@ -102,7 +102,7 @@ export function StoresCarousel({
 			{/* Optional Banner */}
 			{showBanner && (
 				<div className="relative rounded-xl overflow-hidden mb-6 shadow-lg">
-					<div className="absolute inset-0 bg-linear-to-r from-primary/90 via-primary/70 to-primary/50 z-10" />
+					<div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent z-10" />
 					<img
 						src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80"
 						alt="Campus stores"
