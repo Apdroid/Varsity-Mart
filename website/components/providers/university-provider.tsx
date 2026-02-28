@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { UniversitySelectorModal } from "@/components/layout/university-selector-modal";
 import { useUniversityStore } from "@/lib/stores/university-store";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/queries/useAuth";
 
 export function UniversityProvider({ children }: { children: React.ReactNode }) {
 	const { selectedUniversity } = useUniversityStore();

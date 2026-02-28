@@ -6,11 +6,11 @@ import { ChevronRight, Minus, Plus, Trash2, ShoppingBag, Shield, Truck, ArrowRig
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { useCartStore } from "@/lib/stores/cart-store"
+import { useCart } from "@/hooks/queries/useCart"
 import { mockCartItems } from "@/data/cart/cart-items"
 
 export function CartPageContent() {
-  const { items, removeItem, updateQuantity } = useCartStore()
+  const { items, removeItem, updateQuantity } = useCart()
 
   // Use mock data for display
   const cartItems = mockCartItems

@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { useAuthStore } from "@/lib/stores/auth-store"
+import { useAuth } from "@/hooks/queries/useAuth"
 import { cn } from "@/lib/utils"
 import type { Product } from "@/types/models"
 import { AlertCircle, BadgeCheck, Clock, HandCoins, Percent, Shield, Sparkles, Tag } from "lucide-react"
@@ -24,7 +24,7 @@ interface MakeOfferModalProps {
 export function MakeOfferModal({ product, open, onOpenChange, onSubmit }: MakeOfferModalProps) {
   const [amount, setAmount] = useState("")
   const [message, setMessage] = useState("")
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated } = useAuth()
 
   const offerAmount = Number.parseFloat(amount) || 0
   const percentageOfAsking = product.price > 0 ? (offerAmount / product.price) * 100 : 0

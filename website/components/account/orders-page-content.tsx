@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { statusColors } from "@/data/account/orders";
-import { useMyOrders } from "@/hooks/use-orders";
+import { useMyOrders } from "@/hooks/queries/useOrders";
 
 export function OrdersPageContent() {
 	const [activeTab, setActiveTab] = useState("all");
@@ -80,7 +80,7 @@ export function OrdersPageContent() {
 										<div>
 											<p className="text-sm text-muted-foreground">Date</p>
 											<p className="font-medium text-foreground">
-												{new Date(order.createdAt).toLocaleDateString()}
+												{new Date((order as any).createdAt ?? (order as any).date).toLocaleDateString()}
 											</p>
 										</div>
 										<div>
@@ -100,7 +100,7 @@ export function OrdersPageContent() {
 
 								{/* Order Items */}
 								<div className="p-4">
-									{order.items.map((item, index) => (
+									{order.items.map((item: any, index: number) => (
 										<div key={index} className="flex items-center gap-4">
 											<div className="w-16 h-16 rounded-lg overflow-hidden bg-muted shrink-0">
 												<Image

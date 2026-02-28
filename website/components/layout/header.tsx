@@ -27,7 +27,7 @@ import { SearchModal } from "@/components/ui/search-modal";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { mockProducts } from "@/data/products/products";
-import { useCartStore } from "@/lib/stores/cart-store";
+import { useCart } from "@/hooks/queries/useCart";
 import { cn } from "@/lib/utils";
 import Logo from "./logo";
 
@@ -47,7 +47,7 @@ export function Header() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [showAutocomplete, setShowAutocomplete] = useState(false);
 	const [searchResults, setSearchResults] = useState<any[]>([]);
-	const { items } = useCartStore();
+	const { items } = useCart();
 	const cartCount = items.reduce((acc, item) => acc + item.quantity, 0);
 	const { scrollY } = useScroll();
 	const router = useRouter();

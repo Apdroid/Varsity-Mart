@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Clock, AlertCircle } from "lucide-react"
-import { useAuthStore } from "@/lib/stores/auth-store"
+import { useAuth } from "@/hooks/queries/useAuth"
 import { CounterOfferModal } from "./counter-offer-modal"
 import { OfferStatusBadge } from "./offer-status-badge"
 import type { Offer } from "@/types/models"
 import { MOCK_OFFERS } from "@/data/offers/offers"
 
 export function OffersPageContent() {
-  const { user } = useAuthStore()
+  const { user } = useAuth()
   const [offers, setOffers] = useState<Offer[]>(MOCK_OFFERS)
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null)
   const [isCounterModalOpen, setIsCounterModalOpen] = useState(false)

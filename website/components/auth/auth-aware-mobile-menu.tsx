@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Heart, Bell, CircleUser } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/queries/useAuth";
 
 /**
  * AuthAwareMobileMenu - Shows account links in mobile menu only when authenticated

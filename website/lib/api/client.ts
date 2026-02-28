@@ -6,7 +6,7 @@ import axios, {
 import { ENDPOINTS } from "./endpoints";
 
 const API_BASE_URL =
-	process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.varsitymart.org/api/v1";
+	process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.varsitymart.org/v1";
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({

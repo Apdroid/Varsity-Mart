@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/queries/useAuth";
 import ProfileDropdown from "@/components/auth/user-dropdown";
 import { LoginButton } from "@/components/auth/auth-button";
 

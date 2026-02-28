@@ -3,7 +3,7 @@
 import { ProductsCarousel } from "@/components/home/products-carousel";
 import { mockProducts } from "@/data/products/products";
 import type { Product } from "@/types/models";
-import { useProducts } from "@/hooks/use-products";
+import { useProducts } from "@/hooks/queries/useProducts";
 import { Loader2 } from "lucide-react";
 
 interface RelatedProductsProps {

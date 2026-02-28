@@ -28,7 +28,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/queries/useAuth";
 import { universities } from "@/data/auth/universities";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { authService } from "@/lib/api/services/auth.service";

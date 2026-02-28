@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/queries/useAuth";
 import { LocationSelector } from "@/components/layout/location-selector";
 import { UniversityDisplay } from "@/components/layout/university-display";
 

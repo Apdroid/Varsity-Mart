@@ -18,7 +18,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/queries/useAuth";
 import { authService } from "@/lib/api/services/auth.service";
 
 const loginSchema = z.object({

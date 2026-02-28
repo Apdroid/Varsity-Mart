@@ -5,7 +5,7 @@ import { Loader2, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/queries/useAuth";
 
 function CallbackContent() {
 	const router = useRouter();

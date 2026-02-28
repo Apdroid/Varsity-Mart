@@ -1,5 +1,6 @@
 // useStore.ts - Next.js safe store hook using useSyncExternalStore
 import { useEffect, useState } from "react";
+// @ts-expect-error — no types for use-sync-external-store/shim
 import { useSyncExternalStore } from "use-sync-external-store/shim";
 import type { StoreApi } from "zustand";
 

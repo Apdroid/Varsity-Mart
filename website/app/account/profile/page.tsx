@@ -1,6 +1,6 @@
 "use client"
 
-import { useProfile } from "@/hooks/use-user"
+import { useProfile } from "@/hooks/queries/useProfile"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"

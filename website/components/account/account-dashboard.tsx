@@ -16,8 +16,8 @@ import {
 	menuItems,
 	statusColors,
 } from "@/data/account/account";
-import { useAuth } from "@/hooks/use-auth";
-import { useMyOrders } from "@/hooks/use-orders";
+import { useAuth } from "@/hooks/queries/useAuth";
+import { useMyOrders } from "@/hooks/queries/useOrders";
 export function AccountDashboard() {
 	const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
 	const { data: ordersResponse, isLoading: isLoadingOrders } = useMyOrders({ limit: 3 });
@@ -131,7 +131,7 @@ recentOrders.map((order) => (
 										</div>
 										<p className="text-sm text-muted-foreground truncate">{order.items.length} item{order.items.length !== 1 ? 's' : ''}</p>
 										<div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-											<span>{new Date(order.createdAt || order.date).toLocaleDateString()}</span>
+											<span>{new Date((order as any).createdAt ?? (order as any).date).toLocaleDateString()}</span>
 											<span className="font-medium text-foreground">GH₵{order.total.toFixed(2)}</span>
 										</div>
 									</Link>

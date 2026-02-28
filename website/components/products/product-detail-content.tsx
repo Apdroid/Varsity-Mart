@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useCartStore } from "@/lib/stores/cart-store";
-import { useProduct, useLikeProduct } from "@/hooks/use-products";
+import { useCart } from "@/hooks/queries/useCart";
+import { useProduct, useLikeProduct } from "@/hooks/queries/useProducts";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types/models";
 import {
@@ -39,7 +39,7 @@ interface ProductDetailContentProps {
 export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 	const { data: productResponse, isLoading, error } = useProduct(productId);
 	const { mutate: likeProduct, isPending: isLiking } = useLikeProduct();
-	const { addItem } = useCartStore();
+	const { addItem } = useCart();
 
 	const [selectedImage, setSelectedImage] = useState(0);
 	const [isMakeOfferOpen, setIsMakeOfferOpen] = useState(false);
