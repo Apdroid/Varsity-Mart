@@ -93,6 +93,15 @@ export const queryKeys = {
     status: () => [...queryKeys.kyc.all, "status"] as const,
   },
 
+  // Offers
+  offers: {
+    all: ["offers"] as const,
+    lists: () => [...queryKeys.offers.all, "list"] as const,
+    myOffers: () => [...queryKeys.offers.all, "my-offers"] as const,
+    forProduct: (productId: string) => [...queryKeys.offers.all, "product", productId] as const,
+    detail: (id: string) => [...queryKeys.offers.all, "detail", id] as const,
+  },
+
   // Admin
   admin: {
     all: ["admin"] as const,

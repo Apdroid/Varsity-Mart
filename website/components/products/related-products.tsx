@@ -1,11 +1,34 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { ProductsCarousel } from "@/components/home/products-carousel";
-import { mockProducts } from "@/data/products/products";
 import type { Product } from "@/types/models";
 import { useProducts } from "@/hooks/queries/useProducts";
 import { Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
+// ─── Recently Viewed Tracking ───────────────────────────────────────────────
+const RECENTLY_VIEWED_KEY = "varsitymart-recently-viewed"
+const MAX_RECENTLY_VIEWED = 12
+
+function getRecentlyViewedIds(): string[] {
+  if (typeof window === "undefined") return []
+  try {
+    const stored = localStorage.getItem(RECENTLY_VIEWED_KEY)
+    return stored ? JSON.parse(stored) : []
+  } catch { return [] }
+}
+
+export function trackProductView(productId: string) {
+  if (typeof window === "undefined") return
+  try {
+    const ids = getRecentlyViewedIds().filter(id => id !== productId)
+    ids.unshift(productId)
+    localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(ids.slice(0, MAX_RECENTLY_VIEWED)))
+  } catch { /* non-critical */ }
+}
+
+// ─── Related Products (by category) ─────────────────────────────────────────
 interface RelatedProductsProps {
 	currentProduct: Product;
 	className?: string;
@@ -19,8 +42,19 @@ export function RelatedProducts({ currentProduct, className }: RelatedProductsPr
 
 	if (isLoading) {
 		return (
-			<div className="flex justify-center py-12">
-				<Loader2 className="h-8 w-8 animate-spin text-primary" />
+			<div className={className}>
+				<div className="space-y-4">
+					<Skeleton className="h-8 w-48" />
+					<div className="flex gap-4 overflow-hidden">
+						{Array.from({ length: 5 }).map((_, i) => (
+							<div key={i} className="space-y-3 shrink-0 w-[180px]">
+								<Skeleton className="aspect-square rounded-lg" />
+								<Skeleton className="h-4 w-3/4" />
+								<Skeleton className="h-4 w-1/2" />
+							</div>
+						))}
+					</div>
+				</div>
 			</div>
 		);
 	}
@@ -45,6 +79,7 @@ export function RelatedProducts({ currentProduct, className }: RelatedProductsPr
 	);
 }
 
+// ─── More From Seller ───────────────────────────────────────────────────────
 interface MoreFromSellerProps {
 	sellerId: string;
 	storeId?: string;
@@ -67,8 +102,19 @@ export function MoreFromSeller({
 
 	if (isLoading) {
 		return (
-			<div className="flex justify-center py-12">
-				<Loader2 className="h-8 w-8 animate-spin text-primary" />
+			<div className={className}>
+				<div className="space-y-4">
+					<Skeleton className="h-8 w-56" />
+					<div className="flex gap-4 overflow-hidden">
+						{Array.from({ length: 5 }).map((_, i) => (
+							<div key={i} className="space-y-3 shrink-0 w-[180px]">
+								<Skeleton className="aspect-square rounded-lg" />
+								<Skeleton className="h-4 w-3/4" />
+								<Skeleton className="h-4 w-1/2" />
+							</div>
+						))}
+					</div>
+				</div>
 			</div>
 		);
 	}
@@ -93,18 +139,49 @@ export function MoreFromSeller({
 	);
 }
 
+// ─── Recently Viewed ────────────────────────────────────────────────────────
 interface RecentlyViewedProps {
 	excludeProductId?: string;
 	className?: string;
 }
 
 export function RecentlyViewed({ excludeProductId, className }: RecentlyViewedProps) {
-	// In a real app, this would come from localStorage or user session
-	const recentProducts = mockProducts
-		.filter((p) => p.id !== excludeProductId)
-		.slice(0, 8);
+	const [viewedIds, setViewedIds] = useState<string[]>([])
 
-	if (recentProducts.length === 0) return null;
+	useEffect(() => {
+		setViewedIds(getRecentlyViewedIds().filter(id => id !== excludeProductId))
+	}, [excludeProductId])
+
+	// Fetch actual product data for the recently viewed IDs
+	const { data: response, isLoading } = useProducts({
+		ids: viewedIds.length > 0 ? viewedIds : undefined,
+		limit: 8,
+	})
+
+	if (viewedIds.length === 0) return null
+
+	if (isLoading) {
+		return (
+			<div className={className}>
+				<div className="space-y-4">
+					<Skeleton className="h-8 w-40" />
+					<div className="flex gap-4 overflow-hidden">
+						{Array.from({ length: 4 }).map((_, i) => (
+							<div key={i} className="space-y-3 shrink-0 w-[180px]">
+								<Skeleton className="aspect-square rounded-lg" />
+								<Skeleton className="h-4 w-3/4" />
+								<Skeleton className="h-4 w-1/2" />
+							</div>
+						))}
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	const recentProducts = Array.isArray(response?.data) ? response.data : []
+
+	if (recentProducts.length === 0) return null
 
 	return (
 		<div className={className}>

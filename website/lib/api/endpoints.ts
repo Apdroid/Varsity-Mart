@@ -142,6 +142,19 @@ export const ENDPOINTS = {
     RESOLVE_DISPUTE: (id: string) => `/admin/disputes/${id}/resolve/`,
   },
 
+  // Offers
+  OFFERS: {
+    LIST: "/offers/",
+    MY_OFFERS: "/offers/my-offers/",
+    PRODUCT_OFFERS: (productId: string) => `/products/${productId}/offers/`,
+    CREATE: (productId: string) => `/products/${productId}/offers/`,
+    DETAIL: (id: string) => `/offers/${id}/`,
+    CANCEL: (id: string) => `/offers/${id}/cancel/`,
+    ACCEPT: (id: string) => `/offers/${id}/accept/`,
+    DECLINE: (id: string) => `/offers/${id}/decline/`,
+    COUNTER: (id: string) => `/offers/${id}/counter/`,
+  },
+
   // Night Shop
   NIGHT_SHOP: {
     PRODUCTS: "/night-shop/products/",

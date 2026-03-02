@@ -1,7 +1,7 @@
 "use client";
 
 import { MakeOfferModal } from "@/components/offers/make-offer-modal";
-import { RelatedProducts, MoreFromSeller } from "@/components/products/related-products";
+import { RelatedProducts, MoreFromSeller, RecentlyViewed, trackProductView } from "@/components/products/related-products";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,16 +9,24 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useCart } from "@/hooks/queries/useCart";
 import { useProduct, useLikeProduct } from "@/hooks/queries/useProducts";
+import { useProductOffers, useCreateOffer } from "@/hooks/queries/useOffers";
+import { useStartConversation } from "@/hooks/queries/useChat";
+import { useAuth } from "@/hooks/queries/useAuth";
 import { cn } from "@/lib/utils";
-import type { Product } from "@/types/models";
+import type { Product, Offer } from "@/types/models";
 import {
 	BadgeCheck,
+	Check,
 	ChevronLeft,
 	ChevronRight,
+	Clock,
 	HandCoins,
 	Heart,
+	Loader2,
 	MessageCircle,
+	Minus,
 	Package,
+	Plus,
 	Share2,
 	Shield,
 	ShoppingCart,
@@ -30,19 +38,35 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 interface ProductDetailContentProps {
 	productId: string;
 }
 
 export function ProductDetailContent({ productId }: ProductDetailContentProps) {
+	const router = useRouter();
 	const { data: productResponse, isLoading, error } = useProduct(productId);
 	const { mutate: likeProduct, isPending: isLiking } = useLikeProduct();
-	const { addItem } = useCart();
+	const { addItem, removeItem, isInCart, getQuantity, updateQuantity } = useCart();
+	const { user, isAuthenticated } = useAuth();
+	const { data: offersResponse } = useProductOffers(productId);
+	const { mutate: createOffer, isPending: isCreatingOffer } = useCreateOffer();
+	const { mutate: startConversation, isPending: isStartingChat } = useStartConversation();
 
 	const [selectedImage, setSelectedImage] = useState(0);
 	const [isMakeOfferOpen, setIsMakeOfferOpen] = useState(false);
+
+	// Track this product as recently viewed
+	useEffect(() => {
+		trackProductView(productId);
+	}, [productId]);
+
+	// Find the current user's active offers on this product
+	const myOffers: Offer[] = (offersResponse?.data as Offer[] || []).filter(
+		(o: Offer) => o.buyerId === user?.id && (o.status === "pending" || o.status === "countered")
+	);
 
 	// Show loading skeleton
 	if (isLoading) {
@@ -93,10 +117,7 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 		: 0;
 
 	const handleAddToCart = () => {
-		addItem({
-			...product,
-			quantity: 1,
-		});
+		addItem(product, 1);
 	};
 
 	const handleLikeProduct = () => {
@@ -104,11 +125,25 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 	};
 
 	const handleSubmitOffer = (amount: number, message?: string) => {
-		console.log("[v0] Offer submitted:", { amount, message });
-		alert(
-			`Offer submitted! You offered GH₵${amount.toLocaleString()}${message ? `\nMessage: ${message}` : ""}`,
+		createOffer({
+			productId: product.id,
+			data: { amount, message },
+		});
+	};
+
+	const handleMessageSeller = () => {
+		if (!isAuthenticated) {
+			router.push("/auth/login");
+			return;
+		}
+		startConversation(
+			{ participantId: product.sellerId, initialMessage: `Hi! I'm interested in "${product.title}"` },
+			{ onSuccess: () => router.push("/messages") },
 		);
 	};
+
+	const productInCart = isInCart(product.id);
+	const cartQuantity = getQuantity(product.id);
 
 	return (
 		<>
@@ -273,18 +308,108 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 						{/* CTA Buttons */}
 						<div className="flex flex-col gap-3">
 							<div className="flex gap-3">
+								{productInCart ? (
+									<div className="flex-1 flex items-center h-12 rounded-lg border border-primary bg-primary/5">
+										<Button
+											variant="ghost"
+											size="icon"
+											className="h-12 w-12 rounded-r-none text-primary hover:bg-primary/10"
+											onClick={() => {
+												if (cartQuantity <= 1) removeItem(product.id);
+												else updateQuantity(product.id, cartQuantity - 1);
+											}}
+										>
+											<Minus className="h-4 w-4" />
+										</Button>
+										<div className="flex-1 flex items-center justify-center gap-2">
+											<Check className="h-4 w-4 text-primary" />
+											<span className="font-semibold text-primary text-sm">
+												In Cart ({cartQuantity})
+											</span>
+										</div>
+										<Button
+											variant="ghost"
+											size="icon"
+											className="h-12 w-12 rounded-l-none text-primary hover:bg-primary/10"
+											onClick={() => updateQuantity(product.id, cartQuantity + 1)}
+											disabled={cartQuantity >= product.quantity}
+										>
+											<Plus className="h-4 w-4" />
+										</Button>
+									</div>
+								) : (
+									<Button
+										size="lg"
+										className="flex-1 bg-primary hover:bg-primary/90 gap-2 h-12 text-base font-semibold shadow-lg shadow-primary/20"
+										onClick={handleAddToCart}
+									>
+										<ShoppingCart className="h-5 w-5" />
+										Add to Cart
+									</Button>
+								)}
 								<Button
 									size="lg"
-									className="flex-1 bg-primary hover:bg-primary/90 gap-2 h-12 text-base font-semibold shadow-lg shadow-primary/20"
-									onClick={handleAddToCart}
+									variant="outline"
+									className="gap-2 bg-transparent h-12 w-12"
+									title="Message Seller"
+									onClick={handleMessageSeller}
+									disabled={isStartingChat}
 								>
-									<ShoppingCart className="h-5 w-5" />
-									Buy Now
-								</Button>
-								<Button size="lg" variant="outline" className="gap-2 bg-transparent h-12 w-12" title="Message Seller">
-									<MessageCircle className="h-5 w-5" />
+									{isStartingChat ? (
+										<Loader2 className="h-5 w-5 animate-spin" />
+									) : (
+										<MessageCircle className="h-5 w-5" />
+									)}
 								</Button>
 							</div>
+
+							{/* Existing Offers from Current User */}
+							{myOffers.length > 0 && (
+								<div className="space-y-2">
+									{myOffers.map((offer) => (
+										<div
+											key={offer.id}
+											className={cn(
+												"flex items-center gap-3 p-3 rounded-xl border",
+												offer.status === "pending"
+													? "bg-amber-500/5 border-amber-500/20"
+													: "bg-blue-500/5 border-blue-500/20",
+											)}
+										>
+											<div className={cn(
+												"flex items-center justify-center w-9 h-9 rounded-full shrink-0",
+												offer.status === "pending" ? "bg-amber-500/10" : "bg-blue-500/10",
+											)}>
+												{offer.status === "pending" ? (
+													<Clock className="h-4 w-4 text-amber-500" />
+												) : (
+													<HandCoins className="h-4 w-4 text-blue-500" />
+												)}
+											</div>
+											<div className="flex-1 min-w-0">
+												<p className="text-sm font-medium text-foreground">
+													Your offer: GH₵{offer.amount.toLocaleString()}
+												</p>
+												<p className="text-[11px] text-muted-foreground">
+													{offer.status === "pending"
+														? "Waiting for seller response"
+														: `Seller countered with GH₵${offer.counterAmount?.toLocaleString()}`}
+												</p>
+											</div>
+											<Badge
+												variant="secondary"
+												className={cn(
+													"text-[10px] capitalize shrink-0",
+													offer.status === "pending" && "bg-amber-500/10 text-amber-600",
+													offer.status === "countered" && "bg-blue-500/10 text-blue-600",
+												)}
+											>
+												{offer.status}
+											</Badge>
+										</div>
+									))}
+								</div>
+							)}
 
 							{/* Enhanced Make Offer Button */}
 							<Button
@@ -292,14 +417,21 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 								variant="outline"
 								className="w-full gap-3 h-14 border-2 border-dashed border-primary/50 text-primary hover:border-primary hover:bg-primary/5 group relative overflow-hidden"
 								onClick={() => setIsMakeOfferOpen(true)}
+								disabled={isCreatingOffer}
 							>
 								<div className="absolute inset-0 bg-linear-to-r from-primary/5 via-primary/10 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
 								<div className="relative flex items-center gap-3">
 									<div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
-										<HandCoins className="h-5 w-5" />
+										{isCreatingOffer ? (
+											<Loader2 className="h-5 w-5 animate-spin" />
+										) : (
+											<HandCoins className="h-5 w-5" />
+										)}
 									</div>
 									<div className="text-left">
-										<p className="font-semibold text-sm">Make an Offer</p>
+										<p className="font-semibold text-sm">
+											{myOffers.length > 0 ? "Make Another Offer" : "Make an Offer"}
+										</p>
 										<p className="text-[10px] text-muted-foreground">Negotiate a better price</p>
 									</div>
 								</div>
@@ -431,6 +563,9 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 
 				{/* Related products by category */}
 				<RelatedProducts currentProduct={product} />
+
+				{/* Recently viewed */}
+				<RecentlyViewed excludeProductId={product.id} />
 			</div>
 
 			<MakeOfferModal

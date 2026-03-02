@@ -56,11 +56,16 @@ export function useAuth() {
     queryKey: queryKeys.auth.user(),
     queryFn: async () => {
       const response = await authService.getMe()
-      // check-status returns { isAuthenticated, tokens, user } — extract user
-      const userData = (response as any).user ?? response.data ?? response
-      // Persist to localStorage for instant hydration on next reload
+      // check-status returns varying shapes — robustly extract the User object
+      const r = response as any
+      const userData: User =
+        r?.user?.id ? r.user :
+        r?.data?.user?.id ? r.data.user :
+        r?.data?.id ? r.data :
+        r?.id ? r :
+        r
       setCachedUser(userData)
-      return userData as User
+      return userData
     },
     // Show cached user instantly while server check runs in background
     placeholderData: getCachedUser,

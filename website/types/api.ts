@@ -66,6 +66,7 @@ export interface ProductFilters extends PaginationParams {
   maxPrice?: number
   search?: string
   sellerId?: string
+  ids?: string[]
 }
 
 export interface CreateProductRequest {
