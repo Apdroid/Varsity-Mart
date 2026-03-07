@@ -5,15 +5,20 @@ meta {
 }
 
 get {
-  url: {{base_url}}/user/:userId
+  url: {{base_url}}/users/:userId?fields=extended
   body: none
   auth: inherit
 }
 
+params:query {
+  fields: extended
+}
+
 params:path {
-  userId: 
+  userId: 25228295-d072-4369-8cb1-18ffb4c260c5
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

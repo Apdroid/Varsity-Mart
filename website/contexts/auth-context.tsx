@@ -34,8 +34,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			try {
 				console.log("🔐 Checking authentication status...");
 				const response = await authService.getMe();
-				console.log("✅ User authenticated:", response.data);
-				setUser(response.data);
+				if(response.data.isAuthenticated){
+					throw new Error("User not authenticated");
+				}
+				console.log("✅ User authenticated:", response.data.isAuthenticated);
+				setUser(response.data.user);
 				setIsAuthenticated(true);
 			} catch {
 				console.log("❌ User not authenticated");
@@ -119,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			console.log("🔄 Refetching user...");
 			const response = await authService.getMe();
 			console.log("✅ User refetched:", response.data);
-			setUser(response.data);
+			setUser(response.data.user);
 			setIsAuthenticated(true);
 		} catch (error) {
 			console.log("❌ Failed to refetch user");
