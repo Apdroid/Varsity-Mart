@@ -58,6 +58,25 @@ export interface ApiResponse<T> {
 	};
 }
 
+export interface ApiGetMeResponse{
+  success: boolean;
+  data: {
+    isAuthenticated: boolean;
+    user: {
+      id: string;
+      email: string;
+      firstName: string;
+      role: string;
+      isVerified: boolean;
+      avatar: string;
+    };
+    tokens: {
+      accessExpiresIn: number;
+      willRefreshIn: number;
+    };
+  };
+}
+
 export interface ApiError {
 	success: false;
 	message: string;

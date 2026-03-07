@@ -1,7 +1,7 @@
-import apiClient, { type ApiResponse } from "../client"
+import apiClient, { ApiGetMeResponse, type ApiResponse } from "../client"
 import { ENDPOINTS } from "../endpoints"
 import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from "@/types/api"
-import type { User } from "@/types/models"
+import type { GetMe, User } from "@/types/models"
 
 export const authService = {
   async login(data: LoginRequest): Promise<ApiResponse<LoginResponse>> {
@@ -58,7 +58,7 @@ export const authService = {
     return response.data
   },
 
-  async getMe(): Promise<ApiResponse<User>> {
+  async getMe(): Promise<ApiGetMeResponse> {
     const response = await apiClient.get(ENDPOINTS.AUTH.CHECK_STATUS)
     return response.data
   },

@@ -1,4 +1,22 @@
 // User Types
+export type GetMe = {
+  success: boolean;
+  data: {
+    isAuthenticated: boolean;
+    user: {
+      id: string;
+      email: string;
+      firstName: string;
+      role: string;
+      isVerified: boolean;
+      avatar: string;
+    };
+    tokens: {
+      accessExpiresIn: number;
+      willRefreshIn: number;
+    };
+  };
+};
 export interface User {
   id: string
   email: string
