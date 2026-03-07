@@ -34,8 +34,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { authService } from "@/lib/api/services/auth.service";
 
 const registerSchema = z.object({
-	firstName: z.string().min(2, "First name is required"),
-	lastName: z.string().min(2, "Last name is required"),
+	first_name: z.string().min(2, "First name is required"),
+	last_name: z.string().min(2, "Last name is required"),
 	avatar: z.any().optional(),
 	email: z.string().email("Please enter a valid email"),
 	phone: z.string().min(10, "Please enter a valid phone number"),
@@ -47,13 +47,13 @@ const registerSchema = z.object({
 	university: z.string().min(1, "Please select your university"),
 	campus: z.string().min(1, "Please select your campus"),
 	password: z.string().min(8, "Password must be at least 8 characters"),
-	confirmPassword: z.string(),
-	agreeToTerms: z.boolean().refine((val) => val, {
+	confirm_password: z.string(),
+	agree_to_terms: z.boolean().refine((val) => val, {
 		message: "You must agree to the terms and conditions",
 	}),
-}).refine((data) => data.password === data.confirmPassword, {
+}).refine((data) => data.password === data.confirm_password, {
 	message: "Passwords don't match",
-	path: ["confirmPassword"],
+	path: ["confirm_password"],
 }).refine((data) => !data.isStudent || (data.isStudent && data.studentId && data.studentId.length > 0), {
 	message: "Student ID is required for students",
 	path: ["studentId"],
@@ -80,8 +80,8 @@ export default function RegisterForm() {
 	const form = useForm<RegisterFormValues>({
 		resolver: zodResolver(registerSchema),
 		defaultValues: {
-			firstName: "",
-			lastName: "",
+			first_name: "",
+			last_name: "",
 			avatar: undefined,
 			email: "",
 			phone: "",
@@ -91,8 +91,8 @@ export default function RegisterForm() {
 			university: "",
 			campus: "",
 			password: "",
-			confirmPassword: "",
-			agreeToTerms: false,
+			confirm_password: "",
+			agree_to_terms: false,
 		},
 		mode: "onChange",
 	});
@@ -117,7 +117,7 @@ export default function RegisterForm() {
 	// Validate current step before proceeding
 	const validateStep = async (step: number): Promise<boolean> => {
 		let fieldsToValidate: (keyof RegisterFormValues)[] = [];
-		
+
 		switch (step) {
 			case 1:
 				fieldsToValidate = ["role"];
@@ -126,15 +126,15 @@ export default function RegisterForm() {
 				fieldsToValidate = ["firstName", "lastName", "email", "phone"];
 				break;
 			case 3:
-				fieldsToValidate = isStudent 
-					? ["university", "campus", "studentId"] 
+				fieldsToValidate = isStudent
+					? ["university", "campus", "studentId"]
 					: ["university", "campus"];
 				break;
 			case 4:
 				fieldsToValidate = ["password", "confirmPassword", "agreeToTerms"];
 				break;
 		}
-		
+
 		const result = await form.trigger(fieldsToValidate);
 		return result;
 	};
@@ -208,7 +208,7 @@ export default function RegisterForm() {
 								{selectedRole === "seller" ? "Start Selling Today" : "Shop Smart on Campus"}
 							</h2>
 							<p className="text-lg text-muted-foreground max-w-md">
-								{selectedRole === "seller" 
+								{selectedRole === "seller"
 									? "Turn your items into cash. Join thousands of student sellers on VarsityMart."
 									: "Discover amazing deals from fellow students. Buy and sell with confidence."
 								}
@@ -280,8 +280,8 @@ export default function RegisterForm() {
 												currentStep > step.id
 													? "bg-primary text-primary-foreground"
 													: currentStep === step.id
-													? "bg-primary text-primary-foreground"
-													: "bg-muted text-muted-foreground"
+														? "bg-primary text-primary-foreground"
+														: "bg-muted text-muted-foreground"
 											)}
 										>
 											{currentStep > step.id ? (
@@ -690,7 +690,7 @@ export default function RegisterForm() {
 											Back
 										</Button>
 									)}
-									
+
 									{currentStep < STEPS.length ? (
 										<Button
 											type="button"

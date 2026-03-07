@@ -27,7 +27,7 @@ export function AuthAwareProfile() {
 				isAuthenticated,
 				hasUser: !!user,
 				isLoading,
-				userName: user?.fullName,
+				userName: user?.firstName,
 			});
 		}
 	}, [isAuthenticated, user, isLoading, hydrated]);
@@ -48,7 +48,7 @@ export function AuthAwareProfile() {
 
 	// Show profile if authenticated and user exists
 	if (isAuthenticated && user) {
-		const userInitial = user.fullName?.charAt(0)?.toUpperCase() ||
+		const userInitial = user.firstName?.charAt(0)?.toUpperCase() ||
 		                    user.email?.charAt(0)?.toUpperCase() ||
 		                    "U";
 
@@ -64,7 +64,7 @@ export function AuthAwareProfile() {
 						<Avatar className="size-9 cursor-pointer">
 							<AvatarImage
 								src={user.avatar || undefined}
-								alt={user.fullName || "User"}
+								alt={user.firstName || "User"}
 							/>
 							<AvatarFallback className="bg-primary/10 text-primary font-semibold">
 								{userInitial}

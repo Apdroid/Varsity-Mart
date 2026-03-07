@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation"
 import { queryKeys } from "@/lib/api/query-keys"
 import { authService } from "@/lib/api/services/auth.service"
 import type { LoginRequest, RegisterRequest } from "@/types/api"
-import type { GetMe, User } from "@/types/models"
+import type { ApiGetMeResponse } from "@/lib/api/client"
+import type { User } from "@/types/models"
 
 // Single source of truth for auth state — React Query cache only
 export function useAuth() {
@@ -13,38 +14,32 @@ export function useAuth() {
   const queryClient = useQueryClient()
 
   const {
-    data: userData,
-    isLoading,
+    data: meData,
     isFetched,
     refetch: refetchUser,
   } = useQuery({
     queryKey: queryKeys.auth.user(),
-    queryFn: async () => {
-      const response = await authService.getMe()
-      return response
-    },
+    queryFn: () => authService.getMe(),
     enabled: typeof window !== "undefined",
     retry: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
   })
 
-	console.log("UserData is ", userData)
-  const isAuthenticated = userData?.data.isAuthenticated ;
+  const isAuthenticated = meData?.data.isAuthenticated ?? false
+  const user = meData?.data.user ?? null
 
   const loginMutation = useMutation({
     mutationFn: (data: LoginRequest) => authService.login(data),
-    onSuccess: (response) => {
-      const userData = response.data.user
-      queryClient.setQueryData(queryKeys.auth.user(), userData)
+    onSuccess: async () => {
+      await refetchUser()
       router.push("/")
     },
   })
 
   const registerMutation = useMutation({
     mutationFn: (data: RegisterRequest) => authService.register(data),
-    onSuccess: (response) => {
-      const userData = response.data.user
-      queryClient.setQueryData(queryKeys.auth.user(), userData)
+    onSuccess: async () => {
+      await refetchUser()
       router.push("/verify-email")
     },
   })
@@ -52,23 +47,28 @@ export function useAuth() {
   const logoutMutation = useMutation({
     mutationFn: () => authService.logout(),
     onSettled: () => {
-      // Clear persisted cache + React Query cache
       queryClient.clear()
       router.push("/auth/login")
     },
   })
 
   const updateProfile = (data: Partial<User>) => {
-    queryClient.setQueryData<User | undefined>(queryKeys.auth.user(), (old) => {
-      const updated = old ? { ...old, ...data } : old
-      return updated
-    })
+    queryClient.setQueryData<ApiGetMeResponse | undefined>(
+      queryKeys.auth.user(),
+      (old) => {
+        if (!old) return old
+        return {
+          ...old,
+          data: { ...old.data, user: { ...old.data.user, ...data } },
+        }
+      },
+    )
   }
 
   return {
-    user: userData ?? null,
+    user,
     isAuthenticated,
-    isLoading: !isFetched && !userData,
+    isLoading: !isFetched,
     login: loginMutation.mutate,
     loginAsync: loginMutation.mutateAsync,
     isLoggingIn: loginMutation.isPending,
