@@ -27,7 +27,7 @@ export function AuthAwareProfile() {
 				isAuthenticated,
 				hasUser: !!user,
 				isLoading,
-				userName: user?.firstName,
+				userName: user?.first_name,
 			});
 		}
 	}, [isAuthenticated, user, isLoading, hydrated]);
@@ -48,9 +48,9 @@ export function AuthAwareProfile() {
 
 	// Show profile if authenticated and user exists
 	if (isAuthenticated && user) {
-		const userInitial = user.firstName?.charAt(0)?.toUpperCase() ||
-		                    user.email?.charAt(0)?.toUpperCase() ||
-		                    "U";
+		const userInitial = user.first_name?.charAt(0)?.toUpperCase() ||
+			user.email?.charAt(0)?.toUpperCase() ||
+			"U";
 
 		return (
 			<ProfileDropdown

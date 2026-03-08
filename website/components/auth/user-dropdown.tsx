@@ -34,7 +34,7 @@ type Props = {
 
 const ProfileDropdown = ({ trigger, defaultOpen, align = "start" }: Props) => {
 	const { user, logout, isAuthenticated } = useAuth();
-  const [userData, setUser] = useState({});  
+	const [, setUser] = useState({});
 	const [mounted, setMounted] = useState(false);
 
 	// Ensure component is mounted on client
@@ -44,7 +44,7 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "start" }: Props) => {
 
 	// Debug logs
 	useEffect(() => {
-    setUser({ user }); 
+		setUser({ user });
 		console.log("👤 ProfileDropdown - Mounted:", mounted);
 		console.log("👤 ProfileDropdown - User data:", user);
 		console.log("👤 ProfileDropdown - isAuthenticated:", isAuthenticated);
@@ -59,13 +59,13 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "start" }: Props) => {
 	if (!mounted || !user) {
 		return <>{trigger}</>;
 	}
-	
-	
+
+
 
 	const userInitial = user.first_name?.charAt(0)?.toUpperCase() ||
-	                    user.email?.charAt(0)?.toUpperCase() ||
-	                    "U";
-  console.log(user);
+		user.email?.charAt(0)?.toUpperCase() ||
+		"U";
+	console.log(user);
 
 	return (
 		<DropdownMenu defaultOpen={defaultOpen}>
@@ -74,7 +74,7 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "start" }: Props) => {
 				<DropdownMenuLabel className="flex items-center gap-3 px-3 py-2.5 font-normal">
 					<div className="relative">
 						<Avatar className="size-9">
-							<AvatarImage src={user.avatarUrl || undefined} alt={user.firstName || "User"} />
+							<AvatarImage src={user.avatarUrl || undefined} alt={user.first_name || "User"} />
 							<AvatarFallback className="bg-primary/10 text-primary font-semibold">
 								{userInitial}
 							</AvatarFallback>

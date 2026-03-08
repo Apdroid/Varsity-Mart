@@ -34,7 +34,7 @@ export function AccountDashboard() {
 	const recentOrders = ordersResponse?.data || [];
 	if (!mounted || isAuthLoading) {
 		return (
-<div className="flex h-96 items-center justify-center">
+			<div className="flex h-96 items-center justify-center">
 				<div className="text-center">
 					<Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
 					<p className="text-muted-foreground">Loading your account...</p>
@@ -44,7 +44,7 @@ export function AccountDashboard() {
 	}
 	if (!user) {
 		return (
-<div className="flex h-96 items-center justify-center">
+			<div className="flex h-96 items-center justify-center">
 				<div className="text-center">
 					<p className="text-foreground font-semibold mb-2">Unable to load account</p>
 					<p className="text-muted-foreground mb-4">Please try refreshing the page</p>
@@ -53,19 +53,19 @@ export function AccountDashboard() {
 			</div>
 		);
 	}
-	const userInitial = user.firstName?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "U";
+	const userInitial = user.first_name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "U";
 	return (
-<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+		<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
 			<div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
 				<div className="flex items-center gap-4">
 					<Avatar className="h-20 w-20">
-						<AvatarImage src={user.avatar || undefined} alt={user.firstName || "User"} />
+						<AvatarImage src={user.avatarUrl || undefined} alt={user.first_name || "User"} />
 						<AvatarFallback className="text-2xl bg-primary/10 text-primary font-bold">
 							{userInitial}
 						</AvatarFallback>
 					</Avatar>
 					<div>
-						<h1 className="text-2xl font-bold text-foreground">{user.firstName || "User"}</h1>
+						<h1 className="text-2xl font-bold text-foreground">{user.first_name || "User"}</h1>
 						<p className="text-muted-foreground">{user.email || ""}</p>
 						{user.kycStatus === "approved" && (
 							<Badge className="mt-1 bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary">
@@ -94,7 +94,7 @@ export function AccountDashboard() {
 						<CardContent className="p-0">
 							<div className="divide-y divide-border">
 								{menuItems.map((item) => (
-<Link key={item.label} href={item.href} className="flex items-center gap-4 p-4 hover:bg-muted transition-colors">
+									<Link key={item.label} href={item.href} className="flex items-center gap-4 p-4 hover:bg-muted transition-colors">
 										<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
 											<item.icon className="h-5 w-5 text-muted-foreground" />
 										</div>
@@ -119,12 +119,12 @@ export function AccountDashboard() {
 						</CardHeader>
 						<CardContent className="space-y-4">
 							{isLoadingOrders ? (
-<div className="flex justify-center py-8">
+								<div className="flex justify-center py-8">
 									<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
 								</div>
 							) : recentOrders.length > 0 ? (
-recentOrders.map((order) => (
-<Link key={order.id} href={`/account/orders/${order.id}`} className="block p-3 rounded-lg border border-border hover:bg-muted transition-colors">
+								recentOrders.map((order) => (
+									<Link key={order.id} href={`/account/orders/${order.id}`} className="block p-3 rounded-lg border border-border hover:bg-muted transition-colors">
 										<div className="flex items-center justify-between mb-2">
 											<span className="text-sm font-medium text-foreground">#{order.orderNumber}</span>
 											<Badge className={statusColors[order.status as keyof typeof statusColors]} variant="secondary">{order.status}</Badge>
@@ -137,7 +137,7 @@ recentOrders.map((order) => (
 									</Link>
 								))
 							) : (
-<p className="text-center text-muted-foreground py-8">No orders yet</p>
+								<p className="text-center text-muted-foreground py-8">No orders yet</p>
 							)}
 						</CardContent>
 					</Card>

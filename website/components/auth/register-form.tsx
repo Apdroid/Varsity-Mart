@@ -31,6 +31,7 @@ import { useAuth } from "@/hooks/queries/useAuth";
 import { universities } from "@/data/auth/universities";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { authService } from "@/lib/api/services/auth.service";
+import { userService } from "@/lib/api/services/user.service";
 
 const registerSchema = z.object({
 	first_name: z.string().min(2, "First name is required"),
@@ -152,32 +153,32 @@ export default function RegisterForm() {
 
 	const onSubmit = async (data: RegisterFormValues) => {
 		setIsLoading(true);
+		let registrationSucceeded = false;
 		try {
-			const response = await registerAsync({
+			await registerAsync({
 				email: data.email,
 				password: data.password,
 				first_name: data.first_name,
 				last_name: data.last_name,
-				agree_to_terms:data.agree_to_terms,
-				confirm_password:data.confirm_password,
+				agree_to_terms: data.agree_to_terms,
+				confirm_password: data.confirm_password,
 				phone: data.phone,
 				role: data.role,
 				university: data.university,
 				campus: data.campus,
 				studentId: data.isStudent ? data.studentId : undefined,
 			});
-
-			if (response.success && data.avatar instanceof File) {
+			registrationSucceeded = true;
+		} catch (error) {
+			console.error("Registration failed:", error);
+		} finally {
+			if (registrationSucceeded && data.avatar instanceof File) {
 				try {
-					const { userService } = await import("@/lib/api/services/user.service");
 					await userService.uploadAvatar(data.avatar);
 				} catch (uploadError) {
 					console.error("Avatar upload failed:", uploadError);
 				}
 			}
-		} catch (error) {
-			console.error("Registration failed:", error);
-		} finally {
 			setIsLoading(false);
 		}
 	};

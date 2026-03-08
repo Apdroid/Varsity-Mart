@@ -32,7 +32,7 @@ type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
 export function ResetPasswordForm() {
 	const searchParams = useSearchParams();
-	const token = searchParams.get("token");
+	const reset_token = searchParams.get("token");
 	const [isLoading, setIsLoading] = useState(false);
 	const [isSubmitted, setIsSubmitted] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -46,7 +46,7 @@ export function ResetPasswordForm() {
 	});
 
 	const onSubmit = async (data: ResetPasswordFormValues) => {
-		if (!token) {
+		if (!reset_token) {
 			setError("Reset token is missing. Please check your email link.");
 			return;
 		}
@@ -54,7 +54,7 @@ export function ResetPasswordForm() {
 		setIsLoading(true);
 		setError(null);
 		try {
-			await authService.resetPassword(token, data.password);
+			await authService.resetPassword(reset_token, data.password, data.confirmPassword);
 			setIsSubmitted(true);
 		} catch (err: any) {
 			setError(err?.response?.data?.message || "Failed to reset password. The link may have expired.");

@@ -45,8 +45,8 @@ export const authService = {
 		return response.data
 	},
 
-	async resetPassword(token: string, password: string): Promise<ApiResponse<null>> {
-		const response = await apiClient.post(ENDPOINTS.AUTH.RESET_PASSWORD, { token, password })
+	async resetPassword(reset_token: string, new_password: string,confirm_password:string): Promise<ApiResponse<null>> {
+		const response = await apiClient.post(ENDPOINTS.AUTH.RESET_PASSWORD, { reset_token, new_password, confirm_password })
 		return response.data
 	},
 

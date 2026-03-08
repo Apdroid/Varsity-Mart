@@ -40,8 +40,8 @@ export default function ProfilePage() {
   useEffect(() => {
     if (profile) {
       reset({
-        firstName: profile.firstName || profile.fullName?.split(" ")[0] || "",
-        lastName: profile.lastName || profile.fullName?.split(" ").slice(1).join(" ") || "",
+        firstName: profile.first_name || profile.fullName?.split(" ")[0] || "",
+        lastName: profile.last_name || profile.fullName?.split(" ").slice(1).join(" ") || "",
         email: profile.email || "",
         phone: profile.phone || "",
         bio: "", // Bio is not in the model yet, but let's keep it for UI
