@@ -5,17 +5,9 @@ meta {
 }
 
 get {
-  url: {{base_url}}/users/:userId?fields=extended
+  url: {{base_url}}/users/me
   body: none
   auth: inherit
-}
-
-params:query {
-  fields: extended
-}
-
-params:path {
-  userId: 25228295-d072-4369-8cb1-18ffb4c260c5
 }
 
 settings {

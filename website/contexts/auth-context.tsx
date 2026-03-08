@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { queryKeys } from "@/lib/api/query-keys";
 import { authService } from "@/lib/api/services/auth.service";
+import { userService } from "@/lib/api/services/user.service";
 import type { LoginRequest, RegisterRequest } from "@/types/api";
 import type { User } from "@/types/models";
 
@@ -33,12 +34,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		const run = async () => {
 			try {
 				console.log("🔐 Checking authentication status...");
-				const response = await authService.getMe();
-				if(response.data.isAuthenticated){
+				const statusRes = await authService.getMe();
+				if (!statusRes.data.isAuthenticated) {
 					throw new Error("User not authenticated");
 				}
-				console.log("✅ User authenticated:", response.data.isAuthenticated);
-				setUser(response.data.user);
+				console.log("✅ Session active, fetching full profile...");
+				const profileRes = await userService.getProfile();
+				const userData = profileRes.data;
+				setUser(userData);
+				queryClient.setQueryData(queryKeys.user.profile(), userData);
 				setIsAuthenticated(true);
 			} catch {
 				console.log("❌ User not authenticated");
@@ -63,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			setIsAuthenticated(true);
 
 			// Update React Query cache
-			queryClient.setQueryData(queryKeys.auth.user(), userData);
+			queryClient.setQueryData(queryKeys.user.profile(), userData);
 
 			// Navigate to home
 			router.push("/");
@@ -84,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			setIsAuthenticated(true);
 
 			// Update React Query cache
-			queryClient.setQueryData(queryKeys.auth.user(), userData);
+			queryClient.setQueryData(queryKeys.user.profile(), userData);
 
 			// Navigate to verify email
 			router.push("/verify-email");
@@ -113,16 +117,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		if (user) {
 			const updatedUser = { ...user, ...data };
 			setUser(updatedUser);
-			queryClient.setQueryData(queryKeys.auth.user(), updatedUser);
+			queryClient.setQueryData(queryKeys.user.profile(), updatedUser);
 		}
 	};
 
 	const refetchUser = async () => {
 		try {
 			console.log("🔄 Refetching user...");
-			const response = await authService.getMe();
-			console.log("✅ User refetched:", response.data);
-			setUser(response.data.user);
+			const profileRes = await userService.getProfile();
+			const userData = profileRes.data;
+			setUser(userData);
+			queryClient.setQueryData(queryKeys.user.profile(), userData);
 			setIsAuthenticated(true);
 		} catch (error) {
 			console.log("❌ Failed to refetch user");

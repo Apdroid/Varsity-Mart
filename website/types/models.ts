@@ -10,11 +10,11 @@ export type GetMe = {
       role: string;
       isVerified: boolean;
       avatar: string;
-    };
+    } | null;
     tokens: {
       accessExpiresIn: number;
       willRefreshIn: number;
-    };
+    } | null;
   };
 };
 export interface User {

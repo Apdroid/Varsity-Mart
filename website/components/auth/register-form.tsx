@@ -3,8 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, Loader2, ShoppingBag, Store, Upload, User } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { cn } from "@/lib/utils";
@@ -69,7 +68,6 @@ const STEPS = [
 ];
 
 export default function RegisterForm() {
-	const router = useRouter();
 	const { registerAsync, isRegistering } = useAuth();
 	const [currentStep, setCurrentStep] = useState(1);
 	const [showPassword, setShowPassword] = useState(false);
@@ -123,7 +121,7 @@ export default function RegisterForm() {
 				fieldsToValidate = ["role"];
 				break;
 			case 2:
-				fieldsToValidate = ["firstName", "lastName", "email", "phone"];
+				fieldsToValidate = ["first_name", "last_name", "email", "phone"];
 				break;
 			case 3:
 				fieldsToValidate = isStudent
@@ -131,7 +129,7 @@ export default function RegisterForm() {
 					: ["university", "campus"];
 				break;
 			case 4:
-				fieldsToValidate = ["password", "confirmPassword", "agreeToTerms"];
+				fieldsToValidate = ["password", "confirm_password", "agree_to_terms"];
 				break;
 		}
 
@@ -158,7 +156,10 @@ export default function RegisterForm() {
 			const response = await registerAsync({
 				email: data.email,
 				password: data.password,
-				fullName: `${data.firstName} ${data.lastName}`,
+				first_name: data.first_name,
+				last_name: data.last_name,
+				agree_to_terms:data.agree_to_terms,
+				confirm_password:data.confirm_password,
 				phone: data.phone,
 				role: data.role,
 				university: data.university,
@@ -428,7 +429,7 @@ export default function RegisterForm() {
 										<div className="grid grid-cols-2 gap-3">
 											<FormField
 												control={form.control}
-												name="firstName"
+												name="first_name"
 												render={({ field }) => (
 													<FormItem>
 														<FormLabel>First name</FormLabel>
@@ -441,7 +442,7 @@ export default function RegisterForm() {
 											/>
 											<FormField
 												control={form.control}
-												name="lastName"
+												name="last_name"
 												render={({ field }) => (
 													<FormItem>
 														<FormLabel>Last name</FormLabel>
@@ -459,7 +460,7 @@ export default function RegisterForm() {
 											name="email"
 											render={({ field }) => (
 												<FormItem>
-													<FormLabel>Email</FormLabel>
+												<FormLabel>Email</FormLabel>
 													<FormControl>
 														<Input type="email" placeholder="you@university.edu" autoComplete="email" disabled={isLoading || isRegistering} {...field} />
 													</FormControl>
@@ -623,7 +624,7 @@ export default function RegisterForm() {
 
 										<FormField
 											control={form.control}
-											name="confirmPassword"
+											name="confirm_password"
 											render={({ field }) => (
 												<FormItem>
 													<FormLabel>Confirm password</FormLabel>
@@ -653,7 +654,7 @@ export default function RegisterForm() {
 
 										<FormField
 											control={form.control}
-											name="agreeToTerms"
+											name="agree_to_terms"
 											render={({ field }) => (
 												<FormItem className="flex items-start gap-3 rounded-xl border-2 border-muted p-4">
 													<FormControl>
@@ -684,7 +685,7 @@ export default function RegisterForm() {
 											variant="outline"
 											onClick={prevStep}
 											disabled={isLoading || isRegistering}
-											className="flex-1 h-11"
+											className="flex-1 h-11 cursor-pointer"
 										>
 											<ArrowLeft className="h-4 w-4 mr-2" />
 											Back
@@ -696,7 +697,7 @@ export default function RegisterForm() {
 											type="button"
 											onClick={nextStep}
 											disabled={isLoading || isRegistering}
-											className="flex-1 h-11"
+											className="flex-1 h-11 cursor-pointer"
 										>
 											Continue
 											<ArrowRight className="h-4 w-4 ml-2" />
@@ -705,7 +706,7 @@ export default function RegisterForm() {
 										<Button
 											type="submit"
 											disabled={isLoading || isRegistering}
-											className="flex-1 h-11"
+											className="flex-1 h-11 cursor-pointer"
 										>
 											{(isLoading || isRegistering) ? (
 												<>
