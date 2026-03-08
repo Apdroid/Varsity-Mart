@@ -63,8 +63,8 @@ export function AuthAwareProfile() {
 					>
 						<Avatar className="size-9 cursor-pointer">
 							<AvatarImage
-								src={user.avatar || undefined}
-								alt={user.firstName || "User"}
+								src={user.avatarUrl || undefined}
+								alt={user.first_name || "User"}
 							/>
 							<AvatarFallback className="bg-primary/10 text-primary font-semibold">
 								{userInitial}
