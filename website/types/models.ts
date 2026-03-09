@@ -21,8 +21,8 @@ export interface User {
   id: string
   email: string
   fullName?: string // Made optional for backward compatibility
-  first_name?: string // For backward compatibility with mock data
-  last_name?: string  // For backward compatibility with mock data
+  firstName?: string // For backward compatibility with mock data
+  lastName?: string  // For backward compatibility with mock data
   phone?: string
   avatar?: string
 	avatarUrl?:string

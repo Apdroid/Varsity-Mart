@@ -40,8 +40,8 @@ export default function ProfilePage() {
   useEffect(() => {
     if (profile) {
       reset({
-        firstName: profile.first_name || profile.fullName?.split(" ")[0] || "",
-        lastName: profile.last_name || profile.fullName?.split(" ").slice(1).join(" ") || "",
+        firstName: profile.firstName || profile.fullName?.split(" ")[0] || "",
+        lastName: profile.lastName || profile.fullName?.split(" ").slice(1).join(" ") || "",
         email: profile.email || "",
         phone: profile.phone || "",
         bio: "", // Bio is not in the model yet, but let's keep it for UI
@@ -96,7 +96,7 @@ export default function ProfilePage() {
               <Label className="text-foreground mb-4 block text-lg font-semibold">Profile Photo</Label>
               <div className="flex items-center gap-6">
                 <Avatar className="h-24 w-24 border-4 border-primary/20">
-                  <AvatarImage src={profile?.avatar} alt="Profile" />
+                  <AvatarImage src={profile?.avatarUrl} alt="Profile" />
                   <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
                     {profile?.fullName?.charAt(0) || profile?.email?.charAt(0) || "U"}
                   </AvatarFallback>

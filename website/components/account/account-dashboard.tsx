@@ -53,19 +53,19 @@ export function AccountDashboard() {
 			</div>
 		);
 	}
-	const userInitial = user.first_name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "U";
+	const userInitial = user.firstName?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "U";
 	return (
 		<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
 			<div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
 				<div className="flex items-center gap-4">
 					<Avatar className="h-20 w-20">
-						<AvatarImage src={user.avatarUrl || undefined} alt={user.first_name || "User"} />
+						<AvatarImage src={user.avatarUrl || undefined} alt={user.firstName || "User"} />
 						<AvatarFallback className="text-2xl bg-primary/10 text-primary font-bold">
 							{userInitial}
 						</AvatarFallback>
 					</Avatar>
 					<div>
-						<h1 className="text-2xl font-bold text-foreground">{user.first_name || "User"}</h1>
+						<h1 className="text-2xl font-bold text-foreground">{user.firstName || "User"}</h1>
 						<p className="text-muted-foreground">{user.email || ""}</p>
 						{user.kycStatus === "approved" && (
 							<Badge className="mt-1 bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary">

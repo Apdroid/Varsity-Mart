@@ -62,7 +62,7 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "start" }: Props) => {
 
 
 
-	const userInitial = user.first_name?.charAt(0)?.toUpperCase() ||
+	const userInitial = user.firstName?.charAt(0)?.toUpperCase() ||
 		user.email?.charAt(0)?.toUpperCase() ||
 		"U";
 	console.log(user);
@@ -74,7 +74,7 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "start" }: Props) => {
 				<DropdownMenuLabel className="flex items-center gap-3 px-3 py-2.5 font-normal">
 					<div className="relative">
 						<Avatar className="size-9">
-							<AvatarImage src={user.avatarUrl || undefined} alt={user.first_name || "User"} />
+							<AvatarImage src={user.avatarUrl || undefined} alt={user.firstName || "User"} />
 							<AvatarFallback className="bg-primary/10 text-primary font-semibold">
 								{userInitial}
 							</AvatarFallback>
@@ -83,7 +83,7 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "start" }: Props) => {
 					</div>
 					<div className="flex flex-1 flex-col items-start min-w-0">
 						<span className="text-foreground text-sm font-semibold truncate w-full">
-							{user.first_name || "User"}
+							{user.firstName || "User"}
 						</span>
 						<span className="text-muted-foreground text-xs truncate w-full">
 							{user.email || ""}
