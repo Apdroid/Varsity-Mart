@@ -34,8 +34,8 @@ import { authService } from "@/lib/api/services/auth.service";
 import { userService } from "@/lib/api/services/user.service";
 
 const registerSchema = z.object({
-	first_name: z.string().min(2, "First name is required"),
-	last_name: z.string().min(2, "Last name is required"),
+	firstName: z.string().min(2, "First name is required"),
+	lastName: z.string().min(2, "Last name is required"),
 	avatar: z.any().optional(),
 	email: z.string().email("Please enter a valid email"),
 	phone: z.string().min(10, "Please enter a valid phone number"),
@@ -79,8 +79,8 @@ export default function RegisterForm() {
 	const form = useForm<RegisterFormValues>({
 		resolver: zodResolver(registerSchema),
 		defaultValues: {
-			first_name: "",
-			last_name: "",
+			firstName: "",
+			lastName: "",
 			avatar: undefined,
 			email: "",
 			phone: "",
@@ -122,7 +122,7 @@ export default function RegisterForm() {
 				fieldsToValidate = ["role"];
 				break;
 			case 2:
-				fieldsToValidate = ["first_name", "last_name", "email", "phone"];
+				fieldsToValidate = ["firstName", "lastName", "email", "phone"];
 				break;
 			case 3:
 				fieldsToValidate = isStudent
@@ -158,8 +158,8 @@ export default function RegisterForm() {
 			await registerAsync({
 				email: data.email,
 				password: data.password,
-				first_name: data.first_name,
-				last_name: data.last_name,
+				firstName: data.firstName,
+				lastName: data.lastName,
 				agree_to_terms: data.agree_to_terms,
 				confirm_password: data.confirm_password,
 				phone: data.phone,
@@ -430,7 +430,7 @@ export default function RegisterForm() {
 										<div className="grid grid-cols-2 gap-3">
 											<FormField
 												control={form.control}
-												name="first_name"
+												name="firstName"
 												render={({ field }) => (
 													<FormItem>
 														<FormLabel>First name</FormLabel>
@@ -443,7 +443,7 @@ export default function RegisterForm() {
 											/>
 											<FormField
 												control={form.control}
-												name="last_name"
+												name="lastName"
 												render={({ field }) => (
 													<FormItem>
 														<FormLabel>Last name</FormLabel>

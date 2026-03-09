@@ -7,8 +7,8 @@ export interface LoginRequest {
 export interface RegisterRequest {
 	email: string
 	password: string
-	first_name: string
-	last_name: string
+	firstName: string
+	lastName: string
 	confirm_password: string
 	agree_to_terms: boolean
 	phone?: string
