@@ -1,0 +1,28 @@
+meta {
+  name: CreateRestaurantReview
+  type: http
+  seq: 76
+}
+
+post {
+  url: {{base_url}}/restaurants/:restaurant_pk/reviews/
+  body: json
+  auth: inherit
+}
+
+params:path {
+  restaurant_pk: 
+}
+
+body:json {
+  {
+    "rating": 5,
+    "review": "Amazing food and fast delivery!",
+    "images": []
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

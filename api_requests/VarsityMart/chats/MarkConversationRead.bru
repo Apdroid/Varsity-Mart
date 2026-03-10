@@ -1,0 +1,20 @@
+meta {
+  name: MarkConversationRead
+  type: http
+  seq: 25
+}
+
+post {
+  url: {{base_url}}/chats/conversations/:id/mark-read/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

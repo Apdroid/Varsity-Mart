@@ -1,0 +1,26 @@
+meta {
+  name: PatchReview
+  type: http
+  seq: 79
+}
+
+patch {
+  url: {{base_url}}/reviews/:id/
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+body:json {
+  {
+    "rating": 4
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

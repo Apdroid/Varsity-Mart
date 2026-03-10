@@ -1,0 +1,27 @@
+meta {
+  name: UpdateOrderStatus
+  type: http
+  seq: 41
+}
+
+patch {
+  url: {{base_url}}/orders/:orderId/status
+  body: json
+  auth: inherit
+}
+
+params:path {
+  orderId: 
+}
+
+body:json {
+  {
+    "status": "in_transit",
+    "note": "Order has been shipped"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

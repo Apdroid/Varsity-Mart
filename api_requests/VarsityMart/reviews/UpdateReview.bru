@@ -1,0 +1,28 @@
+meta {
+  name: UpdateReview
+  type: http
+  seq: 78
+}
+
+put {
+  url: {{base_url}}/reviews/:id/
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+body:json {
+  {
+    "rating": 4,
+    "review": "Good product overall.",
+    "images": []
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

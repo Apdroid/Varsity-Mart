@@ -1,0 +1,20 @@
+meta {
+  name: GetUserPublicProfile
+  type: http
+  seq: 99
+}
+
+get {
+  url: {{base_url}}/users/:userId/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  userId: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

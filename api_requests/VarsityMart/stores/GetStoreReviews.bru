@@ -1,0 +1,20 @@
+meta {
+  name: GetStoreReviews
+  type: http
+  seq: 94
+}
+
+get {
+  url: {{base_url}}/stores/:store_pk/reviews/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  store_pk: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

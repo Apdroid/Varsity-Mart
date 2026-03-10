@@ -1,0 +1,26 @@
+meta {
+  name: PatchRestaurant
+  type: http
+  seq: 65
+}
+
+patch {
+  url: {{base_url}}/restaurants/:restaurantId/
+  body: json
+  auth: inherit
+}
+
+params:path {
+  restaurantId: 
+}
+
+body:json {
+  {
+    "deliveryFee": "4.00"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,20 @@
+meta {
+  name: RemoveFromCart
+  type: http
+  seq: 23
+}
+
+delete {
+  url: {{base_url}}/cart/:itemId/remove
+  body: none
+  auth: inherit
+}
+
+params:path {
+  itemId: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

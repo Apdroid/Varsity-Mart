@@ -1,0 +1,24 @@
+meta {
+  name: UploadProductImages
+  type: http
+  seq: 54
+}
+
+post {
+  url: {{base_url}}/products/:id/upload_images/
+  body: multipartForm
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+body:multipart-form {
+  images: @file()
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

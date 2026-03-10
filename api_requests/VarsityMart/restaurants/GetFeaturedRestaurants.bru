@@ -1,0 +1,16 @@
+meta {
+  name: GetFeaturedRestaurants
+  type: http
+  seq: 61
+}
+
+get {
+  url: {{base_url}}/restaurants/featured/
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

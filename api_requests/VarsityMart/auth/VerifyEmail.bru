@@ -1,0 +1,22 @@
+meta {
+  name: VerifyEmail
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{base_url}}/auth/verify-email/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "verification_code": "123456"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

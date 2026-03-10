@@ -1,0 +1,28 @@
+meta {
+  name: PatchMenuItem
+  type: http
+  seq: 72
+}
+
+patch {
+  url: {{base_url}}/restaurants/:restaurant_pk/menu/:id/
+  body: json
+  auth: inherit
+}
+
+params:path {
+  restaurant_pk: 
+  id: 
+}
+
+body:json {
+  {
+    "price": "22.00",
+    "isAvailable": true
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

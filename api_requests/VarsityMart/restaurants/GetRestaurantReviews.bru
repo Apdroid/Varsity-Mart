@@ -1,0 +1,20 @@
+meta {
+  name: GetRestaurantReviews
+  type: http
+  seq: 75
+}
+
+get {
+  url: {{base_url}}/restaurants/:restaurant_pk/reviews/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  restaurant_pk: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

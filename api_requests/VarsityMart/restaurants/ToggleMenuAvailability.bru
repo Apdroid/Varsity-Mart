@@ -1,0 +1,21 @@
+meta {
+  name: ToggleMenuAvailability
+  type: http
+  seq: 74
+}
+
+patch {
+  url: {{base_url}}/restaurants/:restaurant_pk/menu/:id/availability/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  restaurant_pk: 
+  id: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

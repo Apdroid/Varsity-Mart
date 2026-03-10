@@ -1,0 +1,20 @@
+meta {
+  name: ReportMessage
+  type: http
+  seq: 34
+}
+
+post {
+  url: {{base_url}}/messages/:message_id/report/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  message_id: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,27 @@
+meta {
+  name: CancelOrder
+  type: http
+  seq: 38
+}
+
+post {
+  url: {{base_url}}/orders/:orderId/cancel
+  body: json
+  auth: inherit
+}
+
+params:path {
+  orderId: 
+}
+
+body:json {
+  {
+    "reason": "changed_mind",
+    "details": "Found a better price elsewhere"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

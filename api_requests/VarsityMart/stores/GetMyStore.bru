@@ -1,0 +1,16 @@
+meta {
+  name: GetMyStore
+  type: http
+  seq: 86
+}
+
+get {
+  url: {{base_url}}/stores/my-store/
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

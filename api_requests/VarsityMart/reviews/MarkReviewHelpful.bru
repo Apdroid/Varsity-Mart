@@ -1,0 +1,20 @@
+meta {
+  name: MarkReviewHelpful
+  type: http
+  seq: 81
+}
+
+post {
+  url: {{base_url}}/reviews/:id/helpful/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

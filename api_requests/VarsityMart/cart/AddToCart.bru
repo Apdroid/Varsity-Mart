@@ -1,0 +1,23 @@
+meta {
+  name: AddToCart
+  type: http
+  seq: 20
+}
+
+post {
+  url: {{base_url}}/cart/add
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "product_id": "660e8400-e29b-41d4-a716-446655440001",
+    "quantity": 1
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

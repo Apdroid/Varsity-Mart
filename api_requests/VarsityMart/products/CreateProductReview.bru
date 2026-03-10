@@ -1,0 +1,28 @@
+meta {
+  name: CreateProductReview
+  type: http
+  seq: 56
+}
+
+post {
+  url: {{base_url}}/products/:product_pk/reviews/
+  body: json
+  auth: inherit
+}
+
+params:path {
+  product_pk: 
+}
+
+body:json {
+  {
+    "rating": 5,
+    "review": "Great product! Exactly as described.",
+    "images": []
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,29 @@
+meta {
+  name: CreateOrder
+  type: http
+  seq: 35
+}
+
+post {
+  url: {{base_url}}/orders
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "productId": "660e8400-e29b-41d4-a716-446655440001",
+    "quantity": 1,
+    "deliveryMethod": "delivery",
+    "deliveryAddress": "KNUST, Kumasi",
+    "deliveryInstructions": "",
+    "paymentMethod": "momo",
+    "momoNumber": "+233201234567",
+    "momoProvider": "mtn"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

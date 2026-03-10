@@ -1,0 +1,25 @@
+meta {
+  name: UpdateUserProfile
+  type: http
+  seq: 96
+}
+
+put {
+  url: {{base_url}}/users/me/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "full_name": "John Doe",
+    "phone": "+233201234567",
+    "university": "KNUST",
+    "campus": "Kumasi"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

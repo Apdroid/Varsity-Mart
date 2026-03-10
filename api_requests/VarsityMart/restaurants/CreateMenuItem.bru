@@ -1,0 +1,36 @@
+meta {
+  name: CreateMenuItem
+  type: http
+  seq: 69
+}
+
+post {
+  url: {{base_url}}/restaurants/:restaurant_pk/menu/
+  body: json
+  auth: inherit
+}
+
+params:path {
+  restaurant_pk: 
+}
+
+body:json {
+  {
+    "name": "Jollof Rice",
+    "description": "Classic West African jollof rice with chicken",
+    "price": "25.00",
+    "category": "660e8400-e29b-41d4-a716-446655440021",
+    "isAvailable": true,
+    "preparationTime": "20",
+    "spicyLevel": 2,
+    "isVegetarian": false,
+    "ingredients": ["rice", "tomato", "chicken"],
+    "customizations": [],
+    "tags": ["popular"]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,33 @@
+meta {
+  name: CreateProduct
+  type: http
+  seq: 44
+}
+
+post {
+  url: {{base_url}}/products/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "MacBook Pro 2021",
+    "description": "Excellent condition, barely used.",
+    "price": "2500.00",
+    "original_price": "3000.00",
+    "category": "660e8400-e29b-41d4-a716-446655440010",
+    "condition": "used",
+    "location": "KNUST, Kumasi",
+    "stock": 1,
+    "delivery_options": ["pickup", "delivery"],
+    "specifications": {},
+    "is_night_shop": false,
+    "status": "active"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

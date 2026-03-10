@@ -1,0 +1,21 @@
+meta {
+  name: GetMenuItem
+  type: http
+  seq: 70
+}
+
+get {
+  url: {{base_url}}/restaurants/:restaurant_pk/menu/:id/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  restaurant_pk: 
+  id: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,29 @@
+meta {
+  name: RateOrder
+  type: http
+  seq: 40
+}
+
+post {
+  url: {{base_url}}/orders/:orderId/rate
+  body: json
+  auth: inherit
+}
+
+params:path {
+  orderId: 
+}
+
+body:json {
+  {
+    "rating": 5,
+    "review": "Great product! Fast delivery and exactly as described.",
+    "rateProduct": true,
+    "rateSeller": true
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

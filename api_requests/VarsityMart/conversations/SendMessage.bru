@@ -1,0 +1,27 @@
+meta {
+  name: SendMessage
+  type: http
+  seq: 32
+}
+
+post {
+  url: {{base_url}}/conversations/:id/send_message/
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+body:json {
+  {
+    "text": "Is this still available?",
+    "product_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

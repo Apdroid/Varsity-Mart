@@ -1,0 +1,16 @@
+meta {
+  name: StartConversation
+  type: http
+  seq: 29
+}
+
+post {
+  url: {{base_url}}/conversations/start/
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

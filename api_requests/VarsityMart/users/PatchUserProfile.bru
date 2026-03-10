@@ -1,0 +1,22 @@
+meta {
+  name: PatchUserProfile
+  type: http
+  seq: 97
+}
+
+patch {
+  url: {{base_url}}/users/me/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "phone": "+233201234567"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

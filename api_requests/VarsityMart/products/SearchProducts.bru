@@ -1,0 +1,20 @@
+meta {
+  name: SearchProducts
+  type: http
+  seq: 46
+}
+
+get {
+  url: {{base_url}}/products/search/
+  body: none
+  auth: inherit
+}
+
+params:query {
+  q: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,20 @@
+meta {
+  name: ConfirmDelivery
+  type: http
+  seq: 39
+}
+
+post {
+  url: {{base_url}}/orders/:orderId/confirm-delivery
+  body: none
+  auth: inherit
+}
+
+params:path {
+  orderId: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
