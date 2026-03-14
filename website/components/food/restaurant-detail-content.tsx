@@ -8,7 +8,6 @@ import {
 	Info,
 	MapPin,
 	Minus,
-	Phone,
 	Plus,
 	Search,
 	Share2,
@@ -31,7 +30,6 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RestaurantsCarousel } from "@/components/home/restaurants-carousel";
 import { mockMenu } from "@/data/food/restaurant-detail";
 import { mockRestaurants } from "@/data/food/restaurants";
@@ -293,7 +291,7 @@ export function RestaurantDetailContent({
 					{/* Menu Section */}
 					<div className="lg:col-span-2">
 						{/* Category Tabs */}
-						<div className="sticky top-16 z-10 bg-background/95 backdrop-blur-sm border-b border-border -mx-4 px-4 sm:mx-0 sm:px-0 sm:rounded-xl sm:border">
+						<div className="relative top-16 z-10 bg-background/95 backdrop-blur-sm border-b border-border -mx-4 px-4 sm:mx-0 sm:px-0 sm:rounded-xl sm:border">
 							<div className="flex gap-1 overflow-x-auto py-2 scrollbar-hide">
 								{menu.map((category: { category: string }) => (
 									<button

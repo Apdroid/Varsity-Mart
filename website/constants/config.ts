@@ -4,8 +4,8 @@ export const APP_CONFIG = {
   url: process.env.NEXT_PUBLIC_APP_URL || "https://varsitymart.com",
 
   // API
-  apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.varsitymart.com/v1",
-  wsBaseUrl: process.env.NEXT_PUBLIC_WS_BASE_URL || "wss://api.varsitymart.com",
+  apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.varsitymart.org/v1",
+  wsBaseUrl: process.env.NEXT_PUBLIC_WS_BASE_URL || "wss://api.varsitymart.org",
 
   // Pagination
   defaultPageSize: 20,

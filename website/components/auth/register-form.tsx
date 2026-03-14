@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhoneInput } from "@/components/ui/phone-input";
 import {
 	Select,
 	SelectContent,
@@ -67,6 +68,13 @@ const STEPS = [
 	{ id: 3, title: "University", description: "Where do you study?" },
 	{ id: 4, title: "Security", description: "Secure your account" },
 ];
+
+const STEP_ENCOURAGEMENT: Record<number, string> = {
+	1: "Great start! Pick your path and you are on your way.",
+	2: "Nice progress! Just a few personal details left.",
+	3: "Almost there! This helps us tailor your campus experience.",
+	4: "Final step. You're moments away from joining VarsityMart.",
+};
 
 export default function RegisterForm() {
 	const { registerAsync, isRegistering } = useAuth();
@@ -306,6 +314,7 @@ export default function RegisterForm() {
 							<div className="text-center mt-4">
 								<h1 className="text-xl font-semibold">{STEPS[currentStep - 1].title}</h1>
 								<p className="text-sm text-muted-foreground">{STEPS[currentStep - 1].description}</p>
+								<p className="text-xs text-primary/90 mt-1">{STEP_ENCOURAGEMENT[currentStep]}</p>
 							</div>
 						</div>
 
@@ -426,6 +435,7 @@ export default function RegisterForm() {
 											</div>
 										</div>
 										<p className="text-xs text-center text-muted-foreground mb-4">Upload a profile photo (optional)</p>
+										<p className="text-xs text-center text-primary/90 -mt-1 mb-2">You&apos;re doing great, this step helps classmates recognize you faster.</p>
 
 										<div className="grid grid-cols-2 gap-3">
 											<FormField
@@ -478,8 +488,19 @@ export default function RegisterForm() {
 												<FormItem>
 													<FormLabel>Phone number</FormLabel>
 													<FormControl>
-														<Input type="tel" placeholder="+233 XX XXX XXXX" autoComplete="tel" disabled={isLoading || isRegistering} {...field} />
+														<PhoneInput
+															placeholder="Enter your phone number"
+															autoComplete="tel"
+															defaultCountry="GH"
+															international
+															disabled={isLoading || isRegistering}
+															value={field.value || ""}
+															onChange={(value) => field.onChange(value || "")}
+															name={field.name}
+															onBlur={field.onBlur}
+														/>
 													</FormControl>
+													<FormDescription className="text-xs">We use this for important account updates only.</FormDescription>
 													<FormMessage />
 												</FormItem>
 											)}
@@ -586,6 +607,7 @@ export default function RegisterForm() {
 												)}
 											/>
 										)}
+										<p className="text-xs text-center text-primary/90">Awesome, one more step after this and your account is ready.</p>
 									</div>
 								)}
 
@@ -675,6 +697,7 @@ export default function RegisterForm() {
 												</FormItem>
 											)}
 										/>
+										<p className="text-xs text-center text-primary/90">You&apos;re at the finish line - create your account to start exploring campus deals.</p>
 									</div>
 								)}
 

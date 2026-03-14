@@ -62,7 +62,7 @@ export interface ApiGetMeResponse{
   success: boolean;
   data: {
     isAuthenticated: boolean;
-    user: {
+    user?: {
       id: string;
       email: string;
       firstName: string;
@@ -70,7 +70,7 @@ export interface ApiGetMeResponse{
       isVerified: boolean;
       avatar: string;
     };
-    tokens: {
+    tokens?: {
       accessExpiresIn: number;
       willRefreshIn: number;
     };

@@ -6,8 +6,15 @@ meta {
 
 post {
   url: {{base_url}}/conversations/start/
-  body: none
+  body: json
   auth: inherit
+}
+
+body:json {
+  {
+    "productId": "cc49b0ac-f220-495c-8f88-eab02bc7e95b",
+    "text": "Is this product available"
+  }
 }
 
 settings {

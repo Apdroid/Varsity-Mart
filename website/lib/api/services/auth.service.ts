@@ -1,3 +1,4 @@
+import { isAxiosError } from "axios"
 import apiClient, { type ApiGetMeResponse, type ApiResponse } from "../client"
 import { ENDPOINTS } from "../endpoints"
 import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from "@/types/api"
@@ -21,7 +22,7 @@ export const authService = {
 
 	// Google OAuth - initiates the OAuth flow
 	getGoogleAuthUrl(): string {
-		const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http:///api.varsitymart.org/v1"
+		const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.varsitymart.org/v1"
 		return `${apiUrl}${ENDPOINTS.AUTH.GOOGLE}`
 	},
 
@@ -59,8 +60,23 @@ export const authService = {
 	},
 
 	async getMe(): Promise<ApiGetMeResponse> {
-		const response = await apiClient.get(ENDPOINTS.AUTH.CHECK_STATUS)
-		return response.data
+		try {
+			const response = await apiClient.get(ENDPOINTS.AUTH.CHECK_STATUS)
+			return response.data
+		} catch (error) {
+			if (
+				isAxiosError(error) &&
+				(error.response?.status === 401 || error.code === "ERR_NETWORK")
+			) {
+				return {
+					success: true,
+					data: {
+						isAuthenticated: false,
+					},
+				}
+			}
+			throw error
+		}
 	},
 
 	async updateProfile(data: Partial<User>): Promise<ApiResponse<User>> {
