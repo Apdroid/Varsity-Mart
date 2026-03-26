@@ -45,7 +45,7 @@ export function useAuth() {
     mutationFn: (data: RegisterRequest) => authService.register(data),
     onSuccess: (response) => {
       queryClient.setQueryData<User | null>(queryKeys.user.profile(), response.data.user)
-      router.push("/verify-email")
+      router.push("/auth/verify-email")
     },
   })
 

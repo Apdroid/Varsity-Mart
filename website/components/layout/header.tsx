@@ -1,15 +1,10 @@
 "use client";
 import {
-	Bell,
-	BookOpen,
 	ChefHat,
-	CircleUser,
-	Heart,
 	Menu,
 	Package,
 	Search,
 	ShoppingCart,
-	Sparkles,
 	Store,
 } from "lucide-react";
 import { useMotionValueEvent, useScroll } from "motion/react";
@@ -52,45 +47,35 @@ export function Header() {
 	const { scrollY } = useScroll();
 	const router = useRouter();
 
-
-
-	// Handle scroll direction for header visibility
 	useMotionValueEvent(scrollY, "change", (current) => {
 		if (typeof current === "number") {
 			const scrollDifference = current - lastScrollY;
-
-			// Show header when scrolling up or at the top
 			if (current < 10) {
 				setIsVisible(true);
 			} else if (scrollDifference < 0) {
-				// Scrolling up
 				setIsVisible(true);
 			} else if (scrollDifference > 0) {
-				// Scrolling down
 				setIsVisible(false);
 			}
-
 			setLastScrollY(current);
 		}
 	});
 
 	useEffect(() => {
 		for (const item of navigation) {
-			const currentPath = path.endsWith(item.href);
-			if (currentPath) {
+			if (path.endsWith(item.href)) {
 				setActiveTab(item.href);
 				break;
 			}
 		}
 	}, [path]);
 
-	// Search autocomplete effect
 	useEffect(() => {
 		if (searchQuery.trim().length > 1) {
 			const filtered = mockProducts.filter((product) =>
 				product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
 				product.category.name.toLowerCase().includes(searchQuery.toLowerCase())
-			).slice(0, 8);
+			).slice(0, 6);
 			setSearchResults(filtered);
 			setShowAutocomplete(filtered.length > 0);
 		} else {
@@ -99,7 +84,6 @@ export function Header() {
 		}
 	}, [searchQuery]);
 
-	// Click outside to close autocomplete
 	const searchRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -111,7 +95,6 @@ export function Header() {
 		return () => document.removeEventListener("mousedown", handleClickOutside);
 	}, []);
 
-	// Keyboard shortcut for search focus (Cmd+K / Ctrl+K)
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -120,7 +103,6 @@ export function Header() {
 				searchInputRef.current?.focus();
 			}
 		};
-
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, []);
@@ -136,24 +118,14 @@ export function Header() {
 		<>
 			<header
 				className={cn(
-					"fixed top-0 left-0 right-0 z-50 w-full bg-background/95 backdrop-blur-md border-b border-border/50 transition-all duration-300 shadow-sm",
+					"fixed top-0 left-0 right-0 z-50 dark:bg-background bg-slate-900 dark:border-border border-slate-800 dark:text-foreground text-slate-100 border-b transition-transform duration-200",
 					isVisible ? "translate-y-0" : "-translate-y-full",
 				)}
 			>
-				{/* Promotional Banner */}
-				<div className="hidden md:block bg-gradient-to-r from-primary via-primary/90 to-primary text-primary-foreground text-center py-2 text-sm font-medium">
-					<div className="container mx-auto px-4 flex items-center justify-center gap-2">
-						<Sparkles className="h-4 w-4 animate-pulse" />
-						<span>Free campus delivery on orders over GH₵100 • Use code <span className="font-bold">CAMPUS10</span> for 10% off</span>
-						<Sparkles className="h-4 w-4 animate-pulse" />
-					</div>
-				</div>
-
-				{/* Main Header */}
-				<div className="container mx-auto px-3 sm:px-4 lg:px-8">
-					<div className="flex h-16 items-center justify-between gap-2 sm:gap-4">
-						{/* Left: Logo and Navigation */}
-						<div className="flex items-center gap-3 sm:gap-6 lg:gap-8">
+				<div className="container mx-auto px-4">
+					<div className="flex h-14 items-center justify-between gap-4">
+						{/* Left: Logo and Nav */}
+						<div className="flex items-center gap-6">
 							<Logo />
 							<nav className="hidden lg:flex items-center gap-1">
 								{navigation.map((item) => {
@@ -163,10 +135,10 @@ export function Header() {
 											key={item.name}
 											href={item.href}
 											className={cn(
-												"flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all rounded-lg",
+												"flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors pb-1",
 												isActive
-													? "text-primary bg-primary/10"
-													: "text-muted-foreground hover:text-foreground hover:bg-accent",
+													? "text-primary border-b-2 border-primary"
+													: "dark:text-muted-foreground text-slate-400 dark:hover:text-foreground hover:text-white",
 											)}
 										>
 											<item.icon className="h-4 w-4" />
@@ -177,20 +149,18 @@ export function Header() {
 							</nav>
 						</div>
 
-						{/* Center: Search Bar with Autocomplete */}
-						<div className="flex-1 max-w-2xl hidden md:block relative" ref={searchRef}>
+						{/* Center: Search */}
+						<div className="flex-1 max-w-xl hidden md:block relative" ref={searchRef}>
 							<div className="relative">
-								<Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+								<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 								<input
 									ref={searchInputRef}
 									type="text"
-									placeholder="Search for products, stores, or food..."
+									placeholder="Search products, stores..."
 									value={searchQuery}
 									onChange={(e) => setSearchQuery(e.target.value)}
 									onKeyDown={(e) => {
-										if (e.key === "Enter") {
-											handleSearch(searchQuery);
-										}
+										if (e.key === "Enter") handleSearch(searchQuery);
 										if (e.key === "Escape") {
 											setShowAutocomplete(false);
 											setSearchQuery("");
@@ -201,16 +171,15 @@ export function Header() {
 											setShowAutocomplete(true);
 										}
 									}}
-									className="w-full flex items-center gap-2 sm:gap-3 px-12 sm:px-12 py-2 sm:py-2.5 text-sm bg-accent/50 hover:bg-accent border border-border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+									className="w-full pl-10 pr-16 py-2 text-sm dark:bg-muted/50 bg-slate-800 dark:border-border border-slate-700 dark:text-foreground text-white dark:placeholder:text-muted-foreground placeholder:text-slate-400 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
 								/>
-								<kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden lg:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground shrink-0">
-									<span className="text-xs">⌘</span>K
+								<kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden lg:inline-flex h-5 items-center gap-1 rounded border bg-background px-1.5 text-[10px] font-mono text-muted-foreground">
+									⌘K
 								</kbd>
 							</div>
 
-							{/* Autocomplete Dropdown */}
 							{showAutocomplete && searchResults.length > 0 && (
-								<div className="absolute top-full left-0 right-0 mt-2 bg-card border-2 border-border rounded-xl shadow-2xl shadow-black/20 z-[100] overflow-hidden max-h-[500px] overflow-y-auto">
+								<div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-md shadow-lg z-50 overflow-hidden">
 									{searchResults.map((product) => (
 										<Link
 											key={product.id}
@@ -219,9 +188,9 @@ export function Header() {
 												setShowAutocomplete(false);
 												setSearchQuery("");
 											}}
-											className="flex items-center gap-4 p-3 hover:bg-accent transition-colors border-b border-border last:border-b-0"
+											className="flex items-center gap-3 p-2 hover:bg-accent transition-colors"
 										>
-											<div className="relative w-12 h-12 rounded-lg overflow-hidden bg-accent shrink-0">
+											<div className="relative w-10 h-10 rounded overflow-hidden bg-muted shrink-0">
 												<Image
 													src={product.images[0] || "/placeholder.svg"}
 													alt={product.title}
@@ -230,173 +199,89 @@ export function Header() {
 												/>
 											</div>
 											<div className="flex-1 min-w-0">
-												<h4 className="text-sm font-semibold line-clamp-1 mb-0.5">
-													{product.title}
-												</h4>
-												<div className="flex items-center gap-2">
-													<span className="text-sm font-bold text-primary">
-														GH₵{product.price}
-													</span>
-													{product.compareAtPrice && (
-														<span className="text-xs text-muted-foreground line-through">
-															GH₵{product.compareAtPrice}
-														</span>
-													)}
-												</div>
+												<p className="text-sm font-medium truncate">{product.title}</p>
+												<p className="text-sm text-primary font-medium">GH₵{product.price}</p>
 											</div>
 										</Link>
 									))}
-									{searchResults.length > 0 && (
-										<button
-											type="button"
-											onClick={() => handleSearch(searchQuery)}
-											className="w-full p-3 text-sm font-medium text-primary hover:bg-accent transition-colors flex items-center justify-center gap-2"
-										>
-											View all results for "{searchQuery}"
-											<Search className="h-4 w-4" />
-										</button>
-									)}
+									<button
+										type="button"
+										onClick={() => handleSearch(searchQuery)}
+										className="w-full p-2 text-sm text-primary hover:bg-accent transition-colors border-t border-border"
+									>
+										View all results
+									</button>
 								</div>
 							)}
 						</div>
 
 						{/* Right: Actions */}
-						<div className="flex items-center gap-1 sm:gap-2 lg:gap-3">
-							{/* Mobile Search Button */}
+						<div className="flex items-center gap-2">
 							<Button
 								variant="ghost"
 								size="icon"
-								className="h-9 w-9 md:hidden"
+								className="md:hidden"
 								onClick={() => setSearchModalOpen(true)}
 							>
 								<Search className="h-5 w-5" />
 							</Button>
 
-							{/* Location Selector - Activity based */}
 							<div className="hidden sm:block">
 								<AuthAwareLocation />
 							</div>
 
-							{/* User Profile or Login - Activity based */}
 							<AuthAwareProfile />
 
-							{/* Cart */}
 							<Link href="/cart">
-								<Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 relative hover:bg-primary/10">
+								<Button variant="ghost" size="icon" className="relative">
 									<ShoppingCart className="h-5 w-5" />
 									{cartCount > 0 && (
-										<Badge className="absolute -top-1 -right-1 h-5 min-w-5 flex items-center justify-center px-1.5 text-xs bg-primary text-primary-foreground border-2 border-background">
+										<Badge className="absolute -top-1 -right-1 h-5 min-w-5 px-1 text-xs">
 											{cartCount > 99 ? '99+' : cartCount}
 										</Badge>
 									)}
 								</Button>
 							</Link>
 
-							{/* Theme Toggle */}
 							<div className="hidden sm:block">
 								<AnimatedThemeToggler />
 							</div>
 
-							{/* Mobile Menu */}
 							<Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
 								<SheetTrigger asChild>
-									<Button variant="ghost" size="icon" className="h-9 w-9 lg:hidden">
+									<Button variant="ghost" size="icon" className="lg:hidden">
 										<Menu className="h-5 w-5" />
 									</Button>
 								</SheetTrigger>
-								<SheetContent side="right" className="w-80 sm:w-96">
+								<SheetContent side="right" className="w-72">
 									<SheetHeader>
 										<SheetTitle>Menu</SheetTitle>
 									</SheetHeader>
-									<div className="flex flex-col gap-6 mt-6">
-										{/* Main Navigation */}
-										<div>
-											<h3 className="text-sm font-semibold text-muted-foreground mb-3 px-2">Browse</h3>
-											<nav className="flex flex-col gap-1">
-												{navigation.map((item) => (
-													<Link
-														key={item.name}
-														href={item.href}
-														className="flex items-center gap-3 px-3 py-3 text-sm font-medium text-foreground hover:bg-accent rounded-lg transition-colors"
-														onClick={() => setMobileMenuOpen(false)}
-													>
-														<item.icon className="h-5 w-5 text-primary" />
-														{item.name}
-													</Link>
-												))}
-											</nav>
-										</div>
-
+									<div className="flex flex-col gap-4 mt-4">
+										<nav className="flex flex-col gap-1">
+											{navigation.map((item) => (
+												<Link
+													key={item.name}
+													href={item.href}
+													className="flex items-center gap-3 px-3 py-2 text-sm font-medium hover:bg-accent rounded-md"
+													onClick={() => setMobileMenuOpen(false)}
+												>
+													<item.icon className="h-4 w-4 text-primary" />
+													{item.name}
+												</Link>
+											))}
+										</nav>
 										<Separator />
-
-										{/* Quick Links - Activity based */}
 										<AuthAwareMobileMenu onLinkClickAction={() => setMobileMenuOpen(false)} />
-
-										<Separator />
-
-										{/* Quick Categories */}
-										<div>
-											<h3 className="text-sm font-semibold text-muted-foreground mb-3 px-2">Quick Categories</h3>
-											<div className="grid grid-cols-2 gap-2">
-												<Link
-													href="/search?category=textbooks"
-													className="flex items-center gap-2 px-3 py-2 text-xs font-medium hover:bg-accent rounded-lg"
-													onClick={() => setMobileMenuOpen(false)}
-												>
-													<BookOpen className="h-4 w-4 text-primary" />
-													<span>Textbooks</span>
-												</Link>
-												<Link
-													href="/search?category=electronics"
-													className="flex items-center gap-2 px-3 py-2 text-xs font-medium hover:bg-accent rounded-lg"
-													onClick={() => setMobileMenuOpen(false)}
-												>
-													<Package className="h-4 w-4 text-primary" />
-													<span>Electronics</span>
-												</Link>
-												<Link
-													href="/restaurants?category=ghanaian"
-													className="flex items-center gap-2 px-3 py-2 text-xs font-medium hover:bg-accent rounded-lg"
-													onClick={() => setMobileMenuOpen(false)}
-												>
-													<ChefHat className="h-4 w-4 text-primary" />
-													<span>Ghanaian</span>
-												</Link>
-												<Link
-													href="/stores?category=fashion"
-													className="flex items-center gap-2 px-3 py-2 text-xs font-medium hover:bg-accent rounded-lg"
-													onClick={() => setMobileMenuOpen(false)}
-												>
-													<Store className="h-4 w-4 text-primary" />
-													<span>Fashion</span>
-												</Link>
-											</div>
-										</div>
 									</div>
 								</SheetContent>
 							</Sheet>
 						</div>
 					</div>
 				</div>
-
-				{/* Mobile Search Bar */}
-				<div className="md:hidden px-4 pb-3 border-t border-border">
-					<button
-						type="button"
-						onClick={() => setSearchModalOpen(true)}
-						className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-muted-foreground bg-accent/50 border border-border rounded-lg"
-					>
-						<Search className="h-4 w-4" />
-						<span>Search VarsityMart...</span>
-					</button>
-				</div>
 			</header>
 
-			{/* Search Modal */}
-			<SearchModal
-				open={searchModalOpen}
-				onOpenChange={setSearchModalOpen}
-			/>
+			<SearchModal open={searchModalOpen} onOpenChange={setSearchModalOpen} />
 		</>
 	);
 }

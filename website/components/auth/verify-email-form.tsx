@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, CheckCircle2, Loader2, Mail, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { AuthLayout } from "@/components/auth/auth-layout";
@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { authService } from "@/lib/api/services/auth.service";
 
 const verifySchema = z.object({
-	code: z.string().min(1, "Verification code is required"),
+	code: z.string().length(6, "Code must be 6 digits").regex(/^\d{6}$/, "Code must contain only numbers"),
 });
 
 const resendSchema = z.object({
@@ -40,6 +40,8 @@ export function VerifyEmailForm() {
 	const [status, setStatus] = useState<Status>("idle");
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const [showResend, setShowResend] = useState(false);
+	const [otpValues, setOtpValues] = useState<string[]>(Array(6).fill(""));
+	const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
 	const form = useForm<VerifyFormValues>({
 		resolver: zodResolver(verifySchema),
@@ -65,12 +67,53 @@ export function VerifyEmailForm() {
 		}
 	};
 
+	// Initialize OTP values from URL code if present
+	useEffect(() => {
+		if (codeFromUrl) {
+			const digits = codeFromUrl.replace(/\D/g, "").slice(0, 6).split("");
+			setOtpValues(digits.concat(Array(6 - digits.length).fill("")));
+		}
+	}, [codeFromUrl]);
+
 	// Auto-verify when a code arrives via URL (e.g. from email link)
 	useEffect(() => {
 		if (codeFromUrl) {
 			verifyCode(codeFromUrl);
 		}
 	}, [codeFromUrl]);
+
+	const handleOtpChange = (index: number, value: string) => {
+		if (value.length > 1) {
+			// Handle paste
+			const digits = value.replace(/\D/g, "").slice(0, 6).split("");
+			const newValues = [...otpValues];
+			digits.forEach((digit, i) => {
+				if (index + i < 6) newValues[index + i] = digit;
+			});
+			setOtpValues(newValues);
+			form.setValue("code", newValues.join(""));
+			const nextIndex = Math.min(index + digits.length, 5);
+			inputRefs.current[nextIndex]?.focus();
+			return;
+		}
+
+		if (!/^\d*$/.test(value)) return;
+
+		const newValues = [...otpValues];
+		newValues[index] = value;
+		setOtpValues(newValues);
+		form.setValue("code", newValues.join(""));
+
+		if (value && index < 5) {
+			inputRefs.current[index + 1]?.focus();
+		}
+	};
+
+	const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
+		if (e.key === "Backspace" && !otpValues[index] && index > 0) {
+			inputRefs.current[index - 1]?.focus();
+		}
+	};
 
 	const onSubmit = async (data: VerifyFormValues) => {
 		await verifyCode(data.code);
@@ -241,16 +284,27 @@ export function VerifyEmailForm() {
 					<FormField
 						control={form.control}
 						name="code"
-						render={({ field }) => (
+						render={() => (
 							<FormItem>
 								<FormLabel>Verification Code</FormLabel>
 								<FormControl>
-									<Input
-										placeholder="Enter your verification code"
-										autoComplete="one-time-code"
-										disabled={status === "verifying"}
-										{...field}
-									/>
+									<div className="flex justify-center gap-2">
+										{Array.from({ length: 6 }).map((_, index) => (
+											<input
+												key={index}
+												ref={(el) => { inputRefs.current[index] = el; }}
+												type="text"
+												inputMode="numeric"
+												maxLength={6}
+												value={otpValues[index]}
+												onChange={(e) => handleOtpChange(index, e.target.value)}
+												onKeyDown={(e) => handleKeyDown(index, e)}
+												disabled={status === "verifying"}
+												className="w-12 h-14 text-center text-xl font-semibold border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent disabled:opacity-50"
+												autoComplete={index === 0 ? "one-time-code" : "off"}
+											/>
+										))}
+									</div>
 								</FormControl>
 								<FormMessage />
 							</FormItem>

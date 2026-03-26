@@ -69,7 +69,7 @@ export function RelatedProducts({ currentProduct, className }: RelatedProductsPr
 		<div className={className}>
 			<ProductsCarousel
 				products={relatedProducts}
-				title="You Might Also Like"
+				title="Others Like This"
 				subtitle={`More items in ${currentProduct.category.name}`}
 				badge="Related"
 				viewAllLink={`/products?category=${currentProduct.category.slug}`}

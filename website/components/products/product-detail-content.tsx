@@ -369,21 +369,13 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 									{myOffers.map((offer) => (
 										<div
 											key={offer.id}
-											className={cn(
-												"flex items-center gap-3 p-3 rounded-xl border",
-												offer.status === "pending"
-													? "bg-amber-500/5 border-amber-500/20"
-													: "bg-blue-500/5 border-blue-500/20",
-											)}
+											className="flex items-center gap-3 p-3 rounded-xl border bg-muted/50 border-border"
 										>
-											<div className={cn(
-												"flex items-center justify-center w-9 h-9 rounded-full shrink-0",
-												offer.status === "pending" ? "bg-amber-500/10" : "bg-blue-500/10",
-											)}>
+											<div className="flex items-center justify-center w-9 h-9 rounded-full shrink-0 bg-muted">
 												{offer.status === "pending" ? (
-													<Clock className="h-4 w-4 text-amber-500" />
+													<Clock className="h-4 w-4 text-muted-foreground" />
 												) : (
-													<HandCoins className="h-4 w-4 text-blue-500" />
+													<HandCoins className="h-4 w-4 text-muted-foreground" />
 												)}
 											</div>
 											<div className="flex-1 min-w-0">
@@ -442,8 +434,8 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 						{/* Quick Info */}
 						<div className="grid grid-cols-2 gap-3">
 							<div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/50">
-								<div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-500/10">
-									<Package className="h-5 w-5 text-green-500" />
+								<div className="flex items-center justify-center w-10 h-10 rounded-full bg-muted">
+									<Package className="h-5 w-5 text-muted-foreground" />
 								</div>
 								<div>
 									<p className="text-xs text-muted-foreground">Stock</p>
@@ -451,8 +443,8 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 								</div>
 							</div>
 							<div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/50">
-								<div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500/10">
-									<Zap className="h-5 w-5 text-blue-500" />
+								<div className="flex items-center justify-center w-10 h-10 rounded-full bg-muted">
+									<Zap className="h-5 w-5 text-muted-foreground" />
 								</div>
 								<div>
 									<p className="text-xs text-muted-foreground">Condition</p>
@@ -463,16 +455,16 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 
 						{/* Trust Badges */}
 						<div className="grid grid-cols-3 gap-2">
-							<div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-center">
-								<Shield className="h-5 w-5 text-emerald-500" />
+							<div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-muted/50 border border-border text-center">
+								<Shield className="h-5 w-5 text-foreground" />
 								<span className="text-[10px] font-medium text-muted-foreground">Escrow Protection</span>
 							</div>
-							<div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-blue-500/5 border border-blue-500/20 text-center">
-								<Truck className="h-5 w-5 text-blue-500" />
+							<div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-muted/50 border border-border text-center">
+								<Truck className="h-5 w-5 text-foreground" />
 								<span className="text-[10px] font-medium text-muted-foreground">Campus Delivery</span>
 							</div>
-							<div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-primary/5 border border-primary/20 text-center">
-								<BadgeCheck className="h-5 w-5 text-primary" />
+							<div className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-muted/50 border border-border text-center">
+								<BadgeCheck className="h-5 w-5 text-foreground" />
 								<span className="text-[10px] font-medium text-muted-foreground">Verified Seller</span>
 							</div>
 						</div>

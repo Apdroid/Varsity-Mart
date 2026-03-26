@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ChevronRight, ChevronLeft, MapPin, CreditCard, Shield, Check, Loader2 } from "lucide-react"
+import { ChevronRight, ChevronLeft, MapPin, CreditCard, Shield, Check, Loader2, Smartphone, Wallet } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,6 +11,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/hooks/queries/useAuth"
+import { AuthModal } from "@/components/auth/auth-modal"
 
 import { mockCheckoutCartItems as mockCartItems, savedAddresses, paymentMethods } from "@/data/checkout/checkout-items"
 
@@ -23,6 +25,8 @@ export function CheckoutPageContent() {
   const [momoNumber, setMomoNumber] = useState("")
   const [orderNotes, setOrderNotes] = useState("")
   const [isProcessing, setIsProcessing] = useState(false)
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
   const subtotal = mockCartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
   const deliveryFee = 25
@@ -38,6 +42,10 @@ export function CheckoutPageContent() {
   const currentStepIndex = steps.findIndex((s) => s.id === currentStep)
 
   const handlePlaceOrder = async () => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true)
+      return
+    }
     setIsProcessing(true)
     await new Promise((resolve) => setTimeout(resolve, 2000))
     setIsProcessing(false)
@@ -170,9 +178,14 @@ export function CheckoutPageContent() {
                     )}
                   >
                     <RadioGroupItem value={method.id} className="mt-1" />
-                    <div className="flex-1">
-                      <span className="font-medium text-foreground">{method.name}</span>
-                      <p className="text-sm text-muted-foreground">{method.description}</p>
+                    <div className="flex items-center gap-3 flex-1">
+                      {method.id === "momo" && <Smartphone className="h-5 w-5 text-muted-foreground" />}
+                      {method.id === "card" && <CreditCard className="h-5 w-5 text-muted-foreground" />}
+                      {method.id === "wallet" && <Wallet className="h-5 w-5 text-muted-foreground" />}
+                      <div className="flex-1">
+                        <span className="font-medium text-foreground">{method.name}</span>
+                        <p className="text-sm text-muted-foreground">{method.description}</p>
+                      </div>
                     </div>
                   </label>
                 ))}
@@ -355,6 +368,14 @@ export function CheckoutPageContent() {
           </div>
         </div>
       </div>
+
+      <AuthModal
+        open={showAuthModal}
+        onOpenChange={setShowAuthModal}
+        onSuccess={() => {
+          setShowAuthModal(false)
+        }}
+      />
     </div>
   )
 }

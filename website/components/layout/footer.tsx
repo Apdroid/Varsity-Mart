@@ -38,13 +38,13 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-muted/30">
+    <footer className="border-t dark:border-border border-slate-800 dark:bg-muted/30 bg-slate-900">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-4 lg:col-span-1">
 						<Logo/>
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className="text-sm dark:text-muted-foreground text-slate-400 mb-4">
               The student marketplace for buying, selling, and discovering campus deals.
             </p>
             <div className="flex gap-3">
@@ -65,13 +65,13 @@ export function Footer() {
 
           {/* Marketplace */}
           <div>
-            <h3 className="font-semibold text-foreground mb-3">Marketplace</h3>
+            <h3 className="font-semibold dark:text-foreground text-white mb-3">Marketplace</h3>
             <ul className="space-y-2">
               {footerLinks.marketplace.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-sm dark:text-muted-foreground text-slate-400 dark:hover:text-foreground hover:text-white transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -82,13 +82,13 @@ export function Footer() {
 
           {/* Selling */}
           <div>
-            <h3 className="font-semibold text-foreground mb-3">Selling</h3>
+            <h3 className="font-semibold dark:text-foreground text-white mb-3">Selling</h3>
             <ul className="space-y-2">
               {footerLinks.selling.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-sm dark:text-muted-foreground text-slate-400 dark:hover:text-foreground hover:text-white transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -99,13 +99,13 @@ export function Footer() {
 
           {/* Support */}
           <div>
-            <h3 className="font-semibold text-foreground mb-3">Support</h3>
+            <h3 className="font-semibold dark:text-foreground text-white mb-3">Support</h3>
             <ul className="space-y-2">
               {footerLinks.support.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-sm dark:text-muted-foreground text-slate-400 dark:hover:text-foreground hover:text-white transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -116,13 +116,13 @@ export function Footer() {
 
           {/* Company */}
           <div>
-            <h3 className="font-semibold text-foreground mb-3">Company</h3>
+            <h3 className="font-semibold dark:text-foreground text-white mb-3">Company</h3>
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-sm dark:text-muted-foreground text-slate-400 dark:hover:text-foreground hover:text-white transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -132,18 +132,18 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-border mt-10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">
+        <div className="border-t dark:border-border border-slate-800 mt-10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-sm dark:text-muted-foreground text-slate-400">
             &copy; {new Date().getFullYear()} VarsityMart. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/privacy" className="text-sm dark:text-muted-foreground text-slate-400 dark:hover:text-foreground hover:text-white transition-colors">
               Privacy
             </Link>
-            <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/terms" className="text-sm dark:text-muted-foreground text-slate-400 dark:hover:text-foreground hover:text-white transition-colors">
               Terms
             </Link>
-            <Link href="/cookies" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/cookies" className="text-sm dark:text-muted-foreground text-slate-400 dark:hover:text-foreground hover:text-white transition-colors">
               Cookies
             </Link>
           </div>

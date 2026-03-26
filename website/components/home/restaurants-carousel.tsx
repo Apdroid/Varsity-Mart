@@ -21,7 +21,7 @@ export function RestaurantCardCompact({ restaurant }: RestaurantCardCompactProps
 		<Card className="rounded-xl cursor-pointer group relative overflow-hidden border-border/50 bg-card hover:shadow-lg hover:border-border transition-all duration-300 h-full">
 			<Link href={`/restaurants/${restaurant.id}`} className="flex flex-col h-full">
 				{/* Banner */}
-				<div className="relative h-32 sm:h-36 overflow-hidden">
+				<div className="relative h-32 sm:h-36 overflow-hidden rounded-t-xl">
 					<Image
 						width={400}
 						height={200}
@@ -112,7 +112,7 @@ export function RestaurantsCarousel({
 					<img
 						src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80"
 						alt="Delicious food"
-						className="w-full h-36 sm:h-44 object-cover"
+						className="w-full h-48 sm:h-64 object-cover"
 					/>
 					<div className="absolute inset-0 z-20 flex flex-col items-start justify-center px-4 sm:px-6">
 						<span className="inline-flex items-center gap-1.5 px-2 py-1 bg-white/10 backdrop-blur-sm rounded-full text-white text-[10px] font-medium mb-2 border border-white/20">
