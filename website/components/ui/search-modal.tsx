@@ -24,9 +24,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { mockProducts } from "@/data/products/products";
+import { useProducts, useSearchProducts } from "@/hooks/queries/useProducts";
+import type { ApiProduct } from "@/types/api";
 import type { LucideIcon } from "lucide-react";
-import type { Product } from "@/types/models";
 
 interface SearchModalProps {
 	open: boolean;
@@ -60,38 +60,25 @@ const trendingSearches = [
 export function SearchModal({ open, onOpenChange, initialQuery = "" }: SearchModalProps) {
 	const router = useRouter();
 	const [searchQuery, setSearchQuery] = useState(initialQuery);
-	const [filteredProducts, setFilteredProducts] = useState(mockProducts.slice(0, 8));
-	const [isSearching, setIsSearching] = useState(false);
 	const [showAutocomplete, setShowAutocomplete] = useState(false);
-	const [suggestions, setSuggestions] = useState<string[]>([]);
+
+	const isSearching = searchQuery.trim().length > 0;
+	const { data: searchData, isLoading: isSearchLoading } = useSearchProducts(
+		isSearching ? searchQuery : "",
+	);
+	const { data: defaultData } = useProducts({ limit: 8 } as any);
+
+	const filteredProducts: ApiProduct[] = isSearching
+		? (searchData?.results?.slice(0, 12) ?? [])
+		: (defaultData?.results?.slice(0, 8) ?? []);
+
+	const suggestions: string[] = isSearching
+		? [...new Set(filteredProducts.map((p) => p.title))].slice(0, 5)
+		: [];
 
 	useEffect(() => {
-		if (searchQuery.trim()) {
-			setIsSearching(true);
-			// Filter products based on search query
-			const filtered = mockProducts.filter((product) =>
-				product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				product.category.name.toLowerCase().includes(searchQuery.toLowerCase())
-			).slice(0, 12);
-			setFilteredProducts(filtered);
-
-			// Generate autocomplete suggestions
-			const uniqueTitles = new Set<string>();
-			mockProducts.forEach((product) => {
-				if (product.title.toLowerCase().includes(searchQuery.toLowerCase())) {
-					uniqueTitles.add(product.title);
-				}
-			});
-			const suggestionsList = Array.from(uniqueTitles).slice(0, 5);
-			setSuggestions(suggestionsList);
-			setShowAutocomplete(suggestionsList.length > 0 && searchQuery.length > 2);
-		} else {
-			setIsSearching(false);
-			setFilteredProducts(mockProducts.slice(0, 8));
-			setShowAutocomplete(false);
-			setSuggestions([]);
-		}
-	}, [searchQuery]);
+		setShowAutocomplete(suggestions.length > 0 && searchQuery.length > 2);
+	}, [suggestions.length, searchQuery]);
 
 	const handleSearch = (query: string) => {
 		if (query.trim()) {
@@ -202,48 +189,47 @@ export function SearchModal({ open, onOpenChange, initialQuery = "" }: SearchMod
 							)}
 						</div>
 
-						{filteredProducts.length > 0 ? (
-							<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-								{filteredProducts.map((product: Product) => (
-									<Link
-										key={product.id}
-										href={`/products/${product.id}`}
-										onClick={handleProductClick}
-										className="group block rounded-2xl border-2 border-border hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all overflow-hidden bg-card"
+					{filteredProducts.length > 0 ? (
+						<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+							{filteredProducts.map((product: ApiProduct) => (
+								<Link
+									key={product.id}
+									href={`/products/${product.id}`}
+									onClick={handleProductClick}
+									className="group block rounded-[var(--r)] overflow-hidden transition-all"
+									style={{
+										background: "var(--surface)",
+										border: "1px solid var(--ink-4)",
+										boxShadow: "var(--sh-sm)",
+									}}
+								>
+									<div
+										className="aspect-square relative overflow-hidden"
+										style={{ background: "var(--bg)" }}
 									>
-										<div className="aspect-square relative overflow-hidden bg-accent">
-											<Image
-												src={product.images[0] || "/placeholder.svg"}
-												alt={product.title}
-												fill
-												className="object-cover group-hover:scale-110 transition-transform duration-500"
-											/>
-											{product.compareAtPrice && (
-												<Badge className="absolute top-2 right-2 bg-primary text-primary-foreground font-bold">
-													{Math.round((1 - product.price / product.compareAtPrice) * 100)}% OFF
-												</Badge>
-											)}
-										</div>
-										<div className="p-3">
-											<h4 className="font-semibold text-sm line-clamp-2 mb-2 group-hover:text-primary transition-colors">
-												{product.title}
-											</h4>
-											<div className="flex items-center gap-2 mb-1">
-												<span className="text-lg font-bold text-primary">
-													GH₵{product.price}
-												</span>
-												{product.compareAtPrice && (
-													<span className="text-xs text-muted-foreground line-through">
-														GH₵{product.compareAtPrice}
-													</span>
-												)}
-											</div>
-											<p className="text-xs text-muted-foreground">
-												{product.condition}
-											</p>
-										</div>
-									</Link>
-								))}
+									<Image
+										src={product.images?.[0]?.url || product.images?.[0]?.optimized_url || "/placeholder.svg"}
+										alt={product.title}
+										fill
+										className="object-cover group-hover:scale-105 transition-transform duration-300"
+									/>
+								</div>
+								<div className="p-2.5">
+									<h4
+										className="font-medium text-[13px] line-clamp-2 mb-1.5"
+										style={{ color: "var(--ink)", fontFamily: "var(--font-body)" }}
+									>
+										{product.title}
+									</h4>
+									<span
+										className="text-sm font-semibold"
+										style={{ color: "var(--orange)", fontFamily: "var(--font-mono)" }}
+									>
+										GH₵{product.price}
+									</span>
+									</div>
+								</Link>
+							))}
 							</div>
 						) : (
 							<div className="text-center py-16">
@@ -293,33 +279,47 @@ export function SearchModal({ open, onOpenChange, initialQuery = "" }: SearchMod
 									<ArrowRight className="h-4 w-4" />
 								</Link>
 							</div>
-							<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-								{filteredProducts.map((product: Product) => (
-									<Link
-										key={product.id}
-										href={`/products/${product.id}`}
-										onClick={handleProductClick}
-										className="group block rounded-2xl border-2 border-border hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all overflow-hidden bg-card"
+						<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+							{filteredProducts.map((product: ApiProduct) => (
+								<Link
+									key={product.id}
+									href={`/products/${product.id}`}
+									onClick={handleProductClick}
+									className="group block rounded-[var(--r)] overflow-hidden transition-all"
+									style={{
+										background: "var(--surface)",
+										border: "1px solid var(--ink-4)",
+										boxShadow: "var(--sh-sm)",
+									}}
+								>
+									<div
+										className="aspect-square relative overflow-hidden"
+										style={{ background: "var(--bg)" }}
 									>
-										<div className="aspect-square relative overflow-hidden bg-accent">
-											<Image
-												src={product.images[0] || "/placeholder.svg"}
-												alt={product.title}
-												fill
-												className="object-cover group-hover:scale-110 transition-transform duration-500"
-											/>
-										</div>
-										<div className="p-3">
-											<h4 className="font-semibold text-xs line-clamp-2 mb-1.5 group-hover:text-primary transition-colors">
-												{product.title}
-											</h4>
-											<span className="text-sm font-bold text-primary">
-												GH₵{product.price}
-											</span>
-										</div>
-									</Link>
-								))}
-							</div>
+									<Image
+										src={product.images?.[0]?.url || product.images?.[0]?.optimized_url || "/placeholder.svg"}
+										alt={product.title}
+										fill
+										className="object-cover group-hover:scale-105 transition-transform duration-300"
+									/>
+								</div>
+								<div className="p-2.5">
+									<h4
+										className="font-medium text-[13px] line-clamp-2 mb-1"
+										style={{ color: "var(--ink)", fontFamily: "var(--font-body)" }}
+									>
+										{product.title}
+									</h4>
+									<span
+										className="text-sm font-semibold"
+										style={{ color: "var(--orange)", fontFamily: "var(--font-mono)" }}
+									>
+										GH₵{product.price}
+									</span>
+									</div>
+								</Link>
+							))}
+						</div>
 						</div>
 
 						{/* Browse by Category */}

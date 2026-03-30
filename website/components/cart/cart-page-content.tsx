@@ -7,15 +7,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { useCart } from "@/hooks/queries/useCart"
-import { mockCartItems } from "@/data/cart/cart-items"
 
 export function CartPageContent() {
-  const { items, removeItem, updateQuantity } = useCart()
+  const { items: cartItems, removeItem, updateQuantity } = useCart()
 
-  // Use mock data for display
-  const cartItems = mockCartItems
-
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
+  const subtotal = cartItems.reduce((acc, item) => acc + (item.product?.price ?? 0) * item.quantity, 0)
   const deliveryFee = subtotal > 0 ? 25 : 0
   const serviceFee = subtotal > 0 ? Math.round(subtotal * 0.02) : 0
   const total = subtotal + deliveryFee + serviceFee
@@ -38,9 +34,9 @@ export function CartPageContent() {
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
             {cartItems.map((item) => (
-              <div key={item.productId} className="flex gap-4 p-4 rounded-xl border border-border bg-card">
+              <div key={item.product.id} className="flex gap-4 p-4 rounded-xl border border-border bg-card">
                 {/* Product Image */}
-                <Link href={`/products/${item.productId}`} className="shrink-0">
+                <Link href={`/products/${item.product.id}`} className="shrink-0">
                   <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted">
                     <Image
                       src={item.product.images[0] || "/placeholder.svg"}
@@ -55,7 +51,7 @@ export function CartPageContent() {
                 {/* Product Details */}
                 <div className="flex-1 min-w-0">
                   <Link
-                    href={`/products/${item.productId}`}
+                    href={`/products/${item.product.id}`}
                     className="font-medium text-foreground hover:text-primary line-clamp-2 transition-colors"
                   >
                     {item.product.title}
@@ -71,7 +67,7 @@ export function CartPageContent() {
                         variant="outline"
                         size="icon"
                         className="h-8 w-8 bg-transparent"
-                        onClick={() => updateQuantity(item.productId, Math.max(1, item.quantity - 1))}
+                        onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1))}
                         disabled={item.quantity <= 1}
                       >
                         <Minus className="h-3 w-3" />
@@ -81,14 +77,14 @@ export function CartPageContent() {
                         variant="outline"
                         size="icon"
                         className="h-8 w-8 bg-transparent"
-                        onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                       >
                         <Plus className="h-3 w-3" />
                       </Button>
                     </div>
 
                     {/* Price */}
-                    <p className="font-bold text-foreground">GH₵{(item.price * item.quantity).toLocaleString()}</p>
+                    <p className="font-bold text-foreground">GH₵{((item.product?.price ?? 0) * item.quantity).toLocaleString()}</p>
                   </div>
                 </div>
 
@@ -97,7 +93,7 @@ export function CartPageContent() {
                   variant="ghost"
                   size="icon"
                   className="shrink-0 text-muted-foreground hover:text-destructive"
-                  onClick={() => removeItem(item.productId)}
+                  onClick={() => removeItem(item.product.id)}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>

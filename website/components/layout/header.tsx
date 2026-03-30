@@ -20,9 +20,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SearchModal } from "@/components/ui/search-modal";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { mockProducts } from "@/data/products/products";
+import {
+	Sheet,
+	SheetContent,
+	SheetHeader,
+	SheetTitle,
+	SheetTrigger,
+} from "@/components/ui/sheet";
 import { useCart } from "@/hooks/queries/useCart";
+import { useSearchProducts } from "@/hooks/queries/useProducts";
 import { cn } from "@/lib/utils";
 import Logo from "./logo";
 
@@ -41,11 +47,13 @@ export function Header() {
 	const [searchModalOpen, setSearchModalOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [showAutocomplete, setShowAutocomplete] = useState(false);
-	const [searchResults, setSearchResults] = useState<any[]>([]);
 	const { items } = useCart();
 	const cartCount = items.reduce((acc, item) => acc + item.quantity, 0);
 	const { scrollY } = useScroll();
 	const router = useRouter();
+
+	const { data: searchData } = useSearchProducts(searchQuery.trim().length > 1 ? searchQuery : "");
+	const searchResults = searchData?.results?.slice(0, 6) ?? [];
 
 	useMotionValueEvent(scrollY, "change", (current) => {
 		if (typeof current === "number") {
@@ -71,23 +79,16 @@ export function Header() {
 	}, [path]);
 
 	useEffect(() => {
-		if (searchQuery.trim().length > 1) {
-			const filtered = mockProducts.filter((product) =>
-				product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				product.category.name.toLowerCase().includes(searchQuery.toLowerCase())
-			).slice(0, 6);
-			setSearchResults(filtered);
-			setShowAutocomplete(filtered.length > 0);
-		} else {
-			setShowAutocomplete(false);
-			setSearchResults([]);
-		}
-	}, [searchQuery]);
+		setShowAutocomplete(searchQuery.trim().length > 1 && searchResults.length > 0);
+	}, [searchQuery, searchResults.length]);
 
 	const searchRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
-			if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+			if (
+				searchRef.current &&
+				!searchRef.current.contains(event.target as Node)
+			) {
 				setShowAutocomplete(false);
 			}
 		};
@@ -116,12 +117,17 @@ export function Header() {
 
 	return (
 		<>
-			<header
-				className={cn(
-					"fixed top-0 left-0 right-0 z-50 dark:bg-background bg-slate-900 dark:border-border border-slate-800 dark:text-foreground text-slate-100 border-b transition-transform duration-200",
-					isVisible ? "translate-y-0" : "-translate-y-full",
-				)}
-			>
+		<header
+			className={cn(
+				"fixed p-1 top-0 left-0 right-0 z-50 border-b transition-transform duration-200",
+				isVisible ? "translate-y-0" : "-translate-y-full",
+			)}
+			style={{
+				background: "var(--ink)",
+				borderColor: "rgba(255,255,255,0.08)",
+				color: "rgba(255,255,255,0.9)",
+			}}
+		>
 				<div className="container mx-auto px-4">
 					<div className="flex h-14 items-center justify-between gap-4">
 						{/* Left: Logo and Nav */}
@@ -136,9 +142,9 @@ export function Header() {
 											href={item.href}
 											className={cn(
 												"flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors pb-1",
-												isActive
-													? "text-primary border-b-2 border-primary"
-													: "dark:text-muted-foreground text-slate-400 dark:hover:text-foreground hover:text-white",
+								isActive
+									? "border-b-2"
+									: "opacity-60 hover:opacity-100",
 											)}
 										>
 											<item.icon className="h-4 w-4" />
@@ -150,7 +156,10 @@ export function Header() {
 						</div>
 
 						{/* Center: Search */}
-						<div className="flex-1 max-w-xl hidden md:block relative" ref={searchRef}>
+						<div
+							className="flex-1 max-w-xl hidden md:block relative"
+							ref={searchRef}
+						>
 							<div className="relative">
 								<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 								<input
@@ -167,52 +176,75 @@ export function Header() {
 										}
 									}}
 									onFocus={() => {
-										if (searchQuery.trim().length > 1 && searchResults.length > 0) {
+										if (
+											searchQuery.trim().length > 1 &&
+											searchResults.length > 0
+										) {
 											setShowAutocomplete(true);
 										}
 									}}
-									className="w-full pl-10 pr-16 py-2 text-sm dark:bg-muted/50 bg-slate-800 dark:border-border border-slate-700 dark:text-foreground text-white dark:placeholder:text-muted-foreground placeholder:text-slate-400 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+									className="w-full pl-10 pr-16 py-2 text-sm rounded-md focus:outline-none focus:ring-1"
+								style={{
+									background: "rgba(255,255,255,0.08)",
+									border: "1px solid rgba(255,255,255,0.12)",
+									color: "rgba(255,255,255,0.9)",
+								}}
 								/>
 								<kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden lg:inline-flex h-5 items-center gap-1 rounded border bg-background px-1.5 text-[10px] font-mono text-muted-foreground">
 									⌘K
 								</kbd>
 							</div>
 
-							{showAutocomplete && searchResults.length > 0 && (
-								<div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-md shadow-lg z-50 overflow-hidden">
-									{searchResults.map((product) => (
-										<Link
-											key={product.id}
-											href={`/products/${product.id}`}
-											onClick={() => {
-												setShowAutocomplete(false);
-												setSearchQuery("");
-											}}
-											className="flex items-center gap-3 p-2 hover:bg-accent transition-colors"
-										>
-											<div className="relative w-10 h-10 rounded overflow-hidden bg-muted shrink-0">
-												<Image
-													src={product.images[0] || "/placeholder.svg"}
-													alt={product.title}
-													fill
-													className="object-cover"
-												/>
-											</div>
-											<div className="flex-1 min-w-0">
-												<p className="text-sm font-medium truncate">{product.title}</p>
-												<p className="text-sm text-primary font-medium">GH₵{product.price}</p>
-											</div>
-										</Link>
-									))}
-									<button
-										type="button"
-										onClick={() => handleSearch(searchQuery)}
-										className="w-full p-2 text-sm text-primary hover:bg-accent transition-colors border-t border-border"
+						{showAutocomplete && searchResults.length > 0 && (
+							<div
+								className="absolute top-full left-0 right-0 mt-1 rounded-[var(--r)] shadow-[var(--sh-lg)] z-50 overflow-hidden"
+								style={{ background: "var(--surface)", border: "1px solid var(--ink-4)" }}
+							>
+								{searchResults.map((product) => (
+									<Link
+										key={product.id}
+										href={`/products/${product.id}`}
+										onClick={() => {
+											setShowAutocomplete(false);
+											setSearchQuery("");
+										}}
+										className="flex items-center gap-3 p-2 transition-colors"
+										style={{ color: "var(--ink)" }}
 									>
-										View all results
-									</button>
-								</div>
-							)}
+										<div
+											className="relative w-10 h-10 rounded overflow-hidden shrink-0"
+											style={{ background: "var(--bg)" }}
+										>
+											<Image
+												src={product.images?.[0]?.url || product.images?.[0]?.optimized_url || "/placeholder.svg"}
+												alt={product.title}
+												fill
+												className="object-cover"
+											/>
+										</div>
+										<div className="flex-1 min-w-0">
+											<p className="text-sm font-medium truncate" style={{ color: "var(--ink)" }}>
+												{product.title}
+											</p>
+											<p className="text-sm font-semibold font-price" style={{ color: "var(--orange)", fontFamily: "var(--font-mono)" }}>
+												GH₵{product.price}
+											</p>
+										</div>
+									</Link>
+								))}
+								<button
+									type="button"
+									onClick={() => handleSearch(searchQuery)}
+									className="w-full p-2 text-sm font-medium transition-colors"
+									style={{
+										color: "var(--orange)",
+										borderTop: "1px solid var(--ink-4)",
+									}}
+								>
+									View all results
+								</button>
+							</div>
+						)}
 						</div>
 
 						{/* Right: Actions */}
@@ -237,7 +269,7 @@ export function Header() {
 									<ShoppingCart className="h-5 w-5" />
 									{cartCount > 0 && (
 										<Badge className="absolute -top-1 -right-1 h-5 min-w-5 px-1 text-xs">
-											{cartCount > 99 ? '99+' : cartCount}
+											{cartCount > 99 ? "99+" : cartCount}
 										</Badge>
 									)}
 								</Button>
@@ -272,7 +304,9 @@ export function Header() {
 											))}
 										</nav>
 										<Separator />
-										<AuthAwareMobileMenu onLinkClickAction={() => setMobileMenuOpen(false)} />
+										<AuthAwareMobileMenu
+											onLinkClickAction={() => setMobileMenuOpen(false)}
+										/>
 									</div>
 								</SheetContent>
 							</Sheet>

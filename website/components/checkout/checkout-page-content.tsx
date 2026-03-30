@@ -12,23 +12,26 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/queries/useAuth"
+import { useCart } from "@/hooks/queries/useCart"
 import { AuthModal } from "@/components/auth/auth-modal"
 
-import { mockCheckoutCartItems as mockCartItems, savedAddresses, paymentMethods } from "@/data/checkout/checkout-items"
+const savedAddresses: any[] = []
+const paymentMethods: any[] = []
 
 type CheckoutStep = "address" | "payment" | "review"
 
 export function CheckoutPageContent() {
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("address")
-  const [selectedAddress, setSelectedAddress] = useState(savedAddresses[0].id)
+  const [selectedAddress, setSelectedAddress] = useState("")
   const [selectedPayment, setSelectedPayment] = useState("momo")
   const [momoNumber, setMomoNumber] = useState("")
   const [orderNotes, setOrderNotes] = useState("")
   const [isProcessing, setIsProcessing] = useState(false)
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const { items: cartItems } = useCart()
 
-  const subtotal = mockCartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
+  const subtotal = cartItems.reduce((acc, item) => acc + (item.product?.price ?? 0) * item.quantity, 0)
   const deliveryFee = 25
   const serviceFee = Math.round(subtotal * 0.02)
   const total = subtotal + deliveryFee + serviceFee
@@ -267,23 +270,23 @@ export function CheckoutPageContent() {
               <div className="p-4 rounded-xl border border-border">
                 <span className="text-sm font-medium text-muted-foreground">Order Items</span>
                 <div className="mt-3 space-y-3">
-                  {mockCartItems.map((item) => (
-                    <div key={item.productId} className="flex items-center gap-3">
+                  {cartItems.map((item) => (
+                    <div key={item.product.id} className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted shrink-0">
                         <Image
-                          src={item.image || "/placeholder.svg"}
-                          alt={item.title}
+                          src={item.product.images?.[0] || "/placeholder.svg"}
+                          alt={item.product.title}
                           width={48}
                           height={48}
                           className="object-cover w-full h-full"
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{item.title}</p>
+                        <p className="text-sm font-medium text-foreground truncate">{item.product.title}</p>
                         <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                       </div>
                       <span className="text-sm font-medium text-foreground">
-                        GH₵{(item.price * item.quantity).toLocaleString()}
+                        GH₵{((item.product?.price ?? 0) * item.quantity).toLocaleString()}
                       </span>
                     </div>
                   ))}
@@ -320,23 +323,23 @@ export function CheckoutPageContent() {
             <h2 className="font-semibold text-lg text-foreground mb-4">Order Summary</h2>
 
             <div className="space-y-3 mb-4">
-              {mockCartItems.map((item) => (
-                <div key={item.productId} className="flex items-center gap-3">
+              {cartItems.map((item) => (
+                <div key={item.product.id} className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted shrink-0">
                     <Image
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.title}
+                      src={item.product.images?.[0] || "/placeholder.svg"}
+                      alt={item.product.title}
                       width={48}
                       height={48}
                       className="object-cover w-full h-full"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-foreground truncate">{item.title}</p>
+                    <p className="text-sm text-foreground truncate">{item.product.title}</p>
                     <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                   </div>
                   <span className="text-sm font-medium text-foreground">
-                    GH₵{(item.price * item.quantity).toLocaleString()}
+                    GH₵{((item.product?.price ?? 0) * item.quantity).toLocaleString()}
                   </span>
                 </div>
               ))}

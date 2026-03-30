@@ -4,9 +4,11 @@ import Link from "next/link"
 import { ChevronRight, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { mockNotifications } from "@/data/notifications/notifications"
+import { useNotifications } from "@/hooks/queries/useNotifications"
 
 export function NotificationsPageContent() {
+  const { data, isLoading } = useNotifications()
+  const mockNotifications = (data as any)?.data ?? []
   return (
     <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumb */}
@@ -27,7 +29,7 @@ export function NotificationsPageContent() {
 
       {mockNotifications.length > 0 ? (
         <div className="space-y-2">
-          {mockNotifications.map((notification) => (
+          {mockNotifications.map((notification: any) => (
             <div
               key={notification.id}
               className={cn(

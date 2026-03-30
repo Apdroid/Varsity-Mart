@@ -4,9 +4,14 @@ import Link from "next/link"
 import { ChevronRight, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/product-card"
-import { mockWishlist } from "@/data/wishlist/wishlist"
+import { useProducts } from "@/hooks/queries/useProducts"
+import { apiProductToModel } from "@/lib/utils/api-product-mapper"
+import type { Product } from "@/types/models"
 
 export function WishlistPageContent() {
+  const { data, isLoading } = useProducts({ limit: 20 } as any)
+  const wishlistProducts: Product[] = data?.results ? data.results.map(apiProductToModel) : []
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumb */}
@@ -20,12 +25,12 @@ export function WishlistPageContent() {
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-foreground">My Wishlist</h1>
-        <span className="text-muted-foreground">{mockWishlist.length} items</span>
+        <span className="text-muted-foreground">{wishlistProducts.length} items</span>
       </div>
 
-      {mockWishlist.length > 0 ? (
+      {!isLoading && wishlistProducts.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {mockWishlist.map((product) => (
+          {wishlistProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

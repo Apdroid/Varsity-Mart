@@ -3,64 +3,32 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { storesService } from "@/lib/api/services/stores.service"
 import { queryKeys } from "@/lib/api/query-keys"
-import { mockStores } from "@/data/stores/stores"
 import type { StoreFilters, CreateStoreRequest, UpdateStoreRequest } from "@/types/api"
 
 export function useStores(filters: StoreFilters = {}) {
   return useQuery({
     queryKey: queryKeys.stores.list(filters),
-    queryFn: async () => {
-      try {
-        return await storesService.getStores(filters)
-      } catch (error) {
-        console.warn("Stores API failed, using mock data:", error)
-        return {
-          success: true,
-          data: mockStores,
-          meta: { page: 1, limit: 50, total: mockStores.length, totalPages: 1 },
-        }
-      }
-    },
+    queryFn: () => storesService.getStores(filters),
     staleTime: 1000 * 60 * 5,
-    retry: 1,
+    retry: 2,
   })
 }
 
 export function useStore(id: string) {
   return useQuery({
     queryKey: queryKeys.stores.detail(id),
-    queryFn: async () => {
-      try {
-        return await storesService.getStoreById(id)
-      } catch (error) {
-        console.warn(`Store ${id} API failed, using mock data:`, error)
-        const mockStore = mockStores.find((s) => s.id === id)
-        if (!mockStore) throw error
-        return { success: true, data: mockStore }
-      }
-    },
+    queryFn: () => storesService.getStoreById(id),
     enabled: !!id,
-    retry: 1,
+    retry: 2,
   })
 }
 
 export function useStoreProducts(storeId: string, filters = {}) {
   return useQuery({
     queryKey: queryKeys.stores.products(storeId, filters),
-    queryFn: async () => {
-      try {
-        return await storesService.getStoreProducts(storeId, filters)
-      } catch (error) {
-        console.warn(`Store ${storeId} products API failed, using fallback:`, error)
-        return {
-          success: true,
-          data: [],
-          meta: { page: 1, limit: 20, total: 0, totalPages: 0 },
-        }
-      }
-    },
+    queryFn: () => storesService.getStoreProducts(storeId, filters),
     enabled: !!storeId,
-    retry: 1,
+    retry: 2,
   })
 }
 

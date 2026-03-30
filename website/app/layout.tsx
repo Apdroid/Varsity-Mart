@@ -1,7 +1,7 @@
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import type { Viewport } from "next";
-import { Inter, Manrope, Raleway } from "next/font/google";
+import { Bricolage_Grotesque, IBM_Plex_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import type React from "react";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { UniversityProvider } from "@/components/providers/university-provider";
@@ -9,23 +9,25 @@ import { AuthGuard } from "@/lib/api/auth-guard";
 import "./globals.css";
 import { ThemeProvider } from "../components/theme-provider";
 
-const fontSans = Raleway({
+const fontHeading = Plus_Jakarta_Sans({
 	subsets: ["latin"],
-	variable: "--font-sans",
+	variable: "--font-heading",
 	display: "swap",
-	weight: ["300", "400", "600", "700", "800"],
+	weight: ["400", "500", "600", "700", "800"],
 });
-const fontMono = Manrope({
+
+const fontBody = Bricolage_Grotesque({
+	subsets: ["latin"],
+	variable: "--font-body",
+	display: "swap",
+	weight: ["400", "500", "600", "700"],
+});
+
+const fontMono = IBM_Plex_Mono({
 	subsets: ["latin"],
 	variable: "--font-mono",
 	display: "swap",
-	weight: ["300", "400", "600", "700", "800"],
-});
-const inter = Inter({
-	subsets: ["latin"],
-	variable: "--font-sans",
-	display: "swap",
-	weight: ["300", "400", "600", "700", "800", "900"],
+	weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -39,7 +41,7 @@ export const metadata: Metadata = {
 				media: "(prefers-color-scheme: light)",
 			},
 			{
-				url: "/icon-dark-32x32.png",
+				url: "/icon-light-32x32.png",
 				media: "(prefers-color-scheme: dark)",
 			},
 			{
@@ -66,12 +68,11 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
-				className={` antialiased ${fontMono.className} ${fontSans.className} ${inter.className}  `}
+				className={`${fontHeading.variable} ${fontBody.variable} ${fontMono.variable} antialiased`}
 			>
 				<ThemeProvider
 					attribute="class"
-					defaultTheme="system"
-					enableSystem
+					defaultTheme="light"
 					disableTransitionOnChange
 				>
 					<QueryProvider>

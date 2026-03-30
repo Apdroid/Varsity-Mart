@@ -43,8 +43,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ProductCard } from "@/components/product-card";
 import { cn } from "@/lib/utils";
+import { useSearchProducts, useProducts } from "@/hooks/queries/useProducts";
+import { apiProductToModel } from "@/lib/utils/api-product-mapper";
 import type { Product } from "@/types/models";
-import { mockProducts } from "@/data/products/products";
 
 // Categories with subcategories
 const categories = [
@@ -106,6 +107,29 @@ export function SearchPageContent() {
 		selectedConditions.length > 0,
 		priceRange[0] > 0 || priceRange[1] < 10000,
 	].filter(Boolean).length;
+
+	const searchFilters = {
+		...(selectedCategory && { category: selectedCategory }),
+		...(selectedConditions.length > 0 && { condition: selectedConditions[0] }),
+	};
+
+	const { data: searchData, isLoading: isSearchLoading } = useSearchProducts(
+		searchQuery.trim() || "",
+		searchFilters,
+	);
+	const { data: defaultData, isLoading: isDefaultLoading } = useProducts({
+		...searchFilters,
+		limit: 40,
+	} as any);
+
+	const isLoading = searchQuery.trim() ? isSearchLoading : isDefaultLoading;
+	const rawProducts = searchQuery.trim()
+		? (searchData?.results ?? [])
+		: (defaultData?.results ?? []);
+	const products: Product[] = rawProducts.map(apiProductToModel);
+	const totalResults = searchQuery.trim()
+		? (searchData?.count ?? products.length)
+		: (defaultData?.count ?? products.length);
 
 	const handleSearch = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -377,11 +401,11 @@ export function SearchPageContent() {
 				<div className="flex-1 min-w-0">
 					{/* Toolbar */}
 					<div className="flex items-center justify-between gap-4 mb-6">
-						<p className="text-sm text-muted-foreground">
-							<span className="font-medium text-foreground">
-								{mockProducts.length}
-							</span>{" "}
-							results
+					<p className="text-sm text-muted-foreground">
+						<span className="font-medium text-foreground">
+							{isLoading ? "…" : totalResults.toLocaleString()}
+						</span>{" "}
+						results
 							{searchQuery && (
 								<>
 									{" "}
@@ -462,20 +486,35 @@ export function SearchPageContent() {
 						</div>
 					</div>
 
-					{/* Results Grid */}
-					{mockProducts.length > 0 ? (
-						<div
-							className={cn(
-								viewMode === "grid"
-									? "grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-4"
-									: "flex flex-col gap-4",
-							)}
-						>
-							{mockProducts.map((product) => (
-								<ProductCard key={product.id} product={product} />
-							))}
-						</div>
-					) : (
+				{/* Results Grid */}
+				{isLoading ? (
+					<div className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-4">
+						{Array.from({ length: 12 }).map((_, i) => (
+							<div key={i} className="rounded-[var(--r)] overflow-hidden" style={{ border: "1px solid var(--ink-4)" }}>
+								<div className="aspect-square animate-pulse" style={{ background: "var(--ink-4)" }} />
+								<div className="p-3 space-y-2">
+									<div className="h-3 rounded animate-pulse w-4/5" style={{ background: "var(--ink-4)" }} />
+									<div className="h-4 rounded animate-pulse w-2/5" style={{ background: "var(--ink-4)" }} />
+								</div>
+							</div>
+						))}
+					</div>
+				) : products.length > 0 ? (
+					<div
+						className={cn(
+							viewMode === "grid"
+								? "grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-4"
+								: "flex flex-col gap-4",
+						)}
+					>
+					{products.map((product) => (
+						<ProductCard
+							key={product.id}
+							product={product}
+						/>
+					))}
+					</div>
+				) : (
 						<div className="text-center py-16">
 							<Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
 							<h3 className="font-semibold text-lg text-foreground mb-2">
@@ -491,8 +530,8 @@ export function SearchPageContent() {
 						</div>
 					)}
 
-					{/* Load More */}
-					{mockProducts.length > 0 && (
+				{/* Load More */}
+				{products.length > 0 && (
 						<div className="mt-8 text-center">
 							<Button variant="outline" size="lg">
 								Load More

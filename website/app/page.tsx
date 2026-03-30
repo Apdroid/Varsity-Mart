@@ -1,80 +1,63 @@
 import { CategoriesCarousel } from "@/components/categories-carousel";
 import { FeaturedProducts } from "@/components/home/featured-products";
 import CampusMarketSlider from "@/components/home/hero-slider";
-import { ProductsCarousel } from "@/components/home/products-carousel";
-import { RestaurantsCarousel } from "@/components/home/restaurants-carousel";
-import { StoresCarousel } from "@/components/home/stores-carousel";
+import { LiveProductsSection } from "@/components/home/live-products-section";
+import { LiveRestaurantsSection } from "@/components/home/live-restaurants-section";
+import { LiveStoresSection } from "@/components/home/live-stores-section";
 import { MainLayout } from "@/components/layout/main-layout";
-import { mockRestaurants } from "@/data/food/restaurants";
-import { mockProducts } from "@/data/products/products";
-import { mockStores } from "@/data/stores/stores";
 
 export default function Home() {
-	const newArrivals = mockProducts.slice(0, 12);
-	const hotDeals = mockProducts.filter(p => p.compareAtPrice).slice(0, 12);
-
 	return (
 		<MainLayout>
 			<CampusMarketSlider />
-			{/* Featured Products Section */}
+
+			{/* Featured Products */}
 			<FeaturedProducts />
-			{/* Restaurants Carousel */}
+
+			{/* Restaurants */}
 			<section className="py-8 md:py-12 px-4 sm:px-6 lg:px-8 bg-muted/30">
 				<div className="mx-auto max-w-360">
-					<RestaurantsCarousel
-						restaurants={mockRestaurants.slice(0, 10)}
-						showBanner={true}
-						title="Hungry? Order Now"
-						subtitle="Fresh meals delivered from campus restaurants"
-					/>
+					<LiveRestaurantsSection />
 				</div>
 			</section>
 
-			{/* New Arrivals Carousel */}
+			{/* New Arrivals */}
 			<section className="py-8 md:py-12 px-4 sm:px-6 lg:px-8 bg-background">
 				<div className="mx-auto max-w-360">
-					<ProductsCarousel
-						products={newArrivals}
+					<LiveProductsSection
 						title="New Arrivals"
 						subtitle="Fresh listings from campus sellers"
 						badge="Just In"
 						viewAllLink="/products?sort=newest"
 						viewAllText="See All New"
+						filters={{ ordering: "-createdAt" }}
 					/>
 				</div>
 			</section>
 
-			{/* Campus Stores Carousel */}
+			{/* Campus Stores */}
 			<section className="py-8 md:py-12 px-4 sm:px-6 lg:px-8 bg-muted/30">
 				<div className="mx-auto max-w-360">
-					<StoresCarousel
-						stores={mockStores.slice(0, 10)}
-						showBanner={true}
-						title="Campus Stores"
-						subtitle="Shop from verified student-run businesses"
-					/>
+					<LiveStoresSection />
 				</div>
 			</section>
 
 			{/* Categories */}
 			<CategoriesCarousel />
 
-			{/* Deals Carousel */}
+			{/* Hot Deals */}
 			<section className="py-8 md:py-12 px-4 sm:px-6 lg:px-8 bg-background">
 				<div className="mx-auto max-w-360">
-					{hotDeals.length > 0 && (
-						<ProductsCarousel
-							products={hotDeals}
-							title="Hot Deals"
-							subtitle="Best discounts on campus"
-							badge="🔥 On Sale"
-							viewAllLink="/deals"
-							viewAllText="View All Deals"
-						/>
-					)}
+					<LiveProductsSection
+						title="Hot Deals"
+						subtitle="Best discounts on campus"
+						badge="🔥 On Sale"
+						viewAllLink="/deals"
+						viewAllText="View All Deals"
+						filters={{ badges: "hot" }}
+					/>
 				</div>
 			</section>
 		</MainLayout>
-
 	);
 }

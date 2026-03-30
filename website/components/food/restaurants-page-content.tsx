@@ -16,7 +16,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { RestaurantsCarousel } from "@/components/home/restaurants-carousel";
-import { mockRestaurants } from "@/data/food/restaurants";
+import { useRestaurants } from "@/hooks/queries/useRestaurants";
 import type { Restaurant } from "@/types/models";
 
 // Restaurant Card Component
@@ -107,30 +107,26 @@ export function RestaurantsPageContent() {
 	const [sortBy, setSortBy] = useState("rating");
 	const [filterOpen, setFilterOpen] = useState<string>("all");
 
-	// Filter and sort restaurants
-	const filteredRestaurants = mockRestaurants
+	const { data, isLoading } = useRestaurants({ search: searchQuery || undefined } as any);
+	const allRestaurants: Restaurant[] = (data as any)?.data ?? [];
+
+	const filteredRestaurants = allRestaurants
 		.filter((restaurant) => {
-			const matchesSearch =
-				restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				restaurant.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				restaurant.tags?.some((tag) =>
-					tag.toLowerCase().includes(searchQuery.toLowerCase())
-				);
 			const matchesOpen =
 				filterOpen === "all" ||
 				(filterOpen === "open" && restaurant.isOpen) ||
 				(filterOpen === "closed" && !restaurant.isOpen);
-			return matchesSearch && matchesOpen;
+			return matchesOpen;
 		})
 		.sort((a, b) => {
-			if (sortBy === "rating") return b.rating - a.rating;
-			if (sortBy === "deliveryFee") return a.deliveryFee - b.deliveryFee;
-			if (sortBy === "minOrder") return a.minOrder - b.minOrder;
+			if (sortBy === "rating") return (b.rating ?? 0) - (a.rating ?? 0);
+			if (sortBy === "deliveryFee") return (a.deliveryFee ?? 0) - (b.deliveryFee ?? 0);
+			if (sortBy === "minOrder") return (a.minOrder ?? 0) - (b.minOrder ?? 0);
 			return 0;
 		});
 
-	const openRestaurants = mockRestaurants.filter((r) => r.isOpen);
-	const topRated = mockRestaurants.filter((r) => r.rating >= 4.5);
+	const openRestaurants = allRestaurants.filter((r) => r.isOpen);
+	const topRated = allRestaurants.filter((r) => (r.rating ?? 0) >= 4.5);
 
 	return (
 		<div className="py-8">

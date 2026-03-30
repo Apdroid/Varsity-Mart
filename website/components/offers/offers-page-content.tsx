@@ -10,11 +10,20 @@ import { useAuth } from "@/hooks/queries/useAuth"
 import { CounterOfferModal } from "./counter-offer-modal"
 import { OfferStatusBadge } from "./offer-status-badge"
 import type { Offer } from "@/types/models"
-import { MOCK_OFFERS } from "@/data/offers/offers"
+import { useMyOffers, useAcceptOffer, useDeclineOffer } from "@/hooks/queries/useOffers"
 
 export function OffersPageContent() {
   const { user } = useAuth()
-  const [offers, setOffers] = useState<Offer[]>(MOCK_OFFERS)
+  const { data: offersData } = useMyOffers()
+  const [offers, setOffers] = useState<Offer[]>([])
+  const acceptOffer = useAcceptOffer()
+  const declineOffer = useDeclineOffer()
+
+  // Sync API data into local state for optimistic UI
+  useState(() => {
+    const apiOffers = (offersData as any)?.data ?? []
+    if (apiOffers.length > 0) setOffers(apiOffers)
+  })
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null)
   const [isCounterModalOpen, setIsCounterModalOpen] = useState(false)
 

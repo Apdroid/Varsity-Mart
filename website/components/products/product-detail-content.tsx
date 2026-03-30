@@ -108,16 +108,54 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 
 	const product = productResponse.data;
 
-	const discount = product.compareAtPrice
+	const comparePrice = (product as any).compareAtPrice ?? (product as any).originalPrice;
+	const discount = comparePrice
 		? Math.round(
-			((product.compareAtPrice - product.price) /
-				product.compareAtPrice) *
+			((parseFloat(comparePrice) - parseFloat(product.price)) /
+				parseFloat(comparePrice)) *
 			100,
 		)
 		: 0;
 
+	const categoryName = product.category?.name ?? "";
+	const mappedProduct = {
+		id: product.id,
+		title: product.title,
+		description: product.description,
+		price: parseFloat(product.price ?? "0"),
+		compareAtPrice: comparePrice ? parseFloat(comparePrice) : undefined,
+		images: (product.images ?? []).map((img) =>
+			typeof img === "string" ? img : (img.optimized_url || img.url || img.thumbnail_url || "")
+		),
+		category: {
+			id: product.category?.id ?? "",
+			name: categoryName,
+			slug: categoryName.toLowerCase(),
+			icon: product.category?.icon ?? "",
+		},
+		condition: (product.condition ?? "new") as any,
+		quantity: 1,
+		status: (product.status ?? "active").toLowerCase() as any,
+		sellerId: product.seller?.id ?? "",
+		seller: {
+			id: product.seller?.id ?? "",
+			email: product.seller?.email ?? "",
+			fullName: product.seller?.name ?? "",
+			role: "seller" as const,
+			isEmailVerified: true,
+			isPhoneVerified: false,
+			kycStatus: "approved" as const,
+			createdAt: product.createdAt,
+			updatedAt: product.createdAt,
+		},
+		likesCount: product.likes ?? 0,
+		tags: product.badges ? [product.badges] : [],
+		createdAt: product.createdAt,
+		updatedAt: product.createdAt,
+	};
+
 	const handleAddToCart = () => {
-		addItem(product, 1);
+		addItem(mappedProduct as any, 1);
 	};
 
 	const handleLikeProduct = () => {
@@ -137,7 +175,7 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 			return;
 		}
 		startConversation(
-			{ participantId: product.sellerId, initialMessage: `Hi! I'm interested in "${product.title}"` },
+			{ participantId: product.seller.id, initialMessage: `Hi! I'm interested in "${product.title}"` },
 			{ onSuccess: () => router.push("/messages") },
 		);
 	};
@@ -159,7 +197,7 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 					</Link>
 					<ChevronRight className="h-4 w-4" />
 					<Link
-						href={`/search?category=${product.category.slug}`}
+						href={`/search?category=${(product.category as any).slug ?? product.category.name.toLowerCase()}`}
 						className="hover:text-foreground"
 					>
 						{product.category.name}
@@ -174,75 +212,75 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 					{/* Images */}
 					<div className="space-y-4">
 						<div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
-							<Image
-								src={
-									product.images[selectedImage] ||
-									"/placeholder.svg?height=600&width=600&query=product"
-								}
-								alt={product.title}
-								fill
-								className="object-cover"
-							/>
-							{discount > 0 && (
-								<Badge className="absolute top-4 left-4 bg-red-500 text-white text-sm">
-									{discount}% OFF
-								</Badge>
-							)}
+						<Image
+							src={
+								mappedProduct.images[selectedImage] ||
+								"/placeholder.svg?height=600&width=600&query=product"
+							}
+							alt={product.title}
+							fill
+							className="object-cover"
+						/>
+						{discount > 0 && (
+							<Badge className="absolute top-4 left-4 bg-red-500 text-white text-sm">
+								{discount}% OFF
+							</Badge>
+						)}
 
-							{/* Navigation Arrows */}
-							{product.images.length > 1 && (
-								<>
-									<Button
-										variant="secondary"
-										size="icon"
-										className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/80 backdrop-blur-sm"
-										onClick={() =>
-											setSelectedImage((prev) =>
-												prev === 0 ? product.images.length - 1 : prev - 1,
-											)
-										}
-									>
-										<ChevronLeft className="h-5 w-5" />
-									</Button>
-									<Button
-										variant="secondary"
-										size="icon"
-										className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/80 backdrop-blur-sm"
-										onClick={() =>
-											setSelectedImage((prev) =>
-												prev === product.images.length - 1 ? 0 : prev + 1,
-											)
-										}
-									>
-										<ChevronRight className="h-5 w-5" />
-									</Button>
-								</>
-							)}
-						</div>
+						{/* Navigation Arrows */}
+						{mappedProduct.images.length > 1 && (
+							<>
+								<Button
+									variant="secondary"
+									size="icon"
+									className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/80 backdrop-blur-sm"
+									onClick={() =>
+										setSelectedImage((prev) =>
+											prev === 0 ? mappedProduct.images.length - 1 : prev - 1,
+										)
+									}
+								>
+									<ChevronLeft className="h-5 w-5" />
+								</Button>
+								<Button
+									variant="secondary"
+									size="icon"
+									className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/80 backdrop-blur-sm"
+									onClick={() =>
+										setSelectedImage((prev) =>
+											prev === mappedProduct.images.length - 1 ? 0 : prev + 1,
+										)
+									}
+								>
+									<ChevronRight className="h-5 w-5" />
+								</Button>
+							</>
+						)}
+					</div>
 
-						{/* Thumbnails */}
-						{product.images.length > 1 && (
-							<div className="flex gap-2 overflow-x-auto pb-2">
-								{product.images.map((image, index) => (
-									<button
-										key={index}
-										onClick={() => setSelectedImage(index)}
-										className={cn(
-											"relative w-20 h-20 rounded-lg overflow-hidden shrink-0 border-2 transition-colors",
-											selectedImage === index
-												? "border-primary"
-												: "border-transparent",
-										)}
-									>
-										<Image
-											src={
-												image ||
-												"/placeholder.svg?height=80&width=80&query=product thumbnail"
-											}
-											alt={`${product.title} ${index + 1}`}
-											fill
-											className="object-cover"
-										/>
+					{/* Thumbnails */}
+					{mappedProduct.images.length > 1 && (
+						<div className="flex gap-2 overflow-x-auto pb-2">
+							{mappedProduct.images.map((image, index) => (
+								<button
+									key={index}
+									onClick={() => setSelectedImage(index)}
+									className={cn(
+										"relative w-20 h-20 rounded-lg overflow-hidden shrink-0 border-2 transition-colors",
+										selectedImage === index
+											? "border-primary"
+											: "border-transparent",
+									)}
+								>
+									<Image
+										src={
+											image ||
+											"/placeholder.svg?height=80&width=80&query=product thumbnail"
+										}
+										alt={`${product.title} ${index + 1}`}
+										fill
+										className="object-cover"
+									/>
 									</button>
 								))}
 							</div>
@@ -263,12 +301,12 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 										size="icon"
 										className={cn(
 											"h-10 w-10 bg-transparent",
-											product.isLiked && "text-red-500 border-red-500",
+											(product as any).isLiked && "text-red-500 border-red-500",
 										)}
 										onClick={handleLikeProduct}
 										disabled={isLiking}
 									>
-										<Heart className={cn("h-5 w-5", product.isLiked && "fill-current")} />
+										<Heart className={cn("h-5 w-5", (product as any).isLiked && "fill-current")} />
 									</Button>
 									<Button
 										variant="outline"
@@ -288,7 +326,7 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 									{product.category.name}
 								</Badge>
 								<span className="text-sm text-muted-foreground">
-									{product.likesCount} likes
+									{(product.likes ?? (product as any).likesCount ?? 0)} likes
 								</span>
 							</div>
 						</div>
@@ -296,11 +334,11 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 						{/* Price */}
 						<div className="flex items-baseline gap-3">
 							<span className="text-3xl font-bold text-foreground">
-								GH₵{product.price.toLocaleString()}
+								GH₵{parseFloat(product.price).toLocaleString()}
 							</span>
-							{product.compareAtPrice && (
+							{comparePrice && (
 								<span className="text-lg text-muted-foreground line-through">
-									GH₵{product.compareAtPrice.toLocaleString()}
+									GH₵{parseFloat(comparePrice).toLocaleString()}
 								</span>
 							)}
 						</div>
@@ -332,7 +370,7 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 											size="icon"
 											className="h-12 w-12 rounded-l-none text-primary hover:bg-primary/10"
 											onClick={() => updateQuantity(product.id, cartQuantity + 1)}
-											disabled={cartQuantity >= product.quantity}
+											disabled={cartQuantity >= ((product as any).quantity ?? 99)}
 										>
 											<Plus className="h-4 w-4" />
 										</Button>
@@ -439,7 +477,7 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 								</div>
 								<div>
 									<p className="text-xs text-muted-foreground">Stock</p>
-									<p className="text-sm font-semibold text-foreground">{product.quantity} available</p>
+									<p className="text-sm font-semibold text-foreground">{(product as any).quantity ?? 99} available</p>
 								</div>
 							</div>
 							<div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/50">
@@ -474,35 +512,32 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 							<div className="flex items-center gap-4">
 								<Avatar className="h-14 w-14">
 									<AvatarImage
-										src={product.store?.logo || product.seller.avatar}
+										src={(product as any).store?.logo || product.seller.avatar}
 									/>
-									<AvatarFallback>
-										{product.seller?.firstName?.[0] || product.seller.fullName?.[0] || "S"}
-									</AvatarFallback>
-								</Avatar>
-								<div className="flex-1 min-w-0">
-									<Link
-										href={product.storeId ? `/stores/${product.storeId}` : "#"}
-										className="font-semibold text-foreground hover:text-primary/90 transition-colors"
-									>
-										{product.store?.name ||
-											(product.seller.firstName && product.seller.lastName
-												? `${product.seller.firstName} ${product.seller.lastName}`
-												: product.seller.fullName || "Unknown Seller")}
+								<AvatarFallback>
+									{product.seller?.name?.[0] || "S"}
+								</AvatarFallback>
+							</Avatar>
+							<div className="flex-1 min-w-0">
+								<Link
+									href={(product as any).storeId ? `/stores/${(product as any).storeId}` : "#"}
+									className="font-semibold text-foreground hover:text-primary/90 transition-colors"
+								>
+									{(product as any).store?.name || product.seller.name || "Unknown Seller"}
 									</Link>
-									{product.store && (
+									{(product as any).store && (
 										<div className="flex items-center gap-2 text-sm text-muted-foreground">
 											<div className="flex items-center gap-1">
 												<Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-												<span>{product.store.rating}</span>
+												<span>{(product as any).store.rating}</span>
 											</div>
 											<span>•</span>
-											<span>{product.store.reviewsCount} reviews</span>
+											<span>{(product as any).store.reviewsCount} reviews</span>
 											<span>•</span>
-											<span>{product.store.productsCount} products</span>
+											<span>{(product as any).store.productsCount} products</span>
 										</div>
 									)}
-									{product.store?.isVerified && (
+									{(product as any).store?.isVerified && (
 										<Badge
 											variant="secondary"
 											className="mt-1 text-xs bg-primary/10 text-primary"
@@ -512,7 +547,7 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 									)}
 								</div>
 								<Button variant="outline" size="sm" asChild className="bg-transparent">
-									<Link href={`/stores/${product.storeId}`}>View Store</Link>
+									<Link href={`/stores/${(product as any).storeId}`}>View Store</Link>
 								</Button>
 							</div>
 						</div>
@@ -526,9 +561,9 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 						</div>
 
 						{/* Tags */}
-						{product.tags.length > 0 && (
+						{(product.badges ? [product.badges] : []).length > 0 && (
 							<div className="flex flex-wrap gap-2">
-								{product.tags.map((tag) => (
+								{(product.badges ? [product.badges] : []).map((tag) => (
 									<Link
 										key={tag}
 										href={`/search?q=${tag}`}
@@ -547,22 +582,22 @@ export function ProductDetailContent({ productId }: ProductDetailContentProps) {
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 space-y-12">
 				{/* More from same seller */}
 				<MoreFromSeller
-					sellerId={product.sellerId}
-					storeId={product.storeId}
+					sellerId={product.seller.id}
+					storeId={(product as any).storeId}
 					currentProductId={product.id}
-					storeName={product.store?.name}
+					storeName={(product as any).store?.name}
 				/>
 
-				{/* Related products by category */}
-				<RelatedProducts currentProduct={product} />
+			{/* Related products by category */}
+			<RelatedProducts currentProduct={mappedProduct as any} />
 
 				{/* Recently viewed */}
 				<RecentlyViewed excludeProductId={product.id} />
 			</div>
 
-			<MakeOfferModal
-				product={product}
-				open={isMakeOfferOpen}
+		<MakeOfferModal
+			product={mappedProduct as any}
+			open={isMakeOfferOpen}
 				onOpenChange={setIsMakeOfferOpen}
 				onSubmit={handleSubmitOffer}
 			/>

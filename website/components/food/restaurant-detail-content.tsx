@@ -31,8 +31,7 @@ import {
 	SheetTrigger,
 } from "@/components/ui/sheet";
 import { RestaurantsCarousel } from "@/components/home/restaurants-carousel";
-import { mockMenu } from "@/data/food/restaurant-detail";
-import { mockRestaurants } from "@/data/food/restaurants";
+import { useRestaurant, useRestaurantMenu, useRestaurants } from "@/hooks/queries/useRestaurants";
 import { cn } from "@/lib/utils";
 import type { MenuItem } from "@/types/models";
 
@@ -56,34 +55,43 @@ export function RestaurantDetailContent({
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isLiked, setIsLiked] = useState(false);
 
-	// Use initial data if provided, otherwise fallback to mock
-	const restaurant = initialRestaurant
+	const { data: restaurantData } = useRestaurant(restaurantId);
+	const { data: menuData } = useRestaurantMenu(restaurantId);
+	const { data: allRestaurantsData } = useRestaurants({ limit: 10 } as any);
+	const nearbyRestaurants = ((allRestaurantsData as any)?.data ?? []).filter(
+		(r: any) => r.id !== restaurantId,
+	).slice(0, 10);
+
+	// Use initial data if provided, otherwise use API data
+	const rawRestaurant = initialRestaurant || (restaurantData as any)?.data;
+	const restaurant = rawRestaurant
 		? {
-			id: initialRestaurant.id,
-			name: initialRestaurant.name,
-			description: initialRestaurant.description,
-			logo: initialRestaurant.logo,
-			banner: initialRestaurant.banner,
-			cuisine: [initialRestaurant.category],
-			rating: initialRestaurant.rating,
-			reviewsCount: initialRestaurant.totalReviews,
-			deliveryTime: initialRestaurant.deliveryTime,
-			deliveryFee: initialRestaurant.deliveryFee,
-			minOrder: initialRestaurant.minOrder,
-			isOpen: initialRestaurant.isOpen,
-			tags: initialRestaurant.tags || [],
-			ownerId: initialRestaurant.owner?.id || "",
-			owner: initialRestaurant.owner || {},
+			id: rawRestaurant.id,
+			name: rawRestaurant.name,
+			description: rawRestaurant.description,
+			logo: rawRestaurant.logo,
+			banner: rawRestaurant.banner,
+			cuisine: [rawRestaurant.category],
+			rating: rawRestaurant.rating,
+			reviewsCount: rawRestaurant.totalReviews,
+			deliveryTime: rawRestaurant.deliveryTime,
+			deliveryFee: rawRestaurant.deliveryFee,
+			minOrder: rawRestaurant.minOrder,
+			isOpen: rawRestaurant.isOpen,
+			tags: rawRestaurant.tags || [],
+			ownerId: rawRestaurant.owner?.id || "",
+			owner: rawRestaurant.owner || {},
 			location: {
-				street: initialRestaurant.location || "Campus Area",
+				street: rawRestaurant.location || "Campus Area",
 			},
-			phone: initialRestaurant.phone || "+233 XX XXX XXXX",
+			phone: rawRestaurant.phone || "+233 XX XXX XXXX",
 		}
-		: mockRestaurants.find((r) => r.id === restaurantId) || mockRestaurants[0];
+		: null;
 
 	// Transform menu
-	const menu = initialMenu?.categories
-		? initialMenu.categories.map((cat: { name: string; items: any[] }) => ({
+	const rawMenu = initialMenu || (menuData as any)?.data;
+	const menu = rawMenu?.categories
+		? rawMenu.categories.map((cat: { name: string; items: any[] }) => ({
 			category: cat.name,
 			items: cat.items.map((item: any) => ({
 				id: item.id,
@@ -97,7 +105,7 @@ export function RestaurantDetailContent({
 				isPopular: item.isPopular || false,
 			})),
 		}))
-		: mockMenu;
+		: [];
 
 	const [activeCategory, setActiveCategory] = useState(menu[0]?.category || "");
 
@@ -142,6 +150,17 @@ export function RestaurantDetailContent({
 
 	// Get popular items
 	const popularItems = menu.flatMap((cat: { items: MenuItem[] }) => cat.items).filter((item: any) => item.isPopular).slice(0, 6);
+
+	if (!restaurant) {
+		return (
+			<div className="min-h-screen flex items-center justify-center">
+				<div className="text-center">
+					<div className="w-10 h-10 rounded-full animate-pulse mx-auto mb-3" style={{ background: "var(--ink-4)" }} />
+					<p style={{ color: "var(--ink-3)" }}>Loading restaurant…</p>
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className="min-h-screen bg-background">
@@ -613,7 +632,7 @@ export function RestaurantDetailContent({
 			<section className="py-10 px-4 sm:px-6 lg:px-8 bg-muted/30 mt-8">
 				<div className="mx-auto max-w-7xl">
 					<RestaurantsCarousel
-						restaurants={mockRestaurants.filter((r) => r.id !== restaurantId).slice(0, 10)}
+						restaurants={nearbyRestaurants}
 						title="You Might Also Like"
 						subtitle="Similar restaurants near you"
 						viewAllLink="/restaurants"

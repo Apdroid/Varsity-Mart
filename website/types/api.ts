@@ -35,6 +35,59 @@ export interface ApiResponse<T = any> {
 	message?: string
 }
 
+/** Image object returned inside an ApiProduct */
+export interface ApiProductImage {
+	id: string
+	product: string
+	url: string
+	thumbnail_url: string
+	optimized_url: string
+	width: number
+	height: number
+	format: string
+	display_order: number
+	created_at: string
+}
+
+/** Shape returned by /products/ list endpoint */
+export interface ApiProduct {
+	id: string
+	title: string
+	description: string
+	price: string
+	originalPrice: string
+	images: ApiProductImage[]
+	category: { id: string; name: string; icon: string; count?: number }
+	condition: string
+	location: string
+	seller: {
+		id: string
+		name: string
+		email: string
+		avatar: string
+		rating: string
+	}
+	badges: string
+	status: string
+	views: number
+	likes: number
+	isNightShop: boolean
+	createdAt: string
+}
+
+/** DRF paginated list response for products */
+export interface ProductsApiResponse {
+	count: number
+	next: string | null
+	previous: string | null
+	results: ApiProduct[]
+}
+
+export interface SingleProductApiResponse {
+	success: boolean
+	data: ApiProduct
+}
+
 export interface PaginationParams {
 	page?: number
 	limit?: number

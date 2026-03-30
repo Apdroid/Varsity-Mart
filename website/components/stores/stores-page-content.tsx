@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { StoresCarousel } from "@/components/home/stores-carousel"
-import { mockStores } from "@/data/stores/stores"
+import { useStores } from "@/hooks/queries/useStores"
 import type { Store as StoreType } from "@/types/models"
 
 // Store Card Component
@@ -96,27 +96,26 @@ export function StoresPageContent() {
   const [sortBy, setSortBy] = useState("rating")
   const [filterVerified, setFilterVerified] = useState<string>("all")
 
-  // Filter and sort stores
-  const filteredStores = mockStores
+  const { data, isLoading } = useStores({ search: searchQuery || undefined } as any)
+  const allStores: StoreType[] = (data as any)?.data ?? []
+
+  const filteredStores = allStores
     .filter((store) => {
-      const matchesSearch =
-        store.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        store.description?.toLowerCase().includes(searchQuery.toLowerCase())
       const matchesVerified =
         filterVerified === "all" ||
         (filterVerified === "verified" && store.isVerified) ||
         (filterVerified === "unverified" && !store.isVerified)
-      return matchesSearch && matchesVerified
+      return matchesVerified
     })
     .sort((a, b) => {
-      if (sortBy === "rating") return b.rating - a.rating
-      if (sortBy === "products") return b.productsCount - a.productsCount
-      if (sortBy === "reviews") return b.reviewsCount - a.reviewsCount
+      if (sortBy === "rating") return (b.rating ?? 0) - (a.rating ?? 0)
+      if (sortBy === "products") return (b.productsCount ?? 0) - (a.productsCount ?? 0)
+      if (sortBy === "reviews") return (b.reviewsCount ?? 0) - (a.reviewsCount ?? 0)
       return 0
     })
 
-  const verifiedStores = mockStores.filter((s) => s.isVerified)
-  const topRatedStores = mockStores.filter((s) => s.rating >= 4.5)
+  const verifiedStores = allStores.filter((s) => s.isVerified)
+  const topRatedStores = allStores.filter((s) => (s.rating ?? 0) >= 4.5)
 
   return (
     <div className="py-8">

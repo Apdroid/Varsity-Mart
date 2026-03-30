@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ProductsCarousel } from "@/components/home/products-carousel";
 import type { Product } from "@/types/models";
 import { useProducts } from "@/hooks/queries/useProducts";
+import { apiProductToModel } from "@/lib/utils/api-product-mapper";
 import { Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -59,9 +60,9 @@ export function RelatedProducts({ currentProduct, className }: RelatedProductsPr
 		);
 	}
 
-	const relatedProducts = Array.isArray(response?.data)
-		? response.data.filter(p => p.id !== currentProduct.id)
-		: [];
+	const relatedProducts = (response?.results ?? [])
+		.filter(p => p.id !== currentProduct.id)
+		.map(apiProductToModel);
 
 	if (relatedProducts.length === 0) return null;
 
@@ -119,9 +120,9 @@ export function MoreFromSeller({
 		);
 	}
 
-	const sellerProducts = Array.isArray(response?.data)
-		? response.data.filter(p => p.id !== currentProductId)
-		: [];
+	const sellerProducts = (response?.results ?? [])
+		.filter(p => p.id !== currentProductId)
+		.map(apiProductToModel);
 
 	if (sellerProducts.length === 0) return null;
 
@@ -179,7 +180,7 @@ export function RecentlyViewed({ excludeProductId, className }: RecentlyViewedPr
 		);
 	}
 
-	const recentProducts = Array.isArray(response?.data) ? response.data : []
+	const recentProducts = (response?.results ?? []).map(apiProductToModel)
 
 	if (recentProducts.length === 0) return null
 

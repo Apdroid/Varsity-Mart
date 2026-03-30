@@ -167,13 +167,5 @@ const RestaurantsSection: React.FC<RestaurantsSectionProps> = ({
 		</section>
 	);
 };
-import { mockRestaurants } from "@/data/food/restaurants";
-
 export { RestaurantsSection, RestaurantCard };
 export default RestaurantsSection;
-
-export const RestaurantsSectionExample = () => {
-	return (
-		<RestaurantsSection restaurants={mockRestaurants.slice(0, 8)} />
-	);
-};
