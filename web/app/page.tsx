@@ -1,5 +1,4 @@
 import Link from "next/link"
-
 import HeroSlider from "@/components/main/hero"
 import Newsletter from "@/components/main/newsletter"
 import { ProductCard, type Product } from "@/components/main/product-card"
@@ -45,7 +44,7 @@ function SectionHeader({
 	)
 }
 
-function getStoreProducts(store: Store, limit = 8): Product[] {
+function getStoreProducts(store: Store, limit = 9): Product[] {
 	const category = store.category.toLowerCase()
 	const tokens: string[] = []
 
