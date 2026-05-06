@@ -5,20 +5,13 @@ meta {
 }
 
 post {
-  url: {{base_url}}/orders/:orderId/cancel
-  body: json
+  url: {{baseUrl}}/orders/:orderId/cancel
+  body: none
   auth: inherit
 }
 
 params:path {
   orderId: 
-}
-
-body:json {
-  {
-    "reason": "changed_mind",
-    "details": "Found a better price elsewhere"
-  }
 }
 
 settings {

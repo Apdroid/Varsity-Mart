@@ -5,9 +5,16 @@ meta {
 }
 
 get {
-  url: {{base_url}}/admin/message-reports/
+  url: {{baseUrl}}/admin/message-reports/
   body: none
   auth: inherit
+}
+
+params:query {
+  ~reviewed: 
+  ~days: 
+  ~page: 
+  ~limit: 
 }
 
 settings {

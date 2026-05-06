@@ -5,19 +5,13 @@ meta {
 }
 
 patch {
-  url: {{base_url}}/restaurants/:restaurantId/
-  body: json
+  url: {{baseUrl}}/restaurants/:restaurantId/
+  body: none
   auth: inherit
 }
 
 params:path {
   restaurantId: 
-}
-
-body:json {
-  {
-    "deliveryFee": "4.00"
-  }
 }
 
 settings {

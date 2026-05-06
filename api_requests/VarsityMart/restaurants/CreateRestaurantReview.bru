@@ -5,21 +5,13 @@ meta {
 }
 
 post {
-  url: {{base_url}}/restaurants/:restaurant_pk/reviews/
-  body: json
+  url: {{baseUrl}}/restaurants/:restaurant_pk/reviews/
+  body: none
   auth: inherit
 }
 
 params:path {
   restaurant_pk: 
-}
-
-body:json {
-  {
-    "rating": 5,
-    "review": "Amazing food and fast delivery!",
-    "images": []
-  }
 }
 
 settings {

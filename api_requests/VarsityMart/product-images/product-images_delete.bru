@@ -1,0 +1,45 @@
+meta {
+  name: product-images_delete
+  type: http
+  seq: 2
+  tags: [
+    product-images
+  ]
+}
+
+delete {
+  url: {{baseUrl}}/product-images/:id/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+example {
+  name: 204 Response
+  
+  request: {
+    url: {{baseUrl}}/product-images/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 204
+      text: No Content
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

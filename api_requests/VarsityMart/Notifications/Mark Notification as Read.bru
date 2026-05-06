@@ -1,0 +1,106 @@
+meta {
+  name: Mark Notification as Read
+  type: http
+  seq: 6
+  tags: [
+    Notifications
+  ]
+}
+
+post {
+  url: {{baseUrl}}/notifications/:notification_id/read/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  notification_id: 
+}
+
+docs {
+  Mark a specific notification as read by its UUID
+}
+
+example {
+  name: 200 Response
+  description: Notification marked as read successfully
+  
+  request: {
+    url: {{baseUrl}}/notifications/:notification_id/read/
+    method: POST
+    mode: none
+    params:path: {
+      notification_id: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Unauthorized - Authentication required
+  
+  request: {
+    url: {{baseUrl}}/notifications/:notification_id/read/
+    method: POST
+    mode: none
+    params:path: {
+      notification_id: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Not Found
+  
+  request: {
+    url: {{baseUrl}}/notifications/:notification_id/read/
+    method: POST
+    mode: none
+    params:path: {
+      notification_id: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

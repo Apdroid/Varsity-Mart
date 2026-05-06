@@ -1,0 +1,78 @@
+meta {
+  name: Confirm Food Order Delivery
+  type: http
+  seq: 4
+  tags: [
+    Food_Orders
+  ]
+}
+
+post {
+  url: {{baseUrl}}/food-orders/:orderId/confirm-delivery
+  body: none
+  auth: inherit
+}
+
+params:path {
+  orderId: 
+}
+
+docs {
+  Confirm food order delivery
+}
+
+example {
+  name: 200 Response
+  description: Delivery confirmed
+  
+  request: {
+    url: {{baseUrl}}/food-orders/:orderId/confirm-delivery
+    method: POST
+    mode: none
+    params:path: {
+      orderId: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Order not found
+  
+  request: {
+    url: {{baseUrl}}/food-orders/:orderId/confirm-delivery
+    method: POST
+    mode: none
+    params:path: {
+      orderId: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

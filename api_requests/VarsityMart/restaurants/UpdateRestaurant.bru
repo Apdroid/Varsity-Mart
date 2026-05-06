@@ -5,28 +5,13 @@ meta {
 }
 
 put {
-  url: {{base_url}}/restaurants/:restaurantId/
-  body: json
+  url: {{baseUrl}}/restaurants/:restaurantId/
+  body: none
   auth: inherit
 }
 
 params:path {
   restaurantId: 
-}
-
-body:json {
-  {
-    "restaurantName": "Campus Bites",
-    "description": "Best campus food around",
-    "category": "660e8400-e29b-41d4-a716-446655440020",
-    "location": "KNUST, Kumasi",
-    "phone": "+233201234567",
-    "openingTime": "08:00",
-    "closingTime": "22:00",
-    "deliveryFee": "5.00",
-    "deliveryTime": "30",
-    "minOrder": 10
-  }
 }
 
 settings {

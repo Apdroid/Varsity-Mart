@@ -5,19 +5,13 @@ meta {
 }
 
 patch {
-  url: {{base_url}}/cart/:itemId
-  body: json
+  url: {{baseUrl}}/cart/:itemId
+  body: none
   auth: inherit
 }
 
 params:path {
-  itemId: 
-}
-
-body:json {
-  {
-    "quantity": 2
-  }
+  itemId: 550e8400-e29b-41d4-a716-446655440000
 }
 
 settings {

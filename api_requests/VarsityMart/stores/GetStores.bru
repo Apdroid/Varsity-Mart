@@ -5,9 +5,14 @@ meta {
 }
 
 get {
-  url: {{base_url}}/stores/
+  url: {{baseUrl}}/stores/
   body: none
   auth: inherit
+}
+
+params:query {
+  ~page: 
+  ~limit: 
 }
 
 settings {

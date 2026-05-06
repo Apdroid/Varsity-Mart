@@ -1,0 +1,68 @@
+meta {
+  name: Add Payment Method
+  type: http
+  seq: 2
+  tags: [
+    Payments_-_Methods
+  ]
+}
+
+post {
+  url: {{baseUrl}}/payments/methods
+  body: none
+  auth: inherit
+}
+
+docs {
+  Add a new payment method (MoMo, Card, or Bank)
+}
+
+example {
+  name: 201 Response
+  description: Payment method added
+  
+  request: {
+    url: {{baseUrl}}/payments/methods
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation error
+  
+  request: {
+    url: {{baseUrl}}/payments/methods
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

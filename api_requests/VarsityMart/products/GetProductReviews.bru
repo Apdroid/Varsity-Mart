@@ -5,9 +5,14 @@ meta {
 }
 
 get {
-  url: {{base_url}}/products/:product_pk/reviews/
+  url: {{baseUrl}}/products/:product_pk/reviews/
   body: none
   auth: inherit
+}
+
+params:query {
+  ~page: 
+  ~limit: 
 }
 
 params:path {

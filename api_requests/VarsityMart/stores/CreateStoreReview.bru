@@ -5,21 +5,13 @@ meta {
 }
 
 post {
-  url: {{base_url}}/stores/:store_pk/reviews/
-  body: json
+  url: {{baseUrl}}/stores/:store_pk/reviews/
+  body: none
   auth: inherit
 }
 
 params:path {
   store_pk: 
-}
-
-body:json {
-  {
-    "rating": 5,
-    "review": "Excellent store with great products!",
-    "images": []
-  }
 }
 
 settings {

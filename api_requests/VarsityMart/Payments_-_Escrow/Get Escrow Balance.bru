@@ -1,0 +1,43 @@
+meta {
+  name: Get Escrow Balance
+  type: http
+  seq: 1
+  tags: [
+    Payments_-_Escrow
+  ]
+}
+
+get {
+  url: {{baseUrl}}/payments/escrow/balance
+  body: none
+  auth: inherit
+}
+
+docs {
+  Get escrow balance and transaction history for sellers
+}
+
+example {
+  name: 200 Response
+  description: Escrow balance retrieved
+  
+  request: {
+    url: {{baseUrl}}/payments/escrow/balance
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

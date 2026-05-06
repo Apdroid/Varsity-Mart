@@ -1,0 +1,68 @@
+meta {
+  name: Request Payout
+  type: http
+  seq: 2
+  tags: [
+    Payments_-_Payouts
+  ]
+}
+
+post {
+  url: {{baseUrl}}/payments/payout
+  body: none
+  auth: inherit
+}
+
+docs {
+  Request a payout from released escrow funds
+}
+
+example {
+  name: 201 Response
+  description: Payout requested
+  
+  request: {
+    url: {{baseUrl}}/payments/payout
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation error or insufficient funds
+  
+  request: {
+    url: {{baseUrl}}/payments/payout
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
