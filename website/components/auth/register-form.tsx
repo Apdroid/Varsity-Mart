@@ -77,6 +77,7 @@ export default function RegisterForm() {
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+	const [registerError, setRegisterError] = useState<string | null>(null);
 
 	const form = useForm<RegisterFormValues>({
 		resolver: zodResolver(registerSchema),
@@ -152,6 +153,7 @@ export default function RegisterForm() {
 
 	const onSubmit = async (data: RegisterFormValues) => {
 		setIsLoading(true);
+		setRegisterError(null);
 		let registrationSucceeded = false;
 		try {
 			await registerAsync({
@@ -168,7 +170,8 @@ export default function RegisterForm() {
 				studentId: data.isStudent ? data.studentId : undefined,
 			});
 			registrationSucceeded = true;
-		} catch (error) {
+		} catch (error: any) {
+			setRegisterError(error?.response?.data?.message || "Registration failed. Please try again.");
 			console.error("Registration failed:", error);
 		} finally {
 			if (registrationSucceeded && data.avatar instanceof File) {
@@ -188,109 +191,188 @@ export default function RegisterForm() {
 	};
 
 	return (
-		<AuthLayout 
-			title={STEPS[currentStep - 1].title} 
-			description={STEPS[currentStep - 1].description}
-			className="max-w-lg"
-		>
-			{/* Progress */}
-			<div className="flex items-center justify-between mb-6">
-				{STEPS.map((step, index) => (
-					<div key={step.id} className="flex items-center">
-						<div
-							className={cn(
-								"w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
-								currentStep >= step.id
-									? "bg-primary text-primary-foreground"
-									: "bg-muted text-muted-foreground"
-							)}
-						>
-							{currentStep > step.id ? <Check className="h-4 w-4" /> : step.id}
+		<div className="min-h-screen flex">
+			{/* Left Side - Illustration Panel */}
+			<div className="hidden lg:flex lg:w-1/2 xl:w-[55%] bg-gradient-to-br from-primary/5 via-background to-primary/10 relative overflow-hidden">
+				{/* Decorative background pattern */}
+				<div className="absolute inset-0 opacity-30">
+					<svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+						<defs>
+							<pattern id="grid-register" width="40" height="40" patternUnits="userSpaceOnUse">
+								<circle cx="20" cy="20" r="1" className="fill-primary/20" />
+							</pattern>
+						</defs>
+						<rect width="100%" height="100%" fill="url(#grid-register)" />
+					</svg>
+				</div>
+
+				<div className="relative z-10 flex flex-col justify-between p-8 xl:p-12 w-full">
+					{/* Logo */}
+					<Link href="/" className="inline-flex items-center gap-2.5 text-foreground hover:text-primary transition-colors w-fit group">
+						<div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground shadow-lg group-hover:scale-105 transition-transform">
+							<ShoppingBag className="h-5 w-5" />
 						</div>
-						{index < STEPS.length - 1 && (
-							<div
-								className={cn(
-									"w-8 sm:w-12 h-1 mx-1",
-									currentStep > step.id ? "bg-primary" : "bg-muted"
-								)}
-							/>
-						)}
+						<span className="font-bold text-xl tracking-tight">VarsityMart</span>
+					</Link>
+
+					{/* Center - Illustration & Content */}
+					<div className="flex-1 flex flex-col items-center justify-center py-8">
+						{/* Registration Celebration Illustration */}
+						<svg viewBox="0 0 500 400" className="w-full max-w-md" fill="none" xmlns="http://www.w3.org/2000/svg">
+							{/* Background Elements */}
+							<circle cx="250" cy="200" r="150" className="fill-primary/10" />
+							<circle cx="380" cy="80" r="40" className="fill-primary/5" />
+							<circle cx="100" cy="320" r="30" className="fill-primary/5" />
+							
+							{/* Floating Books */}
+							<g className="animate-pulse" style={{ animationDuration: "3s" }}>
+								<rect x="60" y="100" width="50" height="65" rx="3" className="fill-primary/20" />
+								<rect x="63" y="103" width="44" height="4" rx="1" className="fill-primary/40" />
+								<rect x="63" y="112" width="35" height="3" rx="1" className="fill-primary/30" />
+							</g>
+							
+							{/* Student Figure - Celebrating */}
+							<g>
+								{/* Body */}
+								<path d="M250 280 L250 340" className="stroke-foreground" strokeWidth="4" strokeLinecap="round" />
+								{/* Arms Up - Celebrating */}
+								<path d="M250 300 L210 260" className="stroke-foreground" strokeWidth="4" strokeLinecap="round" />
+								<path d="M250 300 L290 260" className="stroke-foreground" strokeWidth="4" strokeLinecap="round" />
+								{/* Legs */}
+								<path d="M250 340 L230 380" className="stroke-foreground" strokeWidth="4" strokeLinecap="round" />
+								<path d="M250 340 L270 380" className="stroke-foreground" strokeWidth="4" strokeLinecap="round" />
+								{/* Head */}
+								<circle cx="250" cy="255" r="28" className="fill-primary/20 stroke-foreground" strokeWidth="3" />
+								{/* Happy Face */}
+								<circle cx="240" cy="252" r="3" className="fill-foreground" />
+								<circle cx="260" cy="252" r="3" className="fill-foreground" />
+								<path d="M240 265 Q250 275 260 265" className="stroke-foreground" strokeWidth="2" fill="none" strokeLinecap="round" />
+								{/* Graduation Cap */}
+								<path d="M220 240 L250 225 L280 240 L250 255 Z" className="fill-primary" />
+								<rect x="248" y="220" width="4" height="15" className="fill-primary" />
+								<circle cx="250" cy="218" r="5" className="fill-primary" />
+							</g>
+							
+							{/* Shopping Bag */}
+							<g transform="translate(330, 280)">
+								<rect x="0" y="15" width="45" height="50" rx="5" className="fill-primary/80" />
+								<path d="M10 15 L10 5 Q22.5 -5 35 5 L35 15" className="stroke-primary-foreground" strokeWidth="3" fill="none" />
+								<circle cx="22.5" cy="40" r="8" className="fill-primary-foreground/30" />
+							</g>
+							
+							{/* Confetti */}
+							<rect x="180" y="200" width="8" height="8" rx="1" className="fill-primary animate-bounce" style={{ animationDelay: "0s" }} />
+							<rect x="300" y="180" width="6" height="6" rx="1" className="fill-primary/60 animate-bounce" style={{ animationDelay: "0.2s" }} />
+							<rect x="220" y="170" width="7" height="7" rx="1" className="fill-primary/80 animate-bounce" style={{ animationDelay: "0.4s" }} />
+							<circle cx="350" cy="220" r="4" className="fill-primary/50 animate-bounce" style={{ animationDelay: "0.3s" }} />
+							<circle cx="160" cy="230" r="5" className="fill-primary/70 animate-bounce" style={{ animationDelay: "0.5s" }} />
+						</svg>
+						
+						<div className="mt-8 text-center max-w-md">
+							<h2 className="text-2xl xl:text-3xl font-bold text-foreground mb-3">
+								{selectedRole === "seller" ? "Start Selling Today" : "Join the Campus Community"}
+							</h2>
+							<p className="text-muted-foreground">
+								{selectedRole === "seller"
+									? "Turn your items into cash. Join thousands of student sellers."
+									: "Create your account and start buying, selling, and connecting with students."
+								}
+							</p>
+						</div>
+
+						{/* Feature list */}
+						<div className="mt-8 space-y-3">
+							{(selectedRole === "seller" ? [
+								"Zero listing fees for students",
+								"Instant campus-wide reach",
+								"Secure payments guaranteed",
+							] : [
+								"Buy & sell textbooks and more",
+								"Connect directly with campus sellers",
+								"Exclusive student deals and offers",
+							]).map((feature) => (
+								<div key={feature} className="flex items-center gap-3 text-sm">
+									<div className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/20 text-primary">
+										<Check className="w-3 h-3" />
+									</div>
+									<span className="text-foreground">{feature}</span>
+								</div>
+							))}
+						</div>
 					</div>
-				))}
+
+					{/* Bottom - Stats */}
+					<div className="flex items-center justify-center gap-8 text-center">
+						<div>
+							<p className="text-2xl font-bold text-primary">10K+</p>
+							<p className="text-xs text-muted-foreground">Active Students</p>
+						</div>
+						<div className="w-px h-8 bg-border" />
+						<div>
+							<p className="text-2xl font-bold text-primary">50+</p>
+							<p className="text-xs text-muted-foreground">Universities</p>
+						</div>
+						<div className="w-px h-8 bg-border" />
+						<div>
+							<p className="text-2xl font-bold text-primary">100K+</p>
+							<p className="text-xs text-muted-foreground">Items Traded</p>
+						</div>
+					</div>
+				</div>
 			</div>
 
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-					{/* Step 1: Account Type */}
-					{currentStep === 1 && (
-						<div className="space-y-4">
-							<FormField
-								control={form.control}
-								name="role"
-								render={({ field }) => (
-									<FormItem>
-										<FormControl>
-											<div className="grid grid-cols-2 gap-3">
-												<button
-													type="button"
-													onClick={() => field.onChange("buyer")}
-													className={cn(
-														"flex flex-col items-center p-4 rounded-lg border-2 transition-all",
-														field.value === "buyer"
-															? "border-primary bg-primary/5"
-															: "border-border hover:border-primary/50"
-													)}
-												>
-													<ShoppingBag className="h-6 w-6 text-primary mb-2" />
-													<span className="font-medium">Buy</span>
-													<span className="text-xs text-muted-foreground">Shop on campus</span>
-												</button>
+			{/* Right Side - Form */}
+			<div className="flex-1 flex flex-col min-h-screen bg-background">
+				{/* Mobile Header */}
+				<header className="lg:hidden p-4 border-b border-border">
+					<Link href="/" className="inline-flex items-center gap-2 text-foreground">
+						<div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground">
+							<ShoppingBag className="h-4 w-4" />
+						</div>
+						<span className="font-bold text-lg">VarsityMart</span>
+					</Link>
+				</header>
 
-												<button
-													type="button"
-													onClick={() => field.onChange("seller")}
-													className={cn(
-														"flex flex-col items-center p-4 rounded-lg border-2 transition-all",
-														field.value === "seller"
-															? "border-primary bg-primary/5"
-															: "border-border hover:border-primary/50"
-													)}
-												>
-													<Store className="h-6 w-6 text-primary mb-2" />
-													<span className="font-medium">Sell</span>
-													<span className="text-xs text-muted-foreground">Start selling</span>
-												</button>
-											</div>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							<div className="relative">
-								<div className="absolute inset-0 flex items-center">
-									<span className="w-full border-t border-border" />
-								</div>
-								<div className="relative flex justify-center text-xs">
-									<span className="bg-card px-2 text-muted-foreground">or</span>
-								</div>
+				{/* Form Content */}
+				<div className="flex-1 flex items-center justify-center p-6 sm:p-8">
+					<div className="w-full max-w-md">
+						{/* Progress Indicator */}
+						<div className="mb-8">
+							<div className="flex items-center justify-between mb-2">
+								{STEPS.map((step, index) => (
+									<div key={step.id} className="flex items-center">
+										<div
+											className={cn(
+												"w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors",
+												currentStep > step.id
+													? "bg-primary text-primary-foreground"
+													: currentStep === step.id
+														? "bg-primary text-primary-foreground"
+														: "bg-muted text-muted-foreground"
+											)}
+										>
+											{currentStep > step.id ? (
+												<Check className="h-4 w-4" />
+											) : (
+												step.id
+											)}
+										</div>
+										{index < STEPS.length - 1 && (
+											<div
+												className={cn(
+													"w-12 sm:w-16 h-1 mx-1",
+													currentStep > step.id ? "bg-primary" : "bg-muted"
+												)}
+											/>
+										)}
+									</div>
+								))}
 							</div>
-
-							<Button
-								type="button"
-								variant="outline"
-								className="w-full"
-								onClick={handleGoogleAuth}
-								disabled={isLoading}
-							>
-								<svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
-									<path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-									<path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-									<path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-									<path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-								</svg>
-								Continue with Google
-							</Button>
+							<div className="text-center mt-4">
+								<h1 className="text-xl font-semibold">{STEPS[currentStep - 1].title}</h1>
+								<p className="text-sm text-muted-foreground">{STEPS[currentStep - 1].description}</p>
+								<p className="text-xs text-primary/90 mt-1">{STEP_ENCOURAGEMENT[currentStep]}</p>
+							</div>
 						</div>
 					)}
 
@@ -408,20 +490,110 @@ export default function RegisterForm() {
 										</FormControl>
 									</FormItem>
 								)}
-							/>
 
-							<FormField
-								control={form.control}
-								name="university"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>University</FormLabel>
-										<Select
-											onValueChange={(value) => {
-												field.onChange(value);
-												form.setValue("campus", "");
-											}}
-											defaultValue={field.value}
+								{/* Step 4: Security */}
+								{currentStep === 4 && (
+									<div className="space-y-4">
+										{registerError && (
+											<div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-lg">
+												{registerError}
+											</div>
+										)}
+
+										<FormField
+											control={form.control}
+											name="password"
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>Password</FormLabel>
+													<FormControl>
+														<div className="relative">
+															<Input
+																type={showPassword ? "text" : "password"}
+																placeholder="••••••••"
+																autoComplete="new-password"
+																disabled={isLoading || isRegistering}
+																className="h-11 pr-10"
+																{...field}
+															/>
+															<button
+																type="button"
+																onClick={() => setShowPassword(!showPassword)}
+																className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+															>
+																{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+															</button>
+														</div>
+													</FormControl>
+													<FormDescription className="text-xs">Minimum 8 characters</FormDescription>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+
+										<FormField
+											control={form.control}
+											name="confirm_password"
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>Confirm password</FormLabel>
+													<FormControl>
+														<div className="relative">
+															<Input
+																type={showConfirmPassword ? "text" : "password"}
+																placeholder="••••••••"
+																autoComplete="new-password"
+																disabled={isLoading || isRegistering}
+																className="h-11 pr-10"
+																{...field}
+															/>
+															<button
+																type="button"
+																onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+																className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+															>
+																{showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+															</button>
+														</div>
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+
+										<FormField
+											control={form.control}
+											name="agree_to_terms"
+											render={({ field }) => (
+												<FormItem className="flex items-start gap-3 rounded-xl border-2 border-muted p-4">
+													<FormControl>
+														<Checkbox
+															checked={field.value}
+															onCheckedChange={field.onChange}
+															disabled={isLoading || isRegistering}
+															className="mt-0.5 h-5 w-5 rounded border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+														/>
+													</FormControl>
+													<FormLabel className="text-sm font-normal cursor-pointer leading-snug">
+														I agree to the{" "}
+														<Link href="/terms" className="text-primary hover:underline">Terms of Service</Link>{" "}
+														and{" "}
+														<Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+													</FormLabel>
+												</FormItem>
+											)}
+										/>
+										<p className="text-xs text-center text-primary/90">You&apos;re at the finish line - create your account to start exploring campus deals.</p>
+									</div>
+								)}
+
+								{/* Navigation Buttons */}
+								<div className="flex gap-3 pt-4">
+									{currentStep > 1 && (
+										<Button
+											type="button"
+											variant="outline"
+											onClick={prevStep}
 											disabled={isLoading || isRegistering}
 										>
 											<FormControl>

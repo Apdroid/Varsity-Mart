@@ -28,6 +28,7 @@ type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 export function ForgotPasswordForm() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isSubmitted, setIsSubmitted] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 	const form = useForm<ForgotPasswordFormValues>({
 		resolver: zodResolver(forgotPasswordSchema),
@@ -38,11 +39,13 @@ export function ForgotPasswordForm() {
 
 	const onSubmit = async (data: ForgotPasswordFormValues) => {
 		setIsLoading(true);
+		setError(null);
 		try {
 			await authService.forgotPassword(data.email);
 			setIsSubmitted(true);
-		} catch (error) {
-			console.error(error);
+		} catch (err: any) {
+			setError(err?.response?.data?.message || "Failed to send reset link. Please try again.");
+			console.error(err);
 		} finally {
 			setIsLoading(false);
 		}
@@ -53,6 +56,7 @@ export function ForgotPasswordForm() {
 			<AuthLayout
 				title="Check your email"
 				description="We've sent you a password reset link"
+				variant="verify"
 			>
 				<div className="text-center space-y-6">
 					{/* Success Icon */}
@@ -103,9 +107,16 @@ export function ForgotPasswordForm() {
 		<AuthLayout
 			title="Forgot password?"
 			description="No worries, we'll send you reset instructions"
+			variant="forgot"
 		>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+					{error && (
+						<div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-lg">
+							{error}
+						</div>
+					)}
+
 					{/* Email */}
 					<FormField
 						control={form.control}

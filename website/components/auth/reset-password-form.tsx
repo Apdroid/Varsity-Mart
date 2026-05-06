@@ -66,7 +66,7 @@ export function ResetPasswordForm() {
 
 	if (isSubmitted) {
 		return (
-			<AuthLayout title="Password Reset" description="Your password has been successfully reset">
+			<AuthLayout title="Password Reset" description="Your password has been successfully reset" variant="reset">
 				<div className="space-y-6 py-4">
 					<div className="flex flex-col items-center justify-center text-center space-y-4">
 						<div className="h-16 w-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
@@ -88,7 +88,7 @@ export function ResetPasswordForm() {
 	}
 
 	return (
-		<AuthLayout title="Reset Password" description="Enter your new password below">
+		<AuthLayout title="Reset Password" description="Enter your new password below" variant="reset">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 					{error && (

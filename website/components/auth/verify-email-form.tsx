@@ -141,7 +141,7 @@ export function VerifyEmailForm() {
 
 	if (status === "verifying" && codeFromUrl) {
 		return (
-			<AuthLayout title="Verifying your email" description="Please wait a moment...">
+			<AuthLayout title="Verifying your email" description="Please wait a moment..." variant="verify">
 				<div className="flex flex-col items-center justify-center py-8 space-y-4">
 					<Loader2 className="h-10 w-10 animate-spin text-primary" />
 					<p className="text-sm text-muted-foreground">
@@ -157,6 +157,7 @@ export function VerifyEmailForm() {
 			<AuthLayout
 				title="Email Verified"
 				description="Your email address has been confirmed"
+				variant="verify"
 			>
 				<div className="space-y-6 text-center py-4">
 					<div className="mx-auto w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
@@ -179,6 +180,7 @@ export function VerifyEmailForm() {
 			<AuthLayout
 				title="Check your email"
 				description="A new verification link has been sent"
+				variant="verify"
 			>
 				<div className="space-y-6 text-center">
 					<div className="mx-auto w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
@@ -210,6 +212,7 @@ export function VerifyEmailForm() {
 			<AuthLayout
 				title="Resend verification"
 				description="Enter your email to receive a new verification link"
+				variant="verify"
 			>
 				<Form {...resendForm}>
 					<form onSubmit={resendForm.handleSubmit(onResend)} className="space-y-5">
@@ -273,6 +276,7 @@ export function VerifyEmailForm() {
 		<AuthLayout
 			title="Verify your email"
 			description="Enter the verification code sent to your email"
+			variant="verify"
 		>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
