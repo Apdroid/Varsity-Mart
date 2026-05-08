@@ -63,6 +63,7 @@ import {
 } from "@/components/ui/sheet"
 import Logo from "./logo";
 import Link from "next/link";
+import { CartSheet } from "@/components/cart/cart-sheet";
 
 
 const categories = [
@@ -168,6 +169,7 @@ function MainBar() {
 	return (
 		<div className=" bg-card">
 			<div className="container mx-auto flex justify-between h-20 items-center gap-6 px-4">
+				{/* Mobile Navigation Menu */}
 				<Sheet>
 					<SheetTrigger asChild>
 						<Button variant="ghost" size="icon" className="lg:hidden">
@@ -175,8 +177,8 @@ function MainBar() {
 							<span className="sr-only">Open menu</span>
 						</Button>
 					</SheetTrigger>
-					<SheetContent side="left" className="w-80 p-0">
-						<SheetHeader className="border-b p-4">
+					<SheetContent side="left" className="w-80 p-0 border-none">
+						<SheetHeader className=" p-4">
 							<SheetTitle className="text-left">
 								<Logo variant="header" />
 							</SheetTitle>
@@ -196,6 +198,7 @@ function MainBar() {
 					</SheetContent>
 				</Sheet>
 
+
 				<Link href="/" className="shrink-0">
 					<Logo variant="header" />
 				</Link>
@@ -205,11 +208,10 @@ function MainBar() {
 						<MagnifyingGlassIcon className="ml-4 h-4 w-4 shrink-0 text-muted-foreground" />
 						<Input
 							placeholder="Search for jollof, hoodies, textbooks…"
-							className="h-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+							className="h-full border-0 bg-inherit dark:bg-inherit shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
 						/>
-						<Separator orientation="vertical" className="h-5" />
 						<Select defaultValue="All Categories">
-							<SelectTrigger className="h-full w-38.75 border-0 bg-transparent text-sm shadow-none focus:ring-0 focus:ring-offset-0">
+							<SelectTrigger className="h-full w-38.75 border-0 dark:bg-inherit bg-transparent text-sm shadow-none focus:ring-0 focus:ring-offset-0">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent align="end">
@@ -231,9 +233,6 @@ function MainBar() {
 
 
 				<div className="flex items-center gap-0.5 sm:gap-1">
-				<Button variant="ghost" size="icon" className="md:hidden">
-					<MagnifyingGlassIcon className="h-5 w-5" />
-				</Button>
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<Button
@@ -275,26 +274,7 @@ function MainBar() {
 						</TooltipContent>
 					</Tooltip>
 
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="relative h-10 w-10"
-								aria-label="Cart"
-							>
-								<ShoppingBagIcon className="h-7 w-7" />
-								<Badge
-									className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-2 border-background bg-vm-tangerine p-0 text-[10px] font-bold leading-none text-white"
-								>
-									3
-								</Badge>
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent side="bottom">
-							<p>Cart</p>
-						</TooltipContent>
-					</Tooltip>
+					<CartSheet />
 				</div>
 			</div>
 		</div>
@@ -446,6 +426,53 @@ function NavBar() {
 }
 
 /* -----------------------------------------------------------
+	 Mobile search + quick-filter bar (below main row, mobile only)
+----------------------------------------------------------- */
+function MobileSearchBar() {
+	return (
+		<div className="md:hidden bg-card border-t border-border/40 px-4 pb-3 pt-2">
+			<div className="relative flex h-11 items-center overflow-hidden rounded-full bg-accent transition-all focus-within:bg-background focus-within:shadow-sm">
+				<MagnifyingGlassIcon className="ml-4 h-4 w-4 shrink-0 text-muted-foreground" />
+				<Input
+					placeholder="Search products, food, stores…"
+					className="h-full border-0 bg-inherit dark:bg-inherit shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+				/>
+				<button
+					type="button"
+					className="mr-1.5 ml-1 flex h-8 shrink-0 cursor-pointer items-center rounded-full bg-vm-tangerine px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+				>
+					Search
+				</button>
+			</div>
+
+			<div className="mt-2.5 flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+				<Link
+					href="/search"
+					className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+				>
+					<ShoppingBagIcon className="h-3.5 w-3.5 text-vm-tangerine" />
+					Products
+				</Link>
+				<Link
+					href="/restaurants"
+					className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+				>
+					<ForkKnifeIcon className="h-3.5 w-3.5 text-vm-tangerine" />
+					Food
+				</Link>
+				<Link
+					href="/stores"
+					className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+				>
+					<MapPinIcon className="h-3.5 w-3.5 text-vm-tangerine" />
+					Stores
+				</Link>
+			</div>
+		</div>
+	)
+}
+
+/* -----------------------------------------------------------
 	 Composed header
 ----------------------------------------------------------- */
 export default function VarsityMartHeader() {
@@ -454,6 +481,7 @@ export default function VarsityMartHeader() {
 			<header className="sticky top-0 z-50 w-full shadow-sm">
 				<AnnouncementBar />
 				<MainBar />
+				<MobileSearchBar />
 				<NavBar />
 			</header>
 		</>

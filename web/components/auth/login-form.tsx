@@ -48,11 +48,11 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 			{...props}
 		>
 			{!emailMode ? (
-				<div className="mt-6 flex animate-in fade-in flex-col gap-3 duration-200">
+				<div className="mt-6 flex animate-in fade-in flex-col gap-4 duration-200">
 					<Button
 						variant="outline"
 						type="button"
-						className="gap-4 border p-6"
+						className="gap-4 p-6 outline-none border-none rounded-full"
 					>
 						<Google.Color size={40} />
 						<span>Continue with Google</span>
@@ -60,7 +60,7 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 					<Button
 						type="button"
 						onClick={() => setEmailMode(true)}
-						className="gap-3 p-6 text-base"
+						className="gap-3 p-6 text-base rounded-full"
 					>
 						<Mail className="h-5 w-5" />
 						<span>Sign in with email</span>
@@ -98,7 +98,7 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 											<Input
 												type="email"
 												placeholder="john.doe@university.edu.gh"
-												className="bg-accent p-6"
+												className="bg-accent rounded-full border-none p-6"
 												autoComplete="email"
 												{...field}
 											/>
@@ -122,7 +122,7 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 											</Link>
 										</div>
 										<FormControl>
-											<PasswordInput autoComplete="current-password" {...field} />
+											<PasswordInput autoComplete="current-password" className="rounded-full" {...field} />
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -132,7 +132,7 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 								<Button
 									type="submit"
 									disabled={isSubmitting}
-									className="text-base p-6"
+									className="text-base p-6 rounded-full"
 								>
 									Sign in
 								</Button>

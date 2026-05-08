@@ -189,19 +189,19 @@ export default function StoresPage() {
         </div>
       </section>
 
-      <section className="sticky top-16 z-20 rounded-lg  bg-card/95 p-3 backdrop-blur-sm">
+      <section className="sticky top-16 z-20 rounded-lg   p-3 backdrop-blur-sm">
         <div className="hidden items-center gap-2 md:flex">
-          <div className="relative min-w-0 flex-1">
+          <div className="relative min-w-0 flex-1 ">
             <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={search}
               onChange={(event) => handleSearchChange(event.target.value)}
               placeholder="Search stores..."
-              className="rounded-lg bg-card pl-9"
+              className="rounded-full bg-inherit px-9 py-6"
             />
           </div>
           <Select value={category} onValueChange={handleCategoryChange}>
-            <SelectTrigger className="h-9 w-[170px] rounded-md bg-card">
+            <SelectTrigger className="px-9 py-6 rounded-lg bg-card">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
@@ -214,7 +214,7 @@ export default function StoresPage() {
             </SelectContent>
           </Select>
           <Select value={status} onValueChange={(value) => handleStatusChange(value as StatusFilter)}>
-            <SelectTrigger className="h-9 w-35 rounded-md bg-card">
+            <SelectTrigger className="px-9 py-6 rounded-lg bg-card">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -224,7 +224,7 @@ export default function StoresPage() {
             </SelectContent>
           </Select>
           <Select value={sort} onValueChange={(value) => handleSortChange(value as SortFilter)}>
-            <SelectTrigger className="h-9 w-42.5 rounded-md bg-card">
+            <SelectTrigger className="px-9 py-6  rounded-lg bg-card">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -241,12 +241,12 @@ export default function StoresPage() {
               if (value) setViewMode(value as ViewMode)
             }}
             variant="outline"
-            className="ml-auto"
+            className="ml-auto border border-border outline-1 ring-1 ring-muted" 
           >
-            <ToggleGroupItem value="grid" aria-label="Grid view">
+            <ToggleGroupItem value="grid" aria-label="Grid view" className="px-8 py-6">
               <LayoutGrid className="h-4 w-4" />
             </ToggleGroupItem>
-            <ToggleGroupItem value="list" aria-label="List view">
+            <ToggleGroupItem value="list" aria-label="List view" className="px-8 py-6">
               <List className="h-4 w-4" />
             </ToggleGroupItem>
           </ToggleGroup>

@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel"
 import { cn } from "@/lib/utils"
 
 type Slide = {
@@ -179,6 +180,89 @@ function HeroSlider() {
 }
 
 /* -----------------------------------------------------------
+	 Mobile app-style hero carousel (shown below lg breakpoint)
+----------------------------------------------------------- */
+function MobileHeroCarousel() {
+	const [api, setApi] = React.useState<CarouselApi>()
+	const [current, setCurrent] = React.useState(0)
+
+	React.useEffect(() => {
+		if (!api) return
+		api.on("select", () => setCurrent(api.selectedScrollSnap()))
+	}, [api])
+
+	React.useEffect(() => {
+		if (!api) return
+		const id = setInterval(() => api.scrollNext(), 5000)
+		return () => clearInterval(id)
+	}, [api])
+
+	return (
+		<div className="space-y-3">
+			<Carousel setApi={setApi} opts={{ loop: true }} className="w-full">
+				<CarouselContent className="-ml-0">
+					{slides.map((slide) => (
+						<CarouselItem key={slide.title} className="pl-0">
+							<div
+								className={cn(
+									"relative h-[300px] w-full overflow-hidden rounded-2xl",
+									slide.bgClass
+								)}
+							>
+								<img
+									src={slide.image}
+									alt=""
+									className="absolute inset-0 h-full w-full object-cover object-center"
+								/>
+								{/* Bottom gradient */}
+								<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+
+								{/* Slide content */}
+								<div className="absolute inset-x-0 bottom-0 p-5">
+									<span className="inline-block rounded-full bg-vm-tangerine px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white">
+										{slide.eyebrow}
+									</span>
+									<h2 className="mt-2 text-2xl font-black leading-tight text-white">
+										{slide.title}{" "}
+										<span className="text-vm-tangerine">{slide.highlight}</span>
+									</h2>
+									<p className="mt-1 line-clamp-1 text-xs text-white/70">
+										{slide.description}
+									</p>
+									<button
+										type="button"
+										className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-xs font-bold text-vm-graphite shadow-sm active:scale-95"
+									>
+										{slide.cta}
+										<ArrowRight className="h-3 w-3" />
+									</button>
+								</div>
+							</div>
+						</CarouselItem>
+					))}
+				</CarouselContent>
+			</Carousel>
+
+			{/* Dot indicators */}
+			<div className="flex justify-center gap-1.5">
+				{slides.map((_, i) => (
+					<button
+						key={i}
+						type="button"
+						onClick={() => api?.scrollTo(i)}
+						aria-label={`Go to slide ${i + 1}`}
+						className={cn(
+							"h-1.5 rounded-full transition-all duration-300",
+							i === current ? "w-6 bg-vm-graphite" : "w-1.5 bg-border hover:bg-muted-foreground"
+						)}
+					/>
+				))}
+			</div>
+		</div>
+	)
+}
+
+/* -----------------------------------------------------------
 	 Promo card — used twice on the right column
 ----------------------------------------------------------- */
 type PromoProps = {
@@ -314,37 +398,48 @@ function FeaturesStrip() {
 ----------------------------------------------------------- */
 export default function VarsityMartHeroBento() {
 	return (
-		<section className="container mx-auto px-4 py-6">
-			<div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-				{/* Slider — spans 2 columns on desktop */}
-				<div className="lg:col-span-2">
-					<HeroSlider />
-				</div>
+		<section>
+			{/* Mobile: app-style carousel */}
+			<div className="px-4 pt-4 pb-2 lg:hidden">
+				<MobileHeroCarousel />
+			</div>
 
-				{/* Right column — 2 stacked promos */}
-				<div className="grid grid-cols-1 gap-4">
-					<PromoCard
-						eyebrow="Restaurant Rush"
-						title="Campus"
-						subtitle="Food Deals"
-						cta="View Restaurants"
-						bgClass="bg-[#ededed]"
-						accent="graphite"
-						image="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=400&fit=crop"
-					/>
-					<PromoCard
-						eyebrow="Top Stores"
-						title="Vendor"
-						subtitle="Spotlight"
-						cta="Browse Stores"
-						bgClass="bg-[#f5e9dd]"
-						accent="tangerine"
-						image="https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=400&h=400&fit=crop"
-					/>
+			{/* Desktop: bento grid */}
+			<div className="container mx-auto hidden px-4 py-6 lg:block">
+				<div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+					{/* Slider — spans 2 columns */}
+					<div className="lg:col-span-2">
+						<HeroSlider />
+					</div>
+
+					{/* Right column — 2 stacked promos */}
+					<div className="grid grid-cols-1 gap-4">
+						<PromoCard
+							eyebrow="Restaurant Rush"
+							title="Campus"
+							subtitle="Food Deals"
+							cta="View Restaurants"
+							bgClass="bg-[#ededed]"
+							accent="graphite"
+							image="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=400&fit=crop"
+						/>
+						<PromoCard
+							eyebrow="Top Stores"
+							title="Vendor"
+							subtitle="Spotlight"
+							cta="Browse Stores"
+							bgClass="bg-[#f5e9dd]"
+							accent="tangerine"
+							image="https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=400&h=400&fit=crop"
+						/>
+					</div>
 				</div>
 			</div>
 
-			<FeaturesStrip />
+			{/* Features strip — both breakpoints */}
+			<div className="container mx-auto px-4 pb-6">
+				<FeaturesStrip />
+			</div>
 		</section>
 	)
 }

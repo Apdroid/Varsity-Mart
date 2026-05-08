@@ -107,7 +107,7 @@ export function RestaurantCard({ restaurant, className }: RestaurantCardProps) {
 					height={1200}
           alt=""
           className={cn(
-            "h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-105",
+            "h-full w-full rounded-lg object-cover transition-all duration-700 ease-out group-hover:scale-105",
             !restaurant.isOpen && "grayscale"
           )}
           loading="lazy"
@@ -205,11 +205,9 @@ export function RestaurantCard({ restaurant, className }: RestaurantCardProps) {
           )}
         </div>
 
-        <div className="border-t border-dashed border-border" />
 
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-1.5 text-foreground">
-            <Bike className="h-3.5 w-3.5 text-muted-foreground" />
             {free ? (
               <span className="font-semibold text-vm-tangerine">Free delivery</span>
             ) : (
@@ -221,7 +219,6 @@ export function RestaurantCard({ restaurant, className }: RestaurantCardProps) {
           </div>
 
           <div className="flex items-center gap-1.5 text-muted-foreground">
-            <ShoppingBag className="h-3.5 w-3.5" />
             <span>
               Min{" "}
               <span className="font-semibold text-foreground">

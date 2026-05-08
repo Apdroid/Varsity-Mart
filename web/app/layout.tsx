@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils";
 import { Metadata } from "next";
 import { DownloadAppCard } from "@/components/global/download-app-card";
+import { Toaster } from "sonner";
 
 
 const fontSans = Plus_Jakarta_Sans({
@@ -43,6 +44,7 @@ export default function RootLayout({
 					<ThemeProvider>
 						{children}
 						<DownloadAppCard />
+						<Toaster richColors position="bottom-right" />
 					</ThemeProvider>
 				</TooltipProvider>
 			</body>

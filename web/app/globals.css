@@ -34,7 +34,7 @@
 	--chart-3: oklch(0.702 0.165 41.116);
 	--chart-4: oklch(0.553 0.195 38.402);
 	--chart-5: oklch(0.47 0.157 37.304);
-	--radius: 0.525rem;
+	--radius: 0.725rem;
 	--sidebar: oklch(0.985 0 0);
 	--sidebar-foreground: oklch(0.145 0 0);
 	--sidebar-primary: oklch(0.702 0.165 41.116);
@@ -130,11 +130,12 @@
 
 @layer base {
 	* {
-		@apply leading-loose list-none;
+		@apply leading-loose list-none border-none outline-none ring-0;
+
 	}
 
 	body {
-		@apply font-body bg-background text-foreground antialiased;
+		@apply font-body bg-background  text-foreground antialiased;
 	}
 
 	h1,

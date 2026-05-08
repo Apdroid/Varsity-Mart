@@ -21,7 +21,7 @@ function Newsletter() {
 						<Input
 							type="email"
 							placeholder="your.name@knust.edu.gh"
-							className="h-11 pl-10 focus-visible:ring-0 focus-visible:ring-offset-0"
+							className="h-11 pl-10 focus-visible:ring-0 focus-visible:ring-offset-0 border-none"
 						/>
 					</div>
 					<Button

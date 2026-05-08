@@ -156,7 +156,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 									<Button
 										variant="outline"
 										type="button"
-										className="gap-4 rounded-lg bg-transparent p-6"
+										className="gap-4 rounded-full bg-transparent p-6"
 									>
 										<Google.Color size={40} />
 										<span>Continue with Google</span>
@@ -177,7 +177,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 													placeholder="John"
 													autoFocus
 													autoComplete="given-name"
-													className="p-6"
+													className="p-6 rounded-full"
 													{...field}
 												/>
 											</FormControl>
@@ -196,7 +196,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 													type="text"
 													placeholder="Doe"
 													autoComplete="family-name"
-													className="p-6"
+													className="p-6 rounded-full"
 													{...field}
 												/>
 											</FormControl>
@@ -215,7 +215,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 													type="email"
 													placeholder="john.doe@example.com"
 													autoComplete="email"
-													className="p-6"
+													className="p-6 rounded-full"
 													{...field}
 												/>
 											</FormControl>
@@ -232,7 +232,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 											<FormControl>
 												<PasswordInput
 													autoComplete="new-password"
-													className="p-6"
+													className="p-6 rounded-full"
 													{...field}
 												/>
 											</FormControl>
@@ -260,7 +260,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 									<Button
 										type="button"
 										onClick={handleNext}
-										className="text-md p-6"
+										className="text-md p-6 rounded-full"
 									>
 										Continue
 									</Button>
@@ -288,7 +288,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 													placeholder="+233201234567"
 													autoFocus
 													autoComplete="tel"
-													className="p-6"
+													className="p-6 rounded-full"
 													{...field}
 												/>
 											</FormControl>
@@ -336,7 +336,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 														type="email"
 														placeholder="john.doe@university.edu.gh"
 														autoComplete="email"
-														className="p-6"
+														className="p-6 rounded-full"
 														{...field}
 													/>
 												</FormControl>
@@ -358,7 +358,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 												<Input
 													type="text"
 													placeholder="UGBS123456"
-													className="p-6"
+													className="p-6 rounded-full"
 													disabled={!isStudent}
 													{...field}
 												/>

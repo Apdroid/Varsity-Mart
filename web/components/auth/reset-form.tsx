@@ -59,7 +59,7 @@ export function ResetForm({ className, ...props }: ComponentProps<"div">) {
                     <PasswordInput
                       autoFocus
                       autoComplete="new-password"
-                      className="p-6"
+                      className="p-6 rounded-full"
                       {...field}
                     />
                   </FormControl>
@@ -76,7 +76,7 @@ export function ResetForm({ className, ...props }: ComponentProps<"div">) {
                   <FormControl>
                     <PasswordInput
                       autoComplete="new-password"
-                      className="p-6"
+                      className="p-6 rounded-full"
                       {...field}
                     />
                   </FormControl>

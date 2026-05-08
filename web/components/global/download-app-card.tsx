@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Download, Smartphone } from "lucide-react"
+import { Download, Smartphone, XIcon } from "lucide-react"
 import Logo from "@/components/global/logo"
 
 export function DownloadAppCard() {
@@ -13,11 +13,19 @@ export function DownloadAppCard() {
 	}
 
 	return (
-		<div className="fixed bottom-4 right-4 z-50">
-			<div className="w-70 rounded-lg bg-card p-3 shadow-lg backdrop-blur supports-[backdrop-filter]:bg-card/95">
-				<div className="mb-2 flex items-center justify-between gap-2">
+		<div className="fixed md:hidden bottom-4 right-4 z-50">
+			<div className="w-70 rounded-lg bg-card p-3 shadow-lg backdrop-blur supports-backdrop-filter:bg-card/95">
+				<div className="cancel-btn absolute p-0.5 right-1 top-0 rounded-lg">
+					<button
+						type="button"
+						onClick={() => setIsVisible(false)}
+					>
+						<XIcon />
+					</button>
+				</div>
+				<div className="mb-2 mt-2 flex  flex-col-reverse  justify-between gap-2">
 					<Logo width={96} height={28} className="w-24" />
-					<span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+					<span className="inline-flex mt-3 items-center gap-1 rounded-full  px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
 						<Smartphone className="h-3 w-3 text-vm-tangerine" />
 						Mobile app
 					</span>
@@ -37,13 +45,6 @@ export function DownloadAppCard() {
 					<Download className="h-4 w-4" />
 					Download app
 				</Link>
-				<button
-					type="button"
-					onClick={() => setIsVisible(false)}
-					className="mt-2 w-full rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-				>
-					Cancel
-				</button>
 			</div>
 		</div>
 	)

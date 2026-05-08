@@ -60,7 +60,7 @@ export function ForgotForm({ className, ...props }: ComponentProps<"div">) {
                       placeholder="john.doe@university.edu.gh"
                       autoFocus
                       autoComplete="email"
-                      className="p-6"
+                      className="p-6 rounded-full"
                       {...field}
                     />
                   </FormControl>
@@ -72,7 +72,7 @@ export function ForgotForm({ className, ...props }: ComponentProps<"div">) {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="text-md p-6"
+                className="text-md p-6 rounded-full"
               >
                 Send reset link
               </Button>
