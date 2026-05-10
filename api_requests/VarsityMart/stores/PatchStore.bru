@@ -5,19 +5,13 @@ meta {
 }
 
 patch {
-  url: {{base_url}}/stores/:id/
-  body: json
+  url: {{baseUrl}}/stores/:id/
+  body: none
   auth: inherit
 }
 
 params:path {
   id: 
-}
-
-body:json {
-  {
-    "deliveryFee": "4.00"
-  }
 }
 
 settings {

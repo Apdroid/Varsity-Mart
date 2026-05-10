@@ -1,0 +1,68 @@
+meta {
+  name: Mark All Notifications as Read
+  type: http
+  seq: 2
+  tags: [
+    Notifications
+  ]
+}
+
+post {
+  url: {{baseUrl}}/notifications/read-all/
+  body: none
+  auth: inherit
+}
+
+docs {
+  Mark all notifications as read for the authenticated user
+}
+
+example {
+  name: 200 Response
+  description: All notifications marked as read
+  
+  request: {
+    url: {{baseUrl}}/notifications/read-all/
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Unauthorized - Authentication required
+  
+  request: {
+    url: {{baseUrl}}/notifications/read-all/
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

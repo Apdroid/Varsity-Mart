@@ -5,17 +5,13 @@ meta {
 }
 
 post {
-  url: {{base_url}}/products/:id/upload_images/
-  body: multipartForm
+  url: {{baseUrl}}/products/:id/upload_images/
+  body: none
   auth: inherit
 }
 
 params:path {
   id: 
-}
-
-body:multipart-form {
-  images: @file()
 }
 
 settings {

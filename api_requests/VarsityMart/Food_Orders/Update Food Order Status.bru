@@ -1,0 +1,78 @@
+meta {
+  name: Update Food Order Status
+  type: http
+  seq: 6
+  tags: [
+    Food_Orders
+  ]
+}
+
+patch {
+  url: {{baseUrl}}/food-orders/:orderId/status
+  body: none
+  auth: inherit
+}
+
+params:path {
+  orderId: 
+}
+
+docs {
+  Update food order status
+}
+
+example {
+  name: 200 Response
+  description: Order status updated
+  
+  request: {
+    url: {{baseUrl}}/food-orders/:orderId/status
+    method: PATCH
+    mode: none
+    params:path: {
+      orderId: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Order not found
+  
+  request: {
+    url: {{baseUrl}}/food-orders/:orderId/status
+    method: PATCH
+    mode: none
+    params:path: {
+      orderId: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

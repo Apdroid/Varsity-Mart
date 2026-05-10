@@ -5,9 +5,14 @@ meta {
 }
 
 get {
-  url: {{base_url}}/restaurants/
+  url: {{baseUrl}}/restaurants/
   body: none
   auth: inherit
+}
+
+params:query {
+  ~page: 
+  ~limit: 
 }
 
 settings {

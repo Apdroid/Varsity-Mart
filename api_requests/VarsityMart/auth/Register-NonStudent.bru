@@ -5,26 +5,9 @@ meta {
 }
 
 post {
-  url: {{base_url}}/auth/register/
-  body: json
+  url: {{baseUrl}}/auth/register/
+  body: none
   auth: inherit
-}
-
-body:json {
-  {
-    "full_name": "Eysteix",
-    "email": "vision060607@gmail.com",
-    "phone": "+233552216028",
-    "password": "test@123",
-    "confirm_password": "test@123",
-    "is_student": false,
-    "university": "KNUST",
-    "campus": "Kumasi",
-    "agree_to_terms": true,
-    "role": "buyer",
-    "auth_method": "credentials",
-    "profile_pic": "http://example.com"
-  }
 }
 
 settings {

@@ -5,15 +5,9 @@ meta {
 }
 
 patch {
-  url: {{base_url}}/users/me/
-  body: json
+  url: {{baseUrl}}/users/me/
+  body: none
   auth: inherit
-}
-
-body:json {
-  {
-    "phone": "+233201234567"
-  }
 }
 
 settings {

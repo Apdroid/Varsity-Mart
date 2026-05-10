@@ -1,0 +1,103 @@
+meta {
+  name: List Pending KYC Applications
+  type: http
+  seq: 1
+  tags: [
+    Admin_KYC_Review
+  ]
+}
+
+get {
+  url: {{baseUrl}}/admin/kyc/pending/
+  body: none
+  auth: inherit
+}
+
+docs {
+  
+  Returns every user whose KYC review is currently in `pending` state,
+  ordered by submission time (oldest first).
+  
+  ### Notes:
+  - Requires **staff / admin** credentials.
+  - `seller_type` is derived from whether the user has a pending Store (`products`)
+    or Restaurant (`food`) record. It may be `null` if no linked record is found.
+  - `kyc_document_type` is always `null` until a dedicated KYC submission model
+    is added; clients should degrade gracefully.
+  
+}
+
+example {
+  name: 200 Response
+  description: List of pending KYC applicants
+  
+  request: {
+    url: {{baseUrl}}/admin/kyc/pending/
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided.
+  
+  request: {
+    url: {{baseUrl}}/admin/kyc/pending/
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: You do not have permission to perform this action.
+  
+  request: {
+    url: {{baseUrl}}/admin/kyc/pending/
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

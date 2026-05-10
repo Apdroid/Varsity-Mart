@@ -5,18 +5,9 @@ meta {
 }
 
 put {
-  url: {{base_url}}/users/me/
-  body: json
+  url: {{baseUrl}}/users/me/
+  body: none
   auth: inherit
-}
-
-body:json {
-  {
-    "full_name": "John Doe",
-    "phone": "+233201234567",
-    "university": "KNUST",
-    "campus": "Kumasi"
-  }
 }
 
 settings {

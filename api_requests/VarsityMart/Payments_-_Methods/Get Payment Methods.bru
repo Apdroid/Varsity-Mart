@@ -1,0 +1,43 @@
+meta {
+  name: Get Payment Methods
+  type: http
+  seq: 1
+  tags: [
+    Payments_-_Methods
+  ]
+}
+
+get {
+  url: {{baseUrl}}/payments/methods
+  body: none
+  auth: inherit
+}
+
+docs {
+  Get all payment methods for the authenticated user
+}
+
+example {
+  name: 200 Response
+  description: Payment methods retrieved
+  
+  request: {
+    url: {{baseUrl}}/payments/methods
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

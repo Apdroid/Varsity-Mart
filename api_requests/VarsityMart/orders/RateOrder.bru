@@ -5,22 +5,13 @@ meta {
 }
 
 post {
-  url: {{base_url}}/orders/:orderId/rate
-  body: json
+  url: {{baseUrl}}/orders/:orderId/rate
+  body: none
   auth: inherit
 }
 
 params:path {
   orderId: 
-}
-
-body:json {
-  {
-    "rating": 5,
-    "review": "Great product! Fast delivery and exactly as described.",
-    "rateProduct": true,
-    "rateSeller": true
-  }
 }
 
 settings {

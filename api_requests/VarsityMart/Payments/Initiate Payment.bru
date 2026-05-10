@@ -1,0 +1,93 @@
+meta {
+  name: Initiate Payment
+  type: http
+  seq: 1
+  tags: [
+    Payments
+  ]
+}
+
+post {
+  url: {{baseUrl}}/payments/initiate
+  body: none
+  auth: inherit
+}
+
+docs {
+  Initiate a payment for order, subscription, or food order
+}
+
+example {
+  name: 201 Response
+  description: Payment initiated successfully
+  
+  request: {
+    url: {{baseUrl}}/payments/initiate
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation error
+  
+  request: {
+    url: {{baseUrl}}/payments/initiate
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Unauthorized
+  
+  request: {
+    url: {{baseUrl}}/payments/initiate
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

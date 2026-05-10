@@ -1,0 +1,145 @@
+meta {
+  name: Register/Update Device
+  type: http
+  seq: 1
+  tags: [
+    Devices
+  ]
+}
+
+post {
+  url: {{baseUrl}}/devices/register/
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: 
+}
+
+docs {
+  
+  Register a new device or update existing device with push notification token.
+  
+  **Token Type Detection:**
+  - For iOS devices, the system automatically detects APN tokens based on format:
+    - 64-character hexadecimal strings (traditional APN tokens)
+    - Strings starting with 'APNS' (newer APN tokens)
+  - All other devices use FCM tokens by default
+  
+  **Note:** The frontend continues to send 'fcm_token' field for all devices.
+  The backend automatically determines if it's an FCM or APN token based on format.
+  
+}
+
+example {
+  name: 200 Response
+  description: Device updated successfully
+  
+  request: {
+    url: {{baseUrl}}/devices/register/
+    method: POST
+    mode: none
+    headers: {
+      Authorization: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 201 Response
+  description: Device registered successfully
+  
+  request: {
+    url: {{baseUrl}}/devices/register/
+    method: POST
+    mode: none
+    headers: {
+      Authorization: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Bad Request - Invalid data or missing required fields
+  
+  request: {
+    url: {{baseUrl}}/devices/register/
+    method: POST
+    mode: none
+    headers: {
+      Authorization: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Unauthorized - Authentication required
+  
+  request: {
+    url: {{baseUrl}}/devices/register/
+    method: POST
+    mode: none
+    headers: {
+      Authorization: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

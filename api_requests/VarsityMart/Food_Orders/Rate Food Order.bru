@@ -1,0 +1,78 @@
+meta {
+  name: Rate Food Order
+  type: http
+  seq: 5
+  tags: [
+    Food_Orders
+  ]
+}
+
+post {
+  url: {{baseUrl}}/food-orders/:orderId/rate
+  body: none
+  auth: inherit
+}
+
+params:path {
+  orderId: 
+}
+
+docs {
+  Rate a food order
+}
+
+example {
+  name: 200 Response
+  description: Review submitted
+  
+  request: {
+    url: {{baseUrl}}/food-orders/:orderId/rate
+    method: POST
+    mode: none
+    params:path: {
+      orderId: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Order not found
+  
+  request: {
+    url: {{baseUrl}}/food-orders/:orderId/rate
+    method: POST
+    mode: none
+    params:path: {
+      orderId: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

@@ -5,20 +5,13 @@ meta {
 }
 
 patch {
-  url: {{base_url}}/products/:id/
-  body: json
+  url: {{baseUrl}}/products/:id/
+  body: none
   auth: inherit
 }
 
 params:path {
   id: 
-}
-
-body:json {
-  {
-    "price": "2200.00",
-    "stock": 1
-  }
 }
 
 settings {

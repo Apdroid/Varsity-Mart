@@ -5,21 +5,13 @@ meta {
 }
 
 put {
-  url: {{base_url}}/reviews/:id/
-  body: json
+  url: {{baseUrl}}/reviews/:id/
+  body: none
   auth: inherit
 }
 
 params:path {
   id: 
-}
-
-body:json {
-  {
-    "rating": 4,
-    "review": "Good product overall.",
-    "images": []
-  }
 }
 
 settings {

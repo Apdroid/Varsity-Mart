@@ -5,9 +5,16 @@ meta {
 }
 
 get {
-  url: {{base_url}}/admin/flagged-messages/
+  url: {{baseUrl}}/admin/flagged-messages/
   body: none
   auth: inherit
+}
+
+params:query {
+  ~days: 
+  ~reason: 
+  ~page: 
+  ~limit: 
 }
 
 settings {

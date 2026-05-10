@@ -5,21 +5,14 @@ meta {
 }
 
 patch {
-  url: {{base_url}}/restaurants/:restaurant_pk/menu/:id/
-  body: json
+  url: {{baseUrl}}/restaurants/:restaurant_pk/menu/:id/
+  body: none
   auth: inherit
 }
 
 params:path {
   restaurant_pk: 
   id: 
-}
-
-body:json {
-  {
-    "price": "22.00",
-    "isAvailable": true
-  }
 }
 
 settings {

@@ -1,0 +1,132 @@
+meta {
+  name: Submit Seller Activation Request
+  type: http
+  seq: 1
+  tags: [
+    Seller_Activation
+  ]
+}
+
+post {
+  url: {{baseUrl}}/auth/become-a-seller/
+  body: none
+  auth: inherit
+}
+
+docs {
+  
+  Submit an application to become a seller on VarsityMart.
+  
+  ### Process:
+  1. User must have a verified email before applying.
+  2. A pending **Store** (for `products`) or **Restaurant** (for `food`) record is created.
+  3. The user's `kyc_status` is set to `pending` until an admin approves or rejects it.
+  4. No role change occurs — the existing session and JWT remain valid throughout.
+  
+  ### Constraints:
+  - The user must **not** already own a store or restaurant.
+  - A user with `kyc_status` of `pending` or `approved` cannot re-apply.
+  - `bank_or_momo_details`, `kyc_document_type`, and `kyc_document_number` are
+    collected for manual admin review and are **not** persisted on the user record.
+  
+}
+
+example {
+  name: 201 Response
+  description: Application submitted successfully
+  
+  request: {
+    url: {{baseUrl}}/auth/become-a-seller/
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Bad request — duplicate application or already a seller
+  
+  request: {
+    url: {{baseUrl}}/auth/become-a-seller/
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided.
+  
+  request: {
+    url: {{baseUrl}}/auth/become-a-seller/
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Email not verified
+  
+  request: {
+    url: {{baseUrl}}/auth/become-a-seller/
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

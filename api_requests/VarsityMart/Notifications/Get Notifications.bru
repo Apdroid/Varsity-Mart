@@ -1,0 +1,84 @@
+meta {
+  name: Get Notifications
+  type: http
+  seq: 1
+  tags: [
+    Notifications
+  ]
+}
+
+get {
+  url: {{baseUrl}}/notifications/
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~page: 
+  ~limit: 
+  ~unreadOnly: 
+}
+
+docs {
+  Retrieve notifications for the authenticated user with pagination and filtering
+}
+
+example {
+  name: 200 Response
+  description: List of notifications with pagination
+  
+  request: {
+    url: {{baseUrl}}/notifications/
+    method: GET
+    mode: none
+    params:query: {
+      ~page: 
+      ~limit: 
+      ~unreadOnly: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Unauthorized - Authentication required
+  
+  request: {
+    url: {{baseUrl}}/notifications/
+    method: GET
+    mode: none
+    params:query: {
+      ~page: 
+      ~limit: 
+      ~unreadOnly: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

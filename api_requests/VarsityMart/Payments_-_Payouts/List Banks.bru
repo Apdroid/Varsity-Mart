@@ -1,0 +1,43 @@
+meta {
+  name: List Banks
+  type: http
+  seq: 1
+  tags: [
+    Payments_-_Payouts
+  ]
+}
+
+get {
+  url: {{baseUrl}}/payments/banks
+  body: none
+  auth: inherit
+}
+
+docs {
+  Get list of supported banks for Ghana
+}
+
+example {
+  name: 200 Response
+  description: Banks list retrieved
+  
+  request: {
+    url: {{baseUrl}}/payments/banks
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

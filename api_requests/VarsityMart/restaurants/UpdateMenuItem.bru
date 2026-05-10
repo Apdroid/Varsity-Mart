@@ -5,24 +5,14 @@ meta {
 }
 
 put {
-  url: {{base_url}}/restaurants/:restaurant_pk/menu/:id/
-  body: json
+  url: {{baseUrl}}/restaurants/:restaurant_pk/menu/:id/
+  body: none
   auth: inherit
 }
 
 params:path {
   restaurant_pk: 
   id: 
-}
-
-body:json {
-  {
-    "name": "Jollof Rice",
-    "description": "Classic West African jollof rice with chicken",
-    "price": "25.00",
-    "preparationTime": "20",
-    "isAvailable": true
-  }
 }
 
 settings {

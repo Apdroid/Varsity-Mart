@@ -1,0 +1,93 @@
+meta {
+  name: Unregister Device
+  type: http
+  seq: 2
+  tags: [
+    Devices
+  ]
+}
+
+delete {
+  url: {{baseUrl}}/devices/register/
+  body: none
+  auth: inherit
+}
+
+docs {
+  Unregister a device by device_id or fcm_token. At least one parameter is required.
+}
+
+example {
+  name: 200 Response
+  description: Device unregistered successfully
+  
+  request: {
+    url: {{baseUrl}}/devices/register/
+    method: DELETE
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Bad Request
+  
+  request: {
+    url: {{baseUrl}}/devices/register/
+    method: DELETE
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Unauthorized - Authentication required
+  
+  request: {
+    url: {{baseUrl}}/devices/register/
+    method: DELETE
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

@@ -5,31 +5,26 @@ meta {
 }
 
 post {
-  url: {{base_url}}/auth/register/
-  body: json
+  url: {{baseUrl}}/auth/register/
+  body: none
   auth: inherit
-}
-
-body:json {
-  {
-    "first_name": "Maajao",
-    "last_name":"jjjj",
-    "email": "maajao@st.knust.edu.gh",
-    "phone": "+233200616236",
-    "password": "maajao@123",
-    "confirm_password": "maajao@123",
-    "student_id": "21xxxxx",
-    "is_student": true,
-    "university": "KNUST",
-    "campus": "Kumasi",
-    "agree_to_terms": true,
-    "role": "buyer",
-    "auth_method": "credentials",
-    "profile_pic": "http://example.com"
-  }
 }
 
 settings {
   encodeUrl: true
   timeout: 0
+}
+
+docs {
+  
+  Register a new user on VarsityMart.
+  
+  - **Student registration**: If `is_student` is `true`, `student_id` is required.
+  - **Email domain**: Students must use a university email (containing `.edu`, `.edu.gh`, or `.ac.gh`). Disposable email domains are blocked.
+  - **Verification**: A 6‑digit verification code is sent to the email address. The code expires after 24 hours.
+  - **Authentication method**: Default is `credentials` (email + password). If `google` is used, the user is created without password (OAuth flow handled separately).
+  - **Cookies**: On success, HTTP‑only cookies containing JWT tokens are set automatically.
+  
+  **Note:** Even if the verification email fails to send immediately, the registration is still considered successful and a background task will retry sending it.
+  
 }

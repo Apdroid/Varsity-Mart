@@ -5,15 +5,9 @@ meta {
 }
 
 post {
-  url: {{base_url}}/auth/logout/
-  body: json
+  url: {{baseUrl}}/auth/logout/
+  body: none
   auth: inherit
-}
-
-body:json {
-  {
-    "logout_all":true
-  }
 }
 
 settings {
