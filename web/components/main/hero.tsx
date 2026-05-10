@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Image from "next/image"
+import Link from "next/link"
 import {
 	ArrowRight,
 	ChevronLeft,
@@ -23,6 +24,7 @@ type Slide = {
 	subtitle: string
 	description: string
 	cta: string
+	ctaHref: string
 	image: string
 	bgClass: string
 }
@@ -35,6 +37,7 @@ const slides: Slide[] = [
 		subtitle: "Fresh drops every week",
 		description: "From gadgets to hostel essentials, discover student-favorite deals.",
 		cta: "Shop Products",
+		ctaHref: "/products",
 		bgClass: "bg-[#f5e9dd]",
 		image:
 			"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=600&fit=crop",
@@ -46,6 +49,7 @@ const slides: Slide[] = [
 		subtitle: "Fast delivery around campus",
 		description: "Order waakye, pizza, smoothies, and late-night chops in minutes.",
 		cta: "Order Food",
+		ctaHref: "/restaurants",
 		bgClass: "bg-[#e8e4dc]",
 		image:
 			"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=600&fit=crop",
@@ -57,6 +61,7 @@ const slides: Slide[] = [
 		subtitle: "Verified campus sellers",
 		description: "Browse top vendors for fashion, books, tech, and daily essentials.",
 		cta: "Explore Stores",
+		ctaHref: "/stores",
 		bgClass: "bg-[#efe5d9]",
 		image:
 			"https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=600&h=600&fit=crop",
@@ -125,17 +130,22 @@ function HeroSlider() {
 									{slide.description}
 								</p>
 								<Button
+									asChild
 									className="mt-6 h-11 w-fit rounded-full bg-vm-graphite px-6 text-sm font-semibold text-white shadow-sm hover:opacity-90"
 								>
+									<Link href={slide.ctaHref}>
 									{slide.cta}
 									<ArrowRight className="ml-2 h-4 w-4" />
+									</Link>
 								</Button>
 							</div>
 
 							{/* Image */}
 							<div className="relative hidden md:block">
-								<img
+								<Image
 									src={slide.image}
+									width={1200}
+									height={1200}
 									alt=""
 									className="absolute inset-0 h-full w-full object-cover object-center"
 								/>
@@ -200,22 +210,24 @@ function MobileHeroCarousel() {
 	return (
 		<div className="space-y-3">
 			<Carousel setApi={setApi} opts={{ loop: true }} className="w-full">
-				<CarouselContent className="-ml-0">
+				<CarouselContent className="ml-0 gap-4" >
 					{slides.map((slide) => (
 						<CarouselItem key={slide.title} className="pl-0">
 							<div
 								className={cn(
-									"relative h-[300px] w-full overflow-hidden rounded-2xl",
+									"relative h-75 w-full overflow-hidden rounded-2xl",
 									slide.bgClass
 								)}
 							>
-								<img
+								<Image
 									src={slide.image}
+                  width={1200}
+									height={1200}
 									alt=""
 									className="absolute inset-0 h-full w-full object-cover object-center"
 								/>
 								{/* Bottom gradient */}
-								<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+								<div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/25 to-transparent" />
 
 								{/* Slide content */}
 								<div className="absolute inset-x-0 bottom-0 p-5">
@@ -224,18 +236,18 @@ function MobileHeroCarousel() {
 									</span>
 									<h2 className="mt-2 text-2xl font-black leading-tight text-white">
 										{slide.title}{" "}
-										<span className="text-vm-tangerine">{slide.highlight}</span>
+										<span className="text-white">{slide.highlight}</span>
 									</h2>
 									<p className="mt-1 line-clamp-1 text-xs text-white/70">
 										{slide.description}
 									</p>
-									<button
-										type="button"
+									<Link
+										href={slide.ctaHref}
 										className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-xs font-bold text-vm-graphite shadow-sm active:scale-95"
 									>
 										{slide.cta}
 										<ArrowRight className="h-3 w-3" />
-									</button>
+									</Link>
 								</div>
 							</div>
 						</CarouselItem>
@@ -270,6 +282,7 @@ type PromoProps = {
 	title: string
 	subtitle?: string
 	cta: string
+	href: string
 	image: string
 	bgClass: string
 	accent?: "graphite" | "tangerine"
@@ -280,6 +293,7 @@ function PromoCard({
 	title,
 	subtitle,
 	cta,
+	href,
 	image,
 	bgClass,
 	accent = "graphite",
@@ -288,8 +302,8 @@ function PromoCard({
 		accent === "tangerine" ? "text-vm-tangerine" : "text-vm-graphite"
 
 	return (
-		<a
-			href="#"
+		<Link
+			href={href}
 			className={cn(
 				"group/card relative flex h-full overflow-hidden rounded-2xl transition-transform duration-300 hover:-translate-y-0.5",
 				bgClass
@@ -331,7 +345,7 @@ function PromoCard({
 					className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-500 group-hover/card:scale-105"
 				/>
 			</div>
-		</a>
+		</Link>
 	)
 }
 
@@ -419,6 +433,7 @@ export default function VarsityMartHeroBento() {
 							title="Campus"
 							subtitle="Food Deals"
 							cta="View Restaurants"
+							href="/restaurants"
 							bgClass="bg-[#ededed]"
 							accent="graphite"
 							image="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=400&fit=crop"
@@ -428,6 +443,7 @@ export default function VarsityMartHeroBento() {
 							title="Vendor"
 							subtitle="Spotlight"
 							cta="Browse Stores"
+							href="/stores"
 							bgClass="bg-[#f5e9dd]"
 							accent="tangerine"
 							image="https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=400&h=400&fit=crop"

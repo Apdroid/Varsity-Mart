@@ -11,7 +11,7 @@
       "sourceUrl": "VM.yaml",
       "groupBy": "tags",
       "autoCheck": true,
-      "autoCheckInterval": 5,
+      "autoCheckInterval": 15,
       "lastSyncDate": "2026-05-06T04:55:28.917Z",
       "specHash": "8221fc94c9d22e1057c9a90a37030945"
     }

@@ -87,6 +87,10 @@ const searchCategories = [
 	"Home & Hostel Supplies",
 ] as const
 
+function getCategoryHref(label: string) {
+	return `/search?category=${encodeURIComponent(label.toLowerCase())}`
+}
+
 /* -----------------------------------------------------------
 	 1. Announcement bar — graphite background
 ----------------------------------------------------------- */
@@ -149,10 +153,22 @@ function AnnouncementBar() {
 					<Separator orientation="vertical" className="h-3 bg-white/15" />
 
 					<div className="flex items-center gap-3 text-white/75">
-						<a href="#" aria-label="Twitter" className="transition hover:text-white">
+						<a
+							href="https://x.com"
+							target="_blank"
+							rel="noreferrer"
+							aria-label="Twitter"
+							className="transition hover:text-white"
+						>
 							<XLogoIcon className="h-4 w-4" weight="bold" />
 						</a>
-						<a href="#" aria-label="Facebook" className="transition hover:text-white">
+						<a
+							href="https://facebook.com"
+							target="_blank"
+							rel="noreferrer"
+							aria-label="Facebook"
+							className="transition hover:text-white"
+						>
 							<FacebookLogoIcon className="h-4 w-4" weight="bold" size={32} />
 						</a>
 					</div>
@@ -185,14 +201,14 @@ function MainBar() {
 						</SheetHeader>
 						<nav className="flex flex-col p-2">
 							{categories.map(({ label, icon: Icon }) => (
-								<a
+								<Link
 									key={label}
-									href="#"
+									href={getCategoryHref(label)}
 									className="flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium transition hover:bg-muted"
 								>
 									<Icon className="h-4 w-4 text-muted-foreground" />
 									{label}
-								</a>
+								</Link>
 							))}
 						</nav>
 					</SheetContent>
@@ -346,13 +362,13 @@ function NavBar() {
 										"Local Brands",
 										"Clearance",
 									].map((item) => (
-										<a
+										<Link
 											key={item}
-											href="#"
+											href={`/search?query=${encodeURIComponent(item)}`}
 											className="rounded-md px-3 py-2 text-sm transition hover:bg-muted"
 										>
 											{item}
-										</a>
+										</Link>
 									))}
 								</div>
 							</NavigationMenuContent>
@@ -374,13 +390,13 @@ function NavBar() {
 										"Pre-order for Tomorrow",
 										"Group Orders",
 									].map((item) => (
-										<a
+										<Link
 											key={item}
-											href="#"
+											href={`/search?type=restaurants&query=${encodeURIComponent(item)}`}
 											className="rounded-md px-3 py-2 text-sm transition hover:bg-muted"
 										>
 											{item}
-										</a>
+										</Link>
 									))}
 								</div>
 							</NavigationMenuContent>
@@ -388,7 +404,7 @@ function NavBar() {
 
 						<NavigationMenuItem>
 							<NavigationMenuLink
-								href="#"
+								href="/stores"
 								className="inline-flex h-10 items-center px-3 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
 							>
 								Vendors
@@ -397,7 +413,7 @@ function NavBar() {
 
 						<NavigationMenuItem>
 							<NavigationMenuLink
-								href="#"
+								href="/help"
 								className="inline-flex h-10 items-center px-3 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
 							>
 								Track Order
@@ -406,7 +422,7 @@ function NavBar() {
 
 						<NavigationMenuItem>
 							<NavigationMenuLink
-								href="#"
+								href="/sell"
 								className="ml-1 inline-flex h-8 items-center bg-vm-tangerine gap-1.5 rounded-full px-4 text-sm font-semibold hover:text-black dark:hover:text-white text-white transition-opacity hover:opacity-90"
 							>
 								Become a Seller

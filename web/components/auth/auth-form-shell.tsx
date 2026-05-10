@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils"
-import Logo from "@/components/global/logo"
 import { Card, CardContent } from "@/components/ui/card"
 import { FieldDescription } from "@/components/ui/field"
+import Link from "next/link"
 import type { ComponentProps, ReactNode } from "react"
 
 type AuthFormShellProps = ComponentProps<"div"> & {
@@ -37,19 +37,19 @@ export function AuthFormShell({
 			{showLegalNotice ? (
 				<FieldDescription className="px-6 text-center text-black dark:text-white">
 					By clicking continue, you agree to our{" "}
-					<a
-						href="#"
+					<Link
+						href="/terms"
 						className="text-primary transition-all ease-linear hover:font-bold"
 					>
 						Terms of Service
-					</a>{" "}
+					</Link>{" "}
 					and{" "}
-					<a
-						href="#"
+					<Link
+						href="/privacy"
 						className="text-primary transition-all ease-linear hover:font-bold"
 					>
 						Privacy Policy
-					</a>
+					</Link>
 					.
 				</FieldDescription>
 			) : null}

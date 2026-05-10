@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Facebook, Twitter, Instagram, Youtube,  MapPin } from "lucide-react"
+import Link from "next/link"
 
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
@@ -16,39 +17,39 @@ type LinkGroup = {
 const linkGroups: LinkGroup[] = [
   {
     heading: "Marketplace",
-    links: [
-      { label: "Browse Products", href: "https://varsity-mart.vercel.app/products" },
-      { label: "Stores", href: "https://varsity-mart.vercel.app/stores" },
-      { label: "Food & Restaurants", href: "https://varsity-mart.vercel.app/restaurants" },
-      { label: "Categories", href: "https://varsity-mart.vercel.app/categories" },
-    ],
+      links: [
+        { label: "Browse Products", href: "/products" },
+        { label: "Stores", href: "/stores" },
+        { label: "Food & Restaurants", href: "/restaurants" },
+        { label: "Categories", href: "/categories" },
+      ],
   },
   {
     heading: "Selling",
-    links: [
-      { label: "Start Selling", href: "https://varsity-mart.vercel.app/sell" },
-      { label: "Seller Dashboard", href: "https://varsity-mart.vercel.app/seller/dashboard" },
-      { label: "Seller Guide", href: "https://varsity-mart.vercel.app/help/selling" },
-      { label: "Fees & Pricing", href: "https://varsity-mart.vercel.app/help/fees" },
-    ],
+      links: [
+        { label: "Start Selling", href: "/sell" },
+        { label: "Seller Dashboard", href: "/seller/dashboard" },
+        { label: "Seller Guide", href: "/help/selling" },
+        { label: "Fees & Pricing", href: "/help/fees" },
+      ],
   },
   {
     heading: "Support",
-    links: [
-      { label: "Help Center", href: "https://varsity-mart.vercel.app/help" },
-      { label: "Contact Us", href: "https://varsity-mart.vercel.app/contact" },
-      { label: "Safety Tips", href: "https://varsity-mart.vercel.app/help/safety" },
-      { label: "Report Issue", href: "https://varsity-mart.vercel.app/report" },
-    ],
+      links: [
+        { label: "Help Center", href: "/help" },
+        { label: "Contact Us", href: "/contact" },
+        { label: "Safety Tips", href: "/help/safety" },
+        { label: "Report Issue", href: "/report" },
+      ],
   },
   {
     heading: "Company",
-    links: [
-      { label: "About Us", href: "https://varsity-mart.vercel.app/about" },
-      { label: "Careers", href: "https://varsity-mart.vercel.app/careers" },
-      { label: "Privacy Policy", href: "https://varsity-mart.vercel.app/privacy" },
-      { label: "Terms of Service", href: "https://varsity-mart.vercel.app/terms" },
-    ],
+      links: [
+        { label: "About Us", href: "/about" },
+        { label: "Careers", href: "/careers" },
+        { label: "Privacy Policy", href: "/privacy" },
+        { label: "Terms of Service", href: "/terms" },
+      ],
   },
 ]
 
@@ -60,9 +61,9 @@ const socials = [
 ]
 
 const legalLinks = [
-  { label: "Privacy", href: "https://varsity-mart.vercel.app/privacy" },
-  { label: "Terms", href: "https://varsity-mart.vercel.app/terms" },
-  { label: "Cookies", href: "https://varsity-mart.vercel.app/cookies" },
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+  { label: "Cookies", href: "/cookies" },
 ]
 
 
@@ -87,14 +88,14 @@ export default function VarsityMartFooter() {
             {/* Socials */}
             <div className="mt-6 flex items-center gap-2">
               {socials.map(({ label, href, Icon }) => (
-                <a
+                <Link
                   key={label}
                   href={href}
                   aria-label={label}
                   className="grid h-9 w-9 place-items-center hover:bg-vm-tangerine rounded-full border border-white/15 text-white/80 transition hover:border-transparent hover:text-white"
                 >
                   <Icon className="h-4 w-4" />
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -116,12 +117,12 @@ export default function VarsityMartFooter() {
           <div className="flex items-center gap-1">
             {legalLinks.map((link, i) => (
               <React.Fragment key={link.label}>
-                <a
+                <Link
                   href={link.href}
                   className="px-2 text-white/80 transition hover:text-white"
                 >
                   {link.label}
-                </a>
+                </Link>
                 {i < legalLinks.length - 1 && (
                   <Separator
                     orientation="vertical"
@@ -152,7 +153,7 @@ function FooterLinkGroup({ group }: { group: LinkGroup }) {
       <ul className="space-y-3">
         {group.links.map((link) => (
           <li key={link.label}>
-            <a
+            <Link
               href={link.href}
               className={cn(
                 "group inline-flex items-center text-sm text-white/80",
@@ -165,7 +166,7 @@ function FooterLinkGroup({ group }: { group: LinkGroup }) {
               <span className="transition-all group-hover:translate-x-1">
                 {link.label}
               </span>
-            </a>
+            </Link>
           </li>
         ))}
       </ul>

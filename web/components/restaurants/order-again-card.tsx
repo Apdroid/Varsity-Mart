@@ -4,6 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 
 import type { Restaurant } from "@/components/main/restaurant-card"
+import { ArrowRightIcon } from "@phosphor-icons/react"
 
 type OrderAgainCardProps = {
   restaurant: Restaurant
@@ -24,7 +25,7 @@ export function OrderAgainCard({ restaurant }: OrderAgainCardProps) {
       />
       <div className="min-w-0">
         <p className="truncate text-sm font-semibold text-foreground">{restaurant.name}</p>
-        <p className="text-xs text-vm-tangerine">Order again →</p>
+        <p className="text-xs text-graphite flex align-items align-center gap-2 items-center"><span>Order again</span> <ArrowRightIcon className="text-vm-tangerine"/></p>
       </div>
     </Link>
   )

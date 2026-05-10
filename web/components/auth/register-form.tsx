@@ -429,13 +429,13 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 													/>
 													<div className="font-normal">
 														I agree to Varsity Mart&apos;s{" "}
-														<a href="#" className="text-primary underline-offset-2 hover:underline">
+														<Link href="/terms" className="text-primary underline-offset-2 hover:underline">
 															Terms
-														</a>{" "}
+														</Link>{" "}
 														and{" "}
-														<a href="#" className="text-primary underline-offset-2 hover:underline">
+														<Link href="/privacy" className="text-primary underline-offset-2 hover:underline">
 															Privacy Policy
-														</a>
+														</Link>
 													</div>
 												</div>
 											</FormControl>

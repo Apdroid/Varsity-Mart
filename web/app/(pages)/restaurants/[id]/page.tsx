@@ -115,21 +115,22 @@ export default function RestaurantPage() {
   const params = useParams<{ id: string }>()
   const restaurant = mockRestaurants.find((r) => r.id === params.id)
 
-  const [activeCategory, setActiveCategory] = React.useState<string>("")
+  const [activeCategory, setActiveCategory] = React.useState<string>(
+    restaurant?.menu.categories[0] ?? ""
+  )
   const [activeFilter, setActiveFilter] = React.useState<FilterKey>("all")
   const [customizing, setCustomizing] = React.useState<MenuItem | null>(null)
   const tabsRef = React.useRef<HTMLDivElement>(null)
 
-  React.useEffect(() => {
-    if (restaurant) setActiveCategory(restaurant.menu.categories[0])
-  }, [restaurant?.id])
-
   if (!restaurant) notFound()
 
   const { categories, items } = restaurant.menu
+  const currentCategory = categories.includes(activeCategory)
+    ? activeCategory
+    : categories[0]
 
   const visibleItems = applyFilter(
-    activeCategory ? items.filter((i) => i.category === activeCategory) : items,
+    currentCategory ? items.filter((i) => i.category === currentCategory) : items,
     activeFilter
   )
 
@@ -140,7 +141,7 @@ export default function RestaurantPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto min-h-screen bg-background pb-28">
+    <div className="max-w-7xl mx-auto min-h-screen bg-background pb-28 lg:pb-8">
       <RestaurantHeader restaurant={restaurant} />
 
       {/* Sticky tab bar */}
@@ -157,7 +158,7 @@ export default function RestaurantPage() {
               onClick={() => scrollToCategory(cat)}
               className={cn(
                 "shrink-0 px-4 pb-2.5 text-sm font-semibold transition-colors",
-                activeCategory === cat
+                currentCategory === cat
                   ? "border-b-2 border-vm-tangerine text-vm-tangerine"
                   : "text-muted-foreground hover:text-foreground"
               )}
@@ -191,38 +192,43 @@ export default function RestaurantPage() {
         </div>
       </div>
 
-      {/* Menu */}
-      <div className="mx-auto max-w-2xl px-4 pt-5">
-        {visibleItems.length === 0 ? (
-          <div className="py-16 text-center text-sm text-muted-foreground">
-            No items match this filter.
+      {/* Menu + desktop cart */}
+      <div className="mx-auto max-w-7xl px-4 pt-5">
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+          <div className="mx-auto w-full max-w-2xl lg:max-w-none">
+            {visibleItems.length === 0 ? (
+              <div className="py-16 text-center text-sm text-muted-foreground">
+                No items match this filter.
+              </div>
+            ) : (
+              <div className="space-y-8">
+                {categories
+                  .filter((cat) => visibleItems.some((i) => i.category === cat))
+                  .map((cat, idx) => {
+                    const catItems = visibleItems.filter((i) => i.category === cat)
+                    if (catItems.length === 0) return null
+                    return (
+                      <section key={cat} id={`cat-${cat}`}>
+                        {idx > 0 && <Separator className="mb-6" />}
+                        <h2 className="mb-3 text-base font-bold">{cat}</h2>
+                        <div className="space-y-2.5">
+                          {catItems.map((item) => (
+                            <MenuItemCard
+                              key={item.id}
+                              item={item}
+                              restaurant={restaurant}
+                              onCustomize={setCustomizing}
+                            />
+                          ))}
+                        </div>
+                      </section>
+                    )
+                  })}
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="space-y-8">
-            {categories
-              .filter((cat) => visibleItems.some((i) => i.category === cat))
-              .map((cat, idx) => {
-                const catItems = visibleItems.filter((i) => i.category === cat)
-                if (catItems.length === 0) return null
-                return (
-                  <section key={cat} id={`cat-${cat}`}>
-                    {idx > 0 && <Separator className="mb-6" />}
-                    <h2 className="mb-3 text-base font-bold">{cat}</h2>
-                    <div className="space-y-2.5">
-                      {catItems.map((item) => (
-                        <MenuItemCard
-                          key={item.id}
-                          item={item}
-                          restaurant={restaurant}
-                          onCustomize={setCustomizing}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                )
-              })}
-          </div>
-        )}
+          <RestaurantCart />
+        </div>
       </div>
 
       {/* Customization sheet */}
@@ -233,8 +239,6 @@ export default function RestaurantPage() {
         onClose={() => setCustomizing(null)}
       />
 
-      {/* Floating cart */}
-      <RestaurantCart />
     </div>
   )
 }

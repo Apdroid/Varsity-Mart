@@ -39,7 +39,7 @@ export function DownloadAppCard() {
 				</p>
 
 				<Link
-					href="https://varsity-mart.vercel.app/download"
+					href="/download"
 					className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md bg-vm-tangerine px-3 py-2 text-sm font-semibold text-vm-tangerine-foreground transition-opacity hover:opacity-90"
 				>
 					<Download className="h-4 w-4" />
