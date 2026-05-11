@@ -48,7 +48,7 @@ export function MenuItemCard({ item, restaurant, onCustomize }: Props) {
       quantity: 1,
       unitPrice: item.basePrice,
     })
-    toast.success(`${item.name} added`)
+    toast.success(`${item.name} added to cart`)
   }
 
   return (
@@ -100,7 +100,7 @@ export function MenuItemCard({ item, restaurant, onCustomize }: Props) {
             )}
           >
             <Plus className="h-3.5 w-3.5" />
-            {item.isQuickAdd ? "Add" : "Customise"}
+            {item.isQuickAdd ? "Add to cart" : "Customize"}
           </button>
         </div>
       </div>

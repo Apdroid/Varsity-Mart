@@ -95,17 +95,17 @@ function CustomizationBody({
 			quantity: qty,
 			unitPrice,
 		})
-		toast.success(`${item.name} added to order`)
+		toast.success(`${item.name} added to cart`)
 		onClose()
 	}
 
 	return (
-		<div className="grid h-full md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-			<aside className="hidden border-r border-border bg-card md:flex md:flex-col">
-				<div className="relative aspect-[4/3] w-full overflow-hidden">
+		<div className="grid h-full min-h-0 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+			<aside className="hidden min-h-0 border-r border-border bg-card md:grid md:grid-rows-[minmax(13rem,38%)_1fr]">
+				<div className="relative h-full w-full overflow-hidden">
 					<Image src={item.image} alt={item.name} fill className="object-cover" />
 				</div>
-				<div className="space-y-3 p-5">
+				<div className="min-h-0 space-y-3 overflow-y-auto p-5">
 					<div className="flex flex-wrap gap-1.5">
 						{item.dietaryTags?.map((t) => <DietaryBadge key={t} tag={t} />)}
 					</div>
@@ -128,11 +128,11 @@ function CustomizationBody({
 			</aside>
 
 			<div className="flex min-h-0 flex-col">
-				<div className="relative h-44 w-full shrink-0 overflow-hidden md:hidden">
+				<div className="relative h-40 w-full shrink-0 overflow-hidden md:hidden">
 					<Image src={item.image} alt={item.name} fill className="object-cover" />
 				</div>
 
-				<ScrollArea className="flex-1 overflow-y-auto">
+				<ScrollArea className="min-h-0 flex-1">
 					<div className="space-y-5 px-5 py-4 md:space-y-6 md:px-6">
 						<div className="md:hidden">
 							<div className="flex flex-wrap gap-1.5">
@@ -219,7 +219,7 @@ function CustomizationBody({
 							onClick={handleAdd}
 							className="flex flex-1 items-center justify-between rounded-xl bg-vm-tangerine px-4 py-3 font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
 						>
-							<span>Add to order</span>
+							<span>Add to cart</span>
 							<span>{formatGHS(unitPrice * qty)}</span>
 						</button>
 					</div>
@@ -234,7 +234,7 @@ export function CustomizationSheet({ item, restaurant, open, onClose }: Props) {
 
 	return (
 		<Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-			<DialogContent className="flex max-h-[92vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl">
+			<DialogContent className="flex h-[88vh] w-[96vw] max-w-none flex-col gap-0 overflow-hidden p-0 sm:h-[90vh] sm:max-h-[46rem] sm:w-[92vw] sm:max-w-5xl">
 				<DialogTitle className="sr-only">{item.name}</DialogTitle>
 				<CustomizationBody
 					key={item.id}
