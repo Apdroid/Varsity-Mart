@@ -22,6 +22,8 @@ import {
 	XLogoIcon,
 	UserCircleIcon,
 } from "@phosphor-icons/react"
+import { Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes"
 import {
 	Tooltip,
 	TooltipContent,
@@ -64,6 +66,24 @@ import {
 import Logo from "./logo";
 import Link from "next/link";
 import { CartSheet } from "@/components/cart/cart-sheet";
+
+function ThemeToggleButton({ className = "" }: { className?: string }) {
+	const { resolvedTheme, setTheme } = useTheme()
+	const isDark = resolvedTheme === "dark"
+
+	return (
+		<Button
+			type="button"
+			variant="ghost"
+			size="icon"
+			aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+			onClick={() => setTheme(isDark ? "light" : "dark")}
+			className={className}
+		>
+			{isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+		</Button>
+	)
+}
 
 
 const categories = [
@@ -194,10 +214,13 @@ function MainBar() {
 						</Button>
 					</SheetTrigger>
 					<SheetContent side="left" className="w-80 p-0 border-none">
-						<SheetHeader className=" p-4">
-							<SheetTitle className="text-left">
-								<Logo variant="header" />
-							</SheetTitle>
+						<SheetHeader className="p-4">
+							<div className="flex items-center justify-between">
+								<SheetTitle className="text-left">
+									<Logo variant="header" />
+								</SheetTitle>
+								<ThemeToggleButton className="h-10 w-10" />
+							</div>
 						</SheetHeader>
 						<nav className="flex flex-col p-2">
 							{categories.map(({ label, icon: Icon }) => (
@@ -249,6 +272,8 @@ function MainBar() {
 
 
 				<div className="flex items-center gap-0.5 sm:gap-1">
+					<ThemeToggleButton className="h-10 w-10" />
+
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<Button
