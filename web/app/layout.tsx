@@ -1,6 +1,5 @@
 import { Inter, Plus_Jakarta_Sans } from "next/font/google"
 import { TooltipProvider } from "@/components/ui/tooltip"
-// import localFont from "next/font/local"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -8,6 +7,8 @@ import { cn } from "@/lib/utils";
 import { Metadata } from "next";
 import { DownloadAppCard } from "@/components/global/download-app-card";
 import { Toaster } from "sonner";
+import { QueryProvider } from "@/providers/query-provider";
+import { AuthProvider } from "@/providers/auth-provider";
 
 
 const fontSans = Plus_Jakarta_Sans({
@@ -40,13 +41,17 @@ export default function RootLayout({
 			className={cn("antialiased ", fontSans.variable, fontMono.variable)}
 		>
 			<body>
-				<TooltipProvider>
-					<ThemeProvider>
-						{children}
-						<DownloadAppCard />
-						<Toaster richColors position="bottom-right" />
-					</ThemeProvider>
-				</TooltipProvider>
+				<QueryProvider>
+					<AuthProvider>
+						<TooltipProvider>
+							<ThemeProvider>
+								{children}
+								<DownloadAppCard />
+								<Toaster richColors position="bottom-right" />
+							</ThemeProvider>
+						</TooltipProvider>
+					</AuthProvider>
+				</QueryProvider>
 			</body>
 		</html>
 	)

@@ -1,6 +1,6 @@
 import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { MenuItemOption, SideConfig } from "@/data/restaurant"
+import type { MenuItemOption, SideConfig } from "@/lib/api/types"
 
 type Props = {
   config: SideConfig

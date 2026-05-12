@@ -21,8 +21,11 @@ import {
 	FacebookLogoIcon,
 	XLogoIcon,
 	UserCircleIcon,
+	SignOutIcon,
+	GearIcon,
+	PackageIcon,
 } from "@phosphor-icons/react"
-import { Moon, Sun } from "lucide-react"
+import { Loader2, Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 import {
 	Tooltip,
@@ -41,6 +44,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
 	NavigationMenu,
 	NavigationMenuContent,
@@ -66,6 +70,10 @@ import {
 import Logo from "./logo";
 import Link from "next/link";
 import { CartSheet } from "@/components/cart/cart-sheet";
+import { useAuth } from "@/providers/auth-provider";
+import { useCurrentUser } from "@/hooks/queries/use-user";
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
 
 function ThemeToggleButton({ className = "" }: { className?: string }) {
 	const { resolvedTheme, setTheme } = useTheme()
@@ -109,6 +117,46 @@ const searchCategories = [
 
 function getCategoryHref(label: string) {
 	return `/search?category=${encodeURIComponent(label.toLowerCase())}`
+}
+
+function buildGlobalSearchHref(query: string, category?: string) {
+	const params = new URLSearchParams()
+	const trimmedQuery = query.trim()
+
+	if (trimmedQuery) {
+		params.set("query", trimmedQuery)
+	}
+	if (category && category !== "All Categories") {
+		params.set("category", category)
+	}
+
+	const next = params.toString()
+	return next ? `/search?${next}` : "/search"
+}
+
+function getWishlistCount(...sources: Array<unknown>): number {
+	for (const source of sources) {
+		if (!source || typeof source !== "object") continue
+		const data = source as Record<string, unknown>
+		const value =
+			data.wishlistCount ??
+			data.wishlist_count ??
+			data.likedCount ??
+			data.liked_count ??
+			data.savedCount ??
+			data.saved_count
+
+		if (typeof value === "number" && Number.isFinite(value)) {
+			return Math.max(0, value)
+		}
+		if (typeof value === "string") {
+			const parsed = Number(value)
+			if (Number.isFinite(parsed)) {
+				return Math.max(0, parsed)
+			}
+		}
+	}
+	return 0
 }
 
 /* -----------------------------------------------------------
@@ -202,6 +250,25 @@ function AnnouncementBar() {
 	 2. Main row — logo · search · account/cart
 ----------------------------------------------------------- */
 function MainBar() {
+	const router = useRouter()
+	const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth()
+	const { data: currentUserData } = useCurrentUser({ enabled: isAuthenticated })
+	const [desktopQuery, setDesktopQuery] = useState("")
+	const [desktopCategory, setDesktopCategory] = useState("All Categories")
+
+	const wishlistCount = getWishlistCount(currentUserData?.data, user)
+	const displayName = user ? `${user.firstName} ${user.lastName} `.trim() : ""
+	const initials = user ? `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`.toUpperCase() : "U"
+
+	const handleLogout = async () => {
+		await logout()
+		router.push("/")
+	}
+
+	const handleDesktopSearch = useCallback(() => {
+		router.push(buildGlobalSearchHref(desktopQuery, desktopCategory))
+	}, [router, desktopCategory, desktopQuery])
+
 	return (
 		<div className=" bg-card">
 			<div className="container mx-auto flex justify-between h-20 items-center gap-6 px-4">
@@ -215,12 +282,9 @@ function MainBar() {
 					</SheetTrigger>
 					<SheetContent side="left" className="w-80 p-0 border-none">
 						<SheetHeader className="p-4">
-							<div className="flex items-center justify-between">
-								<SheetTitle className="text-left">
-									<Logo variant="header" />
-								</SheetTitle>
-								<ThemeToggleButton className="h-10 w-10" />
-							</div>
+							<SheetTitle className="text-left">
+								<Logo variant="header" />
+							</SheetTitle>
 						</SheetHeader>
 						<nav className="flex flex-col p-2">
 							{categories.map(({ label, icon: Icon }) => (
@@ -247,9 +311,17 @@ function MainBar() {
 						<MagnifyingGlassIcon className="ml-4 h-4 w-4 shrink-0 text-muted-foreground" />
 						<Input
 							placeholder="Search for jollof, hoodies, textbooks…"
+							value={desktopQuery}
+							onChange={(event) => setDesktopQuery(event.target.value)}
+							onKeyDown={(event) => {
+								if (event.key === "Enter") {
+									event.preventDefault()
+									handleDesktopSearch()
+								}
+							}}
 							className="h-full border-0 bg-inherit dark:bg-inherit shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
 						/>
-						<Select defaultValue="All Categories">
+						<Select value={desktopCategory} onValueChange={setDesktopCategory}>
 							<SelectTrigger className="h-full w-38.75 border-0 dark:bg-inherit bg-transparent text-sm shadow-none focus:ring-0 focus:ring-offset-0">
 								<SelectValue />
 							</SelectTrigger>
@@ -263,6 +335,7 @@ function MainBar() {
 						</Select>
 						<button
 							type="button"
+							onClick={handleDesktopSearch}
 							className="mr-1.5 ml-1 flex h-8 shrink-0 cursor-pointer bg-vm-tangerine items-center rounded-full px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
 						>
 							Search
@@ -272,43 +345,105 @@ function MainBar() {
 
 
 				<div className="flex items-center gap-0.5 sm:gap-1">
-					<ThemeToggleButton className="h-10 w-10" />
+					<ThemeToggleButton className="hidden h-10 w-10 sm:inline-flex" />
 
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								asChild
-								variant="ghost"
-								size="icon"
-								className="hidden h-10 w-10 sm:inline-flex"
-							>
-								<Link href="/login" aria-label="Sign in">
+					{authLoading ? (
+						<div
+							className="h-10 w-10 items-center justify-center inline-flex"
+							aria-label="Loading account"
+						>
+							<Loader2 className="h-5 w-5 animate-spin" />
+						</div>
+					) : isAuthenticated && user ? (
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<button
+									type="button"
+									className="h-10 w-10 items-center justify-center inline-flex"
+									aria-label="Open account menu"
+								>
+									<Avatar className="h-7 w-7">
+										<AvatarImage src={user.avatar || user.avatarUrl || user.profilePic} alt={displayName || "User"} />
+										<AvatarFallback className="text-[11px] font-semibold">{initials}</AvatarFallback>
+									</Avatar>
+								</button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end" className="w-56">
+								<DropdownMenuLabel>
+									<p className="truncate text-sm font-semibold">{displayName || "Account"}</p>
+									<p className="truncate text-xs font-normal text-muted-foreground">{user.email}</p>
+								</DropdownMenuLabel>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem asChild>
+									<Link href="/account">
+										<UserCircleIcon className="mr-2 h-4 w-4" />
+										My Account
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem asChild>
+									<Link href="/account/orders">
+										<PackageIcon className="mr-2 h-4 w-4" />
+										Orders
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem asChild>
+									<Link href="/account/wishlist">
+										<HeartIcon className="mr-2 h-4 w-4" />
+										Wishlist
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem asChild>
+									<Link href="/account/settings">
+										<GearIcon className="mr-2 h-4 w-4" />
+										Settings
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem className="sm:hidden" asChild>
+									<div className="flex w-full items-center justify-between">
+										<span className="text-sm">Theme</span>
+										<ThemeToggleButton className="h-8 w-8" />
+									</div>
+								</DropdownMenuItem>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem onClick={handleLogout}>
+									<SignOutIcon className="mr-2 h-4 w-4" />
+									Sign Out
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					) : (
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Link
+									href="/login"
+									aria-label="Sign in"
+									className="h-10 w-10 items-center justify-center inline-flex"
+								>
 									<UserCircleIcon className="h-7 w-7" weight="light" />
 								</Link>
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent side="bottom">
-							<p>Sign in to buy and sell</p>
-						</TooltipContent>
-					</Tooltip>
+							</TooltipTrigger>
+							<TooltipContent side="bottom">
+								<p>Sign in to buy and sell</p>
+							</TooltipContent>
+						</Tooltip>
+					)}
 
 					<Tooltip>
 						<TooltipTrigger asChild>
-							<Button
-								asChild
-								variant="ghost"
-								size="icon"
-								className="relative hidden h-10 w-10 sm:inline-flex"
+							<Link
+								href="/account/wishlist"
+								aria-label="Wishlist"
+								className="relative hidden h-10 w-10 items-center justify-center sm:inline-flex"
 							>
-								<Link href="/account/wishlist" aria-label="Wishlist">
-									<HeartIcon className="h-7 w-7" weight="light" />
+								<HeartIcon className="h-7 w-7" weight="light" />
+								{wishlistCount > 0 && (
 									<Badge
 										className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-2 border-background bg-vm-tangerine p-0 text-[10px] font-bold leading-none text-white"
 									>
-										2
+										{wishlistCount}
 									</Badge>
-								</Link>
-							</Button>
+								)}
+							</Link>
 						</TooltipTrigger>
 						<TooltipContent side="bottom">
 							<p>Wishlist</p>
@@ -470,16 +605,32 @@ function NavBar() {
 	 Mobile search + quick-filter bar (below main row, mobile only)
 ----------------------------------------------------------- */
 function MobileSearchBar() {
+	const router = useRouter()
+	const [mobileQuery, setMobileQuery] = useState("")
+
+	const handleMobileSearch = useCallback(() => {
+		router.push(buildGlobalSearchHref(mobileQuery))
+	}, [router, mobileQuery])
+
 	return (
 		<div className="md:hidden bg-card border-t border-border/40 px-4 pb-3 pt-2">
 			<div className="relative flex h-11 items-center overflow-hidden rounded-full bg-accent transition-all focus-within:bg-background focus-within:shadow-sm">
 				<MagnifyingGlassIcon className="ml-4 h-4 w-4 shrink-0 text-muted-foreground" />
 				<Input
 					placeholder="Search products, food, stores…"
+					value={mobileQuery}
+					onChange={(event) => setMobileQuery(event.target.value)}
+					onKeyDown={(event) => {
+						if (event.key === "Enter") {
+							event.preventDefault()
+							handleMobileSearch()
+						}
+					}}
 					className="h-full border-0 bg-inherit dark:bg-inherit shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
 				/>
 				<button
 					type="button"
+					onClick={handleMobileSearch}
 					className="mr-1.5 ml-1 flex h-8 shrink-0 cursor-pointer items-center rounded-full bg-vm-tangerine px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
 				>
 					Search

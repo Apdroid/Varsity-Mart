@@ -1,6 +1,6 @@
 import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { MenuItemOption } from "@/data/restaurant"
+import type { MenuItemOption } from "@/lib/api/types"
 
 type Props = {
   label: string

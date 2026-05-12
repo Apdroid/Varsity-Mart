@@ -5,16 +5,16 @@ import {
   Search,
   SlidersHorizontal,
   UtensilsCrossed,
-  X,
 } from "lucide-react"
 
-import { RestaurantCard, type Restaurant } from "@/components/main/restaurant-card"
+import { RestaurantCard } from "@/components/main/restaurant-card"
 import { CuisinePill } from "@/components/restaurants/cuisine-pill"
 import { FeaturedRestaurantCard } from "@/components/restaurants/featured-restaurant-card"
 import { OrderAgainCard } from "@/components/restaurants/order-again-card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Select,
   SelectContent,
@@ -31,15 +31,12 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { mockRestaurants } from "@/data/restaurant"
+import { useRestaurants, useFeaturedRestaurants } from "@/hooks/queries/use-restaurants"
+import { useRestaurantCategories } from "@/hooks/queries/use-categories"
+import type { RestaurantListItem } from "@/lib/api/types"
 
 type StatusFilter = "all" | "open-now" | "free-delivery"
-type PriceFilter = "all" | "$" | "$$" | "$$$"
-type SortFilter =
-  | "recommended"
-  | "fastest-delivery"
-  | "top-rated"
-  | "lowest-min-order"
+type SortFilter = "popular" | "rating" | "newest"
 
 const CUISINES = [
   { label: "All", emoji: "🍽️", query: "all" },
@@ -54,138 +51,111 @@ const CUISINES = [
   { label: "Breakfast", emoji: "☕", query: "coffee" },
 ] as const
 
-function toNumber(value: string) {
-  const parsed = Number.parseFloat(value)
-  return Number.isNaN(parsed) ? 0 : parsed
+function mapApiRestaurantToCard(restaurant: RestaurantListItem) {
+  return {
+    id: restaurant.id,
+    name: restaurant.name,
+    logo: restaurant.logo || "",
+    banner: restaurant.banner || restaurant.logo || "",
+    category: restaurant.category,
+    rating: restaurant.rating,
+    totalReviews: restaurant.totalReviews,
+    deliveryTime: restaurant.deliveryTime,
+    deliveryFee: restaurant.deliveryFee,
+    minOrder: restaurant.minOrder,
+    isOpen: restaurant.isOpen,
+    badge: restaurant.badge,
+  }
 }
 
-function minDeliveryMinutes(deliveryTime: string) {
-  const match = deliveryTime.match(/\d+/)
-  return match ? Number.parseInt(match[0], 10) : Number.POSITIVE_INFINITY
+function RestaurantsSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <Skeleton key={i} className="h-52 w-full rounded-lg" />
+      ))}
+    </div>
+  )
 }
 
-function isFreeDelivery(fee: string) {
-  return fee === "0"
-}
-
-function matchesPriceRange(minOrder: number, priceFilter: PriceFilter) {
-  if (priceFilter === "all") return true
-  if (priceFilter === "$") return minOrder <= 25
-  if (priceFilter === "$$") return minOrder >= 26 && minOrder <= 60
-  return minOrder > 60
+function FeaturedSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <Skeleton key={i} className="h-48 w-full rounded-lg" />
+      ))}
+    </div>
+  )
 }
 
 export default function RestaurantsPage() {
   const [search, setSearch] = React.useState("")
   const [cuisine, setCuisine] = React.useState<string>("all")
   const [status, setStatus] = React.useState<StatusFilter>("all")
-  const [sort, setSort] = React.useState<SortFilter>("recommended")
-  const [price, setPrice] = React.useState<PriceFilter>("all")
-  const [visibleCount, setVisibleCount] = React.useState(8)
+  const [sort, setSort] = React.useState<SortFilter>("popular")
+  const [page, setPage] = React.useState(1)
   const [filtersOpen, setFiltersOpen] = React.useState(false)
-  const [showPromo, setShowPromo] = React.useState(true)
 
-  const nowOpenFeatured = React.useMemo(
-    () =>
-      mockRestaurants
-        .filter((restaurant) => restaurant.isOpen)
-        .sort((a, b) => toNumber(b.rating) - toNumber(a.rating))
-        .slice(0, 3),
-    []
-  )
+  const { data: featuredData, isLoading: featuredLoading } = useFeaturedRestaurants(3)
+  const { data: restaurantsData, isLoading: restaurantsLoading } = useRestaurants({
+    search: search || undefined,
+    cuisineType: cuisine === "all" ? undefined : cuisine,
+    isOpen: status === "open-now" ? true : undefined,
+    sortBy: sort,
+    page,
+    limit: 12,
+  })
+  const { data: categoriesData } = useRestaurantCategories()
 
-  const orderAgainRestaurants = React.useMemo(
-    () => mockRestaurants.slice(0, 4),
-    []
-  )
+  const featuredRestaurants = featuredData || []
+  const allRestaurants = restaurantsData?.restaurants || []
+  const categories = categoriesData || []
+  const totalCount = restaurantsData?.pagination.totalItems ?? 0
+  const openCount = allRestaurants.filter((r) => r.isOpen).length
+  const totalPages = restaurantsData?.pagination.totalPages ?? 1
 
   const filteredRestaurants = React.useMemo(() => {
-    const filtered = mockRestaurants.filter((restaurant) => {
-      const lowerCategory = restaurant.category.toLowerCase()
-      const lowerSearch = search.toLowerCase()
-
-      const matchesCuisine =
-        cuisine === "all" || lowerCategory.includes(cuisine.toLowerCase())
-      const matchesSearch =
-        search.trim().length === 0 ||
-        `${restaurant.name} ${restaurant.category}`
-          .toLowerCase()
-          .includes(lowerSearch)
-      const matchesStatus =
-        status === "all" ||
-        (status === "open-now" && restaurant.isOpen) ||
-        (status === "free-delivery" && isFreeDelivery(restaurant.deliveryFee))
-      const matchesPrice = matchesPriceRange(restaurant.minOrder, price)
-
-      return matchesCuisine && matchesSearch && matchesStatus && matchesPrice
-    })
-
-    const sorted = [...filtered]
-    sorted.sort((a, b) => {
-      if (a.isOpen !== b.isOpen) return a.isOpen ? -1 : 1
-
-      if (sort === "fastest-delivery") {
-        return minDeliveryMinutes(a.deliveryTime) - minDeliveryMinutes(b.deliveryTime)
-      }
-      if (sort === "top-rated") {
-        const byRating = toNumber(b.rating) - toNumber(a.rating)
-        if (byRating !== 0) return byRating
-        return b.totalReviews - a.totalReviews
-      }
-      if (sort === "lowest-min-order") return a.minOrder - b.minOrder
-
-      const recommendedA = toNumber(a.rating) * (a.totalReviews + 1)
-      const recommendedB = toNumber(b.rating) * (b.totalReviews + 1)
-      return recommendedB - recommendedA
-    })
-
-    return sorted
-  }, [cuisine, price, search, sort, status])
-
-  const visibleRestaurants = filteredRestaurants.slice(0, visibleCount)
-  const hasMore = filteredRestaurants.length > visibleCount
+    let result = allRestaurants
+    
+    if (status === "free-delivery") {
+      result = result.filter((r) => Number(r.deliveryFee) === 0)
+    }
+    
+    return result
+  }, [allRestaurants, status])
 
   const activeFilterCount =
     Number(search.trim().length > 0) +
     Number(cuisine !== "all") +
     Number(status !== "all") +
-    Number(price !== "all") +
-    Number(sort !== "recommended")
-
-  const resetVisible = () => setVisibleCount(8)
+    Number(sort !== "popular")
 
   const handleSearchChange = (value: string) => {
     setSearch(value)
-    resetVisible()
+    setPage(1)
   }
 
   const handleCuisineChange = (value: string) => {
     setCuisine(value)
-    resetVisible()
+    setPage(1)
   }
 
   const handleStatusChange = (value: StatusFilter) => {
     setStatus(value)
-    resetVisible()
+    setPage(1)
   }
 
   const handleSortChange = (value: SortFilter) => {
     setSort(value)
-    resetVisible()
-  }
-
-  const handlePriceChange = (value: PriceFilter) => {
-    setPrice(value)
-    resetVisible()
+    setPage(1)
   }
 
   const clearFilters = () => {
     setSearch("")
     setCuisine("all")
     setStatus("all")
-    setSort("recommended")
-    setPrice("all")
-    setVisibleCount(8)
+    setSort("popular")
+    setPage(1)
   }
 
   return (
@@ -193,9 +163,10 @@ export default function RestaurantsPage() {
       <section className="space-y-2">
         <h1 className="font-heading text-3xl font-bold text-foreground">Food Court</h1>
         <p className="text-muted-foreground">Order from your favorite campus spots</p>
-        <p className="text-sm text-muted-foreground">47 restaurants · 12 open now</p>
+        <p className="text-sm text-muted-foreground">
+          {totalCount} restaurants · {openCount} open now
+        </p>
       </section>
-
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
@@ -204,14 +175,21 @@ export default function RestaurantsPage() {
             Top picks
           </Badge>
         </div>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {nowOpenFeatured.map((restaurant) => (
-            <FeaturedRestaurantCard key={restaurant.id} restaurant={restaurant} />
-          ))}
-        </div>
+        {featuredLoading ? (
+          <FeaturedSkeleton />
+        ) : (
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {featuredRestaurants.map((restaurant) => (
+              <FeaturedRestaurantCard
+                key={restaurant.id}
+                restaurant={mapApiRestaurantToCard(restaurant)}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
-      <section className=" top-16 z-20 space-y-3 rounded-lg p-3 backdrop-blur-sm">
+      <section className="top-16 z-20 space-y-3 rounded-lg p-3 backdrop-blur-sm">
         <div className="hidden items-center gap-2 md:flex">
           <div className="relative min-w-0 flex-1">
             <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -240,40 +218,27 @@ export default function RestaurantsPage() {
               <SelectValue placeholder="Sort" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="recommended">Recommended</SelectItem>
-              <SelectItem value="fastest-delivery">Fastest Delivery</SelectItem>
-              <SelectItem value="top-rated">Top Rated</SelectItem>
-              <SelectItem value="lowest-min-order">Lowest Min Order</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={price} onValueChange={(value) => handlePriceChange(value as PriceFilter)}>
-            <SelectTrigger className="h-10 w-28 rounded-md bg-card px-3">
-              <SelectValue placeholder="Price" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="$">$</SelectItem>
-              <SelectItem value="$$">$$</SelectItem>
-              <SelectItem value="$$$">$$$</SelectItem>
+              <SelectItem value="popular">Popular</SelectItem>
+              <SelectItem value="rating">Top Rated</SelectItem>
+              <SelectItem value="newest">Newest</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-      <section className="my-6 space-y-3">
-				<h2 className="font-bold">Categories</h2>
-        <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-          {CUISINES.map((item) => (
-            <CuisinePill
-              key={item.label}
-              label={item.label}
-              emoji={item.emoji}
-              active={cuisine === item.query}
-              onClick={() => handleCuisineChange(item.query)}
-            />
-          ))}
-        </div>
-      </section>
+        <section className="my-6 space-y-3">
+          <h2 className="font-bold">Categories</h2>
+          <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            {CUISINES.map((item) => (
+              <CuisinePill
+                key={item.label}
+                label={item.label}
+                emoji={item.emoji}
+                active={cuisine === item.query}
+                onClick={() => handleCuisineChange(item.query)}
+              />
+            ))}
+          </div>
+        </section>
 
         <div className="flex items-center gap-2 md:hidden">
           <div className="relative min-w-0 flex-1">
@@ -302,21 +267,13 @@ export default function RestaurantsPage() {
                 <ToggleGroup
                   type="single"
                   value={status}
-                  onValueChange={(value) =>
-                    value && handleStatusChange(value as StatusFilter)
-                  }
+                  onValueChange={(value) => value && handleStatusChange(value as StatusFilter)}
                   variant="outline"
                   className="w-full"
                 >
-                  <ToggleGroupItem value="all" className="flex-1">
-                    All
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="open-now" className="flex-1">
-                    Open Now
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="free-delivery" className="flex-1">
-                    Free Delivery
-                  </ToggleGroupItem>
+                  <ToggleGroupItem value="all" className="flex-1">All</ToggleGroupItem>
+                  <ToggleGroupItem value="open-now" className="flex-1">Open Now</ToggleGroupItem>
+                  <ToggleGroupItem value="free-delivery" className="flex-1">Free Delivery</ToggleGroupItem>
                 </ToggleGroup>
 
                 <Select value={sort} onValueChange={(value) => handleSortChange(value as SortFilter)}>
@@ -324,22 +281,9 @@ export default function RestaurantsPage() {
                     <SelectValue placeholder="Sort" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="recommended">Recommended</SelectItem>
-                    <SelectItem value="fastest-delivery">Fastest Delivery</SelectItem>
-                    <SelectItem value="top-rated">Top Rated</SelectItem>
-                    <SelectItem value="lowest-min-order">Lowest Min Order</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select value={price} onValueChange={(value) => handlePriceChange(value as PriceFilter)}>
-                  <SelectTrigger className="h-10 w-full rounded-lg bg-muted px-3">
-                    <SelectValue placeholder="Price" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="$">$</SelectItem>
-                    <SelectItem value="$$">$$</SelectItem>
-                    <SelectItem value="$$$">$$$</SelectItem>
+                    <SelectItem value="popular">Popular</SelectItem>
+                    <SelectItem value="rating">Top Rated</SelectItem>
+                    <SelectItem value="newest">Newest</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -359,24 +303,15 @@ export default function RestaurantsPage() {
         </div>
       </section>
 
-      {orderAgainRestaurants.length > 0 && (
-        <section className="space-y-3">
-          <h2 className="text-md font-bold text-foreground">Order again</h2>
-          <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            {orderAgainRestaurants.map((restaurant) => (
-              <OrderAgainCard key={restaurant.id} restaurant={restaurant} />
-            ))}
-          </div>
-        </section>
-      )}
-
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="font-heading text-xl font-bold text-foreground">All Restaurants</h2>
           <p className="text-sm text-muted-foreground">{filteredRestaurants.length} results</p>
         </div>
 
-        {filteredRestaurants.length === 0 ? (
+        {restaurantsLoading ? (
+          <RestaurantsSkeleton />
+        ) : filteredRestaurants.length === 0 ? (
           <div className="rounded-md bg-card p-10 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted text-muted-foreground">
               <UtensilsCrossed className="h-8 w-8" />
@@ -399,19 +334,35 @@ export default function RestaurantsPage() {
         ) : (
           <>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {visibleRestaurants.map((restaurant: Restaurant) => (
-                <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+              {filteredRestaurants.map((restaurant) => (
+                <RestaurantCard
+                  key={restaurant.id}
+                  restaurant={mapApiRestaurantToCard(restaurant)}
+                />
               ))}
             </div>
-            {hasMore && (
-              <div className="flex justify-center">
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2">
                 <Button
                   type="button"
                   variant="outline"
                   className="rounded-lg"
-                  onClick={() => setVisibleCount((count) => count + 8)}
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => p - 1)}
                 >
-                  Load more
+                  Previous
+                </Button>
+                <span className="flex items-center px-4 text-sm text-muted-foreground">
+                  Page {page} of {totalPages}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-lg"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  Next
                 </Button>
               </div>
             )}

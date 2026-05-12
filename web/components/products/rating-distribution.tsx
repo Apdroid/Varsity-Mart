@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Star } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { Review } from "@/data/reviews"
+import type { Review } from "@/components/products/product-detail-view"
 
 type Props = {
   reviews: Review[]

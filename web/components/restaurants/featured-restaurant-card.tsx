@@ -40,7 +40,7 @@ export function FeaturedRestaurantCard({
           </span>
           <span className="inline-flex items-center gap-1 rounded-full bg-background/15 px-2 py-1 backdrop-blur-sm">
             <Star className="h-3.5 w-3.5 fill-vm-tangerine text-vm-tangerine" />
-            {Number.parseFloat(restaurant.rating).toFixed(1)} (
+            {(typeof restaurant.rating === "number" ? restaurant.rating : Number.parseFloat(restaurant.rating)).toFixed(1)} (
             {compactNumber(restaurant.totalReviews)})
           </span>
         </div>

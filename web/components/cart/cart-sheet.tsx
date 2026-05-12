@@ -3,7 +3,7 @@
 import * as React from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, ShoppingCart } from "lucide-react"
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, ShoppingCart, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -15,42 +15,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-
-type CartItem = {
-  id: string
-  name: string
-  store: string
-  price: number
-  quantity: number
-  image: string
-}
-
-const MOCK_ITEMS: CartItem[] = [
-  {
-    id: "1",
-    name: "KNUST Classic Hoodie",
-    store: "Campus Threads",
-    price: 85,
-    quantity: 1,
-    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200&fit=crop",
-  },
-  {
-    id: "2",
-    name: "Engineering Mathematics",
-    store: "Akosua's Bookstore",
-    price: 120,
-    quantity: 2,
-    image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=200&h=200&fit=crop",
-  },
-  {
-    id: "3",
-    name: "Wireless Earbuds Pro",
-    store: "Tech Hub KNUST",
-    price: 199,
-    quantity: 1,
-    image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=200&h=200&fit=crop",
-  },
-]
+import { useAuth } from "@/providers/auth-provider"
+import { normalizeCartData, useCart, useRemoveFromCart, useUpdateCartItem } from "@/hooks/queries/use-cart"
+import { toast } from "sonner"
 
 function formatGHS(amount: number) {
   return new Intl.NumberFormat("en-GH", {
@@ -63,28 +30,43 @@ function formatGHS(amount: number) {
 export function CartSheet() {
   const router = useRouter()
   const [open, setOpen] = React.useState(false)
-  const [items, setItems] = React.useState<CartItem[]>(MOCK_ITEMS)
+  const { isAuthenticated, isLoading: authLoading } = useAuth()
+  const { data: cartData, isLoading: cartLoading } = useCart({ enabled: isAuthenticated })
+  const updateCartItem = useUpdateCartItem()
+  const removeFromCart = useRemoveFromCart()
 
-  const updateQty = (id: string, delta: number) => {
-    setItems((prev) =>
-      prev
-        .map((item) => (item.id === id ? { ...item, quantity: item.quantity + delta } : item))
-        .filter((item) => item.quantity > 0)
-    )
+  const cart = normalizeCartData(cartData?.data)
+  const items = cart.items
+
+  const updateQty = async (id: string, nextQuantity: number) => {
+    if (nextQuantity < 1) return
+    try {
+      await updateCartItem.mutateAsync({
+        itemId: id,
+        data: { quantity: nextQuantity },
+      })
+    } catch {
+      toast.error("Failed to update cart item")
+    }
   }
 
-  const removeItem = (id: string) =>
-    setItems((prev) => prev.filter((item) => item.id !== id))
+  const removeItem = async (id: string) => {
+    try {
+      await removeFromCart.mutateAsync(id)
+    } catch {
+      toast.error("Failed to remove item from cart")
+    }
+  }
 
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
+  const subtotal = cart.total
+  const itemCount = cart.itemCount
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="relative h-10 w-10" aria-label="Cart">
           <ShoppingCart className="size-6" strokeWidth={2.5} />
-          {itemCount > 0 && (
+          {!authLoading && itemCount > 0 && (
             <Badge className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-2 border-background bg-vm-tangerine p-0 text-[10px] font-bold leading-none text-white">
               {itemCount}
             </Badge>
@@ -104,7 +86,29 @@ export function CartSheet() {
           </SheetTitle>
         </SheetHeader>
 
-        {items.length === 0 ? (
+        {!authLoading && !isAuthenticated ? (
+          <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-10 text-center">
+            <div className="grid h-16 w-16 place-items-center rounded-full bg-muted">
+              <ShoppingBag className="h-7 w-7 text-muted-foreground" />
+            </div>
+            <div>
+              <p className="font-semibold">Sign in to view your cart</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Access your saved cart items and checkout quickly.
+              </p>
+            </div>
+            <Button
+              className="bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
+              onClick={() => { setOpen(false); router.push("/login?redirect=/checkout") }}
+            >
+              Sign in
+            </Button>
+          </div>
+        ) : authLoading || cartLoading ? (
+          <div className="flex flex-1 items-center justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : items.length === 0 ? (
           /* ── Empty state ── */
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-10 text-center">
             <div className="grid h-16 w-16 place-items-center rounded-full bg-muted">
@@ -132,12 +136,18 @@ export function CartSheet() {
                   <React.Fragment key={item.id}>
                     <div className="flex gap-3 py-1">
                       <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          fill
-                          className="object-cover"
-                        />
+                        {item.image ? (
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="grid h-full w-full place-items-center text-muted-foreground">
+                            <ShoppingBag className="h-5 w-5" />
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex min-w-0 flex-1 flex-col justify-between">
@@ -146,7 +156,9 @@ export function CartSheet() {
                             <p className="truncate text-sm font-medium leading-snug">
                               {item.name}
                             </p>
-                            <p className="text-xs text-muted-foreground">{item.store}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {item.inStock ? "In stock" : "Out of stock"}
+                            </p>
                           </div>
                           <button
                             type="button"
@@ -159,12 +171,13 @@ export function CartSheet() {
 
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-bold">
-                            {formatGHS(item.price * item.quantity)}
+                            {formatGHS(item.subtotal)}
                           </span>
                           <div className="flex items-center gap-1.5">
                             <button
                               type="button"
-                              onClick={() => updateQty(item.id, -1)}
+                              onClick={() => updateQty(item.id, item.quantity - 1)}
+                              disabled={item.quantity <= 1 || updateCartItem.isPending}
                               className="grid h-6 w-6 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                             >
                               <Minus className="h-3 w-3" />
@@ -174,7 +187,8 @@ export function CartSheet() {
                             </span>
                             <button
                               type="button"
-                              onClick={() => updateQty(item.id, 1)}
+                              onClick={() => updateQty(item.id, item.quantity + 1)}
+                              disabled={updateCartItem.isPending}
                               className="grid h-6 w-6 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                             >
                               <Plus className="h-3 w-3" />

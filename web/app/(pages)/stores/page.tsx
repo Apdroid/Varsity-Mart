@@ -24,144 +24,108 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { Skeleton } from "@/components/ui/skeleton"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { mockStores } from "@/data/store"
 import { cn } from "@/lib/utils"
+import { useStores, useFeaturedStores } from "@/hooks/queries/use-stores"
+import { useStoreCategories } from "@/hooks/queries/use-categories"
+import type { StoreListItem } from "@/lib/api/types"
 
 type StatusFilter = "all" | "open" | "closed"
-type SortFilter = "most-popular" | "highest-rated" | "most-products" | "newest"
+type SortFilter = "popular" | "newest"
 type ViewMode = "grid" | "list"
 
-function normalizeCategory(category: string) {
-  const value = category.toLowerCase()
-  if (
-    value.includes("electronics") ||
-    value.includes("phone") ||
-    value.includes("laptop")
-  ) {
-    return "Electronics"
+function mapApiStoreToCard(store: StoreListItem) {
+  return {
+    id: store.id,
+    name: store.name,
+    logo: store.logo || "",
+    category: store.category,
+    rating: String(store.rating),
+    totalReviews: store.totalReviews,
+    totalProducts: store.totalProducts,
+    isOpen: store.isOpen,
   }
-  if (
-    value.includes("fashion") ||
-    value.includes("sneaker") ||
-    value.includes("streetwear")
-  ) {
-    return "Fashion"
-  }
-  if (value.includes("snack") || value.includes("drink")) return "Food"
-  if (value.includes("book")) return "Books"
-  if (value.includes("beauty")) return "Beauty"
-  if (value.includes("hostel") || value.includes("home")) return "Hostel Supplies"
-  if (value.includes("print") || value.includes("stationery")) return "Printing"
-  if (value.includes("gift") || value.includes("souvenir")) return "Gifts"
-  if (value.includes("sport") || value.includes("fitness")) return "Sports"
-  return category
 }
 
-function toNumber(value: string) {
-  const parsed = Number.parseFloat(value)
-  return Number.isNaN(parsed) ? 0 : parsed
+function StoreSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <Skeleton key={i} className="h-32 w-full rounded-lg" />
+      ))}
+    </div>
+  )
 }
 
-const CATEGORY_PRIORITY = [
-  "Electronics",
-  "Fashion",
-  "Food",
-  "Books",
-  "Beauty",
-  "Hostel Supplies",
-]
+function FeaturedSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <Skeleton key={i} className="h-48 w-full rounded-lg" />
+      ))}
+    </div>
+  )
+}
 
 export default function StoresPage() {
   const [search, setSearch] = React.useState("")
   const [category, setCategory] = React.useState("all")
   const [status, setStatus] = React.useState<StatusFilter>("all")
-  const [sort, setSort] = React.useState<SortFilter>("most-popular")
+  const [sort, setSort] = React.useState<SortFilter>("popular")
   const [viewMode, setViewMode] = React.useState<ViewMode>("grid")
-  const [visibleCount, setVisibleCount] = React.useState(6)
+  const [page, setPage] = React.useState(1)
   const [filtersOpen, setFiltersOpen] = React.useState(false)
 
-  const featuredStores = React.useMemo(() => {
-    return [...mockStores]
-      .sort((a, b) => toNumber(b.rating) * b.totalProducts - toNumber(a.rating) * a.totalProducts)
-      .slice(0, 3)
-  }, [])
+  const { data: featuredData, isLoading: featuredLoading } = useFeaturedStores(3)
+  const { data: storesData, isLoading: storesLoading } = useStores({
+    search: search || undefined,
+    category: category === "all" ? undefined : category,
+    sortBy: sort,
+    page,
+    limit: 12,
+  })
+  const { data: categoriesData } = useStoreCategories()
 
-  const categoryCounts = React.useMemo(() => {
-    const counts = new Map<string, number>()
-    for (const store of mockStores) {
-      const key = normalizeCategory(store.category)
-      counts.set(key, (counts.get(key) ?? 0) + 1)
-    }
-    return counts
-  }, [])
-
-  const categories = React.useMemo(() => {
-    const all = Array.from(categoryCounts.keys())
-    return all.sort((a, b) => {
-      const aIndex = CATEGORY_PRIORITY.indexOf(a)
-      const bIndex = CATEGORY_PRIORITY.indexOf(b)
-      const aRank = aIndex === -1 ? Number.POSITIVE_INFINITY : aIndex
-      const bRank = bIndex === -1 ? Number.POSITIVE_INFINITY : bIndex
-      if (aRank === bRank) return a.localeCompare(b)
-      return aRank - bRank
-    })
-  }, [categoryCounts])
+  const featuredStores = featuredData || []
+  const allStores = storesData?.stores || []
+  const categories = categoriesData || []
+  const totalCount = storesData?.pagination.totalItems ?? 0
+  const totalPages = storesData?.pagination.totalPages ?? 1
 
   const filteredStores = React.useMemo(() => {
-    const filtered = mockStores.filter((store) => {
-      const normalized = normalizeCategory(store.category)
-      const searchHaystack = `${store.name} ${store.category} ${normalized}`.toLowerCase()
-      const matchesSearch = search.trim().length === 0 || searchHaystack.includes(search.toLowerCase())
-      const matchesCategory = category === "all" || normalized === category
-      const matchesStatus =
-        status === "all" || (status === "open" ? store.isOpen : !store.isOpen)
-      return matchesSearch && matchesCategory && matchesStatus
-    })
-
-    const sorted = [...filtered]
-    sorted.sort((a, b) => {
-      if (sort === "most-popular") return b.totalReviews - a.totalReviews
-      if (sort === "highest-rated") {
-        const ratingDiff = toNumber(b.rating) - toNumber(a.rating)
-        if (ratingDiff !== 0) return ratingDiff
-        return b.totalReviews - a.totalReviews
-      }
-      if (sort === "most-products") return b.totalProducts - a.totalProducts
-      return b.id.localeCompare(a.id)
-    })
-    return sorted
-  }, [category, search, sort, status])
-
-  const visibleStores = filteredStores.slice(0, visibleCount)
-  const hasMore = filteredStores.length > visibleCount
+    if (status === "all") return allStores
+    return allStores.filter((store) => 
+      status === "open" ? store.isOpen : !store.isOpen
+    )
+  }, [allStores, status])
 
   const handleSearchChange = (value: string) => {
     setSearch(value)
-    setVisibleCount(6)
+    setPage(1)
   }
 
   const handleCategoryChange = (value: string) => {
     setCategory(value)
-    setVisibleCount(6)
+    setPage(1)
   }
 
   const handleStatusChange = (value: StatusFilter) => {
     setStatus(value)
-    setVisibleCount(6)
+    setPage(1)
   }
 
   const handleSortChange = (value: SortFilter) => {
     setSort(value)
-    setVisibleCount(6)
+    setPage(1)
   }
 
   const clearFilters = () => {
     setSearch("")
     setCategory("all")
     setStatus("all")
-    setSort("most-popular")
-    setVisibleCount(6)
+    setSort("popular")
+    setPage(1)
   }
 
   return (
@@ -170,11 +134,11 @@ export default function StoresPage() {
         <div className="flex items-center gap-3">
           <h1 className="font-heading text-3xl font-bold text-foreground">Campus Stores</h1>
           <Badge variant="outline" className="text-muted-foreground">
-            248 stores
+            {totalCount} stores
           </Badge>
         </div>
         <p className="text-muted-foreground">
-          Discover verified vendors across KNUST campus
+          Discover verified vendors across campus
         </p>
       </section>
 
@@ -182,16 +146,20 @@ export default function StoresPage() {
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-heading text-xl font-bold text-foreground">Featured Stores</h2>
         </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {featuredStores.map((store) => (
-            <FeaturedStoreCard key={store.id} store={store} />
-          ))}
-        </div>
+        {featuredLoading ? (
+          <FeaturedSkeleton />
+        ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {featuredStores.map((store) => (
+              <FeaturedStoreCard key={store.id} store={mapApiStoreToCard(store)} />
+            ))}
+          </div>
+        )}
       </section>
 
-      <section className="sticky top-16 z-20 rounded-lg   p-3 backdrop-blur-sm">
+      <section className="sticky top-16 z-20 rounded-lg p-3 backdrop-blur-sm">
         <div className="hidden items-center gap-2 md:flex">
-          <div className="relative min-w-0 flex-1 ">
+          <div className="relative min-w-0 flex-1">
             <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={search}
@@ -206,9 +174,9 @@ export default function StoresPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All categories</SelectItem>
-              {categories.map((item) => (
-                <SelectItem key={item} value={item}>
-                  {item}
+              {categories.map((cat) => (
+                <SelectItem key={cat.id} value={cat.id}>
+                  {cat.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -224,13 +192,11 @@ export default function StoresPage() {
             </SelectContent>
           </Select>
           <Select value={sort} onValueChange={(value) => handleSortChange(value as SortFilter)}>
-            <SelectTrigger className="px-9 py-6  rounded-lg bg-card">
+            <SelectTrigger className="px-9 py-6 rounded-lg bg-card">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="most-popular">Most Popular</SelectItem>
-              <SelectItem value="highest-rated">Highest Rated</SelectItem>
-              <SelectItem value="most-products">Most Products</SelectItem>
+              <SelectItem value="popular">Most Popular</SelectItem>
               <SelectItem value="newest">Newest</SelectItem>
             </SelectContent>
           </Select>
@@ -269,7 +235,7 @@ export default function StoresPage() {
                 <span className="sr-only">Open filters</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="bottom" className="rounded-t-lg  bg-card">
+            <SheetContent side="bottom" className="rounded-t-lg bg-card">
               <SheetHeader>
                 <SheetTitle>Filter stores</SheetTitle>
                 <SheetDescription>Refine stores by category, status, and sort.</SheetDescription>
@@ -281,9 +247,9 @@ export default function StoresPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All categories</SelectItem>
-                    {categories.map((item) => (
-                      <SelectItem key={item} value={item}>
-                        {item}
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -306,9 +272,7 @@ export default function StoresPage() {
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="most-popular">Most Popular</SelectItem>
-                    <SelectItem value="highest-rated">Highest Rated</SelectItem>
-                    <SelectItem value="most-products">Most Products</SelectItem>
+                    <SelectItem value="popular">Most Popular</SelectItem>
                     <SelectItem value="newest">Newest</SelectItem>
                   </SelectContent>
                 </Select>
@@ -357,12 +321,12 @@ export default function StoresPage() {
             active={category === "all"}
             onClick={() => handleCategoryChange("all")}
           />
-          {categories.map((item) => (
+          {categories.map((cat) => (
             <CategoryPill
-              key={item}
-              label={item}
-              active={category === item}
-              onClick={() => handleCategoryChange(item)}
+              key={cat.id}
+              label={cat.name}
+              active={category === cat.id}
+              onClick={() => handleCategoryChange(cat.id)}
             />
           ))}
         </div>
@@ -374,7 +338,9 @@ export default function StoresPage() {
           <p className="text-sm text-muted-foreground">{filteredStores.length} results</p>
         </div>
 
-        {filteredStores.length === 0 ? (
+        {storesLoading ? (
+          <StoreSkeleton />
+        ) : filteredStores.length === 0 ? (
           <div className="rounded-lg bg-card p-10 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted text-muted-foreground">
               <Store className="h-8 w-8" />
@@ -402,19 +368,32 @@ export default function StoresPage() {
                   : "grid-cols-1"
               )}
             >
-              {visibleStores.map((store) => (
-                <StoreCard key={store.id} store={store} />
+              {filteredStores.map((store) => (
+                <StoreCard key={store.id} store={mapApiStoreToCard(store)} />
               ))}
             </div>
-            {hasMore && (
-              <div className="flex justify-center">
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2">
                 <Button
                   type="button"
                   variant="outline"
                   className="rounded-md"
-                  onClick={() => setVisibleCount((current) => current + 6)}
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => p - 1)}
                 >
-                  Load more
+                  Previous
+                </Button>
+                <span className="flex items-center px-4 text-sm text-muted-foreground">
+                  Page {page} of {totalPages}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-md"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  Next
                 </Button>
               </div>
             )}

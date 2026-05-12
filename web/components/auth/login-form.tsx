@@ -14,15 +14,22 @@ import { Google } from "@lobehub/icons"
 import { Input } from "@/components/ui/input"
 import { loginSchema, type LoginSchema } from "@/lib/validation/auth"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ArrowLeft, Mail } from "lucide-react"
+import { ArrowLeft, Loader2, Mail } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import type { ComponentProps } from "react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import PasswordInput from "../ui/password-input"
+import { useAuth } from "@/providers/auth-provider"
+import { getGoogleIdToken } from "@/lib/auth/google"
 
 export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 	const [emailMode, setEmailMode] = useState(false)
+	const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false)
+	const router = useRouter()
+	const { googleLogin, login } = useAuth()
 
 	const form = useForm<LoginSchema>({
 		resolver: zodResolver(loginSchema),
@@ -33,6 +40,46 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 		},
 	})
 	const { errors, isSubmitting } = form.formState
+
+	const onSubmit = async (data: LoginSchema) => {
+		const result = await login(data)
+		if (result.success) {
+			toast.success("Welcome back!")
+			router.push("/")
+		} else {
+			toast.error(result.error || "Login failed")
+		}
+	}
+
+	const handleGoogleSignIn = async () => {
+		const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+		if (!clientId) {
+			toast.error("Google sign-in is not configured")
+			return
+		}
+
+		setIsGoogleSubmitting(true)
+		try {
+			const idToken = await getGoogleIdToken(clientId)
+			const result = await googleLogin(idToken)
+			if (!result.success) {
+				toast.error(result.error || "Google sign-in failed")
+				return
+			}
+
+			toast.success("Signed in with Google")
+			if (result.profileComplete === false) {
+				router.push("/account/settings")
+				return
+			}
+			router.push("/")
+		} catch (err) {
+			const message = err instanceof Error ? err.message : "Google sign-in failed"
+			toast.error(message)
+		} finally {
+			setIsGoogleSubmitting(false)
+		}
+	}
 
 	return (
 		<AuthFormShell
@@ -52,9 +99,11 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 					<Button
 						variant="outline"
 						type="button"
+						onClick={handleGoogleSignIn}
+						disabled={isGoogleSubmitting}
 						className="gap-4 p-6 outline-none border-none rounded-full"
 					>
-						<Google.Color size={40} />
+						{isGoogleSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Google.Color size={40} />}
 						<span>Continue with Google</span>
 					</Button>
 					<Button
@@ -75,7 +124,7 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 			) : (
 				<Form {...form}>
 					<form
-						onSubmit={form.handleSubmit(() => {})}
+						onSubmit={form.handleSubmit(onSubmit)}
 						noValidate
 						className="mt-6 animate-in fade-in slide-in-from-bottom-2 duration-200"
 					>
@@ -134,6 +183,7 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 									disabled={isSubmitting}
 									className="text-base p-6 rounded-full"
 								>
+									{isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
 									Sign in
 								</Button>
 							</FormItem>

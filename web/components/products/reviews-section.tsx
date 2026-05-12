@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
+import { MessageSquareOff } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
@@ -12,7 +14,7 @@ import {
 } from "@/components/ui/select"
 import { RatingDistribution } from "./rating-distribution"
 import { ReviewCard } from "./review-card"
-import type { Review } from "@/data/reviews"
+import type { Review } from "@/components/products/product-detail-view"
 import type { ProductSeller } from "@/components/main/product-card"
 
 type Props = {
@@ -33,8 +35,15 @@ function filterAndSort(reviews: Review[], sort: SortKey): Review[] {
 
 function EmptyReviews() {
   return (
-    <div className="py-10 text-center">
-      <p className="text-sm text-muted-foreground">No reviews yet. Be the first!</p>
+    <div className="flex flex-col items-center gap-3 py-12 text-center">
+      <MessageSquareOff className="h-12 w-12 text-muted-foreground/40" />
+      <div>
+        <p className="text-sm font-semibold text-foreground">No reviews yet</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">Be the first to review this product</p>
+      </div>
+      <Button variant="outline" size="sm" className="mt-1 rounded-full">
+        Write a review
+      </Button>
     </div>
   )
 }

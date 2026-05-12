@@ -24,15 +24,15 @@ export type ProductImage = {
 export type ProductCategory = {
 	id: string
 	name: string
-	icon: string
-	count: number
+	icon?: string
+	count?: number
 }
 
 export type ProductSeller = {
 	id: string
 	name: string
-	email: string
-	avatar: string
+	email?: string
+	avatarUrl?: string
 	rating: string
 }
 
@@ -41,14 +41,15 @@ export type Product = {
 	title: string
 	description: string
 	price: string
-	originalPrice: string
+	originalPrice?: string
 	images: ProductImage[]
 	category: ProductCategory
 	condition: string
 	location: string
 	seller: ProductSeller
-	badges: string
+	badges?: string
 	status: string
+	stock?: number
 	views: number
 	likes: number
 	isNightShop: boolean
@@ -68,7 +69,8 @@ function formatGHS(value: string | number) {
 	}).format(n)
 }
 
-function discountPct(price: string, original: string) {
+function discountPct(price: string, original?: string) {
+	if (!original) return null
 	const p = parseFloat(price)
 	const o = parseFloat(original)
 	if (!o || o <= p) return null
@@ -125,7 +127,7 @@ export function ProductCard({
 					<Image
 						width={1200}
 						height={1200}
-						src={primary.optimized_url || primary.url}
+						src={primary.url || primary.optimized_url}
 						alt={product.title}
 						className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
 						loading="lazy"
@@ -204,7 +206,7 @@ export function ProductCard({
 					<span className="text-base font-bold text-vm-tangerine">
 						{formatGHS(product.price)}
 					</span>
-					{discount && (
+					{discount && product.originalPrice && (
 						<span className="text-[11px] text-muted-foreground line-through">
 							{formatGHS(product.originalPrice)}
 						</span>
@@ -223,22 +225,5 @@ export function ProductCard({
 				</div>
 			</div>
 		</a>
-	)
-}
-
-/* -----------------------------------------------------------
-	 Demo grid
------------------------------------------------------------ */
-import { mockProducts } from "@/data/product"
-
-export default function ProductCardDemo() {
-	return (
-		<section className="container mx-auto px-4 py-10">
-			<div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-				{mockProducts.map((p) => (
-					<ProductCard key={p.id} product={p} />
-				))}
-			</div>
-		</section>
 	)
 }

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { Sparkles, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/main/product-card"
 import type { Product } from "@/components/main/product-card"
@@ -7,28 +7,34 @@ import type { Product } from "@/components/main/product-card"
 type Props = {
   products: Product[]
   heading?: string
+  categoryId?: string
 }
 
-export function SimilarProducts({ products, heading = "Similar Products" }: Props) {
+export function SimilarProducts({ products, heading = "Similar Products", categoryId }: Props) {
   if (products.length === 0) return null
 
-  const hasMore = products.length >= 8
+  const href = categoryId ? `/search?category=${categoryId}` : "/search"
 
   return (
-    <section className="mt-12">
+    <section className="mt-12 border-t border-border pt-12">
       <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-xl font-bold">{heading}</h2>
-        {hasMore && (
-          <Button variant="ghost" size="sm" asChild className="gap-1 text-sm">
-            <Link href="/search">
-              View more <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </Button>
-        )}
+        <h2 className="flex items-center gap-2 text-xl font-bold font-heading">
+          <Sparkles className="h-5 w-5 text-vm-tangerine" />
+          {heading}
+        </h2>
+        <Button variant="ghost" size="sm" asChild className="gap-1 text-sm">
+          <Link href={href}>
+            View all <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </Button>
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+
+      {/* Mobile: horizontal scroll; desktop: grid */}
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 md:grid-cols-4">
         {products.slice(0, 8).map((p) => (
-          <ProductCard key={p.id} product={p} />
+          <div key={p.id} className="w-48 shrink-0 sm:w-auto">
+            <ProductCard product={p} />
+          </div>
         ))}
       </div>
     </section>

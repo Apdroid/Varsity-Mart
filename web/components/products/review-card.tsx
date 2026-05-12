@@ -1,6 +1,6 @@
 import { Star } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { Review } from "@/data/reviews"
+import type { Review } from "@/components/products/product-detail-view"
 
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime()
@@ -23,13 +23,13 @@ export function ReviewCard({ review, className }: Props) {
     <div className={cn("py-4", className)}>
       <div className="flex items-start gap-3">
         <img
-          src={review.reviewerAvatar}
-          alt={review.reviewerName}
+          src={review.user.avatar}
+          alt={review.user.name}
           className="h-9 w-9 shrink-0 rounded-full object-cover"
         />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center justify-between gap-1">
-            <span className="text-sm font-semibold">{review.reviewerName}</span>
+            <span className="text-sm font-semibold">{review.user.name}</span>
             <span className="text-xs text-muted-foreground">{timeAgo(review.createdAt)}</span>
           </div>
           <div className="mt-0.5 flex items-center gap-0.5">

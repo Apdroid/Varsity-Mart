@@ -134,20 +134,3 @@ export function StoreCard({ store, className }: StoreCardProps) {
     </a>
   )
 }
-
-/* -----------------------------------------------------------
-   Demo grid
------------------------------------------------------------ */
-import { mockStores } from "@/data/store"
-
-export default function StoreCardDemo() {
-  return (
-    <section className="container mx-auto px-4 py-10">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {mockStores.map((s) => (
-          <StoreCard key={s.id} store={s} />
-        ))}
-      </div>
-    </section>
-  )
-}

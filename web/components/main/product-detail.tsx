@@ -42,7 +42,8 @@ function formatGHS(value: string | number) {
   }).format(n)
 }
 
-function discountPct(price: string, original: string) {
+function discountPct(price: string, original?: string) {
+  if (!original) return null
   const p = parseFloat(price)
   const o = parseFloat(original)
   if (!o || o <= p) return null
@@ -194,7 +195,7 @@ function SellerCard({ seller }: { seller: Product["seller"] }) {
       </p>
       <div className="flex items-center gap-3">
         <Avatar className="h-12 w-12">
-          <AvatarImage src={seller.avatar} alt={seller.name} />
+          <AvatarImage src={seller.avatarUrl} alt={seller.name} />
           <AvatarFallback className="text-sm font-bold">{initials}</AvatarFallback>
         </Avatar>
         <div className="min-w-0 flex-1">
@@ -373,7 +374,7 @@ export default function ProductDetailPage({ product, related }: Props) {
                 <span className="text-3xl font-black text-vm-tangerine">
                   {formatGHS(product.price)}
                 </span>
-                {discount && (
+                {discount && product.originalPrice && (
                   <>
                     <span className="text-base text-muted-foreground line-through">
                       {formatGHS(product.originalPrice)}
@@ -384,7 +385,7 @@ export default function ProductDetailPage({ product, related }: Props) {
                   </>
                 )}
               </div>
-              {discount && (
+              {discount && product.originalPrice && (
                 <p className="text-sm text-muted-foreground">
                   You save{" "}
                   {formatGHS(
@@ -475,7 +476,7 @@ export default function ProductDetailPage({ product, related }: Props) {
             <span className="text-xl font-black text-vm-tangerine">
               {formatGHS(product.price)}
             </span>
-            {discount && (
+            {discount && product.originalPrice && (
               <span className="ml-2 text-xs text-muted-foreground line-through">
                 {formatGHS(product.originalPrice)}
               </span>

@@ -7,12 +7,13 @@ import { ArrowLeft, Star, Clock, Bike, MapPin, Leaf, Droplets } from "lucide-rea
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { mockRestaurants } from "@/data/restaurant"
-import type { MenuItem, RestaurantWithMenu } from "@/data/restaurant"
+import { Skeleton } from "@/components/ui/skeleton"
 import { MenuItemCard } from "@/components/restaurants/menu-item-card"
 import { CustomizationSheet } from "@/components/restaurants/customization-sheet"
 import { RestaurantCart } from "@/components/restaurants/restaurant-cart"
 import { cn } from "@/lib/utils"
+import { useRestaurant, useMenuItems } from "@/hooks/queries/use-restaurants"
+import type { RestaurantDetail, MenuItem as ApiMenuItem } from "@/lib/api/types"
 
 function formatGHS(n: string | number) {
   return new Intl.NumberFormat("en-GH", {
@@ -31,7 +32,7 @@ const FILTER_LABELS: Record<FilterKey, string> = {
   under30: "Under GHS 30",
 }
 
-function applyFilter(items: MenuItem[], filter: FilterKey): MenuItem[] {
+function applyFilter(items: ApiMenuItem[], filter: FilterKey): ApiMenuItem[] {
   if (filter === "all") return items
   if (filter === "vegetarian") return items.filter((i) => i.dietaryTags?.includes("vegetarian"))
   if (filter === "halal") return items.filter((i) => i.dietaryTags?.includes("halal"))
@@ -39,13 +40,54 @@ function applyFilter(items: MenuItem[], filter: FilterKey): MenuItem[] {
   return items
 }
 
-function RestaurantHeader({ restaurant }: { restaurant: RestaurantWithMenu }) {
+function mapMenuItemForComponent(item: ApiMenuItem) {
+  return {
+    id: item.id,
+    name: item.name,
+    slug: item.slug,
+    description: item.description,
+    basePrice: item.basePrice,
+    image: item.image,
+    category: item.category,
+    sizeOptions: item.sizeOptions,
+    proteinOptions: item.proteinOptions,
+    sides: item.sides,
+    modifiers: item.modifiers,
+    allowsNotes: item.allowsNotes,
+    isQuickAdd: item.isQuickAdd,
+    isAvailable: item.isAvailable,
+    dietaryTags: item.dietaryTags,
+    allergens: item.allergens,
+    bundleSuggestionIds: item.bundleSuggestionIds,
+    restaurant: item.restaurant,
+    createdAt: item.createdAt,
+  }
+}
+
+function RestaurantHeaderSkeleton() {
   return (
-    <div >
-      {/* Banner */}
+    <div>
+      <Skeleton className="h-52 w-full md:h-64" />
+      <div className="relative mx-4 -mt-14 rounded-2xl border bg-card px-4 py-4 shadow-md md:mx-6">
+        <div className="flex items-start gap-3">
+          <Skeleton className="h-14 w-14 rounded-xl" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function RestaurantHeader({ restaurant }: { restaurant: RestaurantDetail }) {
+  return (
+    <div>
       <div className="relative h-52 w-full overflow-hidden md:h-64">
         <Image
-          src={restaurant.banner}
+          src={restaurant.banner || restaurant.logo || "/placeholder.jpg"}
           alt={restaurant.name}
           fill
           className="object-cover"
@@ -60,22 +102,22 @@ function RestaurantHeader({ restaurant }: { restaurant: RestaurantWithMenu }) {
         </Link>
       </div>
 
-      {/* Info card */}
       <div className="relative mx-4 -mt-14 rounded-2xl border border-border bg-card px-4 py-4 shadow-md md:mx-6">
         <div className="flex items-start gap-3">
-          {/* Logo */}
-          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
-            <Image src={restaurant.logo} alt={restaurant.name} fill className="object-cover" />
-          </div>
+          {restaurant.logo && (
+            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
+              <Image src={restaurant.logo} alt={restaurant.name} fill className="object-cover" />
+            </div>
+          )}
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
                 <h1 className="text-lg font-bold leading-tight">{restaurant.name}</h1>
                 <p className="text-xs text-muted-foreground">{restaurant.category}</p>
               </div>
-              {restaurant.badge && (
+              {restaurant.isFeatured && (
                 <Badge className="shrink-0 rounded-full bg-vm-tangerine/15 text-xs font-semibold text-vm-tangerine">
-                  {restaurant.badge}
+                  Featured
                 </Badge>
               )}
             </div>
@@ -111,28 +153,54 @@ function RestaurantHeader({ restaurant }: { restaurant: RestaurantWithMenu }) {
   )
 }
 
+function MenuSkeleton() {
+  return (
+    <div className="space-y-4">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Skeleton key={i} className="h-24 w-full rounded-lg" />
+      ))}
+    </div>
+  )
+}
+
 export default function RestaurantPage() {
   const params = useParams<{ id: string }>()
-  const restaurant = mockRestaurants.find((r) => r.id === params.id)
+  const { data: restaurantData, isLoading: restaurantLoading, error } = useRestaurant(params.id)
+  const { data: menuData, isLoading: menuLoading } = useMenuItems(params.id)
 
-  const [activeCategory, setActiveCategory] = React.useState<string>(
-    restaurant?.menu.categories[0] ?? ""
-  )
+  const restaurant = restaurantData
+  const menuItems = menuData?.items || []
+  const menuCategories = menuData?.categories || []
+
+  const [activeCategory, setActiveCategory] = React.useState<string>("")
   const [activeFilter, setActiveFilter] = React.useState<FilterKey>("all")
-  const [customizing, setCustomizing] = React.useState<MenuItem | null>(null)
+  const [customizing, setCustomizing] = React.useState<ApiMenuItem | null>(null)
   const tabsRef = React.useRef<HTMLDivElement>(null)
 
-  if (!restaurant) notFound()
+  React.useEffect(() => {
+    if (menuCategories.length > 0 && !activeCategory) {
+      setActiveCategory(menuCategories[0])
+    }
+  }, [menuCategories, activeCategory])
 
-  const { categories, items } = restaurant.menu
-  const currentCategory = categories.includes(activeCategory)
-    ? activeCategory
-    : categories[0]
+  if (restaurantLoading) {
+    return (
+      <div className="max-w-7xl mx-auto min-h-screen bg-background pb-28 lg:pb-8">
+        <RestaurantHeaderSkeleton />
+        <div className="mx-auto max-w-7xl px-4 pt-5">
+          <MenuSkeleton />
+        </div>
+      </div>
+    )
+  }
 
-  const visibleItems = applyFilter(
-    currentCategory ? items.filter((i) => i.category === currentCategory) : items,
-    activeFilter
-  )
+  if (error || !restaurant) {
+    notFound()
+  }
+
+  const currentCategory = menuCategories.includes(activeCategory) ? activeCategory : menuCategories[0] || ""
+  const categoryItems = menuItems.filter((item) => item.category === currentCategory)
+  const visibleItems = applyFilter(categoryItems, activeFilter)
 
   const scrollToCategory = (cat: string) => {
     setActiveCategory(cat)
@@ -140,18 +208,38 @@ export default function RestaurantPage() {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" })
   }
 
+  const restaurantForCart = {
+    id: restaurant.id,
+    name: restaurant.name,
+    logo: restaurant.logo || "",
+    banner: restaurant.banner || "",
+    category: restaurant.category,
+    cuisineType: restaurant.cuisineType || "",
+    rating: String(restaurant.rating),
+    totalReviews: restaurant.totalReviews,
+    deliveryTime: restaurant.deliveryTime,
+    deliveryFee: String(restaurant.deliveryFee),
+    minOrder: restaurant.minOrder,
+    isOpen: restaurant.isOpen,
+    isFeatured: restaurant.isFeatured,
+    tags: [],
+    badge: restaurant.isFeatured ? "Featured" : undefined,
+    menu: {
+      categories: menuCategories,
+      items: menuItems.map(mapMenuItemForComponent),
+    },
+  }
+
   return (
     <div className="max-w-7xl mx-auto min-h-screen bg-background pb-28 lg:pb-8">
       <RestaurantHeader restaurant={restaurant} />
 
-      {/* Sticky tab bar */}
       <div
         ref={tabsRef}
         className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-md"
       >
-        {/* Category tabs */}
         <div className="flex overflow-x-auto px-4 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {categories.map((cat) => (
+          {menuCategories.map((cat) => (
             <button
               key={cat}
               type="button"
@@ -168,7 +256,6 @@ export default function RestaurantPage() {
           ))}
         </div>
 
-        {/* Filter chips */}
         <div className="flex gap-2 overflow-x-auto px-4 pb-3 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {(Object.keys(FILTER_LABELS) as FilterKey[]).map((key) => {
             const Icon = key === "vegetarian" ? Leaf : key === "halal" ? Droplets : null
@@ -192,20 +279,27 @@ export default function RestaurantPage() {
         </div>
       </div>
 
-      {/* Menu + desktop cart */}
       <div className="mx-auto max-w-7xl px-4 pt-5">
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="mx-auto w-full max-w-2xl lg:max-w-none">
-            {visibleItems.length === 0 ? (
+            {menuLoading ? (
+              <MenuSkeleton />
+            ) : visibleItems.length === 0 ? (
               <div className="py-16 text-center text-sm text-muted-foreground">
                 No items match this filter.
               </div>
             ) : (
               <div className="space-y-8">
-                {categories
-                  .filter((cat) => visibleItems.some((i) => i.category === cat))
+                {menuCategories
+                  .filter((cat) => {
+                    const items = menuItems.filter((i) => i.category === cat)
+                    return applyFilter(items, activeFilter).length > 0
+                  })
                   .map((cat, idx) => {
-                    const catItems = visibleItems.filter((i) => i.category === cat)
+                    const catItems = applyFilter(
+                      menuItems.filter((i) => i.category === cat),
+                      activeFilter
+                    )
                     if (catItems.length === 0) return null
                     return (
                       <section key={cat} id={`cat-${cat}`}>
@@ -215,9 +309,12 @@ export default function RestaurantPage() {
                           {catItems.map((item) => (
                             <MenuItemCard
                               key={item.id}
-                              item={item}
-                              restaurant={restaurant}
-                              onCustomize={setCustomizing}
+                              item={mapMenuItemForComponent(item)}
+                              restaurant={restaurantForCart}
+                              onCustomize={(menuItem) => {
+                                const apiItem = menuItems.find((i) => i.id === menuItem.id)
+                                if (apiItem) setCustomizing(apiItem)
+                              }}
                             />
                           ))}
                         </div>
@@ -231,14 +328,12 @@ export default function RestaurantPage() {
         </div>
       </div>
 
-      {/* Customization sheet */}
       <CustomizationSheet
-        item={customizing}
-        restaurant={restaurant}
+        item={customizing ? mapMenuItemForComponent(customizing) : null}
+        restaurant={restaurantForCart}
         open={!!customizing}
         onClose={() => setCustomizing(null)}
       />
-
     </div>
   )
 }

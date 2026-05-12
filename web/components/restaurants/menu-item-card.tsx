@@ -3,7 +3,7 @@
 import { Plus } from "lucide-react"
 import { toast } from "sonner"
 import { useCartStore } from "@/store/cart-store"
-import type { MenuItem, RestaurantWithMenu } from "@/data/restaurant"
+import type { MenuItem, RestaurantWithMenu } from "@/lib/api/types"
 import { cn } from "@/lib/utils"
 
 type Props = {

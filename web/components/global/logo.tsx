@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 const logoVariantSizes = {
 	default: { width: 1200, height: 100 },
-	auth: { width: 600, height: 50 },
+	auth: { width: 200, height: 50 },
 	header: { width: 100, height: 30 },
 	footer: { width: 120, height: 40 },
 } as const;

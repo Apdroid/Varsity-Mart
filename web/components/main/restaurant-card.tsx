@@ -21,13 +21,13 @@ export type Restaurant = {
   logo: string
   banner: string
   category: string
-  rating: string
+  rating: string | number
   totalReviews: number
   deliveryTime: string
-  deliveryFee: string
+  deliveryFee: string | number
   minOrder: number
   isOpen: boolean
-  badge: string
+  badge?: string
 }
 
 function formatGHS(value: string | number) {
@@ -86,8 +86,8 @@ type RestaurantCardProps = {
 }
 
 export function RestaurantCard({ restaurant, className }: RestaurantCardProps) {
-  const rating = parseFloat(restaurant.rating)
-  const free = isFreeDelivery(restaurant.deliveryFee)
+  const rating = typeof restaurant.rating === "number" ? restaurant.rating : parseFloat(restaurant.rating)
+  const free = isFreeDelivery(String(restaurant.deliveryFee))
 
   return (
     <a
@@ -229,22 +229,5 @@ export function RestaurantCard({ restaurant, className }: RestaurantCardProps) {
         </div>
       </div>
     </a>
-  )
-}
-
-/* -----------------------------------------------------------
-   Demo grid
------------------------------------------------------------ */
-import { mockRestaurants } from "@/data/restaurant"
-
-export default function RestaurantCardDemo() {
-  return (
-    <section className="container mx-auto px-4 py-10">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {mockRestaurants.map((r) => (
-          <RestaurantCard key={r.id} restaurant={r} />
-        ))}
-      </div>
-    </section>
   )
 }

@@ -13,7 +13,7 @@ import { NotesInput } from "./notes-input"
 import { QuantityStepper } from "./quantity-stepper"
 import { BundleSuggestions } from "./bundle-suggestions"
 import { useCartStore } from "@/store/cart-store"
-import type { MenuItem, MenuItemOption, RestaurantWithMenu } from "@/data/restaurant"
+import type { MenuItem, MenuItemOption, RestaurantWithMenu } from "@/lib/api/types"
 
 type Props = {
 	item: MenuItem | null
@@ -103,7 +103,11 @@ function CustomizationBody({
 		<div className="grid h-full min-h-0 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
 			<aside className="hidden min-h-0 border-r border-border bg-card md:grid md:grid-rows-[minmax(13rem,38%)_1fr]">
 				<div className="relative h-full w-full overflow-hidden">
-					<Image src={item.image} alt={item.name} fill className="object-cover" />
+					{item.image ? (
+						<Image src={item.image} alt={item.name} fill className="object-cover" />
+					) : (
+						<div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">No image</div>
+					)}
 				</div>
 				<div className="min-h-0 space-y-3 overflow-y-auto p-5">
 					<div className="flex flex-wrap gap-1.5">
@@ -129,7 +133,11 @@ function CustomizationBody({
 
 			<div className="flex min-h-0 flex-col">
 				<div className="relative h-40 w-full shrink-0 overflow-hidden md:hidden">
-					<Image src={item.image} alt={item.name} fill className="object-cover" />
+					{item.image ? (
+						<Image src={item.image} alt={item.name} fill className="object-cover" />
+					) : (
+						<div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">No image</div>
+					)}
 				</div>
 
 				<ScrollArea className="min-h-0 flex-1">
