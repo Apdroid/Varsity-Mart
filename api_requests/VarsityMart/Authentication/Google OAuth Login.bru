@@ -1,0 +1,197 @@
+meta {
+  name: Google OAuth Login
+  type: http
+  seq: 3
+  tags: [
+    Authentication
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/auth/google/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id_token": ""
+  }
+}
+
+docs {
+  
+          Authenticate using a Google `id_token` obtained from the Google Sign-In SDK.
+  
+          ### Flow:
+          1. Client uses Google Sign-In SDK to get an `id_token`
+          2. Client POSTs `{"id_token": "eyJ..."}` to this endpoint
+          3. Backend verifies the token with Google
+          4. Backend finds or creates a user (auto-verified, auth_method='google')
+          5. Returns user data + sets HttpOnly JWT cookies
+  
+          ### Two-step onboarding:
+          The response includes `isNewUser` and `profileComplete` flags:
+          - If `isNewUser: true` or `profileComplete: false`, the client should
+            show a "Complete your profile" screen and then call
+            `PATCH /v1/users/me/` with `university`, `campus`, `phone`, etc.
+          - If `profileComplete: true`, the user can proceed directly to the app.
+  
+          ### Notes:
+          - If a user with the same email already exists (e.g. registered via email/password),
+            the account is linked and the user is logged in — no data is overwritten.
+          - Suspended or deactivated accounts are rejected with 403.
+          - University and campus default to empty strings for Google sign-ups;
+            the user must complete their profile before full app access.
+          
+}
+
+example {
+  name: 200 Response
+  description: Login successful
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/google/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "id_token": ""
+      }
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/google/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "id_token": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "errors": {
+            "id_token": [
+              "This field is required."
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/google/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "id_token": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "errors": {
+            "id_token": [
+              "Invalid or expired Google token."
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/google/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "id_token": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "errors": {
+            "account": [
+              "This account has been deactivated."
+            ]
+          }
+        }
+      '''
+    }
+  }
+}

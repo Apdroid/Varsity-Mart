@@ -1,49 +1,235 @@
 meta {
   name: Rate Food Order
   type: http
-  seq: 5
+  seq: 4
   tags: [
     Food_Orders
   ]
 }
 
 post {
-  url: {{baseUrl}}/food-orders/:orderId/rate
-  body: none
-  auth: inherit
+  url: {{baseUrl}}/v1/food-orders/:orderId/rate
+  body: json
+  auth: apikey
 }
 
 params:path {
   orderId: 
 }
 
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "rating": 0,
+    "review": "",
+    "foodQuality": 0,
+    "deliverySpeed": 0,
+    "packaging": 0
+  }
+}
+
 docs {
-  Rate a food order
+  Submit a rating and review for a completed food order. Only customers can rate their orders. Order must be delivered.
 }
 
 example {
   name: 200 Response
-  description: Review submitted
+  description: Review submitted successfully
   
   request: {
-    url: {{baseUrl}}/food-orders/:orderId/rate
+    url: {{baseUrl}}/v1/food-orders/:orderId/rate
     method: POST
-    mode: none
+    mode: json
     params:path: {
       orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "foodQuality": 0,
+        "deliverySpeed": 0,
+        "packaging": 0
+      }
     }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 200
       text: OK
     }
   
     body: {
-      type: text
+      type: json
       content: '''
+        {
+          "success": true,
+          "message": "Thank you for your review!",
+          "data": {
+            "reviewId": ""
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation failed or order cannot be rated
   
+  request: {
+    url: {{baseUrl}}/v1/food-orders/:orderId/rate
+    method: POST
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "foodQuality": 0,
+        "deliverySpeed": 0,
+        "packaging": 0
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {}
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/food-orders/:orderId/rate
+    method: POST
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "foodQuality": 0,
+        "deliverySpeed": 0,
+        "packaging": 0
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: User account is not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/food-orders/:orderId/rate
+    method: POST
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "foodQuality": 0,
+        "deliverySpeed": 0,
+        "packaging": 0
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
       '''
     }
   }
@@ -51,27 +237,47 @@ example {
 
 example {
   name: 404 Response
-  description: Order not found
+  description: Food order not found
   
   request: {
-    url: {{baseUrl}}/food-orders/:orderId/rate
+    url: {{baseUrl}}/v1/food-orders/:orderId/rate
     method: POST
-    mode: none
+    mode: json
     params:path: {
       orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "foodQuality": 0,
+        "deliverySpeed": 0,
+        "packaging": 0
+      }
     }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 404
       text: Not Found
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }

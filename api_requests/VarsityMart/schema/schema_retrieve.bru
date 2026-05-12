@@ -1,0 +1,675 @@
+meta {
+  name: schema_retrieve
+  type: http
+  seq: 1
+  tags: [
+    schema
+  ]
+}
+
+get {
+  url: {{baseUrl}}/schema/
+  body: none
+  auth: apikey
+}
+
+params:query {
+  ~format: json
+  ~format: yaml
+  ~lang: af
+  ~lang: ar
+  ~lang: ar-dz
+  ~lang: ast
+  ~lang: az
+  ~lang: be
+  ~lang: bg
+  ~lang: bn
+  ~lang: br
+  ~lang: bs
+  ~lang: ca
+  ~lang: ckb
+  ~lang: cs
+  ~lang: cy
+  ~lang: da
+  ~lang: de
+  ~lang: dsb
+  ~lang: el
+  ~lang: en
+  ~lang: en-au
+  ~lang: en-gb
+  ~lang: eo
+  ~lang: es
+  ~lang: es-ar
+  ~lang: es-co
+  ~lang: es-mx
+  ~lang: es-ni
+  ~lang: es-ve
+  ~lang: et
+  ~lang: eu
+  ~lang: fa
+  ~lang: fi
+  ~lang: fr
+  ~lang: fy
+  ~lang: ga
+  ~lang: gd
+  ~lang: gl
+  ~lang: he
+  ~lang: hi
+  ~lang: hr
+  ~lang: hsb
+  ~lang: hu
+  ~lang: hy
+  ~lang: ia
+  ~lang: id
+  ~lang: ig
+  ~lang: io
+  ~lang: is
+  ~lang: it
+  ~lang: ja
+  ~lang: ka
+  ~lang: kab
+  ~lang: kk
+  ~lang: km
+  ~lang: kn
+  ~lang: ko
+  ~lang: ky
+  ~lang: lb
+  ~lang: lt
+  ~lang: lv
+  ~lang: mk
+  ~lang: ml
+  ~lang: mn
+  ~lang: mr
+  ~lang: ms
+  ~lang: my
+  ~lang: nb
+  ~lang: ne
+  ~lang: nl
+  ~lang: nn
+  ~lang: os
+  ~lang: pa
+  ~lang: pl
+  ~lang: pt
+  ~lang: pt-br
+  ~lang: ro
+  ~lang: ru
+  ~lang: sk
+  ~lang: sl
+  ~lang: sq
+  ~lang: sr
+  ~lang: sr-latn
+  ~lang: sv
+  ~lang: sw
+  ~lang: ta
+  ~lang: te
+  ~lang: tg
+  ~lang: th
+  ~lang: tk
+  ~lang: tr
+  ~lang: tt
+  ~lang: udm
+  ~lang: ug
+  ~lang: uk
+  ~lang: ur
+  ~lang: uz
+  ~lang: vi
+  ~lang: zh-hans
+  ~lang: zh-hant
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  OpenApi3 schema for this API. Format can be selected via content negotiation.
+  
+  - YAML: application/vnd.oai.openapi
+  - JSON: application/vnd.oai.openapi+json
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/schema/
+    method: GET
+    mode: none
+    params:query: {
+      ~format: json
+      ~format: yaml
+      ~lang: af
+      ~lang: ar
+      ~lang: ar-dz
+      ~lang: ast
+      ~lang: az
+      ~lang: be
+      ~lang: bg
+      ~lang: bn
+      ~lang: br
+      ~lang: bs
+      ~lang: ca
+      ~lang: ckb
+      ~lang: cs
+      ~lang: cy
+      ~lang: da
+      ~lang: de
+      ~lang: dsb
+      ~lang: el
+      ~lang: en
+      ~lang: en-au
+      ~lang: en-gb
+      ~lang: eo
+      ~lang: es
+      ~lang: es-ar
+      ~lang: es-co
+      ~lang: es-mx
+      ~lang: es-ni
+      ~lang: es-ve
+      ~lang: et
+      ~lang: eu
+      ~lang: fa
+      ~lang: fi
+      ~lang: fr
+      ~lang: fy
+      ~lang: ga
+      ~lang: gd
+      ~lang: gl
+      ~lang: he
+      ~lang: hi
+      ~lang: hr
+      ~lang: hsb
+      ~lang: hu
+      ~lang: hy
+      ~lang: ia
+      ~lang: id
+      ~lang: ig
+      ~lang: io
+      ~lang: is
+      ~lang: it
+      ~lang: ja
+      ~lang: ka
+      ~lang: kab
+      ~lang: kk
+      ~lang: km
+      ~lang: kn
+      ~lang: ko
+      ~lang: ky
+      ~lang: lb
+      ~lang: lt
+      ~lang: lv
+      ~lang: mk
+      ~lang: ml
+      ~lang: mn
+      ~lang: mr
+      ~lang: ms
+      ~lang: my
+      ~lang: nb
+      ~lang: ne
+      ~lang: nl
+      ~lang: nn
+      ~lang: os
+      ~lang: pa
+      ~lang: pl
+      ~lang: pt
+      ~lang: pt-br
+      ~lang: ro
+      ~lang: ru
+      ~lang: sk
+      ~lang: sl
+      ~lang: sq
+      ~lang: sr
+      ~lang: sr-latn
+      ~lang: sv
+      ~lang: sw
+      ~lang: ta
+      ~lang: te
+      ~lang: tg
+      ~lang: th
+      ~lang: tk
+      ~lang: tr
+      ~lang: tt
+      ~lang: udm
+      ~lang: ug
+      ~lang: uk
+      ~lang: ur
+      ~lang: uz
+      ~lang: vi
+      ~lang: zh-hans
+      ~lang: zh-hant
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/vnd.oai.openapi
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+        {}
+      '''
+    }
+  }
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/schema/
+    method: GET
+    mode: none
+    params:query: {
+      ~format: json
+      ~format: yaml
+      ~lang: af
+      ~lang: ar
+      ~lang: ar-dz
+      ~lang: ast
+      ~lang: az
+      ~lang: be
+      ~lang: bg
+      ~lang: bn
+      ~lang: br
+      ~lang: bs
+      ~lang: ca
+      ~lang: ckb
+      ~lang: cs
+      ~lang: cy
+      ~lang: da
+      ~lang: de
+      ~lang: dsb
+      ~lang: el
+      ~lang: en
+      ~lang: en-au
+      ~lang: en-gb
+      ~lang: eo
+      ~lang: es
+      ~lang: es-ar
+      ~lang: es-co
+      ~lang: es-mx
+      ~lang: es-ni
+      ~lang: es-ve
+      ~lang: et
+      ~lang: eu
+      ~lang: fa
+      ~lang: fi
+      ~lang: fr
+      ~lang: fy
+      ~lang: ga
+      ~lang: gd
+      ~lang: gl
+      ~lang: he
+      ~lang: hi
+      ~lang: hr
+      ~lang: hsb
+      ~lang: hu
+      ~lang: hy
+      ~lang: ia
+      ~lang: id
+      ~lang: ig
+      ~lang: io
+      ~lang: is
+      ~lang: it
+      ~lang: ja
+      ~lang: ka
+      ~lang: kab
+      ~lang: kk
+      ~lang: km
+      ~lang: kn
+      ~lang: ko
+      ~lang: ky
+      ~lang: lb
+      ~lang: lt
+      ~lang: lv
+      ~lang: mk
+      ~lang: ml
+      ~lang: mn
+      ~lang: mr
+      ~lang: ms
+      ~lang: my
+      ~lang: nb
+      ~lang: ne
+      ~lang: nl
+      ~lang: nn
+      ~lang: os
+      ~lang: pa
+      ~lang: pl
+      ~lang: pt
+      ~lang: pt-br
+      ~lang: ro
+      ~lang: ru
+      ~lang: sk
+      ~lang: sl
+      ~lang: sq
+      ~lang: sr
+      ~lang: sr-latn
+      ~lang: sv
+      ~lang: sw
+      ~lang: ta
+      ~lang: te
+      ~lang: tg
+      ~lang: th
+      ~lang: tk
+      ~lang: tr
+      ~lang: tt
+      ~lang: udm
+      ~lang: ug
+      ~lang: uk
+      ~lang: ur
+      ~lang: uz
+      ~lang: vi
+      ~lang: zh-hans
+      ~lang: zh-hant
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/yaml
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+        {}
+      '''
+    }
+  }
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/schema/
+    method: GET
+    mode: none
+    params:query: {
+      ~format: json
+      ~format: yaml
+      ~lang: af
+      ~lang: ar
+      ~lang: ar-dz
+      ~lang: ast
+      ~lang: az
+      ~lang: be
+      ~lang: bg
+      ~lang: bn
+      ~lang: br
+      ~lang: bs
+      ~lang: ca
+      ~lang: ckb
+      ~lang: cs
+      ~lang: cy
+      ~lang: da
+      ~lang: de
+      ~lang: dsb
+      ~lang: el
+      ~lang: en
+      ~lang: en-au
+      ~lang: en-gb
+      ~lang: eo
+      ~lang: es
+      ~lang: es-ar
+      ~lang: es-co
+      ~lang: es-mx
+      ~lang: es-ni
+      ~lang: es-ve
+      ~lang: et
+      ~lang: eu
+      ~lang: fa
+      ~lang: fi
+      ~lang: fr
+      ~lang: fy
+      ~lang: ga
+      ~lang: gd
+      ~lang: gl
+      ~lang: he
+      ~lang: hi
+      ~lang: hr
+      ~lang: hsb
+      ~lang: hu
+      ~lang: hy
+      ~lang: ia
+      ~lang: id
+      ~lang: ig
+      ~lang: io
+      ~lang: is
+      ~lang: it
+      ~lang: ja
+      ~lang: ka
+      ~lang: kab
+      ~lang: kk
+      ~lang: km
+      ~lang: kn
+      ~lang: ko
+      ~lang: ky
+      ~lang: lb
+      ~lang: lt
+      ~lang: lv
+      ~lang: mk
+      ~lang: ml
+      ~lang: mn
+      ~lang: mr
+      ~lang: ms
+      ~lang: my
+      ~lang: nb
+      ~lang: ne
+      ~lang: nl
+      ~lang: nn
+      ~lang: os
+      ~lang: pa
+      ~lang: pl
+      ~lang: pt
+      ~lang: pt-br
+      ~lang: ro
+      ~lang: ru
+      ~lang: sk
+      ~lang: sl
+      ~lang: sq
+      ~lang: sr
+      ~lang: sr-latn
+      ~lang: sv
+      ~lang: sw
+      ~lang: ta
+      ~lang: te
+      ~lang: tg
+      ~lang: th
+      ~lang: tk
+      ~lang: tr
+      ~lang: tt
+      ~lang: udm
+      ~lang: ug
+      ~lang: uk
+      ~lang: ur
+      ~lang: uz
+      ~lang: vi
+      ~lang: zh-hans
+      ~lang: zh-hant
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/vnd.oai.openapi+json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {}
+      '''
+    }
+  }
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/schema/
+    method: GET
+    mode: none
+    params:query: {
+      ~format: json
+      ~format: yaml
+      ~lang: af
+      ~lang: ar
+      ~lang: ar-dz
+      ~lang: ast
+      ~lang: az
+      ~lang: be
+      ~lang: bg
+      ~lang: bn
+      ~lang: br
+      ~lang: bs
+      ~lang: ca
+      ~lang: ckb
+      ~lang: cs
+      ~lang: cy
+      ~lang: da
+      ~lang: de
+      ~lang: dsb
+      ~lang: el
+      ~lang: en
+      ~lang: en-au
+      ~lang: en-gb
+      ~lang: eo
+      ~lang: es
+      ~lang: es-ar
+      ~lang: es-co
+      ~lang: es-mx
+      ~lang: es-ni
+      ~lang: es-ve
+      ~lang: et
+      ~lang: eu
+      ~lang: fa
+      ~lang: fi
+      ~lang: fr
+      ~lang: fy
+      ~lang: ga
+      ~lang: gd
+      ~lang: gl
+      ~lang: he
+      ~lang: hi
+      ~lang: hr
+      ~lang: hsb
+      ~lang: hu
+      ~lang: hy
+      ~lang: ia
+      ~lang: id
+      ~lang: ig
+      ~lang: io
+      ~lang: is
+      ~lang: it
+      ~lang: ja
+      ~lang: ka
+      ~lang: kab
+      ~lang: kk
+      ~lang: km
+      ~lang: kn
+      ~lang: ko
+      ~lang: ky
+      ~lang: lb
+      ~lang: lt
+      ~lang: lv
+      ~lang: mk
+      ~lang: ml
+      ~lang: mn
+      ~lang: mr
+      ~lang: ms
+      ~lang: my
+      ~lang: nb
+      ~lang: ne
+      ~lang: nl
+      ~lang: nn
+      ~lang: os
+      ~lang: pa
+      ~lang: pl
+      ~lang: pt
+      ~lang: pt-br
+      ~lang: ro
+      ~lang: ru
+      ~lang: sk
+      ~lang: sl
+      ~lang: sq
+      ~lang: sr
+      ~lang: sr-latn
+      ~lang: sv
+      ~lang: sw
+      ~lang: ta
+      ~lang: te
+      ~lang: tg
+      ~lang: th
+      ~lang: tk
+      ~lang: tr
+      ~lang: tt
+      ~lang: udm
+      ~lang: ug
+      ~lang: uk
+      ~lang: ur
+      ~lang: uz
+      ~lang: vi
+      ~lang: zh-hans
+      ~lang: zh-hant
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {}
+      '''
+    }
+  }
+}

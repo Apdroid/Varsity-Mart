@@ -1,20 +1,30 @@
 meta {
   name: Mark All Notifications as Read
   type: http
-  seq: 2
+  seq: 4
   tags: [
     Notifications
   ]
 }
 
 post {
-  url: {{baseUrl}}/notifications/read-all/
+  url: {{baseUrl}}/v1/notifications/read-all/
   body: none
-  auth: inherit
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
 }
 
 docs {
-  Mark all notifications as read for the authenticated user
+  
+  Mark every unread notification as read for the current authenticated user.
+  
+  Scope is strictly the caller's own notification records; other users are unaffected.
+  This is commonly used after opening the notifications screen to clear unread counters.
+  The operation is not destructive and can be followed by new unread notifications later.
+          
 }
 
 example {
@@ -22,7 +32,7 @@ example {
   description: All notifications marked as read
   
   request: {
-    url: {{baseUrl}}/notifications/read-all/
+    url: {{baseUrl}}/v1/notifications/read-all/
     method: POST
     mode: none
   }
@@ -44,24 +54,27 @@ example {
 
 example {
   name: 401 Response
-  description: Unauthorized - Authentication required
   
   request: {
-    url: {{baseUrl}}/notifications/read-all/
+    url: {{baseUrl}}/v1/notifications/read-all/
     method: POST
     mode: none
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 401
       text: Unauthorized
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {}
       '''
     }
   }

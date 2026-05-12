@@ -8,9 +8,13 @@ meta {
 }
 
 delete {
-  url: {{baseUrl}}/devices/register/
+  url: {{baseUrl}}/v1/devices/register/
   body: none
-  auth: inherit
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
 }
 
 docs {
@@ -22,21 +26,27 @@ example {
   description: Device unregistered successfully
   
   request: {
-    url: {{baseUrl}}/devices/register/
+    url: {{baseUrl}}/v1/devices/register/
     method: DELETE
     mode: none
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 200
       text: OK
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "message": "Device unregistered successfully"
+        }
       '''
     }
   }
@@ -47,21 +57,27 @@ example {
   description: Bad Request
   
   request: {
-    url: {{baseUrl}}/devices/register/
+    url: {{baseUrl}}/v1/devices/register/
     method: DELETE
     mode: none
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 400
       text: Bad Request
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "error": "device_id or fcm_token is required"
+        }
       '''
     }
   }
@@ -72,21 +88,27 @@ example {
   description: Unauthorized - Authentication required
   
   request: {
-    url: {{baseUrl}}/devices/register/
+    url: {{baseUrl}}/v1/devices/register/
     method: DELETE
     mode: none
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 401
       text: Unauthorized
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }

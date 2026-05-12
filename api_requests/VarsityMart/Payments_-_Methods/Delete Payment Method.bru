@@ -8,13 +8,23 @@ meta {
 }
 
 delete {
-  url: {{baseUrl}}/payments/methods/:methodId
+  url: {{baseUrl}}/v1/payments/methods/:methodId
   body: none
-  auth: inherit
+  auth: apikey
 }
 
 params:path {
   methodId: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
 }
 
 docs {
@@ -26,11 +36,15 @@ example {
   description: Payment method removed
   
   request: {
-    url: {{baseUrl}}/payments/methods/:methodId
+    url: {{baseUrl}}/v1/payments/methods/:methodId
     method: DELETE
     mode: none
     params:path: {
       methodId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
     }
   }
   
@@ -54,24 +68,34 @@ example {
   description: Payment method not found
   
   request: {
-    url: {{baseUrl}}/payments/methods/:methodId
+    url: {{baseUrl}}/v1/payments/methods/:methodId
     method: DELETE
     mode: none
     params:path: {
       methodId: 
     }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 404
       text: Not Found
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }

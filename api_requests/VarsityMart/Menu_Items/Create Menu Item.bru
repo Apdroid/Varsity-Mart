@@ -1,0 +1,265 @@
+meta {
+  name: Create Menu Item
+  type: http
+  seq: 2
+  tags: [
+    Menu_Items
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/restaurants/:restaurant_pk/menu/
+  body: multipartForm
+  auth: apikey
+}
+
+params:path {
+  restaurant_pk: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:multipart-form {
+  name: 
+  description: 
+  price: 
+  category: 
+  images: 
+  isAvailable: 
+  preparationTime: 
+  spicyLevel: 
+  isVegetarian: 
+  ingredients: 
+  customizations: 
+  tags: 
+}
+
+docs {
+  Create a new menu item for a restaurant. Supports multiple images and customization options. JSON fields (ingredients, tags, customizations) can be sent as JSON strings or objects.
+}
+
+example {
+  name: 201 Response
+  description: Menu item created successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:restaurant_pk/menu/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      restaurant_pk: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      name: 
+      description: 
+      price: 
+      category: 
+      images: 
+      isAvailable: 
+      preparationTime: 
+      spicyLevel: 
+      isVegetarian: 
+      ingredients: 
+      customizations: 
+      tags: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Menu item added successfully",
+          "data": {
+            "itemId": "",
+            "name": "",
+            "price": 0
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation failed
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:restaurant_pk/menu/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      restaurant_pk: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      name: 
+      description: 
+      price: 
+      category: 
+      images: 
+      isAvailable: 
+      preparationTime: 
+      spicyLevel: 
+      isVegetarian: 
+      ingredients: 
+      customizations: 
+      tags: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:restaurant_pk/menu/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      restaurant_pk: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      name: 
+      description: 
+      price: 
+      category: 
+      images: 
+      isAvailable: 
+      preparationTime: 
+      spicyLevel: 
+      isVegetarian: 
+      ingredients: 
+      customizations: 
+      tags: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Restaurant not found
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:restaurant_pk/menu/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      restaurant_pk: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      name: 
+      description: 
+      price: 
+      category: 
+      images: 
+      isAvailable: 
+      preparationTime: 
+      spicyLevel: 
+      isVegetarian: 
+      ingredients: 
+      customizations: 
+      tags: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

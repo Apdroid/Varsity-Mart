@@ -1,0 +1,58 @@
+meta {
+  name: Recent Searches
+  type: http
+  seq: 2
+  tags: [
+    Search
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/search/recent/
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  Return the authenticated user's recent search queries.
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/search/recent/
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "recent": [
+            {
+              "query": "",
+              "type": "",
+              "searched_at": ""
+            }
+          ]
+        }
+      '''
+    }
+  }
+}

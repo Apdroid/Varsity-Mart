@@ -8,81 +8,148 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/devices/register/
-  body: none
-  auth: inherit
+  url: {{baseUrl}}/v1/devices/register/
+  body: json
+  auth: bearer
 }
 
 headers {
   Authorization: 
 }
 
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "id": "",
+    "user_id": "",
+    "fcm_token": "",
+    "token_type": "",
+    "device_type": "web",
+    "device_id": "",
+    "is_active": false,
+    "created_at": ""
+  }
+}
+
 docs {
   
-  Register a new device or update existing device with push notification token.
-  
-  **Token Type Detection:**
-  - For iOS devices, the system automatically detects APN tokens based on format:
-    - 64-character hexadecimal strings (traditional APN tokens)
-    - Strings starting with 'APNS' (newer APN tokens)
-  - All other devices use FCM tokens by default
-  
-  **Note:** The frontend continues to send 'fcm_token' field for all devices.
-  The backend automatically determines if it's an FCM or APN token based on format.
-  
+          Register a new device or update existing device with push notification token.
+          
+          **Token Type Detection:**
+          - For iOS devices, the system automatically detects APN tokens based on format:
+            - 64-character hexadecimal strings (traditional APN tokens)
+            - Strings starting with 'APNS' (newer APN tokens)
+          - All other devices use FCM tokens by default
+          
+          **Note:** The frontend continues to send 'fcm_token' field for all devices.
+          The backend automatically determines if it's an FCM or APN token based on format.
+          
 }
 
 example {
-  name: 200 Response
-  description: Device updated successfully
+  name: application/json Example
   
   request: {
-    url: {{baseUrl}}/devices/register/
+    url: {{baseUrl}}/v1/devices/register/
     method: POST
-    mode: none
+    mode: json
     headers: {
       Authorization: 
+    }
+  
+    body:json: {
+      {
+        "id": "",
+        "user_id": "",
+        "fcm_token": "",
+        "token_type": "",
+        "device_type": "web",
+        "device_id": "",
+        "is_active": false,
+        "created_at": ""
+      }
     }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 200
       text: OK
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "id": "123e4567-e89b-12d3-a456-426614174000",
+          "user_id": "123e4567-e89b-12d3-a456-426614174001",
+          "fcm_token": "fcm_or_apn_token_here",
+          "token_type": "fcm",
+          "device_type": "ios",
+          "device_id": "iphone_12_user123",
+          "is_active": true,
+          "created_at": "2024-01-15T10:30:00Z"
+        }
       '''
     }
   }
 }
 
 example {
-  name: 201 Response
-  description: Device registered successfully
+  name: application/json Example
   
   request: {
-    url: {{baseUrl}}/devices/register/
+    url: {{baseUrl}}/v1/devices/register/
     method: POST
-    mode: none
+    mode: json
     headers: {
       Authorization: 
+    }
+  
+    body:json: {
+      {
+        "id": "",
+        "user_id": "",
+        "fcm_token": "",
+        "token_type": "",
+        "device_type": "web",
+        "device_id": "",
+        "is_active": false,
+        "created_at": ""
+      }
     }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 201
       text: Created
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "id": "123e4567-e89b-12d3-a456-426614174000",
+          "user_id": "123e4567-e89b-12d3-a456-426614174001",
+          "fcm_token": "fcm_or_apn_token_here",
+          "token_type": "apn",
+          "device_type": "ios",
+          "device_id": "iphone_12_user123",
+          "is_active": true,
+          "created_at": "2024-01-15T10:30:00Z"
+        }
       '''
     }
   }
@@ -93,24 +160,44 @@ example {
   description: Bad Request - Invalid data or missing required fields
   
   request: {
-    url: {{baseUrl}}/devices/register/
+    url: {{baseUrl}}/v1/devices/register/
     method: POST
-    mode: none
+    mode: json
     headers: {
       Authorization: 
+    }
+  
+    body:json: {
+      {
+        "id": "",
+        "user_id": "",
+        "fcm_token": "",
+        "token_type": "",
+        "device_type": "web",
+        "device_id": "",
+        "is_active": false,
+        "created_at": ""
+      }
     }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 400
       text: Bad Request
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "fcm_token": [],
+          "device_type": []
+        }
       '''
     }
   }
@@ -121,24 +208,43 @@ example {
   description: Unauthorized - Authentication required
   
   request: {
-    url: {{baseUrl}}/devices/register/
+    url: {{baseUrl}}/v1/devices/register/
     method: POST
-    mode: none
+    mode: json
     headers: {
       Authorization: 
+    }
+  
+    body:json: {
+      {
+        "id": "",
+        "user_id": "",
+        "fcm_token": "",
+        "token_type": "",
+        "device_type": "web",
+        "device_id": "",
+        "is_active": false,
+        "created_at": ""
+      }
     }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 401
       text: Unauthorized
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": "Authentication credentials were not provided."
+        }
       '''
     }
   }

@@ -1,0 +1,110 @@
+meta {
+  name: v1_admin_flagged_messages_retrieve
+  type: http
+  seq: 1
+  tags: [
+    v1
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/admin/flagged-messages/
+  body: none
+  auth: bearer
+}
+
+params:query {
+  days: 7
+  limit: 50
+  page: 1
+  ~reason: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  List flagged messages with optional filters for days and reason. Admin only.
+}
+
+example {
+  name: 200 Response
+  description: Flagged messages and totals
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/flagged-messages/
+    method: GET
+    mode: none
+    params:query: {
+      days: 7
+      limit: 50
+      page: 1
+      ~reason: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "data": {
+            "messages": [
+              {}
+            ],
+            "totals": {},
+            "pagination": {}
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Admin privileges required
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/flagged-messages/
+    method: GET
+    mode: none
+    params:query: {
+      days: 7
+      limit: 50
+      page: 1
+      ~reason: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

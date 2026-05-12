@@ -1,0 +1,229 @@
+meta {
+  name: Create Restaurant Review
+  type: http
+  seq: 2
+  tags: [
+    Restaurant_Reviews
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/restaurants/:restaurant_pk/reviews/
+  body: json
+  auth: bearer
+}
+
+params:path {
+  restaurant_pk: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "rating": 0,
+    "review": "",
+    "images": []
+  }
+}
+
+docs {
+  
+          Submit a review for a specific restaurant.
+  
+          ### Requirements:
+          - **Authentication**: User must be logged in
+          - **One review per user**: Each user can only review a restaurant once
+          - **Rating**: Integer between 1 and 5 (required)
+          - **Review text**: Written review content (required)
+  
+          ### Image Uploads (Optional):
+          - Maximum **5 images** per review
+          - Accepted formats: **JPEG, PNG, WebP, GIF**
+          - Maximum file size: **10 MB** per image
+          - Images are uploaded to Cloudinary and optimised automatically
+  
+          ### What Happens:
+          1. Review is created and linked to the restaurant and the authenticated user
+          2. Images (if any) are uploaded to Cloudinary
+          3. The restaurant's average rating and review count are updated automatically via signals
+  
+          ### Duplicate Prevention:
+          If the user has already reviewed this restaurant, a **400** error is returned.
+          
+}
+
+example {
+  name: 201 Response
+  description: Review created successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:restaurant_pk/reviews/
+    method: POST
+    mode: json
+    params:path: {
+      restaurant_pk: 
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "images": []
+      }
+    }
+  }
+  
+  response: {
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:restaurant_pk/reviews/
+    method: POST
+    mode: json
+    params:path: {
+      restaurant_pk: 
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "images": []
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        [
+          {
+            "rating": [
+              "Rating must be between 1 and 5"
+            ]
+          },
+          {
+            "non_field_errors": [
+              "You have already reviewed this restaurant."
+            ]
+          },
+          {
+            "images": [
+              "Maximum of 5 images allowed per menu item"
+            ]
+          }
+        ]
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:restaurant_pk/reviews/
+    method: POST
+    mode: json
+    params:path: {
+      restaurant_pk: 
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "images": []
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Authentication credentials were not provided."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:restaurant_pk/reviews/
+    method: POST
+    mode: json
+    params:path: {
+      restaurant_pk: 
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "images": []
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Not found."
+        }
+      '''
+    }
+  }
+}

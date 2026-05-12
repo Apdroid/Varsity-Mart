@@ -1,0 +1,228 @@
+meta {
+  name: Create Restaurant
+  type: http
+  seq: 2
+  tags: [
+    Restaurants
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/restaurants/
+  body: multipartForm
+  auth: apikey
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:multipart-form {
+  restaurantName: 
+  description: 
+  category: 
+  logo: 
+  banner: 
+  location: 
+  phone: 
+  openingTime: 
+  closingTime: 
+  deliveryFee: 
+  deliveryTime: 
+  minOrder: 
+  restaurantId: 
+  paymentRequired: 
+  amount: 
+  kycRequired: 
+  paymentUrl: 
+}
+
+docs {
+  Create a new restaurant. Requires authentication. After creation, complete KYC and payment process.
+}
+
+example {
+  name: 201 Response
+  description: Restaurant created successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      restaurantName: 
+      description: 
+      category: 
+      logo: 
+      banner: 
+      location: 
+      phone: 
+      openingTime: 
+      closingTime: 
+      deliveryFee: 
+      deliveryTime: 
+      minOrder: 
+      restaurantId: 
+      paymentRequired: 
+      amount: 
+      kycRequired: 
+      paymentUrl: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Restaurant created successfully. Please complete payment and KYC.",
+          "data": {}
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation failed
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      restaurantName: 
+      description: 
+      category: 
+      logo: 
+      banner: 
+      location: 
+      phone: 
+      openingTime: 
+      closingTime: 
+      deliveryFee: 
+      deliveryTime: 
+      minOrder: 
+      restaurantId: 
+      paymentRequired: 
+      amount: 
+      kycRequired: 
+      paymentUrl: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      restaurantName: 
+      description: 
+      category: 
+      logo: 
+      banner: 
+      location: 
+      phone: 
+      openingTime: 
+      closingTime: 
+      deliveryFee: 
+      deliveryTime: 
+      minOrder: 
+      restaurantId: 
+      paymentRequired: 
+      amount: 
+      kycRequired: 
+      paymentUrl: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

@@ -1,24 +1,34 @@
 meta {
   name: Mark Notification as Read
   type: http
-  seq: 6
+  seq: 3
   tags: [
     Notifications
   ]
 }
 
 post {
-  url: {{baseUrl}}/notifications/:notification_id/read/
+  url: {{baseUrl}}/v1/notifications/:notification_id/read/
   body: none
-  auth: inherit
+  auth: bearer
 }
 
 params:path {
   notification_id: 
 }
 
+auth:bearer {
+  token: {{token}}
+}
+
 docs {
-  Mark a specific notification as read by its UUID
+  
+  Mark a single notification as read for the current user.
+  
+  Only authenticated verified users can call this endpoint. `read=True` means the notification no
+  longer counts towards unread badge totals in API responses. This endpoint is effectively
+  idempotent; calling it repeatedly keeps the notification in read state.
+          
 }
 
 example {
@@ -26,7 +36,7 @@ example {
   description: Notification marked as read successfully
   
   request: {
-    url: {{baseUrl}}/notifications/:notification_id/read/
+    url: {{baseUrl}}/v1/notifications/:notification_id/read/
     method: POST
     mode: none
     params:path: {
@@ -51,10 +61,9 @@ example {
 
 example {
   name: 401 Response
-  description: Unauthorized - Authentication required
   
   request: {
-    url: {{baseUrl}}/notifications/:notification_id/read/
+    url: {{baseUrl}}/v1/notifications/:notification_id/read/
     method: POST
     mode: none
     params:path: {
@@ -63,26 +72,29 @@ example {
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 401
       text: Unauthorized
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {}
       '''
     }
   }
 }
 
 example {
-  name: 404 Response
-  description: Not Found
+  name: Notification not found
   
   request: {
-    url: {{baseUrl}}/notifications/:notification_id/read/
+    url: {{baseUrl}}/v1/notifications/:notification_id/read/
     method: POST
     mode: none
     params:path: {
@@ -91,15 +103,56 @@ example {
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 404
       text: Not Found
     }
   
     body: {
-      type: text
+      type: json
       content: '''
+        {
+          "success": false,
+          "message": "Notification not found"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
   
+  request: {
+    url: {{baseUrl}}/v1/notifications/:notification_id/read/
+    method: POST
+    mode: none
+    params:path: {
+      notification_id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Notification not found"
+        }
       '''
     }
   }

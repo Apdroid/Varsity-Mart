@@ -1,0 +1,91 @@
+meta {
+  name: v1_conversations_messages_list
+  type: http
+  seq: 2
+  tags: [
+    conversations
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/conversations/:id/messages/
+  body: none
+  auth: apikey
+}
+
+params:query {
+  ~limit: 
+  ~page: 
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/conversations/:id/messages/
+    method: GET
+    mode: none
+    params:query: {
+      ~limit: 
+      ~page: 
+    }
+  
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "count": 123,
+          "next": "http://api.example.org/accounts/?page=4",
+          "previous": "http://api.example.org/accounts/?page=2",
+          "results": [
+            {
+              "id": "",
+              "sender_id": "",
+              "text": "",
+              "timestamp": "",
+              "delivered_at": "",
+              "is_read": false,
+              "read_at": "",
+              "flagged": false,
+              "flag_reason": "",
+              "product": ""
+            }
+          ]
+        }
+      '''
+    }
+  }
+}

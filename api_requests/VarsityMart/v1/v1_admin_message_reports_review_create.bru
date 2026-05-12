@@ -1,0 +1,150 @@
+meta {
+  name: v1_admin_message_reports_review_create
+  type: http
+  seq: 3
+  tags: [
+    v1
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/admin/message-reports/:report_id/review/
+  body: json
+  auth: bearer
+}
+
+params:path {
+  report_id: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "reason": "spam",
+    "details": ""
+  }
+}
+
+docs {
+  Review a message report and take action (approve, reject, take_action). Admin only.
+}
+
+example {
+  name: 200 Response
+  description: Action taken
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/message-reports/:report_id/review/
+    method: POST
+    mode: json
+    params:path: {
+      report_id: 
+    }
+  
+    body:json: {
+      {
+        "reason": "spam",
+        "details": ""
+      }
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Invalid action
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/message-reports/:report_id/review/
+    method: POST
+    mode: json
+    params:path: {
+      report_id: 
+    }
+  
+    body:json: {
+      {
+        "reason": "spam",
+        "details": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Report not found
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/message-reports/:report_id/review/
+    method: POST
+    mode: json
+    params:path: {
+      report_id: 
+    }
+  
+    body:json: {
+      {
+        "reason": "spam",
+        "details": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

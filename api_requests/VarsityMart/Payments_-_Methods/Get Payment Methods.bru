@@ -8,9 +8,19 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/payments/methods
+  url: {{baseUrl}}/v1/payments/methods
   body: none
-  auth: inherit
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
 }
 
 docs {
@@ -22,9 +32,12 @@ example {
   description: Payment methods retrieved
   
   request: {
-    url: {{baseUrl}}/payments/methods
+    url: {{baseUrl}}/v1/payments/methods
     method: GET
     mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
   }
   
   response: {

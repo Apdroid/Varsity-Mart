@@ -1,0 +1,96 @@
+meta {
+  name: Get Product Image
+  type: http
+  seq: 1
+  tags: [
+    Product_Images
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/product-images/:id/
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  
+          Retrieve details for a specific product image by its ID.
+  
+          ### Requirements:
+          - **Authentication**: User must be logged in
+  
+          ### Response:
+          Returns image URLs (original, thumbnail, optimized), dimensions, format, and display order.
+          
+}
+
+example {
+  name: 200 Response
+  description: Image retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/product-images/:id/
+    method: GET
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/product-images/:id/
+    method: GET
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Image not found"
+        }
+      '''
+    }
+  }
+}

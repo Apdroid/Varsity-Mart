@@ -1,0 +1,89 @@
+meta {
+  name: Get Store Details
+  type: http
+  seq: 3
+  tags: [
+    Stores
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/stores/:id/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+docs {
+  
+  ### Get Store Details
+  
+  Returns full details of a specific store including owner information,
+  ratings, subscription status, and operating hours.
+          
+}
+
+example {
+  name: 200 Response
+  description: Store details retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/
+    method: GET
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Store not found
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/
+    method: GET
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

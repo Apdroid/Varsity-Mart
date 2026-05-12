@@ -1,0 +1,161 @@
+meta {
+  name: Get All Disputes
+  type: http
+  seq: 3
+  tags: [
+    Admin
+    Disputes
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/admin/disputes/
+  body: none
+  auth: apikey
+}
+
+params:query {
+  limit: 10
+  page: 1
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Retrieve all disputes with pagination, ordered by most recent first
+}
+
+example {
+  name: 200 Response
+  description: Disputes retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/disputes/
+    method: GET
+    mode: none
+    params:query: {
+      limit: 10
+      page: 1
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "data": {
+            "disputes": [
+              {}
+            ],
+            "pagination": {
+              "currentPage": 0,
+              "totalPages": 0,
+              "totalItems": 0
+            }
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/disputes/
+    method: GET
+    mode: none
+    params:query: {
+      limit: 10
+      page: 1
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Admin permission required
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/disputes/
+    method: GET
+    mode: none
+    params:query: {
+      limit: 10
+      page: 1
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

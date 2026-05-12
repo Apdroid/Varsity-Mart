@@ -1,0 +1,88 @@
+meta {
+  name: List User Conversations
+  type: http
+  seq: 1
+  tags: [
+    conversations
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/conversations/
+  body: none
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  
+  Return conversations for the authenticated user, scoped to buyer/seller participation.
+  
+  Only signed-in users can call this endpoint. Conversations are sorted by latest activity
+  (`updated_at` descending), include participant context for the "other user", and provide unread
+  message counts for the current caller.
+          
+}
+
+example {
+  name: Conversation list
+  
+  request: {
+    url: {{baseUrl}}/v1/conversations/
+    method: GET
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "count": 1,
+          "next": null,
+          "previous": null,
+          "results": {
+            "conversations": [
+              {
+                "id": "31ef9d3d-d3d7-4ed6-9e7f-1ecf65e18f7c",
+                "other_user": {
+                  "id": "808cb6c7-4d9b-4bcf-88bb-0f11f523b20d",
+                  "firstName": "Ama",
+                  "lastName": "Mensah",
+                  "avatar": "",
+                  "is_online": true
+                },
+                "last_message": {
+                  "text": "Is the Engineering Maths textbook still available?"
+                },
+                "unread_count": 2,
+                "updated_at": "2026-05-11T07:12:00Z"
+              }
+            ]
+          }
+        }
+      '''
+    }
+  }
+}

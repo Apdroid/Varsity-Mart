@@ -1,0 +1,164 @@
+meta {
+  name: Delete Review
+  type: http
+  seq: 3
+  tags: [
+    Reviews
+  ]
+}
+
+delete {
+  url: {{baseUrl}}/v1/reviews/:id/
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  
+          Delete an existing review permanently.
+  
+          ### Requirements:
+          - **Authentication**: User must be logged in
+          - **Ownership**: Only the review author can delete their review
+  
+          ### What Happens:
+          1. All associated images are deleted from Cloudinary (via pre-delete signal)
+          2. The review record is permanently removed
+          3. The parent item's average rating and review count are recalculated automatically
+          
+}
+
+example {
+  name: 204 Response
+  description: Review deleted successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/reviews/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 204
+      text: No Content
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/reviews/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Authentication credentials were not provided."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/reviews/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "You can only delete your own reviews"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/reviews/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Not found."
+        }
+      '''
+    }
+  }
+}

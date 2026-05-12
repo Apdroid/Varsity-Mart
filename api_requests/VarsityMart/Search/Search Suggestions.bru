@@ -1,0 +1,55 @@
+meta {
+  name: Search Suggestions
+  type: http
+  seq: 4
+  tags: [
+    Search
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/search/suggestions/
+  body: none
+  auth: inherit
+}
+
+params:query {
+  query: 
+}
+
+docs {
+  Return prefix-based search suggestions.
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/search/suggestions/
+    method: GET
+    mode: none
+    params:query: {
+      query: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "suggestions": []
+        }
+      '''
+    }
+  }
+}

@@ -1,0 +1,78 @@
+meta {
+  name: v1_restaurants_menu_availability_partial_update
+  type: http
+  seq: 15
+  tags: [
+    v1
+  ]
+}
+
+patch {
+  url: {{baseUrl}}/v1/restaurants/:restaurant_pk/menu/:id/availability/
+  body: multipartForm
+  auth: apikey
+}
+
+params:path {
+  id: 
+  restaurant_pk: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:multipart-form {
+  id: 
+  isAvailable: 
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:restaurant_pk/menu/:id/availability/
+    method: PATCH
+    mode: multipartForm
+    params:path: {
+      id: 
+      restaurant_pk: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      id: 
+      isAvailable: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "id": "",
+          "isAvailable": false
+        }
+      '''
+    }
+  }
+}

@@ -1,0 +1,53 @@
+meta {
+  name: Trending Searches
+  type: http
+  seq: 5
+  tags: [
+    Search
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/search/trending/
+  body: none
+  auth: inherit
+}
+
+docs {
+  Return top search queries from the last 24 hours.
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/search/trending/
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "trending": [
+            {
+              "query": "",
+              "count": 0
+            }
+          ]
+        }
+      '''
+    }
+  }
+}

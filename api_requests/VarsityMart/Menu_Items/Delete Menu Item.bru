@@ -1,0 +1,151 @@
+meta {
+  name: Delete Menu Item
+  type: http
+  seq: 4
+  tags: [
+    Menu_Items
+  ]
+}
+
+delete {
+  url: {{baseUrl}}/v1/restaurants/:restaurant_pk/menu/:id/
+  body: none
+  auth: apikey
+}
+
+params:path {
+  id: 
+  restaurant_pk: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Delete a menu item permanently. This action cannot be undone.
+}
+
+example {
+  name: 200 Response
+  description: Menu item deleted successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:restaurant_pk/menu/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+      restaurant_pk: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Menu item deleted successfully"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:restaurant_pk/menu/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+      restaurant_pk: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Menu item not found
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:restaurant_pk/menu/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+      restaurant_pk: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

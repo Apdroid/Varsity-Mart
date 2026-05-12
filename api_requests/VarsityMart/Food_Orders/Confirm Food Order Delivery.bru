@@ -1,49 +1,154 @@
 meta {
   name: Confirm Food Order Delivery
   type: http
-  seq: 4
+  seq: 3
   tags: [
     Food_Orders
   ]
 }
 
 post {
-  url: {{baseUrl}}/food-orders/:orderId/confirm-delivery
+  url: {{baseUrl}}/v1/food-orders/:orderId/confirm-delivery
   body: none
-  auth: inherit
+  auth: apikey
 }
 
 params:path {
   orderId: 
 }
 
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
 docs {
-  Confirm food order delivery
+  
+  Confirm a food order as delivered from the customer side.
+  
+  Only authenticated verified customers can call this endpoint for their own order.
+  Valid current statuses are `in_delivery` and `ready`; other statuses are rejected.
+  
+  On success, the order transitions to `delivered` and a timeline update is recorded
+  through `update_status()`.
+          
 }
 
 example {
-  name: 200 Response
-  description: Delivery confirmed
+  name: Delivery confirmed
   
   request: {
-    url: {{baseUrl}}/food-orders/:orderId/confirm-delivery
+    url: {{baseUrl}}/v1/food-orders/:orderId/confirm-delivery
     method: POST
     mode: none
     params:path: {
       orderId: 
     }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 200
       text: OK
     }
   
     body: {
-      type: text
+      type: json
       content: '''
+        {
+          "success": true,
+          "message": "Food order delivered successfully",
+          "data": {
+            "orderId": "FOOD-20260511-UG2044",
+            "status": "delivered"
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Invalid transition
   
+  request: {
+    url: {{baseUrl}}/v1/food-orders/:orderId/confirm-delivery
+    method: POST
+    mode: none
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Cannot confirm delivery for order in preparing status"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/food-orders/:orderId/confirm-delivery
+    method: POST
+    mode: none
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {}
       '''
     }
   }
@@ -51,27 +156,34 @@ example {
 
 example {
   name: 404 Response
-  description: Order not found
   
   request: {
-    url: {{baseUrl}}/food-orders/:orderId/confirm-delivery
+    url: {{baseUrl}}/v1/food-orders/:orderId/confirm-delivery
     method: POST
     mode: none
     params:path: {
       orderId: 
     }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 404
       text: Not Found
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {}
       '''
     }
   }

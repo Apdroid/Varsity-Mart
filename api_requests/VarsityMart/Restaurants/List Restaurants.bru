@@ -1,0 +1,110 @@
+meta {
+  name: List Restaurants
+  type: http
+  seq: 1
+  tags: [
+    Restaurants
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/restaurants/
+  body: none
+  auth: apikey
+}
+
+params:query {
+  limit: 10
+  page: 1
+  ~category: 
+  ~isOpen: 
+  ~search: 
+  ~sortBy: newest
+  ~sortBy: popular
+  ~sortBy: rating
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Retrieve all restaurants with optional filtering and sorting. Results are paginated.
+}
+
+example {
+  name: 200 Response
+  description: Restaurants retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/
+    method: GET
+    mode: none
+    params:query: {
+      ~category: 
+      ~isOpen: 
+      limit: 10
+      page: 1
+      ~search: 
+      ~sortBy: newest
+      ~sortBy: popular
+      ~sortBy: rating
+    }
+  
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "count": 123,
+          "next": "http://api.example.org/accounts/?page=4",
+          "previous": "http://api.example.org/accounts/?page=2",
+          "results": [
+            {
+              "success": true,
+              "data": {
+                "restaurants": [
+                  {}
+                ],
+                "pagination": {
+                  "currentPage": 0,
+                  "totalPages": 0,
+                  "totalItems": 0,
+                  "itemsPerPage": 0
+                }
+              }
+            }
+          ]
+        }
+      '''
+    }
+  }
+}

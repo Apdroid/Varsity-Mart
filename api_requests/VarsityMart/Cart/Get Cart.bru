@@ -1,0 +1,118 @@
+meta {
+  name: Get Cart
+  type: http
+  seq: 1
+  tags: [
+    Cart
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/cart
+  body: none
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Retrieve the authenticated user's shopping cart with all items, totals, and counts.
+}
+
+example {
+  name: 200 Response
+  description: Cart retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/cart
+    method: GET
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "data": {
+            "items": [
+              {
+                "id": "550e8400-e29b-41d4-a716-446655440000",
+                "product": {
+                  "id": "660e8400-e29b-41d4-a716-446655440001",
+                  "name": "Wireless Headphones",
+                  "price": 79.99,
+                  "image": "https://api.example.com/media/products/headphones.jpg",
+                  "slug": "wireless-headphones",
+                  "in_stock": true
+                },
+                "quantity": 2,
+                "unit_price": 79.99,
+                "subtotal": 159.98,
+                "created_at": "2023-12-01T10:30:00Z",
+                "updated_at": "2023-12-01T10:30:00Z"
+              }
+            ],
+            "total": 159.98,
+            "item_count": 2
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication required
+  
+  request: {
+    url: {{baseUrl}}/v1/cart
+    method: GET
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Authentication credentials were not provided."
+        }
+      '''
+    }
+  }
+}

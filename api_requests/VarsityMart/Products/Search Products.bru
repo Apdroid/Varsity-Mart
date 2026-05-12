@@ -1,0 +1,100 @@
+meta {
+  name: Search Products
+  type: http
+  seq: 10
+  tags: [
+    Products
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/products/search/
+  body: none
+  auth: inherit
+}
+
+params:query {
+  q: 
+  ~limit: 
+  ~page: 
+}
+
+docs {
+  
+          Search for products by title or description.
+  
+          ### Features:
+          - **Full-text search**: Searches across product title and description fields
+          - **Pagination**: Results are paginated (default 20 per page)
+          - **Case-insensitive**: Search is case-insensitive
+  
+          ### Public Access:
+          This endpoint is publicly accessible — no authentication required.
+          
+}
+
+example {
+  name: 200 Response
+  description: Search results
+  
+  request: {
+    url: {{baseUrl}}/v1/products/search/
+    method: GET
+    mode: none
+    params:query: {
+      ~limit: 
+      ~page: 
+      q: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/products/search/
+    method: GET
+    mode: none
+    params:query: {
+      ~limit: 
+      ~page: 
+      q: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "A search query is needed"
+        }
+      '''
+    }
+  }
+}

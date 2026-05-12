@@ -1,0 +1,109 @@
+meta {
+  name: Get Restaurant Details
+  type: http
+  seq: 3
+  tags: [
+    Restaurants
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/restaurants/:id/
+  body: none
+  auth: apikey
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Retrieve detailed information about a specific restaurant including menu categories and statistics.
+}
+
+example {
+  name: 200 Response
+  description: Restaurant details retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:id/
+    method: GET
+    mode: none
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "data": {}
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Restaurant not found
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:id/
+    method: GET
+    mode: none
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

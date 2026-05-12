@@ -1,0 +1,59 @@
+meta {
+  name: List Product Categories
+  type: http
+  seq: 1
+  tags: [
+    Product_Categories
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/product-categories/
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~page: 
+}
+
+docs {
+  
+          Retrieve all product categories with their product counts.
+  
+          ### Features:
+          - **Product Count**: Each category includes the number of products it contains
+          - **Icons**: Categories include emoji icons for display
+  
+          ### Public Access:
+          This endpoint is publicly accessible — no authentication required.
+          
+}
+
+example {
+  name: 200 Response
+  description: Categories retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/product-categories/
+    method: GET
+    mode: none
+    params:query: {
+      ~page: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

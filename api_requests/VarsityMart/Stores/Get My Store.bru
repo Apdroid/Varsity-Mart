@@ -1,0 +1,87 @@
+meta {
+  name: Get My Store
+  type: http
+  seq: 11
+  tags: [
+    Stores
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/stores/my-store/
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  
+  ### Get My Store
+  
+  Returns the full details of the authenticated user's store.
+  
+  **Responses:**
+  - Returns store details if user has a store
+  - Returns 404 if no store is registered
+  - If multiple stores exist, returns the first one with a warning message
+          
+}
+
+example {
+  name: 200 Response
+  description: Store retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/my-store/
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/my-store/
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "You don't have a store registered"
+        }
+      '''
+    }
+  }
+}

@@ -1,0 +1,185 @@
+meta {
+  name: Get Food Order Details
+  type: http
+  seq: 2
+  tags: [
+    Food_Orders
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/food-orders/:orderId
+  body: none
+  auth: apikey
+}
+
+params:path {
+  orderId: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Retrieve detailed information about a specific food order. Users can only retrieve orders where they are the customer.
+}
+
+example {
+  name: 200 Response
+  description: Food order details retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/food-orders/:orderId
+    method: GET
+    mode: none
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "data": {}
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/food-orders/:orderId
+    method: GET
+    mode: none
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: User account is not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/food-orders/:orderId
+    method: GET
+    mode: none
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Food order not found
+  
+  request: {
+    url: {{baseUrl}}/v1/food-orders/:orderId
+    method: GET
+    mode: none
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

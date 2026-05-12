@@ -1,0 +1,276 @@
+meta {
+  name: Suspend User
+  type: http
+  seq: 7
+  tags: [
+    Admin
+    Users
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/admin/users/:user_id/suspend/
+  body: json
+  auth: apikey
+}
+
+params:path {
+  user_id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "reason": "Violation of terms of service",
+    "duration": "30d",
+    "details": "User repeatedly violated community guidelines"
+  }
+}
+
+docs {
+  Suspend a user account for a specified duration
+}
+
+example {
+  name: 201 Response
+  description: User suspended successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/users/:user_id/suspend/
+    method: POST
+    mode: json
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "reason": "Violation of terms of service",
+        "duration": "30d",
+        "details": "User repeatedly violated community guidelines"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "User suspended successfully",
+          "data": {
+            "userId": "",
+            "suspendedUntil": ""
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation failed
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/users/:user_id/suspend/
+    method: POST
+    mode: json
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "reason": "Violation of terms of service",
+        "duration": "30d",
+        "details": "User repeatedly violated community guidelines"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/users/:user_id/suspend/
+    method: POST
+    mode: json
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "reason": "Violation of terms of service",
+        "duration": "30d",
+        "details": "User repeatedly violated community guidelines"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Admin permission required
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/users/:user_id/suspend/
+    method: POST
+    mode: json
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "reason": "Violation of terms of service",
+        "duration": "30d",
+        "details": "User repeatedly violated community guidelines"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: User not found
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/users/:user_id/suspend/
+    method: POST
+    mode: json
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "reason": "Violation of terms of service",
+        "duration": "30d",
+        "details": "User repeatedly violated community guidelines"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

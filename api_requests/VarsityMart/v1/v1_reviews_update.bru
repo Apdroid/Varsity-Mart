@@ -1,0 +1,83 @@
+meta {
+  name: v1_reviews_update
+  type: http
+  seq: 18
+  tags: [
+    v1
+  ]
+}
+
+put {
+  url: {{baseUrl}}/v1/reviews/:id/
+  body: json
+  auth: apikey
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "rating": 0,
+    "review": "",
+    "images": []
+  }
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/reviews/:id/
+    method: PUT
+    mode: json
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "images": []
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "rating": 0,
+          "review": "",
+          "images": []
+        }
+      '''
+    }
+  }
+}

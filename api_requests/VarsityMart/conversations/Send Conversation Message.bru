@@ -1,0 +1,187 @@
+meta {
+  name: Send Conversation Message
+  type: http
+  seq: 3
+  tags: [
+    conversations
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/conversations/:id/send_message/
+  body: json
+  auth: apikey
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "text": "",
+    "product_id": ""
+  }
+}
+
+docs {
+  
+  Send a message in an existing conversation.
+  
+  Only conversation participants can send messages. `text` is required. `product_id` is optional and
+  links the message to an active marketplace product. Messages may later be flagged by moderation
+  rules (for example contact-information abuse), and the response exposes current flag fields.
+          
+}
+
+example {
+  name: Message sent with product link
+  
+  request: {
+    url: {{baseUrl}}/v1/conversations/:id/send_message/
+    method: POST
+    mode: json
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "text": "",
+        "product_id": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Message sent",
+          "data": {
+            "messageId": "819fda50-e568-4ed0-a870-103de762f6a2",
+            "timestamp": "2026-05-11T07:22:13Z",
+            "flagged": false,
+            "flagReason": null,
+            "productId": "4a51a5bc-5d95-4e4b-97f8-c4db6fd2a2bd"
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Validation error
+  
+  request: {
+    url: {{baseUrl}}/v1/conversations/:id/send_message/
+    method: POST
+    mode: json
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "text": "",
+        "product_id": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "error": {
+            "text": [
+              "This field may not be blank."
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/conversations/:id/send_message/
+    method: POST
+    mode: json
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "text": "",
+        "product_id": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {}
+      '''
+    }
+  }
+}

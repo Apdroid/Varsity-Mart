@@ -1,0 +1,252 @@
+meta {
+  name: Get User Orders
+  type: http
+  seq: 6
+  tags: [
+    Orders
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/orders/my-orders
+  body: none
+  auth: apikey
+}
+
+params:query {
+  limit: 20
+  page: 1
+  type: buyer
+  ~status: cancelled
+  ~status: delivered
+  ~status: pending
+  ~status: processing
+  ~status: shipped
+  ~type: seller
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Retrieve orders for the authenticated user with filtering and pagination options. Users can view their orders as buyer or seller.
+}
+
+example {
+  name: 200 Response
+  description: Orders retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/my-orders
+    method: GET
+    mode: none
+    params:query: {
+      limit: 20
+      page: 1
+      ~status: cancelled
+      ~status: delivered
+      ~status: pending
+      ~status: processing
+      ~status: shipped
+      type: buyer
+      ~type: seller
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "data": {
+            "orders": [
+              {
+                "order_number": "ORD-20231201-ABCDEF",
+                "status": "pending",
+                "total": 0,
+                "item_count": 0,
+                "buyer": {
+                  "id": 0,
+                  "username": ""
+                },
+                "seller": {
+                  "id": 0,
+                  "username": ""
+                },
+                "created_at": "",
+                "estimated_delivery": ""
+              }
+            ],
+            "pagination": {
+              "currentPage": 1,
+              "totalPages": 5,
+              "totalItems": 97,
+              "itemsPerPage": 20
+            }
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Bad request - Invalid parameters
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/my-orders
+    method: GET
+    mode: none
+    params:query: {
+      limit: 20
+      page: 1
+      ~status: cancelled
+      ~status: delivered
+      ~status: pending
+      ~status: processing
+      ~status: shipped
+      type: buyer
+      ~type: seller
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Invalid parameters",
+          "errors": {}
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/my-orders
+    method: GET
+    mode: none
+    params:query: {
+      limit: 20
+      page: 1
+      ~status: cancelled
+      ~status: delivered
+      ~status: pending
+      ~status: processing
+      ~status: shipped
+      type: buyer
+      ~type: seller
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: User account is not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/my-orders
+    method: GET
+    mode: none
+    params:query: {
+      limit: 20
+      page: 1
+      ~status: cancelled
+      ~status: delivered
+      ~status: pending
+      ~status: processing
+      ~status: shipped
+      type: buyer
+      ~type: seller
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

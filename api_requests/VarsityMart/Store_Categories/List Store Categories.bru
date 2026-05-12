@@ -1,0 +1,54 @@
+meta {
+  name: List Store Categories
+  type: http
+  seq: 1
+  tags: [
+    Store_Categories
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/store-categories/
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~page: 
+}
+
+docs {
+  
+  ### List Store Categories
+  
+  Returns all store categories with the number of stores in each category.
+          
+}
+
+example {
+  name: 200 Response
+  description: Categories retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/store-categories/
+    method: GET
+    mode: none
+    params:query: {
+      ~page: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

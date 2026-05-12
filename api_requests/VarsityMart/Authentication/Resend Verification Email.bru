@@ -1,0 +1,190 @@
+meta {
+  name: Resend Verification Email
+  type: http
+  seq: 8
+  tags: [
+    Authentication
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/auth/resend-verification/
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "email": ""
+  }
+}
+
+docs {
+  
+          Resend a new 6-digit OTP verification code with 3-hour account expiry reminder.
+  
+          ### Important Notes:
+          - Previous verification code is invalidated
+          - New code has 24-hour validity period
+          - Account will be deleted if not verified within 3 hours
+          - Rate limited to prevent abuse (max 3 requests per hour)
+  
+          ### Email Content Includes:
+          - New 6-digit OTP verification code
+          - 3-hour account expiry warning
+          - Time remaining for verification
+          - Account deletion consequences
+  
+          ### Account Expiry Timeline:
+          1. Registration: 3-hour timer starts
+          2. Resend email: Timer does NOT reset
+          3. 3 hours pass: Account automatically deleted
+          4. Email becomes available for re-registration
+  
+          ### Email Resolution:
+          - If `email` is provided in the request body, the user is looked up by that email.
+          - Otherwise, falls back to the authenticated user's email (if a valid token is supplied).
+          
+}
+
+example {
+  name: 200 Response
+  description: Verification email sent successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/resend-verification/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "email": ""
+      }
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/resend-verification/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "email": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Email is already verified."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/resend-verification/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "email": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 410
+      text: Gone
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Account has expired. Please register again."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/resend-verification/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "email": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Too many resend attempts. Please try again in 45 minutes."
+        }
+      '''
+    }
+  }
+}

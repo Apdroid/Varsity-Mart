@@ -1,44 +1,63 @@
 meta {
   name: Approve or Reject a KYC Application
   type: http
-  seq: 2
+  seq: 1
   tags: [
     Admin_KYC_Review
   ]
 }
 
 patch {
-  url: {{baseUrl}}/admin/kyc/:userId/review/
-  body: none
-  auth: inherit
+  url: {{baseUrl}}/v1/admin/kyc/:userId/review/
+  body: json
+  auth: apikey
 }
 
 params:path {
   userId: 
 }
 
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "action": "approve",
+    "notes": ""
+  }
+}
+
 docs {
   
-  Approves or rejects the seller KYC application for the specified user.
+          Approves or rejects the seller KYC application for the specified user.
   
-  ### Approve (`action: "approve"`):
-  1. Sets `kyc_status` → `approved` and records `kyc_verified_at`.
-  2. Activates the user's pending Store (subscription status → active) or
-     Restaurant record and flips `has_store` / `has_restaurant` accordingly.
-  3. Sends an approval email to the applicant.
+          ### Approve (`action: "approve"`):
+          1. Sets `kyc_status` → `approved` and records `kyc_verified_at`.
+          2. Sends an approval email to the applicant.
   
-  ### Reject (`action: "reject"`):
-  1. Sets `kyc_status` → `rejected`.
-  2. Deletes the pending Store / Restaurant records so the user can re-apply cleanly.
-  3. Sends a rejection email to the applicant (with optional `notes` as the reason).
+          ### Reject (`action: "reject"`):
+          1. Sets `kyc_status` → `rejected`.
+          2. Sends a rejection email to the applicant (with optional `notes`
+             as the reason).
   
-  ### Notes:
-  - Requires **staff / admin** credentials.
-  - The email notification is best-effort; an SMTP failure will be logged but will
-    **not** roll back the review decision.
-  - The entire state change runs inside an atomic transaction with a row-level lock
-    on the user record to prevent concurrent reviews.
-  
+          ### Notes:
+          - Requires **staff / admin** credentials.
+          - KYC is identity verification only. No Store or Restaurant record is
+            created, activated or deleted by this endpoint — sellers manage
+            their own storefront separately via the create-store / create-
+            restaurant flows after approval.
+          - The email notification is best-effort; an SMTP failure will be
+            logged but will **not** roll back the review decision.
+          - The entire state change runs inside an atomic transaction with a
+            row-level lock on the user record to prevent concurrent reviews.
+          
 }
 
 example {
@@ -46,11 +65,22 @@ example {
   description: Review decision applied successfully
   
   request: {
-    url: {{baseUrl}}/admin/kyc/:userId/review/
+    url: {{baseUrl}}/v1/admin/kyc/:userId/review/
     method: PATCH
-    mode: none
+    mode: json
     params:path: {
       userId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "action": "approve",
+        "notes": ""
+      }
     }
   }
   
@@ -74,24 +104,41 @@ example {
   description: Invalid request body (e.g. unknown action).
   
   request: {
-    url: {{baseUrl}}/admin/kyc/:userId/review/
+    url: {{baseUrl}}/v1/admin/kyc/:userId/review/
     method: PATCH
-    mode: none
+    mode: json
     params:path: {
       userId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "action": "approve",
+        "notes": ""
+      }
     }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 400
       text: Bad Request
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }
@@ -102,24 +149,41 @@ example {
   description: Authentication credentials were not provided.
   
   request: {
-    url: {{baseUrl}}/admin/kyc/:userId/review/
+    url: {{baseUrl}}/v1/admin/kyc/:userId/review/
     method: PATCH
-    mode: none
+    mode: json
     params:path: {
       userId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "action": "approve",
+        "notes": ""
+      }
     }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 401
       text: Unauthorized
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }
@@ -130,52 +194,86 @@ example {
   description: You do not have permission to perform this action.
   
   request: {
-    url: {{baseUrl}}/admin/kyc/:userId/review/
+    url: {{baseUrl}}/v1/admin/kyc/:userId/review/
     method: PATCH
-    mode: none
+    mode: json
     params:path: {
       userId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "action": "approve",
+        "notes": ""
+      }
     }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 403
       text: Forbidden
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }
 }
 
 example {
-  name: 404 Response
-  description: User not found
+  name: application/json Example
   
   request: {
-    url: {{baseUrl}}/admin/kyc/:userId/review/
+    url: {{baseUrl}}/v1/admin/kyc/:userId/review/
     method: PATCH
-    mode: none
+    mode: json
     params:path: {
       userId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "action": "approve",
+        "notes": ""
+      }
     }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 404
       text: Not Found
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "success": false,
+          "message": "User not found"
+        }
       '''
     }
   }

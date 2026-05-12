@@ -1,30 +1,43 @@
 meta {
   name: List Pending KYC Applications
   type: http
-  seq: 1
+  seq: 2
   tags: [
     Admin_KYC_Review
   ]
 }
 
 get {
-  url: {{baseUrl}}/admin/kyc/pending/
+  url: {{baseUrl}}/v1/admin/kyc/pending/
   body: none
-  auth: inherit
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
 }
 
 docs {
   
-  Returns every user whose KYC review is currently in `pending` state,
-  ordered by submission time (oldest first).
+          Returns every user whose KYC review is currently in `pending` state,
+          ordered by submission time (oldest first).
   
-  ### Notes:
-  - Requires **staff / admin** credentials.
-  - `seller_type` is derived from whether the user has a pending Store (`products`)
-    or Restaurant (`food`) record. It may be `null` if no linked record is found.
-  - `kyc_document_type` is always `null` until a dedicated KYC submission model
-    is added; clients should degrade gracefully.
-  
+          ### Notes:
+          - Requires **staff / admin** credentials.
+          - `seller_type` is derived from any Store / Restaurant the user
+            already owns (`products` / `food`). At first-time KYC the user
+            will not own anything yet, so this field is typically `null`
+            during review — the seller type chosen on the application form
+            is informational and is not persisted.
+          - `kyc_document_type` is always `null` until a dedicated KYC
+            submission model is added; clients should degrade gracefully.
+          
 }
 
 example {
@@ -32,9 +45,12 @@ example {
   description: List of pending KYC applicants
   
   request: {
-    url: {{baseUrl}}/admin/kyc/pending/
+    url: {{baseUrl}}/v1/admin/kyc/pending/
     method: GET
     mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
   }
   
   response: {
@@ -57,21 +73,30 @@ example {
   description: Authentication credentials were not provided.
   
   request: {
-    url: {{baseUrl}}/admin/kyc/pending/
+    url: {{baseUrl}}/v1/admin/kyc/pending/
     method: GET
     mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 401
       text: Unauthorized
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }
@@ -82,21 +107,30 @@ example {
   description: You do not have permission to perform this action.
   
   request: {
-    url: {{baseUrl}}/admin/kyc/pending/
+    url: {{baseUrl}}/v1/admin/kyc/pending/
     method: GET
     mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 403
       text: Forbidden
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }

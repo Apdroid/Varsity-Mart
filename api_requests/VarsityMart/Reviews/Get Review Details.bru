@@ -1,0 +1,95 @@
+meta {
+  name: Get Review Details
+  type: http
+  seq: 1
+  tags: [
+    Reviews
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/reviews/:id/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+docs {
+  
+          Retrieve a single review by its ID.
+  
+          ### Response Includes:
+          - Review content and rating
+          - Reviewer information (name, avatar)
+          - Attached images (optimised Cloudinary URLs)
+          - Helpful count and verified status
+          - Display ID (short identifier like `rev_abc123`)
+  
+          ### Public Access:
+          This endpoint is publicly accessible — no authentication required.
+          
+}
+
+example {
+  name: 200 Response
+  description: Review retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/reviews/:id/
+    method: GET
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/reviews/:id/
+    method: GET
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Not found."
+        }
+      '''
+    }
+  }
+}

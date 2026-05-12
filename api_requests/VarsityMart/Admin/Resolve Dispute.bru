@@ -1,0 +1,277 @@
+meta {
+  name: Resolve Dispute
+  type: http
+  seq: 4
+  tags: [
+    Admin
+    Disputes
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/admin/disputes/:dispute_id/resolve/
+  body: json
+  auth: apikey
+}
+
+params:path {
+  dispute_id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "resolution": "buyer_win",
+    "refundAmount": 99.99,
+    "notes": "Item was damaged during shipping"
+  }
+}
+
+docs {
+  Resolve an open dispute by determining resolution and issuing refund if applicable
+}
+
+example {
+  name: 201 Response
+  description: Dispute resolved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/disputes/:dispute_id/resolve/
+    method: POST
+    mode: json
+    params:path: {
+      dispute_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "resolution": "buyer_win",
+        "refundAmount": 99.99,
+        "notes": "Item was damaged during shipping"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Dispute resolved",
+          "data": {
+            "disputeId": "",
+            "resolution": "",
+            "refundAmount": 0
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation failed
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/disputes/:dispute_id/resolve/
+    method: POST
+    mode: json
+    params:path: {
+      dispute_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "resolution": "buyer_win",
+        "refundAmount": 99.99,
+        "notes": "Item was damaged during shipping"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/disputes/:dispute_id/resolve/
+    method: POST
+    mode: json
+    params:path: {
+      dispute_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "resolution": "buyer_win",
+        "refundAmount": 99.99,
+        "notes": "Item was damaged during shipping"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Admin permission required
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/disputes/:dispute_id/resolve/
+    method: POST
+    mode: json
+    params:path: {
+      dispute_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "resolution": "buyer_win",
+        "refundAmount": 99.99,
+        "notes": "Item was damaged during shipping"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Dispute not found
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/disputes/:dispute_id/resolve/
+    method: POST
+    mode: json
+    params:path: {
+      dispute_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "resolution": "buyer_win",
+        "refundAmount": 99.99,
+        "notes": "Item was damaged during shipping"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

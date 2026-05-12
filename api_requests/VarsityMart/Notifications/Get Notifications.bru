@@ -8,15 +8,19 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/notifications/
+  url: {{baseUrl}}/v1/notifications/
   body: none
-  auth: inherit
+  auth: bearer
 }
 
 params:query {
-  ~page: 
   ~limit: 
+  ~page: 
   ~unreadOnly: 
+}
+
+auth:bearer {
+  token: {{token}}
 }
 
 docs {
@@ -28,12 +32,12 @@ example {
   description: List of notifications with pagination
   
   request: {
-    url: {{baseUrl}}/notifications/
+    url: {{baseUrl}}/v1/notifications/
     method: GET
     mode: none
     params:query: {
-      ~page: 
       ~limit: 
+      ~page: 
       ~unreadOnly: 
     }
   }
@@ -55,29 +59,34 @@ example {
 
 example {
   name: 401 Response
-  description: Unauthorized - Authentication required
   
   request: {
-    url: {{baseUrl}}/notifications/
+    url: {{baseUrl}}/v1/notifications/
     method: GET
     mode: none
     params:query: {
-      ~page: 
       ~limit: 
+      ~page: 
       ~unreadOnly: 
     }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 401
       text: Unauthorized
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }

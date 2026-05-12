@@ -1,0 +1,160 @@
+meta {
+  name: Partial Update User Profile
+  type: http
+  seq: 4
+  tags: [
+    User_Management
+  ]
+}
+
+patch {
+  url: {{baseUrl}}/v1/users/me/
+  body: multipartForm
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:multipart-form {
+  firstName: 
+  lastName: 
+  phone: 
+  campus: 
+  bio: 
+  avatar: 
+}
+
+docs {
+  Partially update profile. Only provided fields will be updated.
+}
+
+example {
+  name: 200 Response
+  description: Profile updated successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/
+    method: PATCH
+    mode: multipartForm
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      firstName: 
+      lastName: 
+      phone: 
+      campus: 
+      bio: 
+      avatar: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation error
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/
+    method: PATCH
+    mode: multipartForm
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      firstName: 
+      lastName: 
+      phone: 
+      campus: 
+      bio: 
+      avatar: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 429 Response
+  description: Rate limit exceeded
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/
+    method: PATCH
+    mode: multipartForm
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      firstName: 
+      lastName: 
+      phone: 
+      campus: 
+      bio: 
+      avatar: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

@@ -1,0 +1,135 @@
+meta {
+  name: List Menu Items
+  type: http
+  seq: 1
+  tags: [
+    Menu_Items
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/restaurants/:restaurant_pk/menu/
+  body: none
+  auth: apikey
+}
+
+params:query {
+  ~category: 
+  ~page: 
+}
+
+params:path {
+  restaurant_pk: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  List menu items for a restaurant, organized by category. Optionally filter by category.
+}
+
+example {
+  name: 200 Response
+  description: Menu items retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:restaurant_pk/menu/
+    method: GET
+    mode: none
+    params:query: {
+      ~category: 
+      ~page: 
+    }
+  
+    params:path: {
+      restaurant_pk: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "count": 123,
+          "next": "http://api.example.org/accounts/?page=4",
+          "previous": "http://api.example.org/accounts/?page=2",
+          "results": [
+            {
+              "success": true,
+              "data": {
+                "categories": [
+                  {}
+                ]
+              }
+            }
+          ]
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Restaurant not found
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:restaurant_pk/menu/
+    method: GET
+    mode: none
+    params:query: {
+      ~category: 
+      ~page: 
+    }
+  
+    params:path: {
+      restaurant_pk: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

@@ -8,9 +8,19 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/payments/escrow/balance
+  url: {{baseUrl}}/v1/payments/escrow/balance
   body: none
-  auth: inherit
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
 }
 
 docs {
@@ -22,9 +32,12 @@ example {
   description: Escrow balance retrieved
   
   request: {
-    url: {{baseUrl}}/payments/escrow/balance
+    url: {{baseUrl}}/v1/payments/escrow/balance
     method: GET
     mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
   }
   
   response: {

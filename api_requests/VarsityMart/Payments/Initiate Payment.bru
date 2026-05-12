@@ -1,16 +1,36 @@
 meta {
   name: Initiate Payment
   type: http
-  seq: 1
+  seq: 2
   tags: [
     Payments
   ]
 }
 
 post {
-  url: {{baseUrl}}/payments/initiate
-  body: none
-  auth: inherit
+  url: {{baseUrl}}/v1/payments/initiate
+  body: json
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "type": "",
+    "reference_id": "",
+    "payment_method": "",
+    "momo_number": "",
+    "momo_provider": ""
+  }
 }
 
 docs {
@@ -22,21 +42,48 @@ example {
   description: Payment initiated successfully
   
   request: {
-    url: {{baseUrl}}/payments/initiate
+    url: {{baseUrl}}/v1/payments/initiate
     method: POST
-    mode: none
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "type": "",
+        "reference_id": "",
+        "payment_method": "",
+        "momo_number": "",
+        "momo_provider": ""
+      }
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 201
       text: Created
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "success": true,
+          "message": "Payment initiated",
+          "data": {
+            "paymentId": "pay_260312123456",
+            "status": "pending",
+            "authorizationUrl": "https://checkout.paystack.com/xyz123",
+            "accessCode": "xyz123abc",
+            "expiresAt": "2026-03-13T05:05:00Z"
+          }
+        }
       '''
     }
   }
@@ -47,21 +94,40 @@ example {
   description: Validation error
   
   request: {
-    url: {{baseUrl}}/payments/initiate
+    url: {{baseUrl}}/v1/payments/initiate
     method: POST
-    mode: none
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "type": "",
+        "reference_id": "",
+        "payment_method": "",
+        "momo_number": "",
+        "momo_provider": ""
+      }
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 400
       text: Bad Request
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }
@@ -72,21 +138,40 @@ example {
   description: Unauthorized
   
   request: {
-    url: {{baseUrl}}/payments/initiate
+    url: {{baseUrl}}/v1/payments/initiate
     method: POST
-    mode: none
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "type": "",
+        "reference_id": "",
+        "payment_method": "",
+        "momo_number": "",
+        "momo_provider": ""
+      }
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 401
       text: Unauthorized
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }

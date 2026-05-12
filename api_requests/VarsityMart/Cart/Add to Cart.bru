@@ -1,0 +1,277 @@
+meta {
+  name: Add to Cart
+  type: http
+  seq: 4
+  tags: [
+    Cart
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/cart/add
+  body: json
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "productId": "",
+    "quantity": 0
+  }
+}
+
+docs {
+  Add a product to the user's shopping cart. If the product already exists in the cart, the quantity will be updated to the new value.
+}
+
+example {
+  name: 200 Response
+  description: Item quantity updated successfully (existing item)
+  
+  request: {
+    url: {{baseUrl}}/v1/cart/add
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "productId": "",
+        "quantity": 0
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Item added to cart successfully",
+          "data": {}
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 201 Response
+  description: Item added to cart successfully (new item)
+  
+  request: {
+    url: {{baseUrl}}/v1/cart/add
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "productId": "",
+        "quantity": 0
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Item added to cart successfully",
+          "data": {
+            "id": "550e8400-e29b-41d4-a716-446655440000",
+            "product": {
+              "id": "660e8400-e29b-41d4-a716-446655440001",
+              "name": "Wireless Headphones",
+              "price": 79.99,
+              "image": "https://api.example.com/media/products/headphones.jpg",
+              "slug": "wireless-headphones",
+              "in_stock": true
+            },
+            "quantity": 2,
+            "unit_price": 79.99,
+            "subtotal": 159.98,
+            "created_at": "2023-12-01T10:30:00Z",
+            "updated_at": "2023-12-01T10:30:00Z"
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation failed
+  
+  request: {
+    url: {{baseUrl}}/v1/cart/add
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "productId": "",
+        "quantity": 0
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Validation failed",
+          "errors": {
+            "product_id": [
+              "This field is required."
+            ],
+            "quantity": [
+              "Quantity must be at least 1."
+            ],
+            "non_field_errors": [
+              "Product is out of stock."
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication required
+  
+  request: {
+    url: {{baseUrl}}/v1/cart/add
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "productId": "",
+        "quantity": 0
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Authentication credentials were not provided."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Product not found
+  
+  request: {
+    url: {{baseUrl}}/v1/cart/add
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "productId": "",
+        "quantity": 0
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Product not found",
+          "errors": {
+            "product_id": [
+              "Product with ID 660e8400-e29b-41d4-a716-446655440001 does not exist."
+            ]
+          }
+        }
+      '''
+    }
+  }
+}

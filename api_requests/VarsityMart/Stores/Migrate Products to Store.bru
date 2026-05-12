@@ -1,0 +1,155 @@
+meta {
+  name: Migrate Products to Store
+  type: http
+  seq: 7
+  tags: [
+    Stores
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/stores/:id/migrate-products/
+  body: multipartForm
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  productIds: 
+}
+
+docs {
+  
+  ### Migrate Products to Store
+  
+  Moves the authenticated user's unassigned products into this store.
+  
+  **Requirements:**
+  - Must be the store owner
+  - Only products without a store assignment are eligible
+  
+  **Options:**
+  - Provide `productIds` to migrate specific products
+  - Omit `productIds` to migrate all unassigned products
+  
+  **Atomicity and side effects:**
+  - Product rows are updated in a single query for the filtered set
+  - After migration, `store.totalProducts` is recomputed and persisted
+  - Products already assigned to another store are never moved
+          
+}
+
+example {
+  name: 200 Response
+  description: Products migrated successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/migrate-products/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      productIds: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Not the store owner
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/migrate-products/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      productIds: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Store not found
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/migrate-products/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      productIds: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

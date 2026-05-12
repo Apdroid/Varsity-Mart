@@ -1,49 +1,223 @@
 meta {
   name: Update Food Order Status
   type: http
-  seq: 6
+  seq: 5
   tags: [
     Food_Orders
   ]
 }
 
 patch {
-  url: {{baseUrl}}/food-orders/:orderId/status
-  body: none
-  auth: inherit
+  url: {{baseUrl}}/v1/food-orders/:orderId/status
+  body: json
+  auth: apikey
 }
 
 params:path {
   orderId: 
 }
 
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "status": "pending_payment",
+    "estimatedDeliveryTime": ""
+  }
+}
+
 docs {
-  Update food order status
+  Update the status of a food order. Only the restaurant owner can update order status. Updates status and creates a timeline entry.
 }
 
 example {
   name: 200 Response
-  description: Order status updated
+  description: Order status updated successfully
   
   request: {
-    url: {{baseUrl}}/food-orders/:orderId/status
+    url: {{baseUrl}}/v1/food-orders/:orderId/status
     method: PATCH
-    mode: none
+    mode: json
     params:path: {
       orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "status": "pending_payment",
+        "estimatedDeliveryTime": ""
+      }
     }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 200
       text: OK
     }
   
     body: {
-      type: text
+      type: json
       content: '''
+        {
+          "success": true,
+          "message": "Order status updated",
+          "data": {
+            "orderId": "",
+            "status": ""
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation failed
   
+  request: {
+    url: {{baseUrl}}/v1/food-orders/:orderId/status
+    method: PATCH
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "status": "pending_payment",
+        "estimatedDeliveryTime": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/food-orders/:orderId/status
+    method: PATCH
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "status": "pending_payment",
+        "estimatedDeliveryTime": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Permission denied - not the restaurant owner or user not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/food-orders/:orderId/status
+    method: PATCH
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "status": "pending_payment",
+        "estimatedDeliveryTime": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
       '''
     }
   }
@@ -51,27 +225,44 @@ example {
 
 example {
   name: 404 Response
-  description: Order not found
+  description: Food order not found
   
   request: {
-    url: {{baseUrl}}/food-orders/:orderId/status
+    url: {{baseUrl}}/v1/food-orders/:orderId/status
     method: PATCH
-    mode: none
+    mode: json
     params:path: {
       orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "status": "pending_payment",
+        "estimatedDeliveryTime": ""
+      }
     }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 404
       text: Not Found
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }

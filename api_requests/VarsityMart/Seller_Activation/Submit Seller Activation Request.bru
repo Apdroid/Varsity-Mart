@@ -8,27 +8,52 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/auth/become-a-seller/
-  body: none
-  auth: inherit
+  url: {{baseUrl}}/v1/auth/become-a-seller/
+  body: multipartForm
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:multipart-form {
+  seller_type: 
+  kyc_document_type: 
+  kyc_document: @file()
+  kyc_selfie: @file()
 }
 
 docs {
   
-  Submit an application to become a seller on VarsityMart.
+          Submit identity-verification (KYC) to become a seller on VarsityMart.
   
-  ### Process:
-  1. User must have a verified email before applying.
-  2. A pending **Store** (for `products`) or **Restaurant** (for `food`) record is created.
-  3. The user's `kyc_status` is set to `pending` until an admin approves or rejects it.
-  4. No role change occurs — the existing session and JWT remain valid throughout.
+          ### Process:
+          1. User must have a verified email before applying.
+          2. The user's `kyc_status` is set to `pending` until an admin approves
+             or rejects it.
+          3. **No** Store or Restaurant record is created at this stage. After
+             KYC approval the seller can create up to 2 listings without a
+             store; beyond that they must create a Store via the dedicated
+             create-store endpoint.
   
-  ### Constraints:
-  - The user must **not** already own a store or restaurant.
-  - A user with `kyc_status` of `pending` or `approved` cannot re-apply.
-  - `bank_or_momo_details`, `kyc_document_type`, and `kyc_document_number` are
-    collected for manual admin review and are **not** persisted on the user record.
+          ### Constraints:
+          - A user with `kyc_status` of `pending` or `approved` cannot re-apply.
+          - `seller_type` and `kyc_document_type` are recorded for admin review.
+          - Send **`multipart/form-data`**. `kyc_document` (image of the ID card)
+            and `kyc_selfie` (photo of the user holding the card) must be sent as
+            file fields; they are uploaded to Cloudinary and their URLs are stored
+            on the user record.
   
+          **Accepted file types:** image formats supported by Django's
+          `ImageField` (for example JPEG or PNG).
+          
 }
 
 example {
@@ -36,9 +61,19 @@ example {
   description: Application submitted successfully
   
   request: {
-    url: {{baseUrl}}/auth/become-a-seller/
+    url: {{baseUrl}}/v1/auth/become-a-seller/
     method: POST
-    mode: none
+    mode: multipartForm
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      seller_type: 
+      kyc_document_type: 
+      kyc_document: @file()
+      kyc_selfie: @file()
+    }
   }
   
   response: {
@@ -57,25 +92,40 @@ example {
 }
 
 example {
-  name: 400 Response
-  description: Bad request — duplicate application or already a seller
+  name: application/json Example
   
   request: {
-    url: {{baseUrl}}/auth/become-a-seller/
+    url: {{baseUrl}}/v1/auth/become-a-seller/
     method: POST
-    mode: none
+    mode: multipartForm
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      seller_type: 
+      kyc_document_type: 
+      kyc_document: @file()
+      kyc_selfie: @file()
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 400
       text: Bad Request
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "message": "Your seller application is already under review."
+        }
       '''
     }
   }
@@ -86,46 +136,77 @@ example {
   description: Authentication credentials were not provided.
   
   request: {
-    url: {{baseUrl}}/auth/become-a-seller/
+    url: {{baseUrl}}/v1/auth/become-a-seller/
     method: POST
-    mode: none
+    mode: multipartForm
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      seller_type: 
+      kyc_document_type: 
+      kyc_document: @file()
+      kyc_selfie: @file()
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 401
       text: Unauthorized
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }
 }
 
 example {
-  name: 403 Response
-  description: Email not verified
+  name: application/json Example
   
   request: {
-    url: {{baseUrl}}/auth/become-a-seller/
+    url: {{baseUrl}}/v1/auth/become-a-seller/
     method: POST
-    mode: none
+    mode: multipartForm
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      seller_type: 
+      kyc_document_type: 
+      kyc_document: @file()
+      kyc_selfie: @file()
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 403
       text: Forbidden
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "message": "Please verify your email before becoming a seller."
+        }
       '''
     }
   }

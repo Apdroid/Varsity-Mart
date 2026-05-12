@@ -1,0 +1,218 @@
+meta {
+  name: Get User Public Profile
+  type: http
+  seq: 1
+  tags: [
+    User_Management
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/users/:userId/
+  body: none
+  auth: apikey
+}
+
+params:query {
+  fields: basic
+  ~fields: all
+  ~fields: extended
+}
+
+params:path {
+  userId: 3b3dde7d-88f6-4452-a5a2-d0410ec3456b
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  
+          Get public profile information tailored to user's role.
+          
+          ### Information by Role:
+          
+          **For All Users:**
+          - Basic identity (name, avatar)
+          - Rating and review count
+          - Member since date
+          
+          **Additional for Sellers:**
+          - Response rate and time
+          - Store information
+          - University/campus
+          
+          **Additional for Delivery Partners:**
+          - Response rate and time
+          - Delivery statistics
+          - University/campus
+          
+          **For Buyers:**
+          - Only basic information (privacy focused)
+          
+          ### Privacy Rules:
+          - Email and phone never exposed
+          - Student ID never exposed
+          - Personal bio only if public
+          - KYC status only shows 'verified' (not pending/rejected)
+          
+          ### Rate Limiting:
+          Limited to 100 user profile views per hour per authenticated user.
+          
+}
+
+example {
+  name: 200 Response
+  description: User profile retrieved
+  
+  request: {
+    url: {{baseUrl}}/v1/users/:userId/
+    method: GET
+    mode: none
+    params:query: {
+      ~fields: all
+      fields: basic
+      ~fields: extended
+    }
+  
+    params:path: {
+      userId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "data": {
+            "id": "",
+            "firstName": "",
+            "lastName": "",
+            "avatar": "",
+            "rating": 0,
+            "totalReviews": 0,
+            "memberSince": "",
+            "role": "",
+            "isVerified": false,
+            "hasStore": false,
+            "hasRestaurant": false,
+            "responseRate": "",
+            "responseTime": "",
+            "university": "",
+            "campus": ""
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: User not found
+  
+  request: {
+    url: {{baseUrl}}/v1/users/:userId/
+    method: GET
+    mode: none
+    params:query: {
+      ~fields: all
+      fields: basic
+      ~fields: extended
+    }
+  
+    params:path: {
+      userId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 429 Response
+  description: Too many requests
+  
+  request: {
+    url: {{baseUrl}}/v1/users/:userId/
+    method: GET
+    mode: none
+    params:query: {
+      ~fields: all
+      fields: basic
+      ~fields: extended
+    }
+  
+    params:path: {
+      userId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

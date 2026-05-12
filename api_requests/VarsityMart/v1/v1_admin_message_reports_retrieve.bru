@@ -1,0 +1,104 @@
+meta {
+  name: v1_admin_message_reports_retrieve
+  type: http
+  seq: 2
+  tags: [
+    v1
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/admin/message-reports/
+  body: none
+  auth: bearer
+}
+
+params:query {
+  days: 7
+  limit: 50
+  page: 1
+  ~reviewed: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  List message reports with optional reviewed filter and pagination. Admin only.
+}
+
+example {
+  name: 200 Response
+  description: Message reports list
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/message-reports/
+    method: GET
+    mode: none
+    params:query: {
+      days: 7
+      limit: 50
+      page: 1
+      ~reviewed: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "data": {}
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Admin privileges required
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/message-reports/
+    method: GET
+    mode: none
+    params:query: {
+      days: 7
+      limit: 50
+      page: 1
+      ~reviewed: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

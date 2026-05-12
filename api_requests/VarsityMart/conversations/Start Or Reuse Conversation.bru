@@ -1,0 +1,184 @@
+meta {
+  name: Start Or Reuse Conversation
+  type: http
+  seq: 4
+  tags: [
+    conversations
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/conversations/start/
+  body: json
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "other_user_id": "",
+    "product_id": "",
+    "initial_message": ""
+  }
+}
+
+docs {
+  
+  Create a new conversation with another user or return the existing one.
+  
+  Authenticated users can call this endpoint. `other_user_id` is required; `initial_message` and
+  `product_id` are optional. The system performs get-or-create by user pair, so duplicate
+  conversations are not created. If a conversation already exists, the endpoint returns it with
+  HTTP 200; otherwise a new one is created with HTTP 201.
+          
+}
+
+example {
+  name: Existing conversation reused
+  
+  request: {
+    url: {{baseUrl}}/v1/conversations/start/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "other_user_id": "",
+        "product_id": "",
+        "initial_message": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "data": {
+            "conversation": {
+              "id": "31ef9d3d-d3d7-4ed6-9e7f-1ecf65e18f7c"
+            }
+          },
+          "message": "Conversation retrieved"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Existing conversation reused
+  
+  request: {
+    url: {{baseUrl}}/v1/conversations/start/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "other_user_id": "",
+        "product_id": "",
+        "initial_message": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "data": {
+            "conversation": {
+              "id": "31ef9d3d-d3d7-4ed6-9e7f-1ecf65e18f7c"
+            }
+          },
+          "message": "Conversation retrieved"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: New conversation created
+  
+  request: {
+    url: {{baseUrl}}/v1/conversations/start/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "other_user_id": "",
+        "product_id": "",
+        "initial_message": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "data": {
+            "conversation": {
+              "id": "7f401f4e-9bd3-4f95-bfb3-38f4e8f64f8a"
+            }
+          },
+          "message": "Conversation started"
+        }
+      '''
+    }
+  }
+}

@@ -1,0 +1,88 @@
+meta {
+  name: Get Store Category Details
+  type: http
+  seq: 2
+  tags: [
+    Store_Categories
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/store-categories/:id/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+docs {
+  
+  ### Get Store Category Details
+  
+  Returns details of a specific store category including the count of stores.
+          
+}
+
+example {
+  name: 200 Response
+  description: Category details retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/store-categories/:id/
+    method: GET
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Category not found
+  
+  request: {
+    url: {{baseUrl}}/v1/store-categories/:id/
+    method: GET
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

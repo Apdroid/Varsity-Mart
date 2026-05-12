@@ -1,0 +1,194 @@
+meta {
+  name: Create Product
+  type: http
+  seq: 2
+  tags: [
+    Products
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/products/
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  title: MacBook Pro 2024
+  description: Barely used, excellent condition
+  price: 850
+  original_price: 1200
+  category: Electronics
+  condition: N
+  location: Main Campus Library
+  delivery_options: 
+  stock: 5
+  specifications: 
+  is_night_shop: false
+  images: 
+}
+
+docs {
+  
+          Create a new product listing in the marketplace.
+  
+          ### Requirements:
+          - **Authentication**: User must be logged in
+          - **Store Association**: Product is automatically linked to the seller's store (if one exists)
+  
+          ### Image Upload:
+          - Up to **10 images** can be uploaded during creation
+          - Allowed types: JPEG, PNG, WebP, GIF
+          - Max file size: **10MB** per image
+          - Images are uploaded to Cloudinary automatically
+  
+          ### Fields:
+          - **title**: Product title (required)
+          - **description**: Product description (required)
+          - **price**: Selling price (required, min 1)
+          - **original_price**: Original price before discount (required, min 1)
+          - **category**: Category name (required, must match existing category)
+          - **condition**: "N" for new, "U" for used (default: "N")
+          - **location**: Pickup/delivery location (required)
+          - **delivery_options**: One or more of: campus_delivery, meetup, shipping
+          - **stock**: Available quantity (default: 0)
+          - **specifications**: JSON array of key-value pairs
+          - **is_night_shop**: Whether this is a night shop product (default: false)
+          
+}
+
+example {
+  name: 201 Response
+  description: Product created successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/products/
+    method: POST
+    mode: multipartForm
+    body:multipart-form: {
+      title: MacBook Pro 2024
+      description: Barely used, excellent condition
+      price: 850
+      original_price: 1200
+      category: Electronics
+      condition: N
+      location: Main Campus Library
+      delivery_options: 
+      stock: 5
+      specifications: 
+      is_night_shop: false
+      images: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/products/
+    method: POST
+    mode: multipartForm
+    body:multipart-form: {
+      title: MacBook Pro 2024
+      description: Barely used, excellent condition
+      price: 850
+      original_price: 1200
+      category: Electronics
+      condition: N
+      location: Main Campus Library
+      delivery_options: 
+      stock: 5
+      specifications: 
+      is_night_shop: false
+      images: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "title": [
+            "This field is required."
+          ],
+          "category": [
+            "Object with name=InvalidCategory does not exist."
+          ]
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/products/
+    method: POST
+    mode: multipartForm
+    body:multipart-form: {
+      title: MacBook Pro 2024
+      description: Barely used, excellent condition
+      price: 850
+      original_price: 1200
+      category: Electronics
+      condition: N
+      location: Main Campus Library
+      delivery_options: 
+      stock: 5
+      specifications: 
+      is_night_shop: false
+      images: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Authentication credentials were not provided."
+        }
+      '''
+    }
+  }
+}

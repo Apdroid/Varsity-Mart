@@ -1,0 +1,74 @@
+meta {
+  name: Trigger Unverified User Cleanup
+  type: http
+  seq: 6
+  tags: [
+    Admin
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/admin/trigger-cleanup/
+  body: none
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  
+  Manually enqueue the unverified-user cleanup task.
+  
+  Admin-only endpoint used for operational intervention. The cleanup task removes accounts that
+  remain unverified beyond the 3-hour expiry window. This does not delete verified users and has
+  no effect on active accounts.
+          
+}
+
+example {
+  name: Cleanup task accepted
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/trigger-cleanup/
+    method: POST
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Cleanup task triggered",
+          "task_id": "1b0a9d9a-3564-4d6f-beb7-8a4ac54f5fce",
+          "task_status": "SUCCESS",
+          "task_result": {
+            "deleted_users": 4,
+            "skipped_users": 2
+          }
+        }
+      '''
+    }
+  }
+}

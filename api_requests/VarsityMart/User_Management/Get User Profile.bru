@@ -1,0 +1,136 @@
+meta {
+  name: Get User Profile
+  type: http
+  seq: 2
+  tags: [
+    User_Management
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/users/me/
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  
+          Get authenticated user's complete profile information.
+          
+          ### Profile Information Includes:
+          - **Personal Details**: Full name, email, phone, avatar
+          - **University Information**: Student ID, campus, university
+          - **Account Status**: Verification status, KYC status, role
+          - **Performance Metrics**: Rating, total reviews, response rate/time
+          - **Business Information**: Store/restaurant flags
+          - **Timestamps**: Member since date
+          
+          ### Avatar URL:
+          - Returns absolute URL for profile picture
+          - Falls back to generated avatar if no picture
+          - Includes both `profile_pic` and `avatarUrl` fields
+          
+          ### Authentication Required:
+          - Valid JWT access token required
+          - Returns profile of authenticated user only
+          
+          ### Response Rate/Time:
+          These are currently mock values and will be replaced with actual
+          metrics from order/response tracking system.
+          
+}
+
+example {
+  name: 200 Response
+  description: Profile retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "errors": {
+            "detail": "Authentication credentials were not provided."
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "errors": {
+            "detail": "You do not have permission to perform this action."
+          }
+        }
+      '''
+    }
+  }
+}

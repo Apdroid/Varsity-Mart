@@ -1,0 +1,277 @@
+meta {
+  name: User Login
+  type: http
+  seq: 4
+  tags: [
+    Authentication
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/auth/login/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "vision060607@gmail.com",
+    "password": "test@123"
+  }
+}
+
+docs {
+  
+          Authenticate a user with email and password.
+          
+          ### Authentication Flow:
+          1. User provides email and password
+          2. System validates credentials
+          3. If successful, returns JWT tokens
+          4. User can use access token for subsequent requests
+          
+          ### Verification Requirements:
+          - **Email/Password users**: Must verify email before login
+          - **Google OAuth users**: No email verification required
+          
+          ### Account Status Checks:
+          - Account must be active (`is_active=True`)
+          - Email must be verified (for credentials auth)
+          - Account must not be suspended
+          
+          ### Token Information:
+          - **access_token**: Used for API authentication (60 minutes )
+          - **refresh_token**: Used to obtain new access tokens (7 days)
+          
+          ### Headers for Authenticated Requests:
+          ```
+          Authorization: Bearer <access_token>
+          ```
+          
+          ### Rate Limiting:
+          - 5 failed attempts within 15 minutes triggers temporary lockout
+          - Use password reset if account is locked
+          
+}
+
+example {
+  name: 200 Response
+  description: Login successful
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/login/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "email": "",
+        "password": ""
+      }
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/login/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "email": "",
+        "password": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "errors": {
+            "email": [
+              "This field is required."
+            ],
+            "password": [
+              "This field is required."
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/login/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "email": "",
+        "password": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        [
+          {
+            "success": false,
+            "errors": {
+              "email": [
+                "No user found with this email address."
+              ]
+            }
+          },
+          {
+            "success": false,
+            "errors": {
+              "password": [
+                "Invalid password."
+              ]
+            }
+          },
+          {
+            "success": false,
+            "errors": {
+              "account": [
+                "This account has been deactivated."
+              ]
+            }
+          },
+          {
+            "success": false,
+            "errors": {
+              "email": [
+                "Please verify your email address before logging in."
+              ]
+            }
+          }
+        ]
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/login/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "email": "",
+        "password": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "errors": {
+            "account": [
+              "Account temporarily locked due to too many failed attempts. Try again in 15 minutes."
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/login/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "email": "",
+        "password": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "errors": {
+            "detail": "Too many login attempts. Please try again later."
+          }
+        }
+      '''
+    }
+  }
+}

@@ -1,16 +1,20 @@
 meta {
   name: Get Notification Settings
   type: http
-  seq: 3
+  seq: 5
   tags: [
     Notifications
   ]
 }
 
 get {
-  url: {{baseUrl}}/notifications/settings/
+  url: {{baseUrl}}/v1/notifications/settings/
   body: none
-  auth: inherit
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
 }
 
 docs {
@@ -22,7 +26,7 @@ example {
   description: Notification settings retrieved successfully
   
   request: {
-    url: {{baseUrl}}/notifications/settings/
+    url: {{baseUrl}}/v1/notifications/settings/
     method: GET
     mode: none
   }
@@ -47,21 +51,27 @@ example {
   description: Unauthorized - Authentication required
   
   request: {
-    url: {{baseUrl}}/notifications/settings/
+    url: {{baseUrl}}/v1/notifications/settings/
     method: GET
     mode: none
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 401
       text: Unauthorized
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }

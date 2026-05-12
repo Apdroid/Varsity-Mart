@@ -1,0 +1,346 @@
+meta {
+  name: Upload User Avatar
+  type: http
+  seq: 5
+  tags: [
+    User_Management
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/users/me/avatar/
+  body: multipartForm
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:multipart-form {
+  avatar: @file()
+}
+
+docs {
+  
+          Upload a new profile picture to Cloudinary.
+          
+          ### Requirements:
+          - Max file size: 10MB
+          - Supported formats: JPG, JPEG, PNG, GIF, WebP
+          - Multipart form data required
+          - Authentication required (HTTP-only JWT cookie)
+          
+          ### Transformations Applied:
+          - Width: 400px, Height: 400px
+          - Crop: fill with 'face' gravity for smart cropping
+          - Format: auto-optimized
+          - Quality: auto-optimized
+          
+          ### Response Includes:
+          - Direct Cloudinary URL for the uploaded avatar
+          - Public ID for reference
+          - Image dimensions (width x height)
+          - File format and size in bytes
+          - Upload timestamp
+          
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/avatar/
+    method: POST
+    mode: multipartForm
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      avatar: @file()
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Avatar uploaded successfully",
+          "data": {
+            "avatarUrl": "https://res.cloudinary.com/xyz/image/upload/v123/user_avatars/user_avatar_abc.jpg",
+            "publicId": "user_avatars/user_avatar_abc",
+            "width": 400,
+            "height": 400,
+            "format": "jpg",
+            "bytes": 51234,
+            "folder": "user_avatars",
+            "uploadedAt": "2024-01-15T10:30:00.00Z"
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/avatar/
+    method: POST
+    mode: multipartForm
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      avatar: @file()
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        [
+          {
+            "success": false,
+            "error": "no_file_provided",
+            "message": "No avatar file provided"
+          },
+          {
+            "success": false,
+            "error": "file_too_large",
+            "message": "File size must be less than 10MB"
+          },
+          {
+            "success": false,
+            "error": "invalid_file_type",
+            "message": "Invalid file type. Allowed: jpg, jpeg, png, gif, webp"
+          }
+        ]
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/avatar/
+    method: POST
+    mode: multipartForm
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      avatar: @file()
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Unauthorized - Please ensure HTTP-only JWT cookie is set"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/avatar/
+    method: POST
+    mode: multipartForm
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      avatar: @file()
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 413
+      text: Payload Too Large
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "error": "file_too_large",
+          "message": "File size must be less than 10MB"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/avatar/
+    method: POST
+    mode: multipartForm
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      avatar: @file()
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 415
+      text: Unsupported Media Type
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "error": "invalid_file_type",
+          "message": "Invalid file type. Allowed: jpg, jpeg, png, gif, webp"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/avatar/
+    method: POST
+    mode: multipartForm
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      avatar: @file()
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "error": "rate_limit_exceeded",
+          "message": "Too many upload attempts. Please try again in 1 hour."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/avatar/
+    method: POST
+    mode: multipartForm
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      avatar: @file()
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 500
+      text: Internal Server Error
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "error": "upload_failed",
+          "message": "Failed to upload avatar to Cloudinary"
+        }
+      '''
+    }
+  }
+}

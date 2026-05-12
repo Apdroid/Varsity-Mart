@@ -1,0 +1,133 @@
+meta {
+  name: Delete Store
+  type: http
+  seq: 6
+  tags: [
+    Stores
+  ]
+}
+
+delete {
+  url: {{baseUrl}}/v1/stores/:id/
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  
+  ### Delete Store
+  
+  Deletes a store owned by the authenticated user.
+  
+  **Requirements:**
+  - Must be the store owner
+  
+  **Options:**
+  - `deleteProducts: true` — permanently deletes all products in the store
+  - `deleteProducts: false` (default) — converts store products to general marketplace products
+          
+}
+
+example {
+  name: 200 Response
+  description: Store deleted successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Not the store owner
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Store not found
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

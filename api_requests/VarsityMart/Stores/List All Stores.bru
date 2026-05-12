@@ -1,0 +1,70 @@
+meta {
+  name: List All Stores
+  type: http
+  seq: 1
+  tags: [
+    Stores
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/stores/
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~category: 
+  ~limit: 
+  ~page: 
+  ~search: 
+  ~sortBy: newest
+  ~sortBy: popular
+}
+
+docs {
+  
+  ### List All Stores
+  
+  Returns a paginated list of all stores.
+  
+  **Features:**
+  - Filter by **category** name
+  - **Search** by store name or description
+  - **Sort** by popularity or newest
+  - Paginated results with configurable page size
+          
+}
+
+example {
+  name: 200 Response
+  description: Stores retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/
+    method: GET
+    mode: none
+    params:query: {
+      ~category: 
+      ~limit: 
+      ~page: 
+      ~search: 
+      ~sortBy: newest
+      ~sortBy: popular
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

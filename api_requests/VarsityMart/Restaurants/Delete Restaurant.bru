@@ -1,0 +1,185 @@
+meta {
+  name: Delete Restaurant
+  type: http
+  seq: 5
+  tags: [
+    Restaurants
+  ]
+}
+
+delete {
+  url: {{baseUrl}}/v1/restaurants/:id/
+  body: none
+  auth: apikey
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Delete a restaurant and all associated menu items. Only the restaurant owner can delete their restaurant. This action cannot be undone.
+}
+
+example {
+  name: 200 Response
+  description: Restaurant deleted successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Restaurant and X menu items deleted successfully"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Permission denied - not the restaurant owner
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Restaurant not found
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

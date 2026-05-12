@@ -1,0 +1,185 @@
+meta {
+  name: Upload Product Images
+  type: http
+  seq: 3
+  tags: [
+    Product_Images
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/products/:id/upload_images/
+  body: multipartForm
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  images: 
+}
+
+docs {
+  
+          Upload one or more images for a specific product.
+  
+          ### Requirements:
+          - **Authentication**: User must be logged in
+          - **Ownership**: Only the product seller can upload images
+  
+          ### Constraints:
+          - Maximum **10 images** per product (total, including existing)
+          - Allowed file types: JPEG, PNG, WebP, GIF
+          - Max file size: **10MB** per image
+          - Images are uploaded to Cloudinary with automatic optimization
+  
+          ### Partial Success:
+          If some images fail to upload, a **207 Multi-Status** response is returned
+          with details about which images succeeded and which failed.
+          
+}
+
+example {
+  name: 201 Response
+  description: All images uploaded successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/products/:id/upload_images/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      images: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 207 Response
+  description: Partial success — some images failed
+  
+  request: {
+    url: {{baseUrl}}/v1/products/:id/upload_images/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      images: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 207
+      text: Multi-Status
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/products/:id/upload_images/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      images: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "error": "Cannot upload 5 images. Product already has 8 images. Maximum allowed is 10."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/products/:id/upload_images/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      images: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "error": "You can only upload images to your own products"
+        }
+      '''
+    }
+  }
+}

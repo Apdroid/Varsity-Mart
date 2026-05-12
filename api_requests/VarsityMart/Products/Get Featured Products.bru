@@ -1,0 +1,43 @@
+meta {
+  name: Get Featured Products
+  type: http
+  seq: 8
+  tags: [
+    Products
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/products/featured/
+  body: none
+  auth: inherit
+}
+
+docs {
+  Returns up to 10 featured products selected from the top 15 by rating and likes, shuffled on every request.
+}
+
+example {
+  name: 200 Response
+  description: Featured products retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/products/featured/
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

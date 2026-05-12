@@ -1,0 +1,90 @@
+meta {
+  name: Check Authentication Status
+  type: http
+  seq: 1
+  tags: [
+    Authentication
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/auth/check-status/
+  body: none
+  auth: inherit
+}
+
+docs {
+  
+          Inspect session state from authentication cookies for frontend bootstrap.
+  
+          This endpoint is public and intended for SPA/mobile initialisation checks.
+          If a valid `access_token` cookie is present, it returns lightweight user identity fields
+          and token timing metadata (`accessExpiresIn`, `willRefreshIn`).
+          If no valid cookie exists, it still returns 200 with `isAuthenticated: false`.
+  
+          Typical callers:
+          - Web clients on app load
+          - Mobile clients restoring session state
+          - Silent polling before protected navigation
+          
+}
+
+example {
+  name: 200 Response
+  description: Authentication status
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/check-status/
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/check-status/
+    method: GET
+    mode: none
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "data": {
+            "isAuthenticated": false,
+            "user": null,
+            "tokens": null
+          }
+        }
+      '''
+    }
+  }
+}

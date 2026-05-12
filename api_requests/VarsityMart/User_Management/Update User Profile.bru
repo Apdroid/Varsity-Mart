@@ -1,0 +1,180 @@
+meta {
+  name: Update User Profile
+  type: http
+  seq: 3
+  tags: [
+    User_Management
+  ]
+}
+
+put {
+  url: {{baseUrl}}/v1/users/me/
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  firstName: 
+  lastName: 
+  phone: 
+  campus: 
+  bio: 
+  avatar: 
+}
+
+docs {
+  Update authenticated user's profile information.
+}
+
+example {
+  name: 200 Response
+  description: Profile updated successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/
+    method: PUT
+    mode: multipartForm
+    body:multipart-form: {
+      firstName: 
+      lastName: 
+      phone: 
+      campus: 
+      bio: 
+      avatar: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "",
+          "data": {
+            "id": "123e4567-e89b-12d3-a456-426614174000",
+            "first_name": "John Doe Updated",
+            "email": "john.doe@university.edu.gh",
+            "phone": "+233201234568",
+            "avatar": "",
+            "profile_pic": "https://res.cloudinary.com/cloud_name/image/upload/v123/user_avatar_123.jpg",
+            "avatarUrl": "https://res.cloudinary.com/cloud_name/image/upload/v123/user_avatar_123.jpg",
+            "student_id": "UGBS123456",
+            "campus": "Legon",
+            "university": "University of Ghana",
+            "is_student": true,
+            "is_verified": true,
+            "kyc_status": "approved",
+            "role": "user",
+            "rating": 4.5,
+            "total_reviews": 10,
+            "bio": "Updated bio with more details...",
+            "member_since": "2024-01-01T00:00:00Z",
+            "has_store": false,
+            "has_restaurant": false,
+            "response_rate": "95%",
+            "response_time": "2 hours",
+            "cloudinaryPublicId": "user_avatars/user_avatar_123"
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/
+    method: PUT
+    mode: multipartForm
+    body:multipart-form: {
+      firstName: 
+      lastName: 
+      phone: 
+      campus: 
+      bio: 
+      avatar: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "errors": {
+            "phone": [
+              "This phone number is already in use."
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/
+    method: PUT
+    mode: multipartForm
+    body:multipart-form: {
+      firstName: 
+      lastName: 
+      phone: 
+      campus: 
+      bio: 
+      avatar: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "errors": {
+            "detail": "Too many profile updates. Please try again later."
+          }
+        }
+      '''
+    }
+  }
+}

@@ -1,0 +1,85 @@
+meta {
+  name: List All Products
+  type: http
+  seq: 1
+  tags: [
+    Products
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/products/
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~category: 
+  ~condition: new
+  ~condition: used
+  ~isNightShop: 
+  ~limit: 
+  ~maxPrice: 
+  ~minPrice: 
+  ~page: 
+  ~search: 
+  ~sortBy: newest
+  ~sortBy: popular
+  ~sortBy: price_high
+  ~sortBy: price_low
+}
+
+docs {
+  
+          Retrieve a paginated list of products from the marketplace.
+  
+          ### Features:
+          - **Pagination**: Results are paginated (default 20 per page, max 100)
+          - **Filtering**: Filter by category, price range, condition, and night shop status
+          - **Search**: Search in product title and description using the `search` parameter
+          - **Sorting**: Sort by newest, price (low/high), or popularity
+  
+          ### Public Access:
+          This endpoint is publicly accessible — no authentication required.
+          
+}
+
+example {
+  name: 200 Response
+  description: Products retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/products/
+    method: GET
+    mode: none
+    params:query: {
+      ~category: 
+      ~condition: new
+      ~condition: used
+      ~isNightShop: 
+      ~limit: 
+      ~maxPrice: 
+      ~minPrice: 
+      ~page: 
+      ~search: 
+      ~sortBy: newest
+      ~sortBy: popular
+      ~sortBy: price_high
+      ~sortBy: price_low
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}

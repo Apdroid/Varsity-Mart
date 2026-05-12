@@ -1,0 +1,327 @@
+meta {
+  name: Update Order Status
+  type: http
+  seq: 5
+  tags: [
+    Orders
+  ]
+}
+
+patch {
+  url: {{baseUrl}}/v1/orders/:orderId/status
+  body: json
+  auth: apikey
+}
+
+params:path {
+  orderId: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "status": "seller_confirmed",
+    "note": ""
+  }
+}
+
+docs {
+  Update the status of an order. Only the seller of the order can perform this action.
+}
+
+example {
+  name: 200 Response
+  description: Order status updated successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/status
+    method: PATCH
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "status": "seller_confirmed",
+        "note": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Order status updated",
+          "data": {
+            "orderId": "ORD-20231201-ABCDEF",
+            "status": "in_transit",
+            "previous_status": "processing",
+            "escrow_status": "held"
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation failed - Invalid transition or missing fields
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/status
+    method: PATCH
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "status": "seller_confirmed",
+        "note": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Validation failed",
+          "errors": {
+            "status": [
+              "Cannot transition from 'in_transit' to 'processing'"
+            ],
+            "note": [
+              "Note cannot exceed 500 characters."
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication required
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/status
+    method: PATCH
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "status": "seller_confirmed",
+        "note": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Authentication credentials were not provided."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Permission denied - Not the seller or user not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/status
+    method: PATCH
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "status": "seller_confirmed",
+        "note": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Only the seller can update order status"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Order not found
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/status
+    method: PATCH
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "status": "seller_confirmed",
+        "note": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Not found."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 409 Response
+  description: Conflict - Invalid status transition
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/status
+    method: PATCH
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "status": "seller_confirmed",
+        "note": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 409
+      text: Conflict
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Cannot transition from 'in_transit' to 'processing'"
+        }
+      '''
+    }
+  }
+}

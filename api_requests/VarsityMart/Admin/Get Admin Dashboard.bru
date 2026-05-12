@@ -1,0 +1,150 @@
+meta {
+  name: Get Admin Dashboard
+  type: http
+  seq: 2
+  tags: [
+    Admin
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/admin/dashboard/
+  body: none
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Retrieve admin dashboard overview with platform statistics, recent activity, and popular categories
+}
+
+example {
+  name: 200 Response
+  description: Dashboard data retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/dashboard/
+    method: GET
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "data": {
+            "overview": {
+              "totalUsers": 0,
+              "activeStores": 0,
+              "activeRestaurants": 0,
+              "totalProducts": 0,
+              "totalOrders": 0,
+              "totalRevenue": 0,
+              "platformCommission": 0
+            },
+            "recentActivity": {
+              "newUsers": 0,
+              "newOrders": 0,
+              "newListings": 0,
+              "pendingDisputes": 0
+            },
+            "popularCategories": [
+              {}
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/dashboard/
+    method: GET
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Admin permission required
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/dashboard/
+    method: GET
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

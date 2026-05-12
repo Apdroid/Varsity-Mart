@@ -8,13 +8,45 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/food-orders
-  body: none
-  auth: inherit
+  url: {{baseUrl}}/v1/food-orders
+  body: json
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "restaurantId": "",
+    "items": [
+      {
+        "itemId": "",
+        "quantity": 0,
+        "customizations": [
+          {}
+        ],
+        "specialInstructions": ""
+      }
+    ],
+    "deliveryMethod": "campus_delivery",
+    "deliveryAddress": "",
+    "deliveryInstructions": "",
+    "paymentMethod": "",
+    "momoNumber": "",
+    "momoProvider": ""
+  }
 }
 
 docs {
-  Create a new food order
+  Create a new food order. Calculates subtotal, delivery fee, and service fee automatically. Returns payment URL for checkout.
 }
 
 example {
@@ -22,21 +54,63 @@ example {
   description: Food order created successfully
   
   request: {
-    url: {{baseUrl}}/food-orders
+    url: {{baseUrl}}/v1/food-orders
     method: POST
-    mode: none
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "restaurantId": "",
+        "items": [
+          {
+            "itemId": "",
+            "quantity": 0,
+            "customizations": [
+              {}
+            ],
+            "specialInstructions": ""
+          }
+        ],
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "",
+        "deliveryInstructions": "",
+        "paymentMethod": "",
+        "momoNumber": "",
+        "momoProvider": ""
+      }
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 201
       text: Created
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "success": true,
+          "message": "Food order placed successfully",
+          "data": {
+            "orderId": "FOOD-ORD-20260115-ABCDEF",
+            "status": "pending_payment",
+            "subtotal": 0,
+            "deliveryFee": 0,
+            "serviceFee": 0,
+            "total": 0,
+            "estimatedDelivery": "",
+            "paymentUrl": ""
+          }
+        }
       '''
     }
   }
@@ -44,24 +118,225 @@ example {
 
 example {
   name: 400 Response
-  description: Validation error
+  description: Validation failed or order creation error
   
   request: {
-    url: {{baseUrl}}/food-orders
+    url: {{baseUrl}}/v1/food-orders
     method: POST
-    mode: none
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "restaurantId": "",
+        "items": [
+          {
+            "itemId": "",
+            "quantity": 0,
+            "customizations": [
+              {}
+            ],
+            "specialInstructions": ""
+          }
+        ],
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "",
+        "deliveryInstructions": "",
+        "paymentMethod": "",
+        "momoNumber": "",
+        "momoProvider": ""
+      }
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 400
       text: Bad Request
     }
   
     body: {
-      type: text
+      type: json
       content: '''
+        {
+          "success": false,
+          "message": "",
+          "errors": {}
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
   
+  request: {
+    url: {{baseUrl}}/v1/food-orders
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "restaurantId": "",
+        "items": [
+          {
+            "itemId": "",
+            "quantity": 0,
+            "customizations": [
+              {}
+            ],
+            "specialInstructions": ""
+          }
+        ],
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "",
+        "deliveryInstructions": "",
+        "paymentMethod": "",
+        "momoNumber": "",
+        "momoProvider": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: User account is not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/food-orders
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "restaurantId": "",
+        "items": [
+          {
+            "itemId": "",
+            "quantity": 0,
+            "customizations": [
+              {}
+            ],
+            "specialInstructions": ""
+          }
+        ],
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "",
+        "deliveryInstructions": "",
+        "paymentMethod": "",
+        "momoNumber": "",
+        "momoProvider": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Restaurant or menu item not found
+  
+  request: {
+    url: {{baseUrl}}/v1/food-orders
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "restaurantId": "",
+        "items": [
+          {
+            "itemId": "",
+            "quantity": 0,
+            "customizations": [
+              {}
+            ],
+            "specialInstructions": ""
+          }
+        ],
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "",
+        "deliveryInstructions": "",
+        "paymentMethod": "",
+        "momoNumber": "",
+        "momoProvider": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
       '''
     }
   }

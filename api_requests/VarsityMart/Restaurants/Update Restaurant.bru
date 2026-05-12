@@ -1,0 +1,286 @@
+meta {
+  name: Update Restaurant
+  type: http
+  seq: 4
+  tags: [
+    Restaurants
+  ]
+}
+
+put {
+  url: {{baseUrl}}/v1/restaurants/:id/
+  body: multipartForm
+  auth: apikey
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:multipart-form {
+  restaurantName: 
+  description: 
+  category: 
+  logo: 
+  banner: 
+  location: 
+  phone: 
+  openingTime: 
+  closingTime: 
+  deliveryFee: 
+  deliveryTime: 
+  minOrder: 
+  restaurantId: 
+  paymentRequired: 
+  amount: 
+  kycRequired: 
+  paymentUrl: 
+}
+
+docs {
+  Update restaurant details. Only the restaurant owner can update their restaurant. Supports both full (PUT) and partial (PATCH) updates.
+}
+
+example {
+  name: 200 Response
+  description: Restaurant updated successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:id/
+    method: PUT
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      restaurantName: 
+      description: 
+      category: 
+      logo: 
+      banner: 
+      location: 
+      phone: 
+      openingTime: 
+      closingTime: 
+      deliveryFee: 
+      deliveryTime: 
+      minOrder: 
+      restaurantId: 
+      paymentRequired: 
+      amount: 
+      kycRequired: 
+      paymentUrl: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Restaurant updated successfully",
+          "data": {}
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation failed
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:id/
+    method: PUT
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      restaurantName: 
+      description: 
+      category: 
+      logo: 
+      banner: 
+      location: 
+      phone: 
+      openingTime: 
+      closingTime: 
+      deliveryFee: 
+      deliveryTime: 
+      minOrder: 
+      restaurantId: 
+      paymentRequired: 
+      amount: 
+      kycRequired: 
+      paymentUrl: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:id/
+    method: PUT
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      restaurantName: 
+      description: 
+      category: 
+      logo: 
+      banner: 
+      location: 
+      phone: 
+      openingTime: 
+      closingTime: 
+      deliveryFee: 
+      deliveryTime: 
+      minOrder: 
+      restaurantId: 
+      paymentRequired: 
+      amount: 
+      kycRequired: 
+      paymentUrl: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Permission denied - not the restaurant owner
+  
+  request: {
+    url: {{baseUrl}}/v1/restaurants/:id/
+    method: PUT
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:multipart-form: {
+      restaurantName: 
+      description: 
+      category: 
+      logo: 
+      banner: 
+      location: 
+      phone: 
+      openingTime: 
+      closingTime: 
+      deliveryFee: 
+      deliveryTime: 
+      minOrder: 
+      restaurantId: 
+      paymentRequired: 
+      amount: 
+      kycRequired: 
+      paymentUrl: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

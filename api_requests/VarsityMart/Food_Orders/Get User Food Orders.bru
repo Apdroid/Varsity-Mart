@@ -1,53 +1,159 @@
 meta {
   name: Get User Food Orders
   type: http
-  seq: 2
+  seq: 6
   tags: [
     Food_Orders
   ]
 }
 
 get {
-  url: {{baseUrl}}/food-orders/my-orders
+  url: {{baseUrl}}/v1/food-orders/my-orders
   body: none
-  auth: inherit
+  auth: apikey
 }
 
 params:query {
-  ~page: 
-  ~limit: 
+  limit: 20
+  page: 1
   ~status: 
 }
 
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
 docs {
-  Get user's food orders with pagination
+  Retrieve all food orders for the authenticated user with optional status filtering and pagination.
 }
 
 example {
   name: 200 Response
-  description: User's food orders
+  description: User's food orders retrieved successfully
   
   request: {
-    url: {{baseUrl}}/food-orders/my-orders
+    url: {{baseUrl}}/v1/food-orders/my-orders
     method: GET
     mode: none
     params:query: {
-      ~page: 
-      ~limit: 
+      limit: 20
+      page: 1
       ~status: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
     }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 200
       text: OK
     }
   
     body: {
-      type: text
+      type: json
       content: '''
+        {
+          "success": true,
+          "data": {
+            "orders": [
+              {}
+            ],
+            "total": 0
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
   
+  request: {
+    url: {{baseUrl}}/v1/food-orders/my-orders
+    method: GET
+    mode: none
+    params:query: {
+      limit: 20
+      page: 1
+      ~status: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: User account is not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/food-orders/my-orders
+    method: GET
+    mode: none
+    params:query: {
+      limit: 20
+      page: 1
+      ~status: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
       '''
     }
   }

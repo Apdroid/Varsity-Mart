@@ -1,0 +1,249 @@
+meta {
+  name: Create Order
+  type: http
+  seq: 1
+  tags: [
+    Orders
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/orders
+  body: json
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "productId": "",
+    "quantity": 0,
+    "deliveryMethod": "campus_delivery",
+    "deliveryAddress": "",
+    "deliveryInstructions": "",
+    "paymentMethod": "momo",
+    "momoNumber": "",
+    "momoProvider": ""
+  }
+}
+
+docs {
+  
+  Create a new marketplace order for the authenticated verified user.
+  
+  Preconditions:
+  - Buyer must be authenticated and verified
+  - Product must be purchasable for requested quantity
+  
+  What happens on success:
+  1. Order is created inside an atomic transaction
+  2. If payment method is not cash, Paystack initialisation is attempted
+  3. On payment failure, order creation is rolled back
+  4. Response includes `paymentUrl` for checkout when online payment is required
+          
+}
+
+example {
+  name: Order created with payment URL
+  
+  request: {
+    url: {{baseUrl}}/v1/orders
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "productId": "",
+        "quantity": 0,
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "",
+        "deliveryInstructions": "",
+        "paymentMethod": "momo",
+        "momoNumber": "",
+        "momoProvider": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Order created successfully",
+          "data": {
+            "orderId": "ORD-20260511-A1B2C3",
+            "status": "pending_payment",
+            "total": "189.00",
+            "paymentUrl": "https://checkout.paystack.com/4n3k2x1z",
+            "estimatedDelivery": "2026-05-14T12:00:00Z"
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Payment initialisation failed
+  
+  request: {
+    url: {{baseUrl}}/v1/orders
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "productId": "",
+        "quantity": 0,
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "",
+        "deliveryInstructions": "",
+        "paymentMethod": "momo",
+        "momoNumber": "",
+        "momoProvider": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Unable to initiate payment. Please try again.",
+          "error": "Payment provider rejected the transaction"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/orders
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "productId": "",
+        "quantity": 0,
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "",
+        "deliveryInstructions": "",
+        "paymentMethod": "momo",
+        "momoNumber": "",
+        "momoProvider": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: User is not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/orders
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "productId": "",
+        "quantity": 0,
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "",
+        "deliveryInstructions": "",
+        "paymentMethod": "momo",
+        "momoNumber": "",
+        "momoProvider": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

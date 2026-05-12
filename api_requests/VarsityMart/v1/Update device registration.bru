@@ -1,0 +1,194 @@
+meta {
+  name: Update device registration
+  type: http
+  seq: 6
+  tags: [
+    v1
+  ]
+}
+
+patch {
+  url: {{baseUrl}}/v1/devices/register/
+  body: json
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "id": "",
+    "user_id": "",
+    "fcm_token": "",
+    "token_type": "",
+    "device_type": "web",
+    "device_id": "",
+    "is_active": false,
+    "created_at": ""
+  }
+}
+
+docs {
+  
+          Update existing device registration for sending notifications.
+          
+          Can update fcm_token, device_type, or device_id.
+          Token type is auto-detected for iOS devices.
+          
+}
+
+example {
+  name: 200 Response
+  description: Device updated successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/devices/register/
+    method: PATCH
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "id": "",
+        "user_id": "",
+        "fcm_token": "",
+        "token_type": "",
+        "device_type": "web",
+        "device_id": "",
+        "is_active": false,
+        "created_at": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "id": "",
+          "user_id": "",
+          "fcm_token": "",
+          "token_type": "",
+          "device_type": "web",
+          "device_id": "",
+          "is_active": false,
+          "created_at": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Invalid data
+  
+  request: {
+    url: {{baseUrl}}/v1/devices/register/
+    method: PATCH
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "id": "",
+        "user_id": "",
+        "fcm_token": "",
+        "token_type": "",
+        "device_type": "web",
+        "device_id": "",
+        "is_active": false,
+        "created_at": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "error": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Device not found
+  
+  request: {
+    url: {{baseUrl}}/v1/devices/register/
+    method: PATCH
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "id": "",
+        "user_id": "",
+        "fcm_token": "",
+        "token_type": "",
+        "device_type": "web",
+        "device_id": "",
+        "is_active": false,
+        "created_at": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "error": ""
+        }
+      '''
+    }
+  }
+}

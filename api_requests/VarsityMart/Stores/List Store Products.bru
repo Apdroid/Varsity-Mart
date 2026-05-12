@@ -1,0 +1,103 @@
+meta {
+  name: List Store Products
+  type: http
+  seq: 8
+  tags: [
+    Stores
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/stores/:id/products/
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~limit: 
+  ~page: 
+}
+
+params:path {
+  id: 
+}
+
+docs {
+  
+  ### List Store Products
+  
+  Returns a paginated list of all products belonging to a specific store.
+          
+}
+
+example {
+  name: 200 Response
+  description: Products retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/products/
+    method: GET
+    mode: none
+    params:query: {
+      ~limit: 
+      ~page: 
+    }
+  
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Store not found
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/products/
+    method: GET
+    mode: none
+    params:query: {
+      ~limit: 
+      ~page: 
+    }
+  
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

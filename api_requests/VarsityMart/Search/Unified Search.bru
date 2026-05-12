@@ -1,0 +1,158 @@
+meta {
+  name: Unified Search
+  type: http
+  seq: 1
+  tags: [
+    Search
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/search/
+  body: none
+  auth: inherit
+}
+
+params:query {
+  query: 
+  ~category: 
+  ~condition: 
+  ~freeDelivery: 
+  ~includePrivate: 
+  ~isNightShop: 
+  ~isOpen: 
+  ~limit: 
+  ~maxPrice: 
+  ~minPrice: 
+  ~minRating: 
+  ~page: 
+  ~sort: newest
+  ~sort: popular
+  ~sort: price_asc
+  ~sort: price_desc
+  ~sort: rating
+  ~sort: relevance
+  ~type: all
+  ~type: food
+  ~type: products
+  ~type: stores
+}
+
+docs {
+  Search across products, stores, and food endpoints with filters and pagination.
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/search/
+    method: GET
+    mode: none
+    params:query: {
+      ~category: 
+      ~condition: 
+      ~freeDelivery: 
+      ~includePrivate: 
+      ~isNightShop: 
+      ~isOpen: 
+      ~limit: 
+      ~maxPrice: 
+      ~minPrice: 
+      ~minRating: 
+      ~page: 
+      query: 
+      ~sort: newest
+      ~sort: popular
+      ~sort: price_asc
+      ~sort: price_desc
+      ~sort: rating
+      ~sort: relevance
+      ~type: all
+      ~type: food
+      ~type: products
+      ~type: stores
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "query": "",
+          "type": "",
+          "totals": {},
+          "results": {},
+          "pagination": {},
+          "facets": {},
+          "meta": {}
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Invalid search request
+  
+  request: {
+    url: {{baseUrl}}/v1/search/
+    method: GET
+    mode: none
+    params:query: {
+      ~category: 
+      ~condition: 
+      ~freeDelivery: 
+      ~includePrivate: 
+      ~isNightShop: 
+      ~isOpen: 
+      ~limit: 
+      ~maxPrice: 
+      ~minPrice: 
+      ~minRating: 
+      ~page: 
+      query: 
+      ~sort: newest
+      ~sort: popular
+      ~sort: price_asc
+      ~sort: price_desc
+      ~sort: rating
+      ~sort: relevance
+      ~type: all
+      ~type: food
+      ~type: products
+      ~type: stores
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

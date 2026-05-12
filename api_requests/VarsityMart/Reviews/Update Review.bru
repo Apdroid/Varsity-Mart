@@ -1,0 +1,257 @@
+meta {
+  name: Update Review
+  type: http
+  seq: 2
+  tags: [
+    Reviews
+  ]
+}
+
+patch {
+  url: {{baseUrl}}/v1/reviews/:id/
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "rating": 0,
+    "review": "",
+    "images": []
+  }
+}
+
+docs {
+  
+          Update an existing review (partial update).
+  
+          ### Requirements:
+          - **Authentication**: User must be logged in
+          - **Ownership**: Only the review author can update their review
+  
+          ### Updatable Fields:
+          - `rating` — Integer between 1 and 5
+          - `review` — Review text content
+          - `images` — New set of images (replaces all existing images)
+  
+          ### Image Replacement:
+          When new images are provided, **all existing images are deleted** from Cloudinary
+          and replaced with the new uploads. To keep existing images, do not include the
+          `images` field in the request.
+  
+          ### Image Constraints:
+          - Maximum **5 images** per review
+          - Accepted formats: **JPEG, PNG, WebP, GIF**
+          - Maximum file size: **10 MB** per image
+          
+}
+
+example {
+  name: 200 Response
+  description: Review updated successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/reviews/:id/
+    method: PATCH
+    mode: json
+    params:path: {
+      id: 
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "images": []
+      }
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/reviews/:id/
+    method: PATCH
+    mode: json
+    params:path: {
+      id: 
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "images": []
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "rating": [
+            "Rating must be between 1 and 5"
+          ]
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/reviews/:id/
+    method: PATCH
+    mode: json
+    params:path: {
+      id: 
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "images": []
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Authentication credentials were not provided."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/reviews/:id/
+    method: PATCH
+    mode: json
+    params:path: {
+      id: 
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "images": []
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "You can only edit your own reviews"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/reviews/:id/
+    method: PATCH
+    mode: json
+    params:path: {
+      id: 
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "images": []
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Not found."
+        }
+      '''
+    }
+  }
+}

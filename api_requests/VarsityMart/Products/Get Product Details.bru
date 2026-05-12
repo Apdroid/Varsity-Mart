@@ -1,0 +1,95 @@
+meta {
+  name: Get Product Details
+  type: http
+  seq: 3
+  tags: [
+    Products
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/products/:id/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: e0b4d2bb-a679-4c5b-9e3a-0efbed3aac46
+}
+
+docs {
+  
+          Retrieve detailed information about a specific product by its ID.
+  
+          ### Features:
+          - **View Counter**: Each request increments the product's view count
+          - **Seller Details**: Includes extended seller info (total sales, response rate, response time)
+          - **Like Status**: Shows whether the authenticated user has liked the product
+          - **Delivery Options**: Returns available delivery methods
+          - **Specifications**: Returns product specifications
+  
+          ### Public Access:
+          This endpoint is publicly accessible — no authentication required.
+          
+}
+
+example {
+  name: 200 Response
+  description: Product retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/products/:id/
+    method: GET
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/products/:id/
+    method: GET
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Not found."
+        }
+      '''
+    }
+  }
+}

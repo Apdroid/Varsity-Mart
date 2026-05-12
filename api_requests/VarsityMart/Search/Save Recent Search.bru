@@ -1,0 +1,104 @@
+meta {
+  name: Save Recent Search
+  type: http
+  seq: 3
+  tags: [
+    Search
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/search/recent/
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "query": "",
+    "type": ""
+  }
+}
+
+docs {
+  Create or refresh a recent search entry for the authenticated user.
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/search/recent/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "query": "",
+        "type": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "query": "",
+          "type": "",
+          "searched_at": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Invalid request
+  
+  request: {
+    url: {{baseUrl}}/v1/search/recent/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "query": "",
+        "type": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

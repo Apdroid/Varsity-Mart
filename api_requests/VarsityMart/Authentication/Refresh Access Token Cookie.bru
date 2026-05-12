@@ -1,0 +1,110 @@
+meta {
+  name: Refresh Access Token Cookie
+  type: http
+  seq: 6
+  tags: [
+    Authentication
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/auth/refresh-token/
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "refresh_token": ""
+  }
+}
+
+docs {
+  
+  Issue a fresh access token using the `refresh_token` HttpOnly cookie.
+  
+  Anyone with a valid refresh cookie can call this endpoint. On success, the `access_token`
+  cookie is replaced and, when rotation is enabled, the refresh cookie is rotated as well.
+  If the refresh token is invalid, expired, or linked to a deleted user, authentication cookies
+  are cleared and a 401 response is returned.
+          
+}
+
+example {
+  name: Refresh successful
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/refresh-token/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "refresh_token": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Token refreshed successfully",
+          "data": {
+            "refreshedAt": "2026-05-11T07:45:03Z"
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Refresh rejected
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/refresh-token/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "refresh_token": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "error": "Invalid or expired refresh token"
+        }
+      '''
+    }
+  }
+}

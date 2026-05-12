@@ -1,0 +1,208 @@
+meta {
+  name: Verify Email Address
+  type: http
+  seq: 10
+  tags: [
+    Authentication
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/auth/verify-email/
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "verification_code": "215622"
+  }
+}
+
+docs {
+  
+          Verify user's email address using the 6-digit OTP code.
+  
+          ### Important Security Notes:
+          - User must verify within 3 hours or account will be deleted
+          - Verification code expires in 24 hours
+          - Maximum 10 verification attempts before rate limiting
+          - Account cleanup runs every 15 minutes via Celery
+  
+          ### After Successful Verification:
+          - Email is marked as verified (`is_verified=True`)
+          - 3-hour account expiry timer is cleared
+          - Verification code and expiry are cleared
+          - User gains access to verified-only features
+  
+          ### Account Expiry Warning:
+          If user doesn't verify within 3 hours:
+          - Account is automatically deleted via Celery task
+          - Email address becomes available for re-registration
+          - All user data is permanently removed
+  
+          ### Email Resolution:
+          - If `email` is provided in the request body, the user is looked up by that email.
+          - Otherwise, falls back to the authenticated user's email (if a valid token is supplied).
+          
+}
+
+example {
+  name: 200 Response
+  description: Email verified successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/verify-email/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "verification_code": ""
+      }
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/verify-email/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "verification_code": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        [
+          {
+            "success": false,
+            "message": "Invalid code format. Must be 6 digits"
+          },
+          {
+            "success": false,
+            "message": "No verification code found"
+          },
+          {
+            "success": false,
+            "message": "Verification code has expired"
+          },
+          {
+            "success": false,
+            "message": "Email is already verified"
+          },
+          {
+            "success": false,
+            "message": "Invalid code. 9 attempts remaining"
+          }
+        ]
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/verify-email/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "verification_code": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 410
+      text: Gone
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Account has been deleted due to non-verification. Please register again."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/verify-email/
+    method: POST
+    mode: json
+    body:json: {
+      {
+        "verification_code": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 429
+      text: Too Many Requests
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Too many verification attempts. Please request a new code."
+        }
+      '''
+    }
+  }
+}

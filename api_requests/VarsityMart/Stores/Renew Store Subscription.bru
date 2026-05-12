@@ -1,0 +1,197 @@
+meta {
+  name: Renew Store Subscription
+  type: http
+  seq: 9
+  tags: [
+    Stores
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/stores/:id/renew/
+  body: multipartForm
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  duration: 
+}
+
+docs {
+  
+  ### Renew Store Subscription
+  
+  Initiates a subscription renewal for the store.
+  
+  **Requirements:**
+  - Must be the store owner
+  
+  **Duration options:**
+  - `semester` — 120 days, GHS 25.00
+  - `year` — 365 days, GHS 45.00
+  
+  **Flow:**
+  1. Submit renewal request with desired duration
+  2. Receive a payment URL in the response
+  3. Complete payment at the provided URL
+  4. Subscription is extended upon successful payment
+  
+  **Failure behaviour:**
+  - If payment is not completed, renewal stays in `pending` state
+  - Store access dates are not extended until payment confirmation
+          
+}
+
+example {
+  name: 200 Response
+  description: Renewal initiated successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/renew/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      duration: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Invalid duration
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/renew/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      duration: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Not the store owner
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/renew/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      duration: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Store not found
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/renew/
+    method: POST
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      duration: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

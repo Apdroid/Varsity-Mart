@@ -1,0 +1,270 @@
+meta {
+  name: Review Product Listing
+  type: http
+  seq: 5
+  tags: [
+    Admin
+    Listings
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/admin/listings/:listing_id/review/
+  body: json
+  auth: apikey
+}
+
+params:path {
+  listing_id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "action": "approve",
+    "notes": "Listing meets all requirements"
+  }
+}
+
+docs {
+  Review and approve or reject a product listing
+}
+
+example {
+  name: 201 Response
+  description: Listing reviewed successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/listings/:listing_id/review/
+    method: POST
+    mode: json
+    params:path: {
+      listing_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "action": "approve",
+        "notes": "Listing meets all requirements"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Listing reviewed",
+          "data": {
+            "listingId": "",
+            "status": "approve"
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation failed
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/listings/:listing_id/review/
+    method: POST
+    mode: json
+    params:path: {
+      listing_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "action": "approve",
+        "notes": "Listing meets all requirements"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/listings/:listing_id/review/
+    method: POST
+    mode: json
+    params:path: {
+      listing_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "action": "approve",
+        "notes": "Listing meets all requirements"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Admin permission required
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/listings/:listing_id/review/
+    method: POST
+    mode: json
+    params:path: {
+      listing_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "action": "approve",
+        "notes": "Listing meets all requirements"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Product not found
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/listings/:listing_id/review/
+    method: POST
+    mode: json
+    params:path: {
+      listing_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "action": "approve",
+        "notes": "Listing meets all requirements"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

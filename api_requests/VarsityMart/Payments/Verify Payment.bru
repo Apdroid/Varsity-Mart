@@ -1,20 +1,30 @@
 meta {
   name: Verify Payment
   type: http
-  seq: 2
+  seq: 1
   tags: [
     Payments
   ]
 }
 
 get {
-  url: {{baseUrl}}/payments/:paymentId/verify
+  url: {{baseUrl}}/v1/payments/:paymentId/verify
   body: none
-  auth: inherit
+  auth: apikey
 }
 
 params:path {
   paymentId: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
 }
 
 docs {
@@ -26,11 +36,15 @@ example {
   description: Payment status retrieved
   
   request: {
-    url: {{baseUrl}}/payments/:paymentId/verify
+    url: {{baseUrl}}/v1/payments/:paymentId/verify
     method: GET
     mode: none
     params:path: {
       paymentId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
     }
   }
   
@@ -54,24 +68,34 @@ example {
   description: Payment not found
   
   request: {
-    url: {{baseUrl}}/payments/:paymentId/verify
+    url: {{baseUrl}}/v1/payments/:paymentId/verify
     method: GET
     mode: none
     params:path: {
       paymentId: 
     }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 404
       text: Not Found
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }

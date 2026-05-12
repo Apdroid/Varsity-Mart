@@ -1,0 +1,233 @@
+meta {
+  name: Update Store
+  type: http
+  seq: 4
+  tags: [
+    Stores
+  ]
+}
+
+put {
+  url: {{baseUrl}}/v1/stores/:id/
+  body: multipartForm
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  storeName: 
+  description: 
+  category: 
+  location: 
+  phone: 
+  openingTime: 
+  closingTime: 
+  deliveryFee: 
+  minOrder: 
+  logo: @file()
+  banner: @file()
+}
+
+docs {
+  
+  ### Update Store
+  
+  Fully updates a store. All required fields must be provided.
+  
+  **Supports image uploads:** `logo` and `banner` fields accept image files.
+  Old images are automatically deleted from Cloudinary when replaced.
+          
+}
+
+example {
+  name: 200 Response
+  description: Store updated successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/
+    method: PUT
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      storeName: 
+      description: 
+      category: 
+      location: 
+      phone: 
+      openingTime: 
+      closingTime: 
+      deliveryFee: 
+      minOrder: 
+      logo: @file()
+      banner: @file()
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation error
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/
+    method: PUT
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      storeName: 
+      description: 
+      category: 
+      location: 
+      phone: 
+      openingTime: 
+      closingTime: 
+      deliveryFee: 
+      minOrder: 
+      logo: @file()
+      banner: @file()
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication required
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/
+    method: PUT
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      storeName: 
+      description: 
+      category: 
+      location: 
+      phone: 
+      openingTime: 
+      closingTime: 
+      deliveryFee: 
+      minOrder: 
+      logo: @file()
+      banner: @file()
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Store not found
+  
+  request: {
+    url: {{baseUrl}}/v1/stores/:id/
+    method: PUT
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      storeName: 
+      description: 
+      category: 
+      location: 
+      phone: 
+      openingTime: 
+      closingTime: 
+      deliveryFee: 
+      minOrder: 
+      logo: @file()
+      banner: @file()
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

@@ -1,0 +1,347 @@
+meta {
+  name: Rate Order
+  type: http
+  seq: 4
+  tags: [
+    Orders
+    Reviews
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/orders/:orderId/rate
+  body: json
+  auth: apikey
+}
+
+params:path {
+  orderId: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "rating": 0,
+    "review": "",
+    "rateProduct": false,
+    "rateSeller": false
+  }
+}
+
+docs {
+  
+  Submit a post-delivery review for an order as a verified purchase.
+  
+  Only authenticated verified buyers can rate an order they own. Order must be delivered and not
+  already rated. `rating` is required; `review`, `rateProduct`, and `rateSeller` are optional.
+  
+  Side effects:
+  - Creates a `Review` record with `verified=True`
+  - Marks order as rated (`is_rated=True`, `rated_at` set)
+  - Recalculates product/store aggregate ratings when selected
+          
+}
+
+example {
+  name: Review submitted
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/rate
+    method: POST
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "rateProduct": false,
+        "rateSeller": false
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Thank you for your review!",
+          "data": {
+            "reviewId": 742
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation failed
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/rate
+    method: POST
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "rateProduct": false,
+        "rateSeller": false
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Validation failed",
+          "errors": {
+            "rating": [
+              "Rating must be between 1 and 5."
+            ],
+            "review": [
+              "Review cannot exceed 1000 characters."
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication required
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/rate
+    method: POST
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "rateProduct": false,
+        "rateSeller": false
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Authentication credentials were not provided."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Permission denied - Not the buyer or user not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/rate
+    method: POST
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "rateProduct": false,
+        "rateSeller": false
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Only the buyer can rate this order"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Order not found
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/rate
+    method: POST
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "rateProduct": false,
+        "rateSeller": false
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Not found."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Order already rated
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/rate
+    method: POST
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "rating": 0,
+        "review": "",
+        "rateProduct": false,
+        "rateSeller": false
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 409
+      text: Conflict
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Order has already been rated"
+        }
+      '''
+    }
+  }
+}

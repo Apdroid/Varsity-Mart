@@ -1,0 +1,89 @@
+meta {
+  name: v1_admin_users_list
+  type: http
+  seq: 4
+  tags: [
+    v1
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/admin/users/
+  body: none
+  auth: apikey
+}
+
+params:query {
+  ~limit: 
+  ~page: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  List all users with optional filters
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/users/
+    method: GET
+    mode: none
+    params:query: {
+      ~limit: 
+      ~page: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "count": 123,
+          "next": "http://api.example.org/accounts/?page=4",
+          "previous": "http://api.example.org/accounts/?page=2",
+          "results": [
+            {
+              "id": "",
+              "fullName": "",
+              "email": "",
+              "role": "user",
+              "kycStatus": "",
+              "isActive": false,
+              "isVerified": false,
+              "totalOrders": 0,
+              "totalSpent": 0,
+              "memberSince": "",
+              "hasStore": false,
+              "hasRestaurant": false
+            }
+          ]
+        }
+      '''
+    }
+  }
+}

@@ -1,0 +1,327 @@
+meta {
+  name: Cancel Order
+  type: http
+  seq: 2
+  tags: [
+    Orders
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/orders/:orderId/cancel
+  body: json
+  auth: apikey
+}
+
+params:path {
+  orderId: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "reason": "",
+    "details": ""
+  }
+}
+
+docs {
+  Cancel an order. Both buyer and seller can cancel orders, but with different restrictions based on order status and timing.
+}
+
+example {
+  name: 200 Response
+  description: Order cancelled successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/cancel
+    method: POST
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "reason": "",
+        "details": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Order cancelled successfully. Refund initiated.",
+          "data": {
+            "orderId": "ORD-20231201-ABCDEF",
+            "status": "cancelled",
+            "refundStatus": "pending",
+            "refundAmount": 99.99
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation failed
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/cancel
+    method: POST
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "reason": "",
+        "details": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Validation failed",
+          "errors": {
+            "reason": [
+              "This field is required."
+            ],
+            "details": [
+              "Details cannot exceed 500 characters."
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication required
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/cancel
+    method: POST
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "reason": "",
+        "details": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Authentication credentials were not provided."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Permission denied - Not authorized to cancel this order
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/cancel
+    method: POST
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "reason": "",
+        "details": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "You don't have permission to cancel this order"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Order not found
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/cancel
+    method: POST
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "reason": "",
+        "details": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Not found."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 409 Response
+  description: Conflict - Order cannot be cancelled in current status
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId/cancel
+    method: POST
+    mode: json
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "reason": "",
+        "details": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 409
+      text: Conflict
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Order cannot be cancelled in delivered status"
+        }
+      '''
+    }
+  }
+}

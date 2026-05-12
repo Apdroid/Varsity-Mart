@@ -1,0 +1,126 @@
+meta {
+  name: List Product Reviews
+  type: http
+  seq: 1
+  tags: [
+    Product_Reviews
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/products/:product_pk/reviews/
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~limit: 
+  ~page: 
+  ~rating: 1
+  ~rating: 2
+  ~rating: 3
+  ~rating: 4
+  ~rating: 5
+}
+
+params:path {
+  product_pk: 
+}
+
+docs {
+  
+          Retrieve a paginated list of reviews for a specific product.
+  
+          ### Features:
+          - **Pagination**: Results are paginated (default 10 per page, max 100)
+          - **Filtering**: Filter by star rating using the `rating` query parameter
+          - **Statistics**: Response includes aggregate stats (average rating, total reviews, rating distribution)
+  
+          ### Rating Distribution:
+          The response includes a breakdown of how many reviews exist for each star rating (1–5).
+  
+          ### Public Access:
+          This endpoint is publicly accessible — no authentication required.
+          
+}
+
+example {
+  name: 200 Response
+  description: Reviews retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/products/:product_pk/reviews/
+    method: GET
+    mode: none
+    params:query: {
+      ~limit: 
+      ~page: 
+      ~rating: 1
+      ~rating: 2
+      ~rating: 3
+      ~rating: 4
+      ~rating: 5
+    }
+  
+    params:path: {
+      product_pk: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/products/:product_pk/reviews/
+    method: GET
+    mode: none
+    params:query: {
+      ~limit: 
+      ~page: 
+      ~rating: 1
+      ~rating: 2
+      ~rating: 3
+      ~rating: 4
+      ~rating: 5
+    }
+  
+    params:path: {
+      product_pk: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Not found."
+        }
+      '''
+    }
+  }
+}

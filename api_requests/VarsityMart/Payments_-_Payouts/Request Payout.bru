@@ -8,9 +8,26 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/payments/payout
-  body: none
-  auth: inherit
+  url: {{baseUrl}}/v1/payments/payout
+  body: json
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "amount": "",
+    "payment_method": ""
+  }
 }
 
 docs {
@@ -22,9 +39,19 @@ example {
   description: Payout requested
   
   request: {
-    url: {{baseUrl}}/payments/payout
+    url: {{baseUrl}}/v1/payments/payout
     method: POST
-    mode: none
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "amount": "",
+        "payment_method": ""
+      }
+    }
   }
   
   response: {
@@ -47,21 +74,37 @@ example {
   description: Validation error or insufficient funds
   
   request: {
-    url: {{baseUrl}}/payments/payout
+    url: {{baseUrl}}/v1/payments/payout
     method: POST
-    mode: none
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "amount": "",
+        "payment_method": ""
+      }
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 400
       text: Bad Request
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }

@@ -1,0 +1,185 @@
+meta {
+  name: Remove from Cart
+  type: http
+  seq: 3
+  tags: [
+    Cart
+  ]
+}
+
+delete {
+  url: {{baseUrl}}/v1/cart/:itemId/remove
+  body: none
+  auth: apikey
+}
+
+params:path {
+  itemId: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Remove a specific item from the user's shopping cart. Only the owner of the cart can remove items.
+}
+
+example {
+  name: 200 Response
+  description: Item removed successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/cart/:itemId/remove
+    method: DELETE
+    mode: none
+    params:path: {
+      itemId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Item removed from cart"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication required
+  
+  request: {
+    url: {{baseUrl}}/v1/cart/:itemId/remove
+    method: DELETE
+    mode: none
+    params:path: {
+      itemId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Authentication credentials were not provided."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Permission denied - Not the owner of this cart item
+  
+  request: {
+    url: {{baseUrl}}/v1/cart/:itemId/remove
+    method: DELETE
+    mode: none
+    params:path: {
+      itemId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "You do not have permission to perform this action."
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Cart item not found
+  
+  request: {
+    url: {{baseUrl}}/v1/cart/:itemId/remove
+    method: DELETE
+    mode: none
+    params:path: {
+      itemId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Not found."
+        }
+      '''
+    }
+  }
+}

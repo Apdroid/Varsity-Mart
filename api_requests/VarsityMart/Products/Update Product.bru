@@ -1,0 +1,251 @@
+meta {
+  name: Update Product
+  type: http
+  seq: 4
+  tags: [
+    Products
+  ]
+}
+
+put {
+  url: {{baseUrl}}/v1/products/:id/
+  body: multipartForm
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  id: 
+  title: 
+  description: 
+  price: 
+  original_price: 
+  category: 
+  condition: N
+  location: 
+  stock: 
+  delivery_options: 
+  images: 
+  specifications: 
+  is_night_shop: 
+  status: 
+}
+
+docs {
+  
+          Fully update an existing product listing.
+  
+          ### Requirements:
+          - **Authentication**: User must be logged in
+          - **Ownership**: Only the product seller can update their product
+          - All required fields must be provided for a full update
+  
+          ### Note:
+          Use PATCH for partial updates where only some fields need to change.
+          
+}
+
+example {
+  name: 200 Response
+  description: Product updated successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/products/:id/
+    method: PUT
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      id: 
+      title: 
+      description: 
+      price: 
+      original_price: 
+      category: 
+      condition: N
+      location: 
+      stock: 
+      delivery_options: 
+      images: 
+      specifications: 
+      is_night_shop: 
+      status: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation error
+  
+  request: {
+    url: {{baseUrl}}/v1/products/:id/
+    method: PUT
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      id: 
+      title: 
+      description: 
+      price: 
+      original_price: 
+      category: 
+      condition: N
+      location: 
+      stock: 
+      delivery_options: 
+      images: 
+      specifications: 
+      is_night_shop: 
+      status: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication required
+  
+  request: {
+    url: {{baseUrl}}/v1/products/:id/
+    method: PUT
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      id: 
+      title: 
+      description: 
+      price: 
+      original_price: 
+      category: 
+      condition: N
+      location: 
+      stock: 
+      delivery_options: 
+      images: 
+      specifications: 
+      is_night_shop: 
+      status: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Product not found
+  
+  request: {
+    url: {{baseUrl}}/v1/products/:id/
+    method: PUT
+    mode: multipartForm
+    params:path: {
+      id: 
+    }
+  
+    body:multipart-form: {
+      id: 
+      title: 
+      description: 
+      price: 
+      original_price: 
+      category: 
+      condition: N
+      location: 
+      stock: 
+      delivery_options: 
+      images: 
+      specifications: 
+      is_night_shop: 
+      status: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

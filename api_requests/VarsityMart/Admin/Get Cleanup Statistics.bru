@@ -1,0 +1,83 @@
+meta {
+  name: Get Cleanup Statistics
+  type: http
+  seq: 1
+  tags: [
+    Admin
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/admin/cleanup-stats/
+  body: none
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  
+  Get operational statistics for unverified-account cleanup.
+  
+  Admin users use this endpoint to monitor accounts that are close to expiry or already expired
+  under the 3-hour unverified-user retention rule. It returns aggregate counts and an hourly trend
+  to help diagnose queue delays or spikes in sign-up traffic.
+          
+}
+
+example {
+  name: Cleanup stats example
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/cleanup-stats/
+    method: GET
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "data": {
+            "current_time": "2026-05-11T07:40:00Z",
+            "total_unverified": 48,
+            "expiring_soon": 11,
+            "expired_unverified": 6,
+            "unverified_by_hour": [
+              {
+                "hour": "2026-05-11T06:00:00Z",
+                "count": 7
+              },
+              {
+                "hour": "2026-05-11T05:00:00Z",
+                "count": 4
+              }
+            ]
+          }
+        }
+      '''
+    }
+  }
+}

@@ -8,22 +8,39 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/auth/seller-status/
+  url: {{baseUrl}}/v1/auth/seller-status/
   body: none
-  auth: inherit
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
 }
 
 docs {
   
-  Returns the seller-capability snapshot for the currently authenticated user.
+          Returns the seller-capability snapshot for the currently authenticated user.
   
-  ### Response fields:
-  - **kyc_status**: Current KYC review state (`none`, `pending`, `approved`, `rejected`).
-  - **has_store**: Whether the user owns an active product store.
-  - **has_restaurant**: Whether the user owns an active restaurant.
-  - **seller_type**: Derived seller type — `products`, `food`, or `null` if not a seller yet.
-  - **submitted_at**: ISO-8601 timestamp of the KYC submission, or `null` if not submitted.
-  
+          ### Response fields:
+          - **kyc_status**: Current KYC review state
+            (`not_submitted`, `pending`, `approved`, `rejected`).
+          - **has_store**: Whether the user has created a Store
+            (derived from actual ownership).
+          - **has_restaurant**: Whether the user has created a Restaurant
+            (derived from actual ownership).
+          - **seller_type**: Derived seller type — `products` if the user owns
+            a Store, `food` if they own a Restaurant, otherwise `null`. KYC
+            itself no longer commits the user to a seller type; the type is
+            inferred from what the user later creates.
+          - **submitted_at**: ISO-8601 timestamp of the KYC submission, or
+            `null` if not submitted.
+          
 }
 
 example {
@@ -31,9 +48,12 @@ example {
   description: Seller status snapshot
   
   request: {
-    url: {{baseUrl}}/auth/seller-status/
+    url: {{baseUrl}}/v1/auth/seller-status/
     method: GET
     mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
   }
   
   response: {
@@ -56,21 +76,30 @@ example {
   description: Authentication credentials were not provided.
   
   request: {
-    url: {{baseUrl}}/auth/seller-status/
+    url: {{baseUrl}}/v1/auth/seller-status/
     method: GET
     mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 401
       text: Unauthorized
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }

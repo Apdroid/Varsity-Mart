@@ -1,16 +1,33 @@
 meta {
   name: Update Notification Settings
   type: http
-  seq: 4
+  seq: 6
   tags: [
     Notifications
   ]
 }
 
 put {
-  url: {{baseUrl}}/notifications/settings/
-  body: none
-  auth: inherit
+  url: {{baseUrl}}/v1/notifications/settings/
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "order_updates": false,
+    "new_messages": false,
+    "promotions": false,
+    "price_drops": false,
+    "new_followers": false,
+    "push_enabled": false,
+    "email_enabled": false,
+    "sms_enabled": false
+  }
 }
 
 docs {
@@ -22,9 +39,21 @@ example {
   description: Notification settings updated successfully
   
   request: {
-    url: {{baseUrl}}/notifications/settings/
+    url: {{baseUrl}}/v1/notifications/settings/
     method: PUT
-    mode: none
+    mode: json
+    body:json: {
+      {
+        "order_updates": false,
+        "new_messages": false,
+        "promotions": false,
+        "price_drops": false,
+        "new_followers": false,
+        "push_enabled": false,
+        "email_enabled": false,
+        "sms_enabled": false
+      }
+    }
   }
   
   response: {
@@ -47,21 +76,39 @@ example {
   description: Unauthorized - Authentication required
   
   request: {
-    url: {{baseUrl}}/notifications/settings/
+    url: {{baseUrl}}/v1/notifications/settings/
     method: PUT
-    mode: none
+    mode: json
+    body:json: {
+      {
+        "order_updates": false,
+        "new_messages": false,
+        "promotions": false,
+        "price_drops": false,
+        "new_followers": false,
+        "push_enabled": false,
+        "email_enabled": false,
+        "sms_enabled": false
+      }
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 401
       text: Unauthorized
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }

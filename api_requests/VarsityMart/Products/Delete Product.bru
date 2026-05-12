@@ -1,0 +1,132 @@
+meta {
+  name: Delete Product
+  type: http
+  seq: 6
+  tags: [
+    Products
+  ]
+}
+
+delete {
+  url: {{baseUrl}}/v1/products/:id/
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  
+          Delete a product listing from the marketplace.
+  
+          ### Requirements:
+          - **Authentication**: User must be logged in
+          - **Ownership**: Only the product seller can delete their product
+  
+          ### What Happens:
+          - The product and all associated images are permanently removed
+          - Cloudinary images are cleaned up via the model's delete signal
+          
+}
+
+example {
+  name: 200 Response
+  description: Product deleted successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/products/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication required
+  
+  request: {
+    url: {{baseUrl}}/v1/products/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Product not found
+  
+  request: {
+    url: {{baseUrl}}/v1/products/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

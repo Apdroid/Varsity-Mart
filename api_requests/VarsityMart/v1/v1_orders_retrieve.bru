@@ -1,0 +1,97 @@
+meta {
+  name: v1_orders_retrieve
+  type: http
+  seq: 9
+  tags: [
+    v1
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/orders/:orderId
+  body: none
+  auth: apikey
+}
+
+params:path {
+  orderId: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/orders/:orderId
+    method: GET
+    mode: none
+    params:path: {
+      orderId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "id": "",
+          "order_number": "",
+          "status": "pending_payment",
+          "status_display": "",
+          "product": "",
+          "quantity": 0,
+          "subtotal": "",
+          "delivery_fee": "",
+          "service_fee": "",
+          "total": "",
+          "seller": "",
+          "buyer": "",
+          "store": "",
+          "delivery_method": "campus_delivery",
+          "delivery_method_display": "",
+          "delivery_address": "",
+          "delivery_instructions": "",
+          "payment_method": "momo",
+          "payment_method_display": "",
+          "payment_status": "pending",
+          "payment_status_display": "",
+          "escrow_status": "not_applicable",
+          "escrow_status_display": "",
+          "timeline": [
+            {
+              "status": "pending_payment",
+              "status_display": "",
+              "timestamp": "",
+              "description": ""
+            }
+          ],
+          "estimated_delivery": "",
+          "created_at": ""
+        }
+      '''
+    }
+  }
+}

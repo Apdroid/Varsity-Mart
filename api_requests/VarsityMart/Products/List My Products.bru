@@ -1,0 +1,110 @@
+meta {
+  name: List My Products
+  type: http
+  seq: 9
+  tags: [
+    Products
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/products/my-products/
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~limit: 
+  ~page: 
+  ~status: active
+  ~status: inactive
+  ~status: sold
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  
+          Retrieve a list of products owned by the authenticated user.
+  
+          ### Requirements:
+          - **Authentication**: User must be logged in
+  
+          ### Features:
+          - **Status Filter**: Optionally filter by product status (active, inactive, sold)
+          - **Pagination**: Results are paginated (default 20 per page)
+          - **Sorting**: Products are sorted by newest first
+          
+}
+
+example {
+  name: 200 Response
+  description: Products retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/products/my-products/
+    method: GET
+    mode: none
+    params:query: {
+      ~limit: 
+      ~page: 
+      ~status: active
+      ~status: inactive
+      ~status: sold
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication required
+  
+  request: {
+    url: {{baseUrl}}/v1/products/my-products/
+    method: GET
+    mode: none
+    params:query: {
+      ~limit: 
+      ~page: 
+      ~status: active
+      ~status: inactive
+      ~status: sold
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

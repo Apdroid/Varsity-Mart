@@ -1,0 +1,132 @@
+meta {
+  name: Delete Product Image
+  type: http
+  seq: 2
+  tags: [
+    Product_Images
+  ]
+}
+
+delete {
+  url: {{baseUrl}}/v1/product-images/:id/
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  
+          Delete a specific product image.
+  
+          ### Requirements:
+          - **Authentication**: User must be logged in
+          - **Ownership**: Only the product owner can delete images
+  
+          ### What Happens:
+          - The image is removed from Cloudinary via the model's delete signal
+          - The database record is permanently deleted
+          
+}
+
+example {
+  name: 200 Response
+  description: Image deleted successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/product-images/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/product-images/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "error": "You can only delete images from your own products, sir"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/product-images/:id/
+    method: DELETE
+    mode: none
+    params:path: {
+      id: 
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "Image not found"
+        }
+      '''
+    }
+  }
+}

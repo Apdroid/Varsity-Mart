@@ -1,0 +1,176 @@
+meta {
+  name: User Logout
+  type: http
+  seq: 5
+  tags: [
+    Authentication
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/auth/logout/
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  
+          Logout user and invalidate refresh token.
+          
+          ### Logout Types:
+          1. **Single Device Logout**: Invalidates the provided refresh token only
+          2. **Multi-Device Logout**: Optionally blacklist all user's refresh tokens
+          
+          ### What Happens:
+          - Provided refresh token is blacklisted (cannot be used again)
+          - Access token remains valid until expiration (cannot be revoked immediately)
+          - User must provide credentials to login again
+          - Optional: Can blacklist all user's refresh tokens for complete logout
+          
+          ### Security Notes:
+          - This endpoint requires a valid access token
+          - Blacklisting prevents refresh token reuse
+          - Access tokens cannot be immediately invalidated (JWT limitation)
+          - Consider using short access token lifetimes (15-30 minutes)
+          
+          ### Multiple Device Considerations:
+          - Logout on one device doesn't affect other devices
+          - For complete logout from all devices, use logout_all endpoint
+          - Users can see active sessions in their profile
+          
+          ### After Logout:
+          - User cannot refresh access token with blacklisted refresh token
+          - API requests with expired access token will fail
+          - User must login again for new tokens
+          
+}
+
+example {
+  name: 200 Response
+  description: Logout successful
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/logout/
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/logout/
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "errors": {
+            "refresh_token": [
+              "This field is required for single device logout."
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/logout/
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "errors": {
+            "detail": "Authentication credentials were not provided."
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: application/json Example
+  
+  request: {
+    url: {{baseUrl}}/v1/auth/logout/
+    method: POST
+    mode: none
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "errors": {
+            "detail": "You do not have permission to perform this action."
+          }
+        }
+      '''
+    }
+  }
+}

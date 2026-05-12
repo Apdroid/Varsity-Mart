@@ -1,0 +1,97 @@
+meta {
+  name: Clear Cart
+  type: http
+  seq: 5
+  tags: [
+    Cart
+  ]
+}
+
+delete {
+  url: {{baseUrl}}/v1/cart/clear
+  body: none
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Remove all items from the authenticated user's shopping cart. This action cannot be undone.
+}
+
+example {
+  name: 200 Response
+  description: Cart cleared successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/cart/clear
+    method: DELETE
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "Cart cleared successfully"
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication required
+  
+  request: {
+    url: {{baseUrl}}/v1/cart/clear
+    method: DELETE
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": "Authentication credentials were not provided."
+        }
+      '''
+    }
+  }
+}

@@ -8,9 +8,30 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/payments/methods
-  body: none
-  auth: inherit
+  url: {{baseUrl}}/v1/payments/methods
+  body: json
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "type": "",
+    "provider": "",
+    "number": "",
+    "name": "",
+    "bank_code": "",
+    "is_default": false
+  }
 }
 
 docs {
@@ -22,9 +43,23 @@ example {
   description: Payment method added
   
   request: {
-    url: {{baseUrl}}/payments/methods
+    url: {{baseUrl}}/v1/payments/methods
     method: POST
-    mode: none
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "type": "",
+        "provider": "",
+        "number": "",
+        "name": "",
+        "bank_code": "",
+        "is_default": false
+      }
+    }
   }
   
   response: {
@@ -47,21 +82,41 @@ example {
   description: Validation error
   
   request: {
-    url: {{baseUrl}}/payments/methods
+    url: {{baseUrl}}/v1/payments/methods
     method: POST
-    mode: none
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "type": "",
+        "provider": "",
+        "number": "",
+        "name": "",
+        "bank_code": "",
+        "is_default": false
+      }
+    }
   }
   
   response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
     status: {
       code: 400
       text: Bad Request
     }
   
     body: {
-      type: text
+      type: json
       content: '''
-  
+        {
+          "detail": ""
+        }
       '''
     }
   }
