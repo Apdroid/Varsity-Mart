@@ -23,6 +23,48 @@ async function parseResponse<T>(response: Response): Promise<T> {
   return response.text() as unknown as T
 }
 
+// Deduplicate concurrent refresh calls — all waiters share the same promise.
+let refreshPromise: Promise<void> | null = null
+
+async function refreshToken(): Promise<void> {
+  const url = `${API_BASE_URL}/auth/refresh-token/`
+  const response = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+  })
+  if (!response.ok) throw new ApiError(response.status, response.statusText)
+}
+
+// Internal executor — handles the 401 → refresh → retry flow.
+async function executeRequest<T>(
+  endpoint: string,
+  config: RequestInit,
+  isRetry: boolean
+): Promise<T> {
+  const url = endpoint.startsWith("http") ? endpoint : `${API_BASE_URL}${endpoint}`
+  const response = await fetch(url, config)
+
+  if (response.status === 401 && !isRetry) {
+    if (!refreshPromise) {
+      refreshPromise = refreshToken().finally(() => { refreshPromise = null })
+    }
+    try {
+      await refreshPromise
+      return executeRequest<T>(endpoint, config, true)
+    } catch {
+      throw new ApiError(401, "Unauthorized")
+    }
+  }
+
+  if (!response.ok) {
+    const data = await parseResponse(response).catch(() => undefined)
+    throw new ApiError(response.status, response.statusText, data)
+  }
+
+  return parseResponse<T>(response)
+}
+
 export async function apiClient<T>(
   endpoint: string,
   options: RequestOptions = {}
@@ -42,15 +84,7 @@ export async function apiClient<T>(
     config.body = JSON.stringify(body)
   }
 
-  const url = endpoint.startsWith("http") ? endpoint : `${API_BASE_URL}${endpoint}`
-  const response = await fetch(url, config)
-
-  if (!response.ok) {
-    const data = await parseResponse(response).catch(() => undefined)
-    throw new ApiError(response.status, response.statusText, data)
-  }
-
-  return parseResponse<T>(response)
+  return executeRequest<T>(endpoint, config, false)
 }
 
 export async function apiClientFormData<T>(
@@ -58,21 +92,14 @@ export async function apiClientFormData<T>(
   formData: FormData,
   options: Omit<RequestInit, "body" | "headers"> = {}
 ): Promise<T> {
-  const url = endpoint.startsWith("http") ? endpoint : `${API_BASE_URL}${endpoint}`
-
-  const response = await fetch(url, {
+  const config: RequestInit = {
     ...options,
     method: options.method || "POST",
     credentials: "include",
     body: formData,
-  })
-
-  if (!response.ok) {
-    const data = await parseResponse(response).catch(() => undefined)
-    throw new ApiError(response.status, response.statusText, data)
   }
 
-  return parseResponse<T>(response)
+  return executeRequest<T>(endpoint, config, false)
 }
 
 export const api = {

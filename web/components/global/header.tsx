@@ -25,7 +25,7 @@ import {
 	GearIcon,
 	PackageIcon,
 } from "@phosphor-icons/react"
-import { Loader2, Moon, Sun } from "lucide-react"
+import { Loader2, MessageCircleIcon, Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 import {
 	Tooltip,
@@ -390,6 +390,12 @@ function MainBar() {
 									<Link href="/account/wishlist">
 										<HeartIcon className="mr-2 h-4 w-4" />
 										Wishlist
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem asChild>
+									<Link href="/messages">
+										<MessageCircleIcon className="mr-2 h-4 w-4" />
+										Chats
 									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuItem asChild>
