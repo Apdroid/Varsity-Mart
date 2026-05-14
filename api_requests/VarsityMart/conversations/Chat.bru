@@ -1,0 +1,30 @@
+meta {
+  name: Chat
+  type: ws
+  seq: 6
+}
+
+ws {
+  url: wss://api.varsitymart.org/ws/chat/{{conversation_id}}/
+  body: ws
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc4NzI1MjU0LCJpYXQiOjE3Nzg3MjE2NTQsImp0aSI6Ijk1N2I2ZjMzZjljMDQ2ZjY5OWEzYzkzNThkM2Y2NzQ4IiwidXNlcl9pZCI6IjNiM2RkZTdkLTg4ZjYtNDQ1Mi1hNWEyLWQwNDEwZWMzNDU2YiJ9.3zmw8re98oIue45SVG3GUGAij5lnvNgV-WS9E2aOBYs
+}
+
+body:ws {
+  name: message 1
+  type: json
+  content: '''
+    {
+      "type":"chat_message",
+      "text":"Just texting, josh"
+    }
+  '''
+}
+
+vars:pre-request {
+  conversation_id: 33eab7ab-6149-4518-9f04-fd0399d63d2a
+}

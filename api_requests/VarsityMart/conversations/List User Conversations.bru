@@ -8,9 +8,14 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/v1/conversations/
+  url: {{baseUrl}}/v1/conversations/?page=1&limit=20
   body: none
   auth: apikey
+}
+
+params:query {
+  page: 1
+  limit: 20
 }
 
 headers {
