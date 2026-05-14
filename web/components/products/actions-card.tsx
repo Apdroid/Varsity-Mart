@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
+import { useAddToCart } from "@/hooks/queries/use-cart"
 
 type Props = {
+  productId: string
   price: string
   stock?: number
   title: string
@@ -37,7 +39,7 @@ function OfferModal({ open, onClose, price, quantity, title }: OfferModalProps) 
   const total = offerNum * quantity
   const invalid = offerNum <= 0 || offerNum >= price
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (invalid) return
     toast.success("Offer sent!", {
@@ -103,18 +105,27 @@ function OfferModal({ open, onClose, price, quantity, title }: OfferModalProps) 
   )
 }
 
-export function ActionsCard({ price, stock, title, quantity }: Props) {
+export function ActionsCard({ productId, price, stock, title, quantity }: Props) {
   const [liked, setLiked] = React.useState(false)
   const [offerOpen, setOfferOpen] = React.useState(false)
   const isSoldOut = stock === undefined || stock <= 0
   const priceNum = Number(price)
   const total = priceNum * quantity
 
+  const { mutate: addToCart, isPending } = useAddToCart()
+
   const handleAddToCart = () => {
-    toast.success(quantity > 1 ? `${quantity} items added to cart` : "Added to cart", {
-      description: title,
-      action: { label: "View Cart", onClick: () => {} },
-    })
+    addToCart(
+      { productId, quantity },
+      {
+        onSuccess: () =>
+          toast.success(quantity > 1 ? `${quantity} items added to cart` : "Added to cart", {
+            description: title,
+            action: { label: "View Cart", onClick: () => {} },
+          }),
+        onError: () => toast.error("Failed to add to cart"),
+      }
+    )
   }
 
   return (
@@ -139,12 +150,15 @@ export function ActionsCard({ price, stock, title, quantity }: Props) {
           <Button
             className="w-full h-11 bg-vm-tangerine font-semibold text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
             size="lg"
+            disabled={isPending}
             onClick={handleAddToCart}
           >
             <ShoppingCart className="mr-2 h-4 w-4" />
-            {quantity > 1
-              ? `Add ${quantity} to Cart — ${formatGHS(total)}`
-              : "Add to Cart"}
+            {isPending
+              ? "Adding…"
+              : quantity > 1
+                ? `Add ${quantity} to Cart — ${formatGHS(total)}`
+                : "Add to Cart"}
           </Button>
           <Button
             variant="outline"

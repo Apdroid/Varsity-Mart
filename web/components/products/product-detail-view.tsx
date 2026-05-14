@@ -237,6 +237,7 @@ function ProductInfo({ product, quantity, onQuantityChange, actionsRef }: Produc
       {/* i. Actions card */}
       <div ref={actionsRef}>
         <ActionsCard
+          productId={product.id}
           price={product.price}
           stock={product.stock}
           title={product.title}

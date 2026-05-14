@@ -14,7 +14,6 @@ export function useMessages(conversationId: string, page = 1, limit = 50) {
 		queryKey: ["messages", conversationId, page, limit],
 		queryFn: () => conversationsApi.messages(conversationId, page, limit),
 		enabled: !!conversationId,
-		refetchInterval: 10000,
 	})
 }
 

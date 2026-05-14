@@ -8,8 +8,8 @@ function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 60 * 1000,
-        gcTime: 5 * 60 * 1000,
+        staleTime: 5 * 60 * 1000,
+        gcTime: 15 * 60 * 1000,
         retry: (failureCount, error) => {
           if (error instanceof Error && error.message.includes("401")) {
             return false

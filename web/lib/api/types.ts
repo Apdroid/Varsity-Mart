@@ -528,7 +528,7 @@ export interface Cart {
 }
 
 export interface AddToCartRequest {
-	product_id: string
+	productId: string
 	quantity: number
 }
 
