@@ -82,10 +82,12 @@ function groupMessagesByDate(messages: ChatMessage[]) {
 }
 
 // ── Message status icon ────────────────────────────────────────────────────────
-function MessageStatus({ message }: { message: ChatMessage }) {
-	if (message.isRead) return <CheckCheck className="h-3.5 w-3.5 text-vm-tangerine" />
-	if (message.deliveredAt) return <CheckCheck className="h-3.5 w-3.5 text-muted-foreground/60" />
-	return <Check className="h-3.5 w-3.5 text-muted-foreground/40" />
+function MessageStatus({ message, inBubble }: { message: ChatMessage; inBubble?: boolean }) {
+	if (message.isRead)
+		return <CheckCheck className={cn("h-3.5 w-3.5", inBubble ? "text-vm-tangerine-foreground" : "text-vm-tangerine")} />
+	if (message.deliveredAt)
+		return <CheckCheck className={cn("h-3.5 w-3.5", inBubble ? "text-vm-tangerine-foreground/70" : "text-muted-foreground/60")} />
+	return <Check className={cn("h-3.5 w-3.5", inBubble ? "text-vm-tangerine-foreground/50" : "text-muted-foreground/40")} />
 }
 
 // ── Single message bubble ──────────────────────────────────────────────────────
@@ -122,13 +124,14 @@ function MessageBubble({
 				</div>
 			)}
 
-			<div className={cn("flex max-w-[72%] flex-col gap-1", isOwn && "items-end")}>
-				{/* Bubble with full timestamp in tooltip */}
+			<div className={cn("flex max-w-[72%]", isOwn && "justify-end")}>
+				{/* Bubble — hover tooltip shows full date+time */}
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<div
 							className={cn(
-								"rounded-2xl px-3.5 py-2.5 cursor-default select-text",
+								"cursor-default select-text rounded-2xl px-3.5 pt-2.5",
+								isLastInGroup ? "pb-2" : "pb-2.5",
 								isOwn
 									? cn(
 											"bg-vm-tangerine text-vm-tangerine-foreground",
@@ -143,23 +146,26 @@ function MessageBubble({
 							)}
 						>
 							<p className="text-sm leading-relaxed whitespace-pre-wrap break-words">{message.text}</p>
+
+							{/* Time + status inside the bubble, WhatsApp-style */}
+							{isLastInGroup && (
+								<div className={cn(
+									"mt-1 flex items-center justify-end gap-1",
+									isOwn ? "text-vm-tangerine-foreground/70" : "text-muted-foreground"
+								)}>
+									{message.flagged && (
+										<span className="text-[10px] text-destructive">Flagged</span>
+									)}
+									<span className="text-[10px]">{formatTime(message.timestamp)}</span>
+									{isOwn && <MessageStatus message={message} inBubble />}
+								</div>
+							)}
 						</div>
 					</TooltipTrigger>
 					<TooltipContent side={isOwn ? "left" : "right"} className="text-xs">
 						{formatFullTime(message.timestamp)}
 					</TooltipContent>
 				</Tooltip>
-
-				{/* Short time + delivery status — only on last bubble in group */}
-				{isLastInGroup && (
-					<div className="flex items-center gap-1.5 px-1">
-						<span className="text-[10px] text-muted-foreground">{formatTime(message.timestamp)}</span>
-						{isOwn && <MessageStatus message={message} />}
-						{message.flagged && (
-							<span className="text-[10px] text-destructive">Flagged</span>
-						)}
-					</div>
-				)}
 			</div>
 
 			{/* Report button — on hover for incoming messages only */}
@@ -168,10 +174,7 @@ function MessageBubble({
 					<DropdownMenuTrigger asChild>
 						<button
 							type="button"
-							className={cn(
-								"shrink-0 rounded p-1 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted",
-								isLastInGroup ? "mb-6" : "mb-0"
-							)}
+							className="shrink-0 rounded p-1 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted"
 						>
 							<MoreVertical className="h-3.5 w-3.5 text-muted-foreground" />
 						</button>

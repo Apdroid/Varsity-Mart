@@ -3,10 +3,12 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Search, MessageSquareDashed } from "lucide-react"
+import { Search, MessageSquareDashed, Home, Sun, Moon } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
 import { useConversations } from "@/hooks/queries/use-conversations"
 import type { Conversation } from "@/lib/api/types"
@@ -160,6 +162,7 @@ export function ConversationsSidebar() {
 	const pathname = usePathname()
 	const [search, setSearch] = React.useState("")
 	const { data, isLoading } = useConversations()
+	const { resolvedTheme, setTheme } = useTheme()
 
 	const activeId = pathname.startsWith("/messages/")
 		? pathname.replace("/messages/", "").split("/")[0]
@@ -216,6 +219,24 @@ export function ConversationsSidebar() {
 						))}
 					</div>
 				)}
+			</div>
+
+			{/* Footer */}
+			<div className="shrink-0 flex items-center gap-1 border-t border-border px-3 py-2">
+				<Button variant="ghost" size="sm" asChild className="flex-1 justify-start">
+					<Link href="/">
+						<Home data-icon="inline-start" />
+						Back to home
+					</Link>
+				</Button>
+				<Button
+					variant="ghost"
+					size="icon"
+					aria-label="Toggle theme"
+					onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+				>
+					{resolvedTheme === "dark" ? <Sun /> : <Moon />}
+				</Button>
 			</div>
 		</div>
 	)

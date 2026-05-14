@@ -11,11 +11,14 @@ function ThemeProvider({
 	...props
 }: React.ComponentProps<typeof NextThemesProvider>) {
 	const pathname = usePathname()
-	const hideComponents = React.useMemo(
+	const hideExact = React.useMemo(
 		() => new Set(["/login", "/register", "/forgot", "/reset"]),
 		[]
 	)
-	const showHeader = !pathname || !hideComponents.has(pathname)
+	const hidePrefix = ["/messages"]
+	const showHeader =
+		!pathname ||
+		(!hideExact.has(pathname) && !hidePrefix.some((p) => pathname.startsWith(p)))
 
 	return (
 		<NextThemesProvider
