@@ -9,14 +9,6 @@ export function useConversations(page = 1, limit = 20) {
 	})
 }
 
-export function useConversation(conversationId: string, page = 1, limit = 50) {
-	return useQuery({
-		queryKey: ["conversation", conversationId, page, limit],
-		queryFn: () => conversationsApi.messages(conversationId, page, limit),
-		enabled: !!conversationId,
-	})
-}
-
 export function useMessages(conversationId: string, page = 1, limit = 50) {
 	return useQuery({
 		queryKey: ["messages", conversationId, page, limit],
@@ -56,7 +48,6 @@ export function useMarkConversationAsRead(conversationId: string) {
 		mutationFn: () => conversationsApi.markRead(conversationId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["conversations"] })
-			queryClient.invalidateQueries({ queryKey: ["conversation", conversationId] })
 		},
 	})
 }

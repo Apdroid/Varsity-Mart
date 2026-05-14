@@ -2,22 +2,22 @@ import { api } from "./client"
 import type {
 	ApiResponse,
 	Conversation,
-	ConversationList,
+	ConversationListResponse,
+	MessageListResponse,
 	Message,
-	MessageList,
 	SendMessageRequest,
 	StartConversationRequest,
 } from "./types"
 
 export const conversationsApi = {
 	list: (page = 1, limit = 20) =>
-		api.get<ConversationList>(`/conversations/?page=${page}&limit=${limit}`),
+		api.get<ConversationListResponse>(`/conversations/?page=${page}&limit=${limit}`),
 
 	start: (data: StartConversationRequest) =>
 		api.post<ApiResponse<Conversation>>("/conversations/start/", data),
 
 	messages: (conversationId: string, page = 1, limit = 50) =>
-		api.get<MessageList>(`/conversations/${conversationId}/messages/?page=${page}&limit=${limit}`),
+		api.get<MessageListResponse>(`/conversations/${conversationId}/messages/?page=${page}&limit=${limit}`),
 
 	send: (conversationId: string, data: SendMessageRequest) =>
 		api.post<ApiResponse<Message>>(`/conversations/${conversationId}/messages/`, data),

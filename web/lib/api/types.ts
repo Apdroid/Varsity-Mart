@@ -24,8 +24,28 @@ export interface DRFPaginatedList<T> {
 /** Alias for DRF-style paginated JSON (`count`, `next`, `previous`, `results`). */
 export type PaginatedList<T> = DRFPaginatedList<T>
 
-export type ConversationList = PaginatedList<{ conversations: Conversation[] }>
-export type MessageList = PaginatedList<{ messages: Message[] }>
+export interface ConversationListResponse {
+	count: number
+	next: string | null
+	previous: string | null
+	results: {
+		conversations: Conversation[]
+	}
+}
+
+export interface MessageListResponse {
+	count: number
+	next: string | null
+	previous: string | null
+	results: {
+		messages: Message[]
+		pagination: {
+			currentPage: number
+			totalPages: number
+			totalItems: number
+		}
+	}
+}
 
 // Products list response
 export interface ProductsListResponse {
@@ -773,20 +793,20 @@ export interface Conversation {
 
 export interface Message {
 	id: string
-	senderId: string
+	sender_id: string
 	text: string
 	timestamp: string
-	deliveredAt?: string
-	isRead: boolean
-	readAt?: string
+	delivered_at?: string | null
+	is_read: boolean
+	read_at?: string | null
 	flagged: boolean
-	flagReason?: "contact_info" | "spam" | "inappropriate" | "harassment" | "other"
+	flag_reason?: "contact_info" | "spam" | "inappropriate" | "harassment" | "other" | null
 	product?: {
 		id: string
 		title: string
 		price: number
 		firstImageUrl?: string
-	}
+	} | null
 }
 
 export interface StartConversationRequest {

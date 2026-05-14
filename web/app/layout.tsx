@@ -47,7 +47,7 @@ export default function RootLayout({
 							<ThemeProvider>
 								{children}
 								<DownloadAppCard />
-								<Toaster richColors position="bottom-right" />
+								<Toaster richColors theme="system" position="bottom-right" />
 							</ThemeProvider>
 						</TooltipProvider>
 					</AuthProvider>

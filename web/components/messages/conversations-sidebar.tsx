@@ -165,8 +165,7 @@ export function ConversationsSidebar() {
 		? pathname.replace("/messages/", "").split("/")[0]
 		: null
 
-	const raw = data?.results
-	const conversations: Conversation[] = Array.isArray(raw) ? raw : []
+	const conversations: Conversation[] = data?.results?.conversations ?? []
 	const filtered = search
 		? conversations.filter((c) => {
 			const name = [c.other_user.firstName, c.other_user.lastName, c.other_user.name]

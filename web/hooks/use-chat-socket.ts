@@ -1,11 +1,10 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { io, type Socket } from "socket.io-client"
 
-// Socket.IO requires HTTP/HTTPS — strip any ws/wss scheme from the env var
-const rawBase = process.env.NEXT_PUBLIC_WS_URL || "https://api.varsitymart.org"
-const SOCKET_BASE = rawBase.replace(/^wss:\/\//, "https://").replace(/^ws:\/\//, "http://")
+const rawBase = process.env.NEXT_PUBLIC_WS_URL || "wss://api.varsitymart.org"
+// Ensure we use the WebSocket scheme
+const WS_BASE = rawBase.replace(/^https:\/\//, "wss://").replace(/^http:\/\//, "ws://")
 
 export interface ChatMessage {
 	id: string
@@ -19,9 +18,10 @@ export interface ChatMessage {
 	flagReason?: string | null
 }
 
-// ── Server → client event payloads (snake_case from Django backend) ────────────
+// ── Server → client message shapes (Django Channels sends JSON with a `type` field) ──
 
-interface ConversationMessagesPayload {
+interface ConversationMessagesEvent {
+	type: "conversation_messages"
 	conversation_id: string
 	messages: Array<{
 		id: string
@@ -41,7 +41,8 @@ interface ConversationMessagesPayload {
 	}
 }
 
-interface ChatMessagePayload {
+interface ChatMessageEvent {
+	type: "chat_message"
 	message_id: string
 	sender_id: string
 	text: string
@@ -53,32 +54,44 @@ interface ChatMessagePayload {
 	flag_reason: string | null
 }
 
-interface TypingPayload {
+interface TypingEvent {
+	type: "typing"
 	user_id: string
 	is_typing: boolean
 }
 
-interface PresencePayload {
+interface PresenceEvent {
+	type: "user_joined" | "user_left"
 	user_id: string
 	is_online: boolean
 	timestamp: string
 }
 
-interface DeliveryReceiptPayload {
+interface DeliveryReceiptEvent {
+	type: "delivery_receipt"
 	message_id: string
 	delivered_to: string
 	delivered_at: string
 }
 
-interface ReadReceiptPayload {
+interface ReadReceiptEvent {
+	type: "read_receipt"
 	message_ids: string[]
 	reader_id: string
 	read_at: string
 }
 
+type ServerEvent =
+	| ConversationMessagesEvent
+	| ChatMessageEvent
+	| TypingEvent
+	| PresenceEvent
+	| DeliveryReceiptEvent
+	| ReadReceiptEvent
+
 // ── Transform helpers ──────────────────────────────────────────────────────────
 
-function fromInitial(msg: ConversationMessagesPayload["messages"][0]): ChatMessage {
+function fromInitial(msg: ConversationMessagesEvent["messages"][0]): ChatMessage {
 	return {
 		id: msg.id,
 		senderId: msg.sender_id,
@@ -92,7 +105,7 @@ function fromInitial(msg: ConversationMessagesPayload["messages"][0]): ChatMessa
 	}
 }
 
-function fromIncoming(msg: ChatMessagePayload): ChatMessage {
+function fromIncoming(msg: ChatMessageEvent): ChatMessage {
 	return {
 		id: msg.message_id,
 		senderId: msg.sender_id,
@@ -130,6 +143,10 @@ interface UseChatSocketReturn {
 	reconnect: () => void
 }
 
+const MAX_RECONNECT_ATTEMPTS = 5
+const BASE_DELAY_MS = 1000
+const MAX_DELAY_MS = 30000
+
 export function useChatSocket({
 	conversationId,
 	currentUserId,
@@ -139,10 +156,13 @@ export function useChatSocket({
 	onReadReceipt,
 	onDeliveryReceipt,
 }: UseChatSocketOptions): UseChatSocketReturn {
-	const socketRef = useRef<Socket | null>(null)
+	const wsRef = useRef<WebSocket | null>(null)
 	const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+	const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+	const attemptRef = useRef(0)
+	const unmountedRef = useRef(false)
 
-	// Keep callback refs stable so changing them doesn't reconnect the socket
+	// Keep callback refs stable so changing them doesn't reconnect
 	const onMessageRef = useRef(onMessage)
 	const onTypingRef = useRef(onTyping)
 	const onPresenceRef = useRef(onPresence)
@@ -160,126 +180,148 @@ export function useChatSocket({
 	const [otherUserOnline, setOtherUserOnline] = useState(false)
 	const [otherUserTyping, setOtherUserTyping] = useState(false)
 
+	// Expose a ref to sendRaw so emitters can access current socket without captures
+	const sendRaw = useCallback((payload: object) => {
+		if (wsRef.current?.readyState === WebSocket.OPEN) {
+			wsRef.current.send(JSON.stringify(payload))
+		}
+	}, [])
+
 	useEffect(() => {
 		if (!conversationId || !currentUserId) return
+		unmountedRef.current = false
 
-		setIsConnecting(true)
-		setIsConnected(false)
-
-		const socket = io(SOCKET_BASE, {
-			withCredentials: true,              // sends HTTP-only cookies on every request
-			transports: ["websocket"],          // skip HTTP polling; go straight to WS
-			path: `/ws/chat/${conversationId}/`,
-			reconnection: true,
-			reconnectionAttempts: 5,
-			reconnectionDelay: 1000,
-			reconnectionDelayMax: 30000,
-		})
-
-		socketRef.current = socket
-
-		socket.on("connect", () => {
-			setIsConnected(true)
-			setIsConnecting(false)
-		})
-
-		socket.on("disconnect", (reason) => {
+		function connect() {
+			if (unmountedRef.current) return
+			setIsConnecting(true)
 			setIsConnected(false)
-			// "io server disconnect" means the server closed it intentionally — don't retry
-			if (reason === "io server disconnect") setIsConnecting(false)
-		})
 
-		socket.on("connect_error", () => {
-			setIsConnecting(false)
-			setIsConnected(false)
-		})
+			const ws = new WebSocket(`${WS_BASE}/ws/chat/${conversationId}/`)
+			wsRef.current = ws
 
-		socket.on("reconnect_attempt", () => setIsConnecting(true))
-		socket.on("reconnect_failed", () => setIsConnecting(false))
-
-		// ── Server events ──────────────────────────────────────────────────────
-
-		socket.on("conversation_messages", (data: ConversationMessagesPayload) => {
-			setMessages(data.messages.map(fromInitial))
-		})
-
-		socket.on("chat_message", (data: ChatMessagePayload) => {
-			const msg = fromIncoming(data)
-			setMessages((prev) => {
-				if (prev.some((m) => m.id === msg.id)) return prev
-				return [...prev, msg]
-			})
-			onMessageRef.current?.(msg)
-
-			if (data.sender_id !== currentUserId) {
-				socket.emit("read_receipt", { message_ids: [data.message_id] })
+			ws.onopen = () => {
+				if (unmountedRef.current) { ws.close(); return }
+				attemptRef.current = 0
+				setIsConnected(true)
+				setIsConnecting(false)
 			}
-		})
 
-		socket.on("typing", (data: TypingPayload) => {
-			if (data.user_id === currentUserId) return
-			setOtherUserTyping(data.is_typing)
-			onTypingRef.current?.(data.user_id, data.is_typing)
-			if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
-			if (data.is_typing) {
-				typingTimeoutRef.current = setTimeout(() => setOtherUserTyping(false), 5000)
+			ws.onclose = (event) => {
+				setIsConnected(false)
+				if (unmountedRef.current) return
+				// 1000 = normal close (server-initiated intentional close) — don't retry
+				if (event.code === 1000 || attemptRef.current >= MAX_RECONNECT_ATTEMPTS) {
+					setIsConnecting(false)
+					return
+				}
+				const delay = Math.min(BASE_DELAY_MS * 2 ** attemptRef.current, MAX_DELAY_MS)
+				attemptRef.current += 1
+				setIsConnecting(true)
+				reconnectTimeoutRef.current = setTimeout(connect, delay)
 			}
-		})
 
-		socket.on("user_joined", (data: PresencePayload) => {
-			if (data.user_id === currentUserId) return
-			setOtherUserOnline(true)
-			onPresenceRef.current?.(data.user_id, true)
-		})
+			ws.onerror = () => {
+				// onerror is always followed by onclose, so reconnection is handled there
+				setIsConnecting(false)
+			}
 
-		socket.on("user_left", (data: PresencePayload) => {
-			if (data.user_id === currentUserId) return
-			setOtherUserOnline(false)
-			onPresenceRef.current?.(data.user_id, false)
-		})
+			ws.onmessage = (event) => {
+				let data: ServerEvent
+				try {
+					data = JSON.parse(event.data as string) as ServerEvent
+				} catch {
+					return
+				}
 
-		socket.on("delivery_receipt", (data: DeliveryReceiptPayload) => {
-			setMessages((prev) =>
-				prev.map((m) => m.id === data.message_id ? { ...m, deliveredAt: data.delivered_at } : m)
-			)
-			onDeliveryReceiptRef.current?.(data.message_id, data.delivered_at)
-		})
+				switch (data.type) {
+					case "conversation_messages":
+						setMessages(data.messages.map(fromInitial))
+						break
 
-		socket.on("read_receipt", (data: ReadReceiptPayload) => {
-			setMessages((prev) =>
-				prev.map((m) =>
-					data.message_ids.includes(m.id) ? { ...m, isRead: true, readAt: data.read_at } : m
-				)
-			)
-			onReadReceiptRef.current?.(data.message_ids, data.read_at)
-		})
+					case "chat_message": {
+						const msg = fromIncoming(data)
+						setMessages((prev) => {
+							if (prev.some((m) => m.id === msg.id)) return prev
+							return [...prev, msg]
+						})
+						onMessageRef.current?.(msg)
+						if (data.sender_id !== currentUserId) {
+							sendRaw({ type: "read_receipt", message_ids: [data.message_id] })
+						}
+						break
+					}
+
+					case "typing":
+						if (data.user_id === currentUserId) break
+						setOtherUserTyping(data.is_typing)
+						onTypingRef.current?.(data.user_id, data.is_typing)
+						if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+						if (data.is_typing) {
+							typingTimeoutRef.current = setTimeout(() => setOtherUserTyping(false), 5000)
+						}
+						break
+
+					case "user_joined":
+						if (data.user_id === currentUserId) break
+						setOtherUserOnline(true)
+						onPresenceRef.current?.(data.user_id, true)
+						break
+
+					case "user_left":
+						if (data.user_id === currentUserId) break
+						setOtherUserOnline(false)
+						onPresenceRef.current?.(data.user_id, false)
+						break
+
+					case "delivery_receipt":
+						setMessages((prev) =>
+							prev.map((m) => m.id === data.message_id ? { ...m, deliveredAt: data.delivered_at } : m)
+						)
+						onDeliveryReceiptRef.current?.(data.message_id, data.delivered_at)
+						break
+
+					case "read_receipt":
+						setMessages((prev) =>
+							prev.map((m) =>
+								data.message_ids.includes(m.id) ? { ...m, isRead: true, readAt: data.read_at } : m
+							)
+						)
+						onReadReceiptRef.current?.(data.message_ids, data.read_at)
+						break
+				}
+			}
+		}
+
+		connect()
 
 		return () => {
+			unmountedRef.current = true
+			if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
 			if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
-			socket.disconnect()
-			socketRef.current = null
+			wsRef.current?.close(1000, "unmount")
+			wsRef.current = null
 			setIsConnected(false)
 			setIsConnecting(false)
 		}
-	}, [conversationId, currentUserId])
+	}, [conversationId, currentUserId, sendRaw])
 
 	const sendMessage = useCallback((text: string) => {
 		if (!text.trim()) return
-		socketRef.current?.emit("chat_message", { text: text.trim() })
-	}, [])
+		sendRaw({ type: "chat_message", text: text.trim() })
+	}, [sendRaw])
 
 	const sendTyping = useCallback((isTyping: boolean) => {
-		socketRef.current?.emit("typing", { is_typing: isTyping })
-	}, [])
+		sendRaw({ type: "typing", is_typing: isTyping })
+	}, [sendRaw])
 
 	const sendReadReceipt = useCallback((messageIds: string[]) => {
 		if (messageIds.length === 0) return
-		socketRef.current?.emit("read_receipt", { message_ids: messageIds })
-	}, [])
+		sendRaw({ type: "read_receipt", message_ids: messageIds })
+	}, [sendRaw])
 
 	const reconnect = useCallback(() => {
-		socketRef.current?.disconnect()
-		socketRef.current?.connect()
+		if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
+		wsRef.current?.close(1000, "manual reconnect")
 	}, [])
 
 	return {
