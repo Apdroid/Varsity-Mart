@@ -51,7 +51,7 @@ export interface MessageListResponse {
 export interface ProductsListResponse {
 	success: boolean
 	data: {
-		products: Product[]
+		stores: Product[]
 		pagination: Pagination
 	}
 }
@@ -356,7 +356,7 @@ export interface StoreDetail {
 	owner: {
 		id: string
 		name: string
-		avatar?: string
+		avatarUrl?: string
 	}
 	member_since: string
 	subscriptionStatus: string
