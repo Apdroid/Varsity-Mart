@@ -8,13 +8,13 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/v1/search/
+  url: {{baseUrl}}/v1/search/?query=weiss
   body: none
   auth: inherit
 }
 
 params:query {
-  query: 
+  query: weiss
   ~category: 
   ~condition: 
   ~freeDelivery: 
@@ -33,7 +33,6 @@ params:query {
   ~sort: rating
   ~sort: relevance
   ~type: all
-  ~type: food
   ~type: products
   ~type: stores
 }

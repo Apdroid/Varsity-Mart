@@ -9,11 +9,10 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { MenuItemCard } from "@/components/restaurants/menu-item-card"
-import { CustomizationSheet } from "@/components/restaurants/customization-sheet"
 import { RestaurantCart } from "@/components/restaurants/restaurant-cart"
 import { cn } from "@/lib/utils"
 import { useRestaurant, useMenuItems } from "@/hooks/queries/use-restaurants"
-import type { RestaurantDetail, MenuItem as ApiMenuItem } from "@/lib/api/types"
+import type { RestaurantDetail, MenuItem, MenuCategory } from "@/lib/api/types"
 
 function formatGHS(n: string | number) {
   return new Intl.NumberFormat("en-GH", {
@@ -32,36 +31,12 @@ const FILTER_LABELS: Record<FilterKey, string> = {
   under30: "Under GHS 30",
 }
 
-function applyFilter(items: ApiMenuItem[], filter: FilterKey): ApiMenuItem[] {
+function applyFilter(items: MenuItem[], filter: FilterKey): MenuItem[] {
   if (filter === "all") return items
-  if (filter === "vegetarian") return items.filter((i) => i.dietaryTags?.includes("vegetarian"))
-  if (filter === "halal") return items.filter((i) => i.dietaryTags?.includes("halal"))
-  if (filter === "under30") return items.filter((i) => i.basePrice < 30)
+  if (filter === "vegetarian") return items.filter((i) => i.isVegetarian)
+  if (filter === "halal") return items.filter((i) => i.tags.includes("halal"))
+  if (filter === "under30") return items.filter((i) => i.price < 30)
   return items
-}
-
-function mapMenuItemForComponent(item: ApiMenuItem) {
-  return {
-    id: item.id,
-    name: item.name,
-    slug: item.slug,
-    description: item.description,
-    basePrice: item.basePrice,
-    image: item.image,
-    category: item.category,
-    sizeOptions: item.sizeOptions,
-    proteinOptions: item.proteinOptions,
-    sides: item.sides,
-    modifiers: item.modifiers,
-    allowsNotes: item.allowsNotes,
-    isQuickAdd: item.isQuickAdd,
-    isAvailable: item.isAvailable,
-    dietaryTags: item.dietaryTags,
-    allergens: item.allergens,
-    bundleSuggestionIds: item.bundleSuggestionIds,
-    restaurant: item.restaurant,
-    createdAt: item.createdAt,
-  }
 }
 
 function RestaurantHeaderSkeleton() {
@@ -165,23 +140,18 @@ function MenuSkeleton() {
 
 export default function RestaurantPage() {
   const params = useParams<{ id: string }>()
-  const { data: restaurantData, isLoading: restaurantLoading, error } = useRestaurant(params.id)
-  const { data: menuData, isLoading: menuLoading } = useMenuItems(params.id)
+  const { data: restaurant, isLoading: restaurantLoading, error } = useRestaurant(params.id)
+  const { data: categories = [], isLoading: menuLoading } = useMenuItems(params.id)
 
-  const restaurant = restaurantData
-  const menuItems = menuData?.items || []
-  const menuCategories = menuData?.categories || []
-
-  const [activeCategory, setActiveCategory] = React.useState<string>("")
+  const [activeCategoryId, setActiveCategoryId] = React.useState<string>("")
   const [activeFilter, setActiveFilter] = React.useState<FilterKey>("all")
-  const [customizing, setCustomizing] = React.useState<ApiMenuItem | null>(null)
   const tabsRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
-    if (menuCategories.length > 0 && !activeCategory) {
-      setActiveCategory(menuCategories[0])
+    if (categories.length > 0 && !activeCategoryId) {
+      setActiveCategoryId(categories[0].id)
     }
-  }, [menuCategories, activeCategory])
+  }, [categories, activeCategoryId])
 
   if (restaurantLoading) {
     return (
@@ -198,13 +168,13 @@ export default function RestaurantPage() {
     notFound()
   }
 
-  const currentCategory = menuCategories.includes(activeCategory) ? activeCategory : menuCategories[0] || ""
-  const categoryItems = menuItems.filter((item) => item.category === currentCategory)
-  const visibleItems = applyFilter(categoryItems, activeFilter)
+  const currentCategoryId = categories.find((c) => c.id === activeCategoryId)
+    ? activeCategoryId
+    : categories[0]?.id ?? ""
 
-  const scrollToCategory = (cat: string) => {
-    setActiveCategory(cat)
-    const el = document.getElementById(`cat-${cat}`)
+  const scrollToCategory = (id: string) => {
+    setActiveCategoryId(id)
+    const el = document.getElementById(`cat-${id}`)
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" })
   }
 
@@ -222,13 +192,14 @@ export default function RestaurantPage() {
     minOrder: restaurant.minOrder,
     isOpen: restaurant.isOpen,
     isFeatured: restaurant.isFeatured,
-    tags: [],
+    tags: [] as string[],
     badge: restaurant.isFeatured ? "Featured" : undefined,
-    menu: {
-      categories: menuCategories,
-      items: menuItems.map(mapMenuItemForComponent),
-    },
+    menu: { categories },
   }
+
+  const hasAnyVisibleItems = categories.some(
+    (cat) => applyFilter(cat.items, activeFilter).length > 0
+  )
 
   return (
     <div className="max-w-7xl mx-auto min-h-screen bg-background pb-28 lg:pb-8">
@@ -238,24 +209,26 @@ export default function RestaurantPage() {
         ref={tabsRef}
         className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-md"
       >
+        {/* Category tabs */}
         <div className="flex overflow-x-auto px-4 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {menuCategories.map((cat) => (
+          {categories.map((cat) => (
             <button
-              key={cat}
+              key={cat.id}
               type="button"
-              onClick={() => scrollToCategory(cat)}
+              onClick={() => scrollToCategory(cat.id)}
               className={cn(
                 "shrink-0 px-4 pb-2.5 text-sm font-semibold transition-colors",
-                currentCategory === cat
+                currentCategoryId === cat.id
                   ? "border-b-2 border-vm-tangerine text-vm-tangerine"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              {cat}
+              {cat.name}
             </button>
           ))}
         </div>
 
+        {/* Diet / price filters */}
         <div className="flex gap-2 overflow-x-auto px-4 pb-3 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {(Object.keys(FILTER_LABELS) as FilterKey[]).map((key) => {
             const Icon = key === "vegetarian" ? Leaf : key === "halal" ? Droplets : null
@@ -284,43 +257,31 @@ export default function RestaurantPage() {
           <div className="mx-auto w-full max-w-2xl lg:max-w-none">
             {menuLoading ? (
               <MenuSkeleton />
-            ) : visibleItems.length === 0 ? (
+            ) : !hasAnyVisibleItems ? (
               <div className="py-16 text-center text-sm text-muted-foreground">
                 No items match this filter.
               </div>
             ) : (
               <div className="space-y-8">
-                {menuCategories
-                  .filter((cat) => {
-                    const items = menuItems.filter((i) => i.category === cat)
-                    return applyFilter(items, activeFilter).length > 0
-                  })
-                  .map((cat, idx) => {
-                    const catItems = applyFilter(
-                      menuItems.filter((i) => i.category === cat),
-                      activeFilter
-                    )
-                    if (catItems.length === 0) return null
-                    return (
-                      <section key={cat} id={`cat-${cat}`}>
-                        {idx > 0 && <Separator className="mb-6" />}
-                        <h2 className="mb-3 text-base font-bold">{cat}</h2>
-                        <div className="space-y-2.5">
-                          {catItems.map((item) => (
-                            <MenuItemCard
-                              key={item.id}
-                              item={mapMenuItemForComponent(item)}
-                              restaurant={restaurantForCart}
-                              onCustomize={(menuItem) => {
-                                const apiItem = menuItems.find((i) => i.id === menuItem.id)
-                                if (apiItem) setCustomizing(apiItem)
-                              }}
-                            />
-                          ))}
-                        </div>
-                      </section>
-                    )
-                  })}
+                {categories.map((cat: MenuCategory, idx: number) => {
+                  const catItems = applyFilter(cat.items, activeFilter)
+                  if (catItems.length === 0) return null
+                  return (
+                    <section key={cat.id} id={`cat-${cat.id}`}>
+                      {idx > 0 && <Separator className="mb-6" />}
+                      <h2 className="mb-3 text-base font-bold">{cat.name}</h2>
+                      <div className="space-y-2.5">
+                        {catItems.map((item) => (
+                          <MenuItemCard
+                            key={item.id}
+                            item={item}
+                            restaurant={restaurantForCart}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  )
+                })}
               </div>
             )}
           </div>
@@ -328,12 +289,6 @@ export default function RestaurantPage() {
         </div>
       </div>
 
-      <CustomizationSheet
-        item={customizing ? mapMenuItemForComponent(customizing) : null}
-        restaurant={restaurantForCart}
-        open={!!customizing}
-        onClose={() => setCustomizing(null)}
-      />
     </div>
   )
 }

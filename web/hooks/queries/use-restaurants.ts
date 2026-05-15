@@ -20,17 +20,13 @@ interface CreateRestaurantRequest {
 interface CreateMenuItemRequest {
   name: string
   description: string
-  basePrice: number
+  price: number
   category: string
-  sizeOptions?: { name: string; priceMod: number }[]
-  proteinOptions?: { name: string; priceMod: number }[]
-  sides?: { options: { name: string; priceMod: number }[]; max: number }
-  modifiers?: string[]
-  allowsNotes?: boolean
-  isQuickAdd?: boolean
-  dietaryTags?: string[]
-  allergens?: string[]
-  bundleSuggestionIds?: string[]
+  isAvailable?: boolean
+  preparationTime?: string
+  spicyLevel?: number
+  isVegetarian?: boolean
+  tags?: string[]
 }
 
 export const restaurantKeys = {
@@ -102,29 +98,14 @@ export function useRestaurantDashboard() {
   })
 }
 
-export function useMenuItems(restaurantId: string, page = 1, limit = 50) {
+export function useMenuItems(restaurantId: string) {
   return useQuery({
-    queryKey: restaurantKeys.menuItems(restaurantId, page),
+    queryKey: restaurantKeys.menuItems(restaurantId),
     queryFn: async () => {
-      const response = await restaurantsApi.menuItems(restaurantId, page, limit)
-      return {
-        items: response.data.items,
-        categories: response.data.categories,
-        pagination: response.data.pagination,
-      }
+      const response = await restaurantsApi.menu(restaurantId)
+      return response.data.categories
     },
     enabled: !!restaurantId,
-  })
-}
-
-export function useMenuItem(itemId: string) {
-  return useQuery({
-    queryKey: restaurantKeys.menuItem(itemId),
-    queryFn: async () => {
-      const response = await restaurantsApi.getMenuItem(itemId)
-      return response.data
-    },
-    enabled: !!itemId,
   })
 }
 
@@ -222,11 +203,10 @@ export function useUpdateMenuItem() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ itemId, data }: { itemId: string; data: Partial<CreateMenuItemRequest> }) =>
-      restaurantsApi.updateMenuItem(itemId, data),
-    onSuccess: (_, { itemId }) => {
-      queryClient.invalidateQueries({ queryKey: restaurantKeys.menuItem(itemId) })
-      queryClient.invalidateQueries({ queryKey: restaurantKeys.all })
+    mutationFn: ({ restaurantId, itemId, data }: { restaurantId: string; itemId: string; data: Partial<CreateMenuItemRequest> }) =>
+      restaurantsApi.updateMenuItem(restaurantId, itemId, data),
+    onSuccess: (_, { restaurantId }) => {
+      queryClient.invalidateQueries({ queryKey: restaurantKeys.menuItems(restaurantId) })
     },
   })
 }
@@ -235,32 +215,10 @@ export function useDeleteMenuItem() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (itemId: string) => restaurantsApi.deleteMenuItem(itemId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: restaurantKeys.all })
-    },
-  })
-}
-
-export function useToggleMenuAvailability() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (itemId: string) => restaurantsApi.toggleMenuItemAvailability(itemId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: restaurantKeys.all })
-    },
-  })
-}
-
-export function useUploadMenuItemImage() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: ({ itemId, file }: { itemId: string; file: File }) =>
-      restaurantsApi.uploadMenuItemImage(itemId, file),
-    onSuccess: (_, { itemId }) => {
-      queryClient.invalidateQueries({ queryKey: restaurantKeys.menuItem(itemId) })
+    mutationFn: ({ restaurantId, itemId }: { restaurantId: string; itemId: string }) =>
+      restaurantsApi.deleteMenuItem(restaurantId, itemId),
+    onSuccess: (_, { restaurantId }) => {
+      queryClient.invalidateQueries({ queryKey: restaurantKeys.menuItems(restaurantId) })
     },
   })
 }

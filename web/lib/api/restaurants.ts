@@ -7,6 +7,7 @@ import type {
   RestaurantsListResponse,
   FeaturedResponse,
   MenuItem,
+  MenuCategory,
   ReviewsResponse,
   CreateReviewRequest,
 } from "./types"
@@ -22,17 +23,23 @@ function buildQueryString(params: object): string {
   return query ? `?${query}` : ""
 }
 
-interface MenuItemsResponse {
+interface MenuResponse {
   success: boolean
   data: {
-    items: MenuItem[]
-    categories: string[]
-    pagination?: {
-      currentPage: number
-      totalPages: number
-      totalItems: number
-    }
+    categories: MenuCategory[]
   }
+}
+
+interface CreateMenuItemRequest {
+  name: string
+  description: string
+  price: number
+  category: string
+  isAvailable?: boolean
+  preparationTime?: string
+  spicyLevel?: number
+  isVegetarian?: boolean
+  tags?: string[]
 }
 
 interface CreateRestaurantRequest {
@@ -48,21 +55,6 @@ interface CreateRestaurantRequest {
   closingTime?: string
 }
 
-interface CreateMenuItemRequest {
-  name: string
-  description: string
-  basePrice: number
-  category: string
-  sizeOptions?: { name: string; priceMod: number }[]
-  proteinOptions?: { name: string; priceMod: number }[]
-  sides?: { options: { name: string; priceMod: number }[]; max: number }
-  modifiers?: string[]
-  allowsNotes?: boolean
-  isQuickAdd?: boolean
-  dietaryTags?: string[]
-  allergens?: string[]
-  bundleSuggestionIds?: string[]
-}
 
 interface RestaurantDashboard {
   todayOrders: number
@@ -118,32 +110,17 @@ export const restaurantsApi = {
     )
   },
 
-  menuItems: (restaurantId: string, page = 1, limit = 50) =>
-    api.get<MenuItemsResponse>(`/menu-items/?restaurant=${restaurantId}&page=${page}&limit=${limit}`),
-
-  getMenuItem: (itemId: string) =>
-    api.get<ApiResponse<MenuItem>>(`/menu-items/${itemId}/`),
+  menu: (restaurantId: string) =>
+    api.get<MenuResponse>(`/restaurants/${restaurantId}/menu/`),
 
   createMenuItem: (restaurantId: string, data: CreateMenuItemRequest) =>
-    api.post<ApiResponse<MenuItem>>(`/menu-items/`, { ...data, restaurant: restaurantId }),
+    api.post<ApiResponse<MenuItem>>(`/restaurants/${restaurantId}/menu/`, data),
 
-  updateMenuItem: (itemId: string, data: Partial<CreateMenuItemRequest>) =>
-    api.patch<ApiResponse<MenuItem>>(`/menu-items/${itemId}/`, data),
+  updateMenuItem: (restaurantId: string, itemId: string, data: Partial<CreateMenuItemRequest>) =>
+    api.put<ApiResponse<MenuItem>>(`/restaurants/${restaurantId}/menu/${itemId}/`, data),
 
-  deleteMenuItem: (itemId: string) =>
-    api.delete<ApiResponse<{ success: boolean }>>(`/menu-items/${itemId}/`),
-
-  toggleMenuItemAvailability: (itemId: string) =>
-    api.post<ApiResponse<{ isAvailable: boolean }>>(`/menu-items/${itemId}/toggle-availability/`),
-
-  uploadMenuItemImage: (itemId: string, file: File) => {
-    const formData = new FormData()
-    formData.append("image", file)
-    return apiClientFormData<ApiResponse<{ imageUrl: string }>>(
-      `/menu-items/${itemId}/image/`,
-      formData
-    )
-  },
+  deleteMenuItem: (restaurantId: string, itemId: string) =>
+    api.delete<ApiResponse<{ success: boolean }>>(`/restaurants/${restaurantId}/menu/${itemId}/`),
 
   reviews: (restaurantId: string, page = 1, limit = 10) =>
     api.get<ReviewsResponse>(`/restaurants/${restaurantId}/reviews/?page=${page}&limit=${limit}`),

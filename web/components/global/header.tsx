@@ -87,7 +87,7 @@ function ThemeToggleButton({ className = "" }: { className?: string }) {
 			onClick={() => setTheme(isDark ? "light" : "dark")}
 			className={`h-10 w-10 inline-flex items-center justify-center ${className}`}
 		>
-			{isDark ? <Sun className="h-7 w-7" /> : <Moon className="h-7 w-7" />}
+			{isDark ? <Sun className="h-7 w-7" /> : <Moon className="h-7 w-7"  />}
 		</button>
 	)
 }
@@ -424,7 +424,7 @@ function MainBar() {
 									aria-label="Sign in"
 									className="h-10 w-10 items-center justify-center inline-flex"
 								>
-									<UserCircleIcon className="h-7 w-7" weight="light" />
+									<UserCircleIcon className="h-7 w-7" weight="regular" />
 								</Link>
 							</TooltipTrigger>
 							<TooltipContent side="bottom">
@@ -440,7 +440,7 @@ function MainBar() {
 								aria-label="Wishlist"
 								className="relative hidden h-10 w-10 items-center justify-center sm:inline-flex"
 							>
-								<HeartIcon className="h-7 w-7" weight="light" />
+								<HeartIcon className="h-7 w-7" weight="regular" />
 								{wishlistCount > 0 && (
 									<Badge
 										className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-2 border-background bg-vm-tangerine p-0 text-[10px] font-bold leading-none text-white"

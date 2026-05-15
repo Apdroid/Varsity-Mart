@@ -67,7 +67,7 @@ export function CartSheet() {
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger asChild>
 				<Button variant="ghost" size="icon" className="relative h-10 w-10" aria-label="Cart">
-					<ShoppingCart className="size-6" strokeWidth={2.5} />
+					<ShoppingCart className="size-6" strokeWidth={2.2} />
 					{!authLoading && itemCount > 0 && (
 						<Badge className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-2 border-background bg-vm-tangerine p-0 text-[10px] font-bold leading-none text-white">
 							{itemCount}

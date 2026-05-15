@@ -1,15 +1,13 @@
 "use client"
 
-import { Plus } from "lucide-react"
+import { Plus, Flame, Clock } from "lucide-react"
 import { toast } from "sonner"
 import { useCartStore } from "@/store/cart-store"
 import type { MenuItem, RestaurantWithMenu } from "@/lib/api/types"
-import { cn } from "@/lib/utils"
 
 type Props = {
   item: MenuItem
   restaurant: RestaurantWithMenu
-  onCustomize: (item: MenuItem) => void
 }
 
 function formatGHS(n: number) {
@@ -20,20 +18,10 @@ function formatGHS(n: number) {
   }).format(n)
 }
 
-const dietaryColors: Record<string, string> = {
-  vegetarian: "bg-emerald-500/10 text-emerald-600",
-  vegan: "bg-green-500/10 text-green-600",
-  halal: "bg-sky-500/10 text-sky-600",
-}
-
-export function MenuItemCard({ item, restaurant, onCustomize }: Props) {
+export function MenuItemCard({ item, restaurant }: Props) {
   const addLine = useCartStore((s) => s.addLine)
 
   const handleAdd = () => {
-    if (!item.isQuickAdd) {
-      onCustomize(item)
-      return
-    }
     addLine({
       restaurantId: restaurant.id,
       restaurantName: restaurant.name,
@@ -46,14 +34,15 @@ export function MenuItemCard({ item, restaurant, onCustomize }: Props) {
       selectedModifiers: [],
       notes: "",
       quantity: 1,
-      unitPrice: item.basePrice,
+      unitPrice: item.price,
     })
     toast.success(`${item.name} added to cart`)
   }
 
+  const showHalal = item.tags.includes("halal")
+
   return (
     <div className="group flex gap-3 rounded-xl border border-border bg-card p-3 transition-shadow hover:shadow-sm">
-      {/* Image */}
       <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-muted md:h-24 md:w-24">
         <img
           src={item.image}
@@ -62,45 +51,50 @@ export function MenuItemCard({ item, restaurant, onCustomize }: Props) {
         />
       </div>
 
-      {/* Content */}
       <div className="flex min-w-0 flex-1 flex-col justify-between">
         <div>
-          {/* Dietary tags */}
-          {item.dietaryTags && item.dietaryTags.length > 0 && (
+          {(item.isVegetarian || showHalal) && (
             <div className="mb-1 flex flex-wrap gap-1">
-              {item.dietaryTags.map((tag) => (
-                <span
-                  key={tag}
-                  className={cn("rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase", dietaryColors[tag])}
-                >
-                  {tag === "vegetarian" ? "Veg" : tag === "vegan" ? "Vegan" : "Halal"}
+              {item.isVegetarian && (
+                <span className="rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold uppercase text-emerald-600">
+                  Veg
                 </span>
-              ))}
+              )}
+              {showHalal && (
+                <span className="rounded-full bg-sky-500/10 px-1.5 py-0.5 text-[9px] font-bold uppercase text-sky-600">
+                  Halal
+                </span>
+              )}
             </div>
           )}
           <p className="text-sm font-semibold leading-snug">{item.name}</p>
           <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{item.description}</p>
-          {item.allergens && item.allergens.length > 0 && (
-            <p className="mt-0.5 text-[10px] text-muted-foreground/70">
-              Contains: {item.allergens.join(", ")}
-            </p>
-          )}
+          <div className="mt-1 flex items-center gap-2 text-[10px] text-muted-foreground">
+            {item.preparationTime && (
+              <span className="flex items-center gap-0.5">
+                <Clock className="h-3 w-3" />
+                {item.preparationTime}
+              </span>
+            )}
+            {item.spicyLevel > 0 && (
+              <span className="flex items-center gap-0.5 text-orange-500">
+                {Array.from({ length: item.spicyLevel }).map((_, i) => (
+                  <Flame key={i} className="h-3 w-3" />
+                ))}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="mt-2 flex items-center justify-between">
-          <span className="text-sm font-extrabold text-vm-tangerine">{formatGHS(item.basePrice)}</span>
+          <span className="text-sm font-extrabold text-vm-tangerine">{formatGHS(item.price)}</span>
           <button
             type="button"
             onClick={handleAdd}
-            className={cn(
-              "flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-all active:scale-95",
-              item.isQuickAdd
-                ? "bg-vm-tangerine text-white hover:bg-vm-tangerine/90"
-                : "border border-vm-tangerine text-vm-tangerine hover:bg-vm-tangerine/10"
-            )}
+            className="flex items-center gap-1 rounded-full bg-vm-tangerine px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-vm-tangerine/90 active:scale-95"
           >
             <Plus className="h-3.5 w-3.5" />
-            {item.isQuickAdd ? "Add to cart" : "Customize"}
+            Add
           </button>
         </div>
       </div>

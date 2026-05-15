@@ -442,33 +442,23 @@ export interface MenuItemOption {
 	priceMod: number
 }
 
-export interface SideConfig {
-	options: MenuItemOption[]
-	max: number
-}
-
-export type DietaryTag = "vegetarian" | "vegan" | "halal"
-
 export interface MenuItem {
 	id: string
 	name: string
-	slug: string
 	description: string
-	basePrice: number
-	image?: string
-	category: string
-	sizeOptions?: MenuItemOption[]
-	proteinOptions?: MenuItemOption[]
-	sides?: SideConfig
-	modifiers?: string[]
-	allowsNotes: boolean
-	isQuickAdd: boolean
+	price: number
+	image: string
 	isAvailable: boolean
-	dietaryTags?: DietaryTag[]
-	allergens?: string[]
-	bundleSuggestionIds?: string[]
-	restaurant: string
-	createdAt: string
+	preparationTime: string
+	spicyLevel: number
+	isVegetarian: boolean
+	tags: string[]
+}
+
+export interface MenuCategory {
+	id: string
+	name: string
+	items: MenuItem[]
 }
 
 export interface RestaurantFilters {
@@ -498,8 +488,7 @@ export interface RestaurantWithMenu {
 	tags?: string[]
 	badge?: string
 	menu: {
-		categories: string[]
-		items: MenuItem[]
+		categories: MenuCategory[]
 	}
 }
 
