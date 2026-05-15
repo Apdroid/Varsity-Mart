@@ -375,9 +375,14 @@ export interface CreateStoreRequest {
 	description: string
 	category: string
 	location: string
+	deliveryFee: number
+	minOrder: number
 	phone?: string
 	openingTime?: string
 	closingTime?: string
+	logo?: File
+	banner?: File
+	migrateProducts?: boolean
 }
 
 export interface StoreFilters {
@@ -838,7 +843,7 @@ export interface PaymentResponse {
 // Search Types
 export interface SearchFilters {
 	query: string
-	type?: "all" | "products" | "stores" | "restaurants"
+	type?: "all" | "products" | "stores" | "food"
 	category?: string
 	minPrice?: number
 	maxPrice?: number

@@ -1,6 +1,6 @@
 "use client"
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { storesApi } from "@/lib/api/stores"
 import type { CreateStoreRequest, StoreFilters, CreateReviewRequest } from "@/lib/api/types"
 
@@ -26,6 +26,8 @@ export function useStores(filters?: StoreFilters) {
         pagination: response.data.pagination,
       }
     },
+    staleTime: 10 * 60 * 1000,
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -37,6 +39,7 @@ export function useStore(id: string) {
       return response.data
     },
     enabled: !!id,
+    staleTime: 15 * 60 * 1000,
   })
 }
 
@@ -47,6 +50,7 @@ export function useFeaturedStores(limit = 10) {
       const response = await storesApi.featured(limit)
       return response.data
     },
+    staleTime: 10 * 60 * 1000,
   })
 }
 
@@ -72,6 +76,8 @@ export function useStoreProducts(storeId: string, page = 1, limit = 20) {
       }
     },
     enabled: !!storeId,
+    staleTime: 10 * 60 * 1000,
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -89,6 +95,8 @@ export function useStoreReviews(storeId: string, page = 1, limit = 10) {
       }
     },
     enabled: !!storeId,
+    staleTime: 10 * 60 * 1000,
+    placeholderData: keepPreviousData,
   })
 }
 

@@ -9,7 +9,7 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
   const inConversation = pathname !== "/messages"
 
   return (
-    <div className="max-w-7xl mx-auto flex h-[calc(100dvh-var(--header-height,80px))] overflow-hidden">
+    <div className="max-w-7xl mx-auto flex min-h-screen overflow-hidden">
       {/* Left — conversation list */}
       <aside
         className={cn(

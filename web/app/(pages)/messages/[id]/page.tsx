@@ -130,8 +130,7 @@ function MessageBubble({
 					<TooltipTrigger asChild>
 						<div
 							className={cn(
-								"cursor-default select-text rounded-2xl px-3.5 pt-2.5",
-								isLastInGroup ? "pb-2" : "pb-2.5",
+								"cursor-default select-text rounded-2xl px-3.5 pt-2.5 pb-2",
 								isOwn
 									? cn(
 											"bg-vm-tangerine text-vm-tangerine-foreground",
@@ -147,19 +146,17 @@ function MessageBubble({
 						>
 							<p className="text-sm leading-relaxed whitespace-pre-wrap break-words">{message.text}</p>
 
-							{/* Time + status inside the bubble, WhatsApp-style */}
-							{isLastInGroup && (
-								<div className={cn(
-									"mt-1 flex items-center justify-end gap-1",
-									isOwn ? "text-vm-tangerine-foreground/70" : "text-muted-foreground"
-								)}>
-									{message.flagged && (
-										<span className="text-[10px] text-destructive">Flagged</span>
-									)}
-									<span className="text-[10px]">{formatTime(message.timestamp)}</span>
-									{isOwn && <MessageStatus message={message} inBubble />}
-								</div>
-							)}
+							{/* Time + status — shown on every message so the sender always knows status */}
+							<div className={cn(
+								"mt-1 flex items-center justify-end gap-1",
+								isOwn ? "text-vm-tangerine-foreground/70" : "text-muted-foreground"
+							)}>
+								{message.flagged && (
+									<span className="text-[10px] text-destructive">Flagged</span>
+								)}
+								<span className="text-[10px]">{formatTime(message.timestamp)}</span>
+								{isOwn && <MessageStatus message={message} inBubble />}
+							</div>
 						</div>
 					</TooltipTrigger>
 					<TooltipContent side={isOwn ? "left" : "right"} className="text-xs">
@@ -548,7 +545,7 @@ function ConversationContent({ conversationId }: { conversationId: string }) {
 				{/* ── Composer ────────────────────────────────────────────────────── */}
 				<form
 					onSubmit={handleSend}
-					className="shrink-0 border-t border-border bg-background px-4 py-3"
+					className="shrink-0 border-t border-border bg-background px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
 				>
 					<div className="flex items-end gap-2">
 						<Textarea
@@ -570,7 +567,7 @@ function ConversationContent({ conversationId }: { conversationId: string }) {
 							<Send className="h-4 w-4" />
 						</Button>
 					</div>
-					<p className="mt-1.5 text-[10px] text-muted-foreground/60">
+					<p className="mt-1 hidden text-[10px] text-muted-foreground/60 sm:block">
 						Enter to send · Shift+Enter for new line
 					</p>
 				</form>

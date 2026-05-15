@@ -16,7 +16,7 @@ import {
 	SheetTrigger,
 } from "@/components/ui/sheet"
 import { useAuth } from "@/providers/auth-provider"
-import { normalizeCartData, useCart, useRemoveFromCart, useUpdateCartItem } from "@/hooks/queries/use-cart"
+import { useCart, useRemoveFromCart, useUpdateCartItem } from "@/hooks/queries/use-cart"
 import { toast } from "sonner"
 
 function formatGHS(amount: number) {
@@ -31,14 +31,11 @@ export function CartSheet() {
 	const router = useRouter()
 	const [open, setOpen] = React.useState(false)
 	const { isAuthenticated, isLoading: authLoading } = useAuth()
-	const { data: cartData, isLoading: cartLoading } = useCart({ enabled: isAuthenticated })
+	const { data: cart, isLoading: cartLoading } = useCart({ enabled: isAuthenticated })
 	const updateCartItem = useUpdateCartItem()
 	const removeFromCart = useRemoveFromCart()
 
-	const cart = normalizeCartData(cartData?.data)
-	console.log(cartData?.data)
-	const items = cart.items
-	console.log(items);
+	const items = cart?.items ?? []
 
 	const updateQty = async (id: string, nextQuantity: number) => {
 		if (nextQuantity < 1) return
@@ -60,8 +57,8 @@ export function CartSheet() {
 		}
 	}
 
-	const subtotal = cart.total
-	const itemCount = cart.itemCount
+	const subtotal = cart?.total ?? 0
+	const itemCount = cart?.itemCount ?? 0
 
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
@@ -76,8 +73,8 @@ export function CartSheet() {
 				</Button>
 			</SheetTrigger>
 
-			<SheetContent className="flex w-full flex-col gap-0 p-0 sm:max-w-md">
-				<SheetHeader className="border-b border-border px-5 py-4">
+			<SheetContent className="flex h-[100dvh] w-full flex-col gap-0 p-0 sm:max-w-md">
+				<SheetHeader className="shrink-0 border-b border-border px-5 py-4">
 					<SheetTitle className="flex items-center gap-2 text-base">
 						Your Cart
 						{itemCount > 0 && (
@@ -111,7 +108,6 @@ export function CartSheet() {
 						<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
 					</div>
 				) : items.length === 0 ? (
-					/* ── Empty state ── */
 					<div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-10 text-center">
 						<div className="grid h-16 w-16 place-items-center rounded-full bg-muted">
 							<ShoppingBag className="h-7 w-7 text-muted-foreground" />
@@ -132,7 +128,7 @@ export function CartSheet() {
 				) : (
 					<>
 						{/* ── Items ── */}
-						<ScrollArea className="flex-1">
+						<ScrollArea className="min-h-0 flex-1">
 							<div className="space-y-0 px-5 py-4">
 								{items.map((item, i) => (
 									<React.Fragment key={item.id}>
@@ -175,25 +171,26 @@ export function CartSheet() {
 													<span className="text-sm font-bold">
 														{formatGHS(item.subtotal)}
 													</span>
-													<div className="flex items-center gap-1.5">
+													{/* Fix #5 — bigger tap targets */}
+													<div className="flex items-center gap-2">
 														<button
 															type="button"
 															onClick={() => updateQty(item.id, item.quantity - 1)}
 															disabled={item.quantity <= 1 || updateCartItem.isPending}
-															className="grid h-6 w-6 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+															className="grid h-8 w-8 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
 														>
-															<Minus className="h-3 w-3" />
+															<Minus className="h-4 w-4" />
 														</button>
-														<span className="w-4 text-center text-sm font-medium tabular-nums">
+														<span className="w-5 text-center text-sm font-semibold tabular-nums">
 															{item.quantity}
 														</span>
 														<button
 															type="button"
 															onClick={() => updateQty(item.id, item.quantity + 1)}
 															disabled={updateCartItem.isPending}
-															className="grid h-6 w-6 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+															className="grid h-8 w-8 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
 														>
-															<Plus className="h-3 w-3" />
+															<Plus className="h-4 w-4" />
 														</button>
 													</div>
 												</div>
@@ -206,7 +203,7 @@ export function CartSheet() {
 						</ScrollArea>
 
 						{/* ── Footer ── */}
-						<div className="space-y-3 border-t border-border bg-card px-5 py-4">
+						<div className="shrink-0 space-y-3 border-t border-border bg-card px-5 py-4">
 							<div className="flex items-center justify-between">
 								<span className="text-sm text-muted-foreground">
 									Subtotal ({itemCount} item{itemCount !== 1 ? "s" : ""})

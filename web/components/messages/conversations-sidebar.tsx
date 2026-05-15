@@ -4,6 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Search, MessageSquareDashed, Home, Sun, Moon } from "lucide-react"
+import Logo from "@/components/global/logo"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -181,9 +182,26 @@ export function ConversationsSidebar() {
 
 	return (
 		<div className="flex h-full flex-col">
-			{/* Header */}
-			<div className="shrink-0 px-4 pb-3 pt-4">
-				<h1 className="mb-3 text-lg font-bold font-heading">Messages</h1>
+			{/* Header — with Back to Home + theme toggle */}
+			<div className="shrink-0 px-3 pb-3 pt-3">
+				<div className="mb-3 flex items-center justify-between gap-2">
+					<Button variant="ghost" size="sm" asChild className="h-8 justify-start px-2 text-muted-foreground hover:text-foreground">
+						<Link href="/">
+							<Home className="mr-1.5 h-3.5 w-3.5" />
+							Home
+						</Link>
+					</Button>
+					<Logo variant="header" className="h-5 w-auto" />
+					<Button
+						variant="ghost"
+						size="icon"
+						className="h-8 w-8 shrink-0"
+						aria-label="Toggle theme"
+						onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+					>
+						{resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+					</Button>
+				</div>
 				<div className="relative">
 					<Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
 					<Input
@@ -219,24 +237,6 @@ export function ConversationsSidebar() {
 						))}
 					</div>
 				)}
-			</div>
-
-			{/* Footer */}
-			<div className="shrink-0 flex items-center gap-1 border-t border-border px-3 py-2">
-				<Button variant="ghost" size="sm" asChild className="flex-1 justify-start">
-					<Link href="/">
-						<Home data-icon="inline-start" />
-						Back to home
-					</Link>
-				</Button>
-				<Button
-					variant="ghost"
-					size="icon"
-					aria-label="Toggle theme"
-					onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-				>
-					{resolvedTheme === "dark" ? <Sun /> : <Moon />}
-				</Button>
 			</div>
 		</div>
 	)

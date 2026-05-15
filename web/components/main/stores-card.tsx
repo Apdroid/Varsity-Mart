@@ -81,14 +81,18 @@ export function StoreCard({ store, className }: StoreCardProps) {
           )}
         </div>
 
-        {/* Status dot — anchored to logo */}
+        {/* Status badge — visible label so non-technical users understand */}
         <span
           className={cn(
-            "absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-card",
-            store.isOpen ? "bg-emerald-500" : "bg-muted-foreground"
+            "absolute -bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1 rounded-full border border-card px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide whitespace-nowrap",
+            store.isOpen
+              ? "bg-emerald-500 text-white"
+              : "bg-muted-foreground text-white"
           )}
-          aria-label={store.isOpen ? "Open" : "Closed"}
-        />
+        >
+          <span className={cn("h-1.5 w-1.5 rounded-full", store.isOpen ? "bg-white/80 animate-pulse" : "bg-white/50")} />
+          {store.isOpen ? "Open" : "Closed"}
+        </span>
       </div>
 
       {/* ─── Body ─────────────────────────────────────────── */}

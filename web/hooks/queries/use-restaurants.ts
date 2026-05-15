@@ -1,21 +1,9 @@
 "use client"
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { restaurantsApi } from "@/lib/api/restaurants"
+import type { CreateRestaurantRequest } from "@/lib/api/restaurants"
 import type { RestaurantFilters, CreateReviewRequest } from "@/lib/api/types"
-
-interface CreateRestaurantRequest {
-  name: string
-  description: string
-  category: string
-  location: string
-  phone?: string
-  deliveryFee?: number
-  minOrder?: number
-  deliveryTime?: string
-  openingTime?: string
-  closingTime?: string
-}
 
 interface CreateMenuItemRequest {
   name: string
@@ -53,6 +41,8 @@ export function useRestaurants(filters?: RestaurantFilters) {
         pagination: response.data.pagination,
       }
     },
+    staleTime: 10 * 60 * 1000,
+    placeholderData: keepPreviousData,
   })
 }
 
@@ -64,6 +54,7 @@ export function useRestaurant(id: string) {
       return response.data
     },
     enabled: !!id,
+    staleTime: 15 * 60 * 1000,
   })
 }
 
@@ -74,6 +65,7 @@ export function useFeaturedRestaurants(limit = 10) {
       const response = await restaurantsApi.featured(limit)
       return response.data
     },
+    staleTime: 10 * 60 * 1000,
   })
 }
 
@@ -106,6 +98,7 @@ export function useMenuItems(restaurantId: string) {
       return response.data.categories
     },
     enabled: !!restaurantId,
+    staleTime: 15 * 60 * 1000,
   })
 }
 
@@ -123,6 +116,8 @@ export function useRestaurantReviews(restaurantId: string, page = 1, limit = 10)
       }
     },
     enabled: !!restaurantId,
+    staleTime: 10 * 60 * 1000,
+    placeholderData: keepPreviousData,
   })
 }
 

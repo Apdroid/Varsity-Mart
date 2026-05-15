@@ -10,6 +10,7 @@ import { Toaster } from "sonner";
 import { QueryProvider } from "@/providers/query-provider";
 import { AuthProvider } from "@/providers/auth-provider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { ProfileGate } from "@/components/global/profile-gate";
 
 
 const fontSans = Plus_Jakarta_Sans({
@@ -46,7 +47,9 @@ export default function RootLayout({
 						<GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
 							<TooltipProvider>
 								<ThemeProvider>
-									{children}
+									<ProfileGate>
+										{children}
+									</ProfileGate>
 									<DownloadAppCard />
 									<Toaster richColors theme="system" position="bottom-right" />
 								</ThemeProvider>

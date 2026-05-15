@@ -68,7 +68,7 @@ function mapApiRestaurantToCard(restaurant: RestaurantListItem) {
 
 function RestaurantsSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
       {Array.from({ length: 8 }).map((_, i) => (
         <Skeleton key={i} className="h-52 w-full rounded-lg" />
       ))}
@@ -329,7 +329,7 @@ export function RestaurantsView() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4">
               {filteredRestaurants.map((restaurant) => (
                 <RestaurantCard
                   key={restaurant.id}

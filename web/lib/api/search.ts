@@ -18,18 +18,31 @@ function buildQueryString(params: object): string {
   return query ? `?${query}` : ""
 }
 
+interface SearchFacets {
+  categories: { id: string; name: string; count: number }[]
+  priceRange: { min: number; max: number }
+  conditions: { value: string; count: number }[]
+}
+
 interface SearchResponse {
-  success: boolean
-  data: {
+  totals: {
+    products: number
+    stores: number
+    food: number
+    all: number
+  }
+  results: {
     products: Product[]
     stores: StoreListItem[]
-    restaurants: RestaurantListItem[]
-    pagination: Pagination
-    totals: {
-      products: number
-      stores: number
-      restaurants: number
-    }
+    food: RestaurantListItem[]
+  }
+  pagination: Pagination
+  facets?: SearchFacets
+  query: string
+  type: string
+  meta?: {
+    took_ms: number
+    from_cache: boolean
   }
 }
 

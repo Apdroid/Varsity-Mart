@@ -42,17 +42,19 @@ interface CreateMenuItemRequest {
   tags?: string[]
 }
 
-interface CreateRestaurantRequest {
-  name: string
+export interface CreateRestaurantRequest {
+  restaurantName: string
   description: string
   category: string
-  location: string
+  openingTime: string
+  closingTime: string
+  deliveryFee: number
+  minOrder: number
+  location?: string
   phone?: string
-  deliveryFee?: number
-  minOrder?: number
   deliveryTime?: string
-  openingTime?: string
-  closingTime?: string
+  logo?: File
+  banner?: File
 }
 
 
@@ -83,8 +85,22 @@ export const restaurantsApi = {
   dashboard: () =>
     api.get<ApiResponse<RestaurantDashboard>>("/restaurants/my-restaurant/dashboard/"),
 
-  create: (data: CreateRestaurantRequest) =>
-    api.post<ApiResponse<RestaurantDetail>>("/restaurants/", data),
+  create: (data: CreateRestaurantRequest) => {
+    const formData = new FormData()
+    formData.append("restaurantName", data.restaurantName)
+    formData.append("description", data.description)
+    formData.append("category", data.category)
+    formData.append("openingTime", data.openingTime)
+    formData.append("closingTime", data.closingTime)
+    formData.append("deliveryFee", String(data.deliveryFee))
+    formData.append("minOrder", String(data.minOrder))
+    if (data.location) formData.append("location", data.location)
+    if (data.phone) formData.append("phone", data.phone)
+    if (data.deliveryTime) formData.append("deliveryTime", data.deliveryTime)
+    if (data.logo) formData.append("logo", data.logo)
+    if (data.banner) formData.append("banner", data.banner)
+    return apiClientFormData<ApiResponse<RestaurantDetail>>("/restaurants/", formData)
+  },
 
   update: (id: string, data: Partial<CreateRestaurantRequest>) =>
     api.patch<ApiResponse<RestaurantDetail>>(`/restaurants/${id}/`, data),

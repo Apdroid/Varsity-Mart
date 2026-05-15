@@ -67,7 +67,7 @@ function mapApiProductToCard(product: ApiProduct) {
 			count: product.category.count ?? 0,
 		},
 		condition:
-			product.condition === "like_new"
+			product.condition === "like_new" || product.condition === "like-new"
 				? "Like New"
 				: product.condition === "new"
 					? "New"
@@ -140,15 +140,6 @@ function SearchPageClient() {
 	const [view, setView] = React.useState<"grid" | "list">("grid")
 	const [isMobileFiltersOpen, setIsMobileFiltersOpen] = React.useState(false)
 
-	const searchType =
-		filters.type === "food"
-			? "restaurants"
-			: filters.type === "stores"
-				? "stores"
-				: filters.type === "products"
-					? "products"
-					: "all"
-
 	const sortByApi =
 		sort === "newest"
 			? "newest"
@@ -158,10 +149,10 @@ function SearchPageClient() {
 					? "price_high"
 					: "relevance"
 
-	const { data: searchData, isLoading } = useSearch(
+	const { data: searchData, isLoading, isFetching } = useSearch(
 		{
 			query,
-			type: searchType as "products" | "stores" | "restaurants" | "all",
+			type: filters.type,
 			category: filters.category !== "all" ? filters.category : undefined,
 			minPrice: filters.priceMin !== PRICE_RANGE_MIN ? filters.priceMin : undefined,
 			maxPrice: filters.priceMax !== PRICE_RANGE_MAX ? filters.priceMax : undefined,
@@ -177,13 +168,14 @@ function SearchPageClient() {
 	const { data: popularProductsData } = useProducts({ sortBy: "popular", limit: 4 })
 
 	const products = searchData?.products || []
-	const restaurants = searchData?.restaurants || []
+	const food = searchData?.food || []
 	const stores = searchData?.stores || []
 
-	const totalCount =
+	const totalCount = searchData?.totals?.all ?? (
 		(searchData?.totals?.products ?? 0) +
 		(searchData?.totals?.stores ?? 0) +
-		(searchData?.totals?.restaurants ?? 0)
+		(searchData?.totals?.food ?? 0)
+	)
 
 	const activeFilterCount = React.useMemo(
 		() =>
@@ -262,7 +254,7 @@ function SearchPageClient() {
 						</aside>
 
 						<div className="min-w-0 flex-1 space-y-4">
-							{isLoading ? (
+							{isLoading || (isFetching && !searchData) ? (
 								<>
 									<MobileFilterTrigger />
 									<SkeletonGrid type={filters.type} />
@@ -278,7 +270,7 @@ function SearchPageClient() {
 									/>
 								</>
 							) : (
-								<>
+								<div className={cn("transition-opacity duration-200", isFetching && "opacity-50 pointer-events-none")}>
 									<div className="flex flex-wrap items-center gap-3">
 										<MobileFilterTrigger />
 										<div className="min-w-0 flex-1">
@@ -296,24 +288,24 @@ function SearchPageClient() {
 									{filters.type === "all" ? (
 										<AllResultsView
 											products={products.map(mapApiProductToCard)}
-											food={restaurants.map(mapApiRestaurantToCard)}
+											food={food.map(mapApiRestaurantToCard)}
 											stores={stores.map(mapApiStoreToCard)}
 											view={view}
 											onViewAll={(type) => handleFilterChange({ type })}
 											productTotal={searchData?.totals?.products ?? 0}
-											foodTotal={searchData?.totals?.restaurants ?? 0}
+											foodTotal={searchData?.totals?.food ?? 0}
 											storeTotal={searchData?.totals?.stores ?? 0}
 										/>
 									) : (
 										<TypeResultsView
 											type={filters.type}
 											products={products.map(mapApiProductToCard)}
-											food={restaurants.map(mapApiRestaurantToCard)}
+											food={food.map(mapApiRestaurantToCard)}
 											stores={stores.map(mapApiStoreToCard)}
 											view={view}
 										/>
 									)}
-								</>
+								</div>
 							)}
 						</div>
 					</div>

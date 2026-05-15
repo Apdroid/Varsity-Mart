@@ -1,6 +1,6 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, keepPreviousData } from "@tanstack/react-query"
 import { searchApi } from "@/lib/api/search"
 import type { SearchFilters } from "@/lib/api/types"
 
@@ -15,13 +15,17 @@ export function useSearch(filters: SearchFilters, enabled = true) {
     queryFn: async () => {
       const response = await searchApi.search(filters)
       return {
-        products: response.data.products,
-        stores: response.data.stores,
-        restaurants: response.data.restaurants,
-        totals: response.data.totals,
-        pagination: response.data.pagination,
+        products: response.results.products,
+        stores: response.results.stores,
+        food: response.results.food,
+        totals: response.totals,
+        pagination: response.pagination,
+        facets: response.facets,
       }
     },
     enabled: enabled && !!filters.query,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    placeholderData: keepPreviousData,
   })
 }

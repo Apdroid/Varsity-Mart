@@ -37,8 +37,22 @@ export const storesApi = {
   myStore: () =>
     api.get<ApiResponse<StoreDetail>>("/stores/my-store/"),
 
-  create: (data: CreateStoreRequest) =>
-    api.post<ApiResponse<StoreDetail>>("/stores/", data),
+  create: (data: CreateStoreRequest) => {
+    const formData = new FormData()
+    formData.append("storeName", data.storeName)
+    formData.append("description", data.description)
+    formData.append("category", data.category)
+    formData.append("location", data.location)
+    formData.append("deliveryFee", String(data.deliveryFee))
+    formData.append("minOrder", String(data.minOrder))
+    if (data.phone) formData.append("phone", data.phone)
+    if (data.openingTime) formData.append("openingTime", data.openingTime)
+    if (data.closingTime) formData.append("closingTime", data.closingTime)
+    if (data.logo) formData.append("logo", data.logo)
+    if (data.banner) formData.append("banner", data.banner)
+    if (data.migrateProducts) formData.append("migrateProducts", "true")
+    return apiClientFormData<ApiResponse<StoreDetail>>("/stores/", formData)
+  },
 
   update: (id: string, data: Partial<CreateStoreRequest>) =>
     api.patch<ApiResponse<StoreDetail>>(`/stores/${id}/`, data),

@@ -1,4 +1,5 @@
 'use client';
+import dynamic from "next/dynamic"
 import {
 	MagnifyingGlassIcon,
 	ShoppingBagIcon,
@@ -24,8 +25,9 @@ import {
 	SignOutIcon,
 	GearIcon,
 	PackageIcon,
+	StorefrontIcon,
 } from "@phosphor-icons/react"
-import { Clock, Loader2, MessageCircleIcon, Moon, Sun } from "lucide-react"
+import { Clock, Loader2, MessageCircleIcon, Monitor, Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 import {
 	Tooltip,
@@ -69,13 +71,35 @@ import {
 } from "@/components/ui/sheet"
 import Logo from "./logo";
 import Link from "next/link";
-import { CartSheet } from "@/components/cart/cart-sheet";
-import { FoodCartSheet } from "@/components/cart/food-cart-sheet";
+import { cn } from "@/lib/utils";
+const CartSheet = dynamic(() => import("@/components/cart/cart-sheet").then(m => m.CartSheet), { ssr: false })
+const FoodCartSheet = dynamic(() => import("@/components/cart/food-cart-sheet").then(m => m.FoodCartSheet), { ssr: false })
 import { useAuth } from "@/providers/auth-provider";
 import { useCurrentUser } from "@/hooks/queries/use-user";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+
+function useScrollDirection() {
+	const [hidden, setHidden] = useState(false)
+	const lastY = useRef(0)
+
+	useEffect(() => {
+		const onScroll = () => {
+			const y = window.scrollY
+			if (y > lastY.current + 8) {
+				setHidden(true)
+			} else if (y < lastY.current - 4) {
+				setHidden(false)
+			}
+			lastY.current = y
+		}
+		window.addEventListener("scroll", onScroll, { passive: true })
+		return () => window.removeEventListener("scroll", onScroll)
+	}, [])
+
+	return hidden
+}
 
 const RECENT_SEARCHES_KEY = "vm-recent-searches"
 const TRENDING_SEARCHES = [
@@ -217,8 +241,38 @@ function ThemeToggleButton({ className = "" }: { className?: string }) {
 			onClick={() => setTheme(isDark ? "light" : "dark")}
 			className={`h-10 w-10 inline-flex items-center justify-center ${className}`}
 		>
-			{isDark ? <Sun className="h-7 w-7" /> : <Moon className="h-7 w-7"  />}
+			{isDark ? <Sun className="h-7 w-7" /> : <Moon className="h-7 w-7" />}
 		</button>
+	)
+}
+
+function ThemeSwitcher() {
+	const { theme, setTheme } = useTheme()
+	const options = [
+		{ value: "light", icon: Sun, label: "Light" },
+		{ value: "dark", icon: Moon, label: "Dark" },
+		{ value: "system", icon: Monitor, label: "System" },
+	] as const
+
+	return (
+		<div className="flex items-center gap-0.5 rounded-lg border border-border bg-muted/50 p-0.5">
+			{options.map(({ value, icon: Icon, label }) => (
+				<button
+					key={value}
+					type="button"
+					aria-label={label}
+					onClick={() => setTheme(value)}
+					className={cn(
+						"flex h-7 w-7 items-center justify-center rounded-md transition-colors",
+						theme === value
+							? "bg-background text-foreground shadow-sm"
+							: "text-muted-foreground hover:text-foreground"
+					)}
+				>
+					<Icon className="h-3.5 w-3.5" />
+				</button>
+			))}
+		</div>
 	)
 }
 
@@ -532,53 +586,88 @@ function MainBar() {
 									</Avatar>
 								</button>
 							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end" className="w-56">
-								<DropdownMenuLabel>
-									<p className="truncate text-sm font-semibold">{displayName || "Account"}</p>
-									<p className="truncate text-xs font-normal text-muted-foreground">{user.email}</p>
-								</DropdownMenuLabel>
-								<DropdownMenuSeparator />
-								<DropdownMenuItem asChild>
-									<Link href="/account">
-										<UserCircleIcon className="mr-2 h-4 w-4" />
-										My Account
-									</Link>
-								</DropdownMenuItem>
-								<DropdownMenuItem asChild>
-									<Link href="/account/orders">
-										<PackageIcon className="mr-2 h-4 w-4" />
-										Orders
-									</Link>
-								</DropdownMenuItem>
-								<DropdownMenuItem asChild>
-									<Link href="/account/wishlist">
-										<HeartIcon className="mr-2 h-4 w-4" />
-										Wishlist
-									</Link>
-								</DropdownMenuItem>
-								<DropdownMenuItem asChild>
-									<Link href="/messages">
-										<MessageCircleIcon className="mr-2 h-4 w-4" />
-										Chats
-									</Link>
-								</DropdownMenuItem>
-								<DropdownMenuItem asChild>
-									<Link href="/account/settings">
-										<GearIcon className="mr-2 h-4 w-4" />
-										Settings
-									</Link>
-								</DropdownMenuItem>
-								<DropdownMenuItem className="sm:hidden" asChild>
-									<div className="flex w-full items-center justify-between">
-										<span className="text-sm">Theme</span>
-										<ThemeToggleButton className="h-8 w-8" />
+							<DropdownMenuContent align="end" className="w-64 p-0">
+								{/* ── Profile header ── */}
+								<div className="flex flex-col items-center gap-2 px-4 py-5 border-b border-border">
+									<Avatar className="h-14 w-14">
+										<AvatarImage src={user.avatar || user.avatarUrl || user.profilePic} alt={displayName || "User"} />
+										<AvatarFallback className="text-base font-bold">{initials}</AvatarFallback>
+									</Avatar>
+									<div className="text-center min-w-0 w-full">
+										<p className="truncate font-semibold text-sm">{displayName || "Account"}</p>
+										<p className="truncate text-xs text-muted-foreground">{user.email}</p>
 									</div>
-								</DropdownMenuItem>
-								<DropdownMenuSeparator />
-								<DropdownMenuItem onClick={handleLogout}>
-									<SignOutIcon className="mr-2 h-4 w-4" />
-									Sign Out
-								</DropdownMenuItem>
+									<ThemeSwitcher />
+								</div>
+
+								{/* ── Menu items ── */}
+								<div className="py-1.5">
+									<DropdownMenuItem asChild>
+										<Link href="/account">
+											<UserCircleIcon className="mr-2.5 h-4 w-4" />
+											My Account
+										</Link>
+									</DropdownMenuItem>
+									<DropdownMenuItem asChild>
+										<Link href="/account/orders">
+											<PackageIcon className="mr-2.5 h-4 w-4" />
+											Orders
+										</Link>
+									</DropdownMenuItem>
+									{!user.hasStore && !user.hasRestaurant ? (
+										<DropdownMenuItem asChild>
+											<Link href="/seller/start">
+												<StorefrontIcon className="mr-2.5 h-4 w-4" />
+												Start Selling
+											</Link>
+										</DropdownMenuItem>
+									) : (
+										<>
+											{user.hasStore && (
+												<DropdownMenuItem asChild>
+													<Link href="/seller/store">
+														<StorefrontIcon className="mr-2.5 h-4 w-4" />
+														My Store
+													</Link>
+												</DropdownMenuItem>
+											)}
+											{user.hasRestaurant && (
+												<DropdownMenuItem asChild>
+													<Link href="/seller/restaurant">
+														<ForkKnifeIcon className="mr-2.5 h-4 w-4" />
+														My Restaurant
+													</Link>
+												</DropdownMenuItem>
+											)}
+										</>
+									)}
+									<DropdownMenuItem asChild>
+										<Link href="/account/wishlist">
+											<HeartIcon className="mr-2.5 h-4 w-4" />
+											Wishlist
+										</Link>
+									</DropdownMenuItem>
+									<DropdownMenuItem asChild>
+										<Link href="/messages">
+											<MessageCircleIcon className="mr-2.5 h-4 w-4" />
+											Chats
+										</Link>
+									</DropdownMenuItem>
+									<DropdownMenuItem asChild>
+										<Link href="/account/settings">
+											<GearIcon className="mr-2.5 h-4 w-4" />
+											Settings
+										</Link>
+									</DropdownMenuItem>
+								</div>
+
+								<DropdownMenuSeparator className="my-0" />
+								<div className="py-1.5">
+									<DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+										<SignOutIcon className="mr-2.5 h-4 w-4" />
+										Sign Out
+									</DropdownMenuItem>
+								</div>
 							</DropdownMenuContent>
 						</DropdownMenu>
 					) : (
@@ -876,9 +965,15 @@ function MobileSearchBar() {
 	 Composed header
 ----------------------------------------------------------- */
 export default function VarsityMartHeader() {
+	const headerHidden = useScrollDirection()
+
 	return (
 		<>
-			<header className="sticky top-0 z-50 w-full shadow-sm">
+			<header
+				className={`sticky top-0 z-50 w-full shadow-sm transition-transform duration-300 will-change-transform ${
+					headerHidden ? "-translate-y-full" : "translate-y-0"
+				}`}
+			>
 				<AnnouncementBar />
 				<MainBar />
 				<MobileSearchBar />

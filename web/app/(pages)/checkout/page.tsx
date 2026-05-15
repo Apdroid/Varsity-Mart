@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
-import { normalizeCartData, useCart } from "@/hooks/queries/use-cart"
+import { useCart } from "@/hooks/queries/use-cart"
 import { useCreateOrder } from "@/hooks/queries/use-orders"
 import { useAuth } from "@/providers/auth-provider"
 import { toast } from "sonner"
@@ -73,7 +73,7 @@ const MOMO_PROVIDERS: { value: MomoProvider; label: string; activeClass: string 
 export default function CheckoutPage() {
   const router = useRouter()
   const { isAuthenticated, isLoading: authLoading } = useAuth()
-  const { data: cartData, isLoading: cartLoading } = useCart({ enabled: isAuthenticated })
+  const { data: cart, isLoading: cartLoading } = useCart({ enabled: isAuthenticated })
   const createOrderMutation = useCreateOrder()
 
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("campus_delivery")
@@ -83,9 +83,8 @@ export default function CheckoutPage() {
   const [momoNumber, setMomoNumber] = useState("")
   const [momoProvider, setMomoProvider] = useState<MomoProvider>("mtn")
 
-  const cart = normalizeCartData(cartData?.data)
-  const items = cart?.items || []
-  const subtotal = cart?.total || 0
+  const items = cart?.items ?? []
+  const subtotal = cart?.total ?? 0
   const deliveryFee = deliveryMethod === "campus_delivery" ? 5 : 0
   const serviceFee = Math.round(subtotal * 0.02 * 100) / 100
   const total = subtotal + deliveryFee + serviceFee
@@ -251,17 +250,17 @@ export default function CheckoutPage() {
                           <Icon className="h-4 w-4" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
                             <span className="font-semibold text-sm">{title}</span>
-                            <span className={cn("shrink-0 text-xs font-bold", badgeClass)}>{badge}</span>
+                            {selected && (
+                              <span className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-vm-tangerine">
+                                <Check className="h-3 w-3 text-white" />
+                              </span>
+                            )}
                           </div>
+                          <span className={cn("text-xs font-bold", badgeClass)}>{badge}</span>
                           <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{desc}</p>
                         </div>
-                        {selected && (
-                          <div className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-vm-tangerine">
-                            <Check className="h-3 w-3 text-white" />
-                          </div>
-                        )}
                       </button>
                     )
                   })}
@@ -342,15 +341,17 @@ export default function CheckoutPage() {
                         )}>
                           <Icon className="h-4 w-4" />
                         </div>
-                        <div>
-                          <p className="font-semibold text-sm">{title}</p>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold text-sm">{title}</p>
+                            {selected && (
+                              <span className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-vm-tangerine">
+                                <Check className="h-3 w-3 text-white" />
+                              </span>
+                            )}
+                          </div>
                           <p className="mt-0.5 text-xs text-muted-foreground">{desc}</p>
                         </div>
-                        {selected && (
-                          <div className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-vm-tangerine">
-                            <Check className="h-3 w-3 text-white" />
-                          </div>
-                        )}
                       </button>
                     )
                   })}

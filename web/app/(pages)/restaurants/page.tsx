@@ -3,7 +3,9 @@ import { RestaurantsView } from "./restaurants-view"
 import { restaurantsApi } from "@/lib/api/restaurants"
 
 export default async function RestaurantsPage() {
-  const queryClient = new QueryClient()
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { staleTime: 10 * 60 * 1000 } },
+  })
 
   await Promise.allSettled([
     queryClient.prefetchQuery({

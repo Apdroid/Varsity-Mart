@@ -66,7 +66,7 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 			}
 			toast.success("Signed in with Google")
 			if (result.profileComplete === false) {
-				router.push("/account/settings")
+				router.push("/complete-profile")
 				return
 			}
 			router.push("/")

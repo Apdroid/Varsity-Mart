@@ -6,6 +6,8 @@ export function useConversations(page = 1, limit = 20) {
 	return useQuery({
 		queryKey: ["conversations", page, limit],
 		queryFn: () => conversationsApi.list(page, limit),
+		staleTime: 10 * 60 * 1000,
+		gcTime: 30 * 60 * 1000,
 	})
 }
 
@@ -14,6 +16,7 @@ export function useMessages(conversationId: string, page = 1, limit = 50) {
 		queryKey: ["messages", conversationId, page, limit],
 		queryFn: () => conversationsApi.messages(conversationId, page, limit),
 		enabled: !!conversationId,
+		staleTime: 5 * 60 * 1000,
 	})
 }
 

@@ -21,6 +21,7 @@ export function useCurrentUser(options?: { enabled?: boolean }) {
     queryKey: userKeys.me(),
     queryFn: () => usersApi.me(),
     enabled: options?.enabled ?? true,
+    staleTime: 30 * 60 * 1000,
   })
 }
 
@@ -29,6 +30,7 @@ export function useUserProfile(userId: string) {
     queryKey: userKeys.profile(userId),
     queryFn: () => usersApi.getPublicProfile(userId),
     enabled: !!userId,
+    staleTime: 15 * 60 * 1000,
   })
 }
 

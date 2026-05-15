@@ -67,6 +67,11 @@ interface PresenceEvent {
 	timestamp: string
 }
 
+interface PresenceStateEvent {
+	type: "presence_state"
+	users: Array<{ user_id: string; is_online: boolean }>
+}
+
 interface DeliveryReceiptEvent {
 	type: "delivery_receipt"
 	message_id: string
@@ -86,6 +91,7 @@ type ServerEvent =
 	| ChatMessageEvent
 	| TypingEvent
 	| PresenceEvent
+	| PresenceStateEvent
 	| DeliveryReceiptEvent
 	| ReadReceiptEvent
 
@@ -204,6 +210,9 @@ export function useChatSocket({
 				attemptRef.current = 0
 				setIsConnected(true)
 				setIsConnecting(false)
+				// Ask the server for current presence of all users already in the room.
+				// This ensures we see the other user as online even if they connected first.
+				ws.send(JSON.stringify({ type: "get_presence" }))
 			}
 
 			ws.onclose = (event) => {
@@ -258,6 +267,15 @@ export function useChatSocket({
 						if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
 						if (data.is_typing) {
 							typingTimeoutRef.current = setTimeout(() => setOtherUserTyping(false), 5000)
+						}
+						break
+
+					case "presence_state":
+						// Response to our get_presence ping — set initial online state for all other users
+						for (const u of data.users) {
+							if (u.user_id !== currentUserId) {
+								setOtherUserOnline(u.is_online)
+							}
 						}
 						break
 

@@ -23,6 +23,7 @@ interface AuthContextValue {
 	isLoading: boolean
 	isAuthenticated: boolean
 	needsVerification: boolean
+	needsProfileCompletion: boolean
 	login: (data: LoginRequest) => Promise<{ success: boolean; error?: string }>
 	register: (data: RegisterRequest) => Promise<{ success: boolean; error?: string }>
 	logout: () => Promise<void>
@@ -38,6 +39,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const [user, setUser] = useState<User | null>(null)
 	const [isLoading, setIsLoading] = useState(true)
 	const [needsVerification, setNeedsVerification] = useState(false)
+
+	const needsProfileCompletion = useMemo(() => {
+		if (!user) return false
+		return !user.phone?.trim() || !user.university?.trim() || !user.campus?.trim()
+	}, [user])
 
 	const checkAuth = useCallback(async () => {
 		try {
@@ -177,6 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			isLoading,
 			isAuthenticated: !!user,
 			needsVerification,
+			needsProfileCompletion,
 			login,
 			register,
 			logout,
@@ -185,7 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			resendVerification,
 			refreshUser,
 		}),
-		[user, isLoading, needsVerification, login, register, logout, googleLogin, verifyEmail, resendVerification, refreshUser]
+		[user, isLoading, needsVerification, needsProfileCompletion, login, register, logout, googleLogin, verifyEmail, resendVerification, refreshUser]
 	)
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -3,7 +3,9 @@ import { StoresView } from "./stores-view"
 import { storesApi } from "@/lib/api/stores"
 
 export default async function StoresPage() {
-  const queryClient = new QueryClient()
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { staleTime: 10 * 60 * 1000 } },
+  })
 
   await Promise.allSettled([
     queryClient.prefetchQuery({

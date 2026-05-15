@@ -84,11 +84,22 @@ export function normalizeCartData(rawCart: unknown): NormalizedCart {
 	}
 }
 
+function recompute(items: NormalizedCartItem[]): Pick<NormalizedCart, "total" | "itemCount"> {
+	return {
+		total: items.reduce((sum, item) => sum + item.subtotal, 0),
+		itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
+	}
+}
+
 export function useCart(options?: { enabled?: boolean }) {
 	return useQuery({
 		queryKey: cartKeys.cart(),
-		queryFn: () => cartApi.get(),
+		queryFn: async () => {
+			const response = await cartApi.get()
+			return normalizeCartData(response.data)
+		},
 		enabled: options?.enabled ?? true,
+		staleTime: 2 * 60 * 1000,
 	})
 }
 
@@ -97,17 +108,8 @@ export function useAddToCart() {
 
 	return useMutation({
 		mutationFn: (data: AddToCartRequest) => cartApi.add(data),
-		onMutate: async () => {
-			await queryClient.cancelQueries({ queryKey: cartKeys.cart() })
-			const previousCart = queryClient.getQueryData(cartKeys.cart())
-			return { previousCart }
-		},
-		onError: (_, __, context) => {
-			if (context?.previousCart) {
-				queryClient.setQueryData(cartKeys.cart(), context.previousCart)
-			}
-		},
 		onSettled: () => {
+			// Need real server data for newly added item (ID, stock status, etc.)
 			queryClient.invalidateQueries({ queryKey: cartKeys.cart() })
 		},
 	})
@@ -121,25 +123,17 @@ export function useUpdateCartItem() {
 			cartApi.update(itemId, data),
 		onMutate: async ({ itemId, data }) => {
 			await queryClient.cancelQueries({ queryKey: cartKeys.cart() })
-			const previousCart = queryClient.getQueryData<{ data: unknown }>(cartKeys.cart())
+			const previousCart = queryClient.getQueryData<NormalizedCart>(cartKeys.cart())
 
-			if (previousCart?.data) {
-				const normalized = normalizeCartData(previousCart.data)
-				const updatedItems = normalized.items.map((item) =>
+			if (previousCart) {
+				const updatedItems = previousCart.items.map((item) =>
 					item.id === itemId
 						? { ...item, quantity: data.quantity, subtotal: item.unitPrice * data.quantity }
 						: item
 				)
-				const newTotal = updatedItems.reduce((sum, item) => sum + item.subtotal, 0)
-				const newCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0)
-
-				queryClient.setQueryData(cartKeys.cart(), {
-					...previousCart,
-					data: {
-						items: updatedItems,
-						total: newTotal,
-						itemCount: newCount,
-					},
+				queryClient.setQueryData<NormalizedCart>(cartKeys.cart(), {
+					items: updatedItems,
+					...recompute(updatedItems),
 				})
 			}
 
@@ -150,9 +144,7 @@ export function useUpdateCartItem() {
 				queryClient.setQueryData(cartKeys.cart(), context.previousCart)
 			}
 		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: cartKeys.cart() })
-		},
+		// No onSettled invalidation — our math is exact, no need to re-fetch
 	})
 }
 
@@ -163,21 +155,13 @@ export function useRemoveFromCart() {
 		mutationFn: (itemId: string) => cartApi.remove(itemId),
 		onMutate: async (itemId) => {
 			await queryClient.cancelQueries({ queryKey: cartKeys.cart() })
-			const previousCart = queryClient.getQueryData<{ data: unknown }>(cartKeys.cart())
+			const previousCart = queryClient.getQueryData<NormalizedCart>(cartKeys.cart())
 
-			if (previousCart?.data) {
-				const normalized = normalizeCartData(previousCart.data)
-				const updatedItems = normalized.items.filter((item) => item.id !== itemId)
-				const newTotal = updatedItems.reduce((sum, item) => sum + item.subtotal, 0)
-				const newCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0)
-
-				queryClient.setQueryData(cartKeys.cart(), {
-					...previousCart,
-					data: {
-						items: updatedItems,
-						total: newTotal,
-						itemCount: newCount,
-					},
+			if (previousCart) {
+				const updatedItems = previousCart.items.filter((item) => item.id !== itemId)
+				queryClient.setQueryData<NormalizedCart>(cartKeys.cart(), {
+					items: updatedItems,
+					...recompute(updatedItems),
 				})
 			}
 
@@ -188,9 +172,7 @@ export function useRemoveFromCart() {
 				queryClient.setQueryData(cartKeys.cart(), context.previousCart)
 			}
 		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: cartKeys.cart() })
-		},
+		// No onSettled invalidation — trust the optimistic removal
 	})
 }
 
@@ -200,9 +182,10 @@ export function useClearCart() {
 	return useMutation({
 		mutationFn: () => cartApi.clear(),
 		onSuccess: () => {
-			queryClient.setQueryData(cartKeys.cart(), {
-				success: true,
-				data: { items: [], total: 0, itemCount: 0 },
+			queryClient.setQueryData<NormalizedCart>(cartKeys.cart(), {
+				items: [],
+				total: 0,
+				itemCount: 0,
 			})
 		},
 	})
