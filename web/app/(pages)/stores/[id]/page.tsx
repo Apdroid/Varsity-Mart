@@ -303,8 +303,7 @@ function ProductsSection({ storeId }: { storeId: string }) {
 	const [page, setPage] = React.useState(1)
 	const { data, isLoading } = useStoreProducts(storeId, page, 20)
 
-	const products = data?.products ?? []
-	console.log(products);
+	const products: ApiProduct[] = data?.products ?? []
 	const pagination = data?.pagination
 
 	if (isLoading) {
