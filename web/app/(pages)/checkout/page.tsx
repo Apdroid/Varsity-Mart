@@ -3,17 +3,31 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, CreditCard, Loader2, MapPin, Phone, Smartphone } from "lucide-react"
+import {
+  ArrowLeft,
+  Check,
+  CreditCard,
+  ImageIcon,
+  Loader2,
+  Lock,
+  MapPin,
+  MessageSquare,
+  Phone,
+  ShieldCheck,
+  Smartphone,
+  Store,
+  Truck,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { normalizeCartData, useCart } from "@/hooks/queries/use-cart"
 import { useCreateOrder } from "@/hooks/queries/use-orders"
 import { useAuth } from "@/providers/auth-provider"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 function formatGHS(n: number) {
   return new Intl.NumberFormat("en-GH", {
@@ -23,18 +37,51 @@ function formatGHS(n: number) {
   }).format(n)
 }
 
+function StepHeader({ step, label }: { step: number; label: string }) {
+  return (
+    <div className="mb-5 flex items-center gap-3">
+      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-vm-tangerine text-xs font-bold text-white">
+        {step}
+      </div>
+      <h2 className="text-base font-semibold">{label}</h2>
+    </div>
+  )
+}
+
+type DeliveryMethod = "campus_delivery" | "pickup"
+type PaymentMethod = "momo" | "card"
+type MomoProvider = "mtn" | "vodafone" | "airteltigo"
+
+const MOMO_PROVIDERS: { value: MomoProvider; label: string; activeClass: string }[] = [
+  {
+    value: "mtn",
+    label: "MTN MoMo",
+    activeClass: "border-yellow-400 bg-yellow-50 text-yellow-800 dark:bg-yellow-950/30 dark:text-yellow-400",
+  },
+  {
+    value: "vodafone",
+    label: "Vodafone",
+    activeClass: "border-red-400 bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400",
+  },
+  {
+    value: "airteltigo",
+    label: "AirtelTigo",
+    activeClass: "border-blue-400 bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400",
+  },
+]
+
 export default function CheckoutPage() {
   const router = useRouter()
   const { isAuthenticated, isLoading: authLoading } = useAuth()
   const { data: cartData, isLoading: cartLoading } = useCart({ enabled: isAuthenticated })
   const createOrderMutation = useCreateOrder()
 
-  const [deliveryMethod, setDeliveryMethod] = useState<"campus_delivery" | "pickup">("campus_delivery")
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("campus_delivery")
   const [deliveryAddress, setDeliveryAddress] = useState("")
   const [deliveryInstructions, setDeliveryInstructions] = useState("")
-  const [paymentMethod, setPaymentMethod] = useState("momo")
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("momo")
   const [momoNumber, setMomoNumber] = useState("")
-  const [momoProvider, setMomoProvider] = useState("mtn")
+  const [momoProvider, setMomoProvider] = useState<MomoProvider>("mtn")
 
   const cart = normalizeCartData(cartData?.data)
   const items = cart?.items || []
@@ -45,32 +92,22 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (items.length === 0) {
-      toast.error("Your cart is empty")
-      return
+    if (items.length === 0) { toast.error("Your cart is empty"); return }
+    if (deliveryMethod === "campus_delivery" && !deliveryAddress.trim()) {
+      toast.error("Please enter a delivery address"); return
     }
-
-    if (deliveryMethod === "campus_delivery" && !deliveryAddress) {
-      toast.error("Please enter a delivery address")
-      return
+    if (paymentMethod === "momo" && !momoNumber.trim()) {
+      toast.error("Please enter your mobile money number"); return
     }
-
-    if (paymentMethod === "momo" && !momoNumber) {
-      toast.error("Please enter your mobile money number")
-      return
-    }
-
     try {
       const result = await createOrderMutation.mutateAsync({
         delivery_method: deliveryMethod,
         delivery_address: deliveryMethod === "campus_delivery" ? deliveryAddress : undefined,
         delivery_instructions: deliveryInstructions || undefined,
-        payment_method: paymentMethod === "card" ? "card" : "momo",
+        payment_method: paymentMethod,
         momo_number: paymentMethod === "momo" ? momoNumber : undefined,
         momo_provider: paymentMethod === "momo" ? momoProvider : undefined,
       })
-
       if (result.data?.paymentUrl) {
         window.location.href = result.data.paymentUrl
       } else {
@@ -84,7 +121,7 @@ export default function CheckoutPage() {
 
   if (authLoading || cartLoading) {
     return (
-      <div className="container mx-auto flex min-h-[60vh] items-center justify-center px-4 py-8">
+      <div className="flex min-h-[60vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
@@ -92,13 +129,16 @@ export default function CheckoutPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="mx-auto max-w-md rounded-lg bg-card p-8 text-center">
-          <h1 className="text-2xl font-bold">Sign in to checkout</h1>
-          <p className="mt-2 text-muted-foreground">
+      <div className="flex min-h-[60vh] items-center justify-center px-4">
+        <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-vm-tangerine/10">
+            <Lock className="h-6 w-6 text-vm-tangerine" />
+          </div>
+          <h1 className="text-xl font-bold">Sign in to checkout</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
             You need to be signed in to complete your purchase
           </p>
-          <Button asChild className="mt-4 w-full">
+          <Button asChild className="mt-6 w-full rounded-full bg-vm-tangerine hover:bg-vm-tangerine/90">
             <Link href="/login?redirect=/checkout">Sign in</Link>
           </Button>
         </div>
@@ -108,13 +148,16 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="mx-auto max-w-md rounded-lg bg-card p-8 text-center">
-          <h1 className="text-2xl font-bold">Your cart is empty</h1>
-          <p className="mt-2 text-muted-foreground">
+      <div className="flex min-h-[60vh] items-center justify-center px-4">
+        <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+            <ShieldCheck className="h-6 w-6 text-muted-foreground" />
+          </div>
+          <h1 className="text-xl font-bold">Your cart is empty</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
             Add some products to your cart before checking out
           </p>
-          <Button asChild className="mt-4 w-full">
+          <Button asChild className="mt-6 w-full rounded-full bg-vm-tangerine hover:bg-vm-tangerine/90">
             <Link href="/products">Browse Products</Link>
           </Button>
         </div>
@@ -122,223 +165,333 @@ export default function CheckoutPage() {
     )
   }
 
+  const SubmitButton = ({ className }: { className?: string }) => (
+    <Button
+      type="submit"
+      disabled={createOrderMutation.isPending}
+      className={cn(
+        "w-full rounded-full bg-vm-tangerine py-6 text-base font-semibold text-white hover:bg-vm-tangerine/90",
+        className
+      )}
+    >
+      {createOrderMutation.isPending ? (
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      ) : (
+        <Lock className="mr-2 h-4 w-4" />
+      )}
+      Place Order · {formatGHS(total)}
+    </Button>
+  )
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <Link
-          href="/products"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Continue shopping
-        </Link>
-      </div>
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:py-10">
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-2xl font-bold">Checkout</h1>
-            <p className="text-muted-foreground">Complete your order</p>
-          </div>
+        {/* Back link + title */}
+        <div className="mb-8 flex items-center justify-between">
+          <Link
+            href="/cart"
+            className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Cart
+          </Link>
+          <span className="text-sm text-muted-foreground">
+            {items.length} item{items.length !== 1 ? "s" : ""}
+          </span>
+        </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="rounded-lg border bg-card p-4">
-              <h2 className="mb-4 font-semibold">Delivery Method</h2>
-              <RadioGroup
-                value={deliveryMethod}
-                onValueChange={(v) => setDeliveryMethod(v as "campus_delivery" | "pickup")}
-                className="space-y-3"
-              >
-                <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50 has-[[data-state=checked]]:border-primary">
-                  <RadioGroupItem value="campus_delivery" id="delivery" />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      <span className="font-medium">Campus Delivery</span>
-                    </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Delivered to your hostel or campus location
-                    </p>
-                    <p className="mt-1 text-sm font-medium">{formatGHS(5)} delivery fee</p>
-                  </div>
-                </label>
-                <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50 has-[[data-state=checked]]:border-primary">
-                  <RadioGroupItem value="pickup" id="pickup" />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      <span className="font-medium">Pickup</span>
-                    </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Pick up from seller&apos;s location
-                    </p>
-                    <p className="mt-1 text-sm font-medium text-green-600">Free</p>
-                  </div>
-                </label>
-              </RadioGroup>
-            </div>
+        <h1 className="mb-8 text-2xl font-bold tracking-tight sm:text-3xl">Checkout</h1>
 
-            {deliveryMethod === "campus_delivery" && (
-              <div className="rounded-lg border bg-card p-4">
-                <h2 className="mb-4 font-semibold">Delivery Address</h2>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="address">Address</Label>
-                    <Input
-                      id="address"
-                      placeholder="e.g., Room 205, Unity Hall, KNUST"
-                      value={deliveryAddress}
-                      onChange={(e) => setDeliveryAddress(e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="instructions">Delivery Instructions (optional)</Label>
-                    <Textarea
-                      id="instructions"
-                      placeholder="Any special instructions for delivery..."
-                      value={deliveryInstructions}
-                      onChange={(e) => setDeliveryInstructions(e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-8 lg:grid-cols-[1fr_22rem]">
+
+            {/* ── LEFT: Steps ── */}
+            <div className="space-y-5">
+
+              {/* Step 1 — Delivery Method */}
+              <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+                <StepHeader step={1} label="Delivery Method" />
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {[
+                    {
+                      value: "campus_delivery" as DeliveryMethod,
+                      icon: Truck,
+                      title: "Campus Delivery",
+                      desc: "Delivered to your hostel or campus location",
+                      badge: formatGHS(5),
+                      badgeClass: "text-vm-tangerine",
+                    },
+                    {
+                      value: "pickup" as DeliveryMethod,
+                      icon: Store,
+                      title: "Pickup",
+                      desc: "Collect from the seller's location at your convenience",
+                      badge: "Free",
+                      badgeClass: "text-emerald-600",
+                    },
+                  ].map(({ value, icon: Icon, title, desc, badge, badgeClass }) => {
+                    const selected = deliveryMethod === value
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setDeliveryMethod(value)}
+                        className={cn(
+                          "relative flex items-start gap-3 rounded-xl border-2 p-4 text-left transition-all",
+                          selected
+                            ? "border-vm-tangerine bg-vm-tangerine/5"
+                            : "border-border hover:border-vm-tangerine/40 hover:bg-muted/40"
+                        )}
+                      >
+                        <div className={cn(
+                          "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+                          selected ? "bg-vm-tangerine/15 text-vm-tangerine" : "bg-muted text-muted-foreground"
+                        )}>
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-semibold text-sm">{title}</span>
+                            <span className={cn("shrink-0 text-xs font-bold", badgeClass)}>{badge}</span>
+                          </div>
+                          <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{desc}</p>
+                        </div>
+                        {selected && (
+                          <div className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-vm-tangerine">
+                            <Check className="h-3 w-3 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
-            )}
 
-            <div className="rounded-lg border bg-card p-4">
-              <h2 className="mb-4 font-semibold">Payment Method</h2>
-              <RadioGroup
-                value={paymentMethod}
-                onValueChange={setPaymentMethod}
-                className="space-y-3"
-              >
-                <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50 has-[[data-state=checked]]:border-primary">
-                  <RadioGroupItem value="momo" id="momo" />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <Smartphone className="h-4 w-4" />
-                      <span className="font-medium">Mobile Money</span>
-                    </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Pay with MTN MoMo, Vodafone Cash, or AirtelTigo Money
-                    </p>
-                  </div>
-                </label>
-                <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50 has-[[data-state=checked]]:border-primary">
-                  <RadioGroupItem value="card" id="card" />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="h-4 w-4" />
-                      <span className="font-medium">Card</span>
-                    </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Pay with Visa, Mastercard, or other cards
-                    </p>
-                  </div>
-                </label>
-              </RadioGroup>
-
-              {paymentMethod === "momo" && (
-                <div className="mt-4 space-y-4">
-                  <div>
-                    <Label htmlFor="momoProvider">Provider</Label>
-                    <RadioGroup
-                      value={momoProvider}
-                      onValueChange={setMomoProvider}
-                      className="mt-2 flex gap-4"
-                    >
-                      <label className="flex cursor-pointer items-center gap-2">
-                        <RadioGroupItem value="mtn" id="mtn" />
-                        <span className="text-sm">MTN MoMo</span>
-                      </label>
-                      <label className="flex cursor-pointer items-center gap-2">
-                        <RadioGroupItem value="vodafone" id="vodafone" />
-                        <span className="text-sm">Vodafone Cash</span>
-                      </label>
-                      <label className="flex cursor-pointer items-center gap-2">
-                        <RadioGroupItem value="airteltigo" id="airteltigo" />
-                        <span className="text-sm">AirtelTigo</span>
-                      </label>
-                    </RadioGroup>
-                  </div>
-                  <div>
-                    <Label htmlFor="momoNumber">Phone Number</Label>
-                    <div className="relative mt-1">
-                      <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              {/* Step 2 — Delivery Details (conditional) */}
+              {deliveryMethod === "campus_delivery" && (
+                <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+                  <StepHeader step={2} label="Delivery Details" />
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="address" className="flex items-center gap-1.5 text-sm font-medium">
+                        <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                        Delivery Address
+                      </Label>
                       <Input
-                        id="momoNumber"
-                        type="tel"
-                        placeholder="0201234567"
-                        value={momoNumber}
-                        onChange={(e) => setMomoNumber(e.target.value)}
-                        className="pl-9"
+                        id="address"
+                        placeholder="e.g., Room 205, Unity Hall, KNUST"
+                        value={deliveryAddress}
+                        onChange={(e) => setDeliveryAddress(e.target.value)}
+                        className="mt-1.5 h-11 rounded-xl"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="instructions" className="flex items-center gap-1.5 text-sm font-medium">
+                        <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
+                        Instructions
+                        <span className="ml-1 font-normal text-muted-foreground">(optional)</span>
+                      </Label>
+                      <Textarea
+                        id="instructions"
+                        placeholder="Any special instructions for the delivery rider…"
+                        value={deliveryInstructions}
+                        onChange={(e) => setDeliveryInstructions(e.target.value)}
+                        className="mt-1.5 min-h-[80px] rounded-xl resize-none"
                       />
                     </div>
                   </div>
                 </div>
               )}
-            </div>
 
-            <Button
-              type="submit"
-              className="w-full rounded-full py-6 text-base"
-              disabled={createOrderMutation.isPending}
-            >
-              {createOrderMutation.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Place Order - {formatGHS(total)}
-            </Button>
-          </form>
-        </div>
+              {/* Step 3 — Payment */}
+              <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+                <StepHeader step={deliveryMethod === "campus_delivery" ? 3 : 2} label="Payment Method" />
 
-        <div>
-          <div className="sticky top-20 rounded-lg border bg-card p-6">
-            <h2 className="mb-4 font-semibold">Order Summary</h2>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {[
+                    {
+                      value: "momo" as PaymentMethod,
+                      icon: Smartphone,
+                      title: "Mobile Money",
+                      desc: "MTN MoMo, Vodafone Cash, or AirtelTigo",
+                    },
+                    {
+                      value: "card" as PaymentMethod,
+                      icon: CreditCard,
+                      title: "Debit / Credit Card",
+                      desc: "Visa, Mastercard, and more",
+                    },
+                  ].map(({ value, icon: Icon, title, desc }) => {
+                    const selected = paymentMethod === value
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setPaymentMethod(value)}
+                        className={cn(
+                          "relative flex items-start gap-3 rounded-xl border-2 p-4 text-left transition-all",
+                          selected
+                            ? "border-vm-tangerine bg-vm-tangerine/5"
+                            : "border-border hover:border-vm-tangerine/40 hover:bg-muted/40"
+                        )}
+                      >
+                        <div className={cn(
+                          "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+                          selected ? "bg-vm-tangerine/15 text-vm-tangerine" : "bg-muted text-muted-foreground"
+                        )}>
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-sm">{title}</p>
+                          <p className="mt-0.5 text-xs text-muted-foreground">{desc}</p>
+                        </div>
+                        {selected && (
+                          <div className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-vm-tangerine">
+                            <Check className="h-3 w-3 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
 
-            <div className="space-y-4">
-                {items.map((item) => (
-                  <div key={item.id} className="flex gap-3">
-                    <div className="h-16 w-16 rounded-lg bg-muted" />
-                    <div className="flex-1">
-                      <p className="font-medium line-clamp-1">{item.name}</p>
-                      <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
-                      <p className="text-sm font-medium">{formatGHS(item.subtotal)}</p>
+                {paymentMethod === "momo" && (
+                  <div className="mt-5 space-y-4">
+                    <div>
+                      <p className="mb-2 text-sm font-medium">Network Provider</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {MOMO_PROVIDERS.map(({ value, label, activeClass }) => (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => setMomoProvider(value)}
+                            className={cn(
+                              "rounded-xl border-2 py-2.5 text-xs font-semibold transition-all",
+                              momoProvider === value
+                                ? activeClass
+                                : "border-border text-muted-foreground hover:border-border/60 hover:bg-muted/40"
+                            )}
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="momoNumber" className="flex items-center gap-1.5 text-sm font-medium">
+                        <Phone className="h-3.5 w-3.5 text-muted-foreground" />
+                        Mobile Money Number
+                      </Label>
+                      <div className="relative mt-1.5">
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">
+                          +233
+                        </span>
+                        <Input
+                          id="momoNumber"
+                          type="tel"
+                          placeholder="20 123 4567"
+                          value={momoNumber}
+                          onChange={(e) => setMomoNumber(e.target.value)}
+                          className="h-11 rounded-xl pl-14"
+                        />
+                      </div>
                     </div>
                   </div>
-                ))}
-            </div>
+                )}
+              </div>
 
-            <Separator className="my-4" />
-
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span>{formatGHS(subtotal)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Delivery Fee</span>
-                <span>{deliveryFee === 0 ? "Free" : formatGHS(deliveryFee)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Service Fee (2%)</span>
-                <span>{formatGHS(serviceFee)}</span>
-              </div>
-              <Separator className="my-2" />
-              <div className="flex justify-between font-semibold">
-                <span>Total</span>
-                <span>{formatGHS(total)}</span>
+              {/* Mobile submit */}
+              <div className="lg:hidden">
+                <SubmitButton />
               </div>
             </div>
 
-            <div className="mt-4 rounded-lg bg-muted p-3">
-              <p className="text-xs text-muted-foreground">
-                By placing your order, you agree to our Terms of Service and acknowledge that your payment will be held in escrow until you confirm delivery.
-              </p>
+            {/* ── RIGHT: Order Summary ── */}
+            <div className="lg:sticky lg:top-8 lg:self-start">
+              <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="font-semibold">Order Summary</h2>
+                  <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
+                    {items.length} item{items.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+
+                {/* Items */}
+                <div className="max-h-64 space-y-3 overflow-y-auto pr-1 [scrollbar-width:thin]">
+                  {items.map((item) => (
+                    <div key={item.id} className="flex gap-3">
+                      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-muted">
+                        {item.image ? (
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center">
+                            <ImageIcon className="h-5 w-5 text-muted-foreground/50" />
+                          </div>
+                        )}
+                        <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-background bg-vm-tangerine text-[10px] font-bold text-white">
+                          {item.quantity}
+                        </span>
+                      </div>
+                      <div className="min-w-0 flex-1 pt-0.5">
+                        <p className="line-clamp-1 text-sm font-medium">{item.name}</p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          {formatGHS(item.unitPrice)} × {item.quantity}
+                        </p>
+                      </div>
+                      <p className="shrink-0 pt-0.5 text-sm font-semibold">{formatGHS(item.subtotal)}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <Separator className="my-4" />
+
+                {/* Fee breakdown */}
+                <div className="space-y-2.5 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span className="font-medium">{formatGHS(subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Delivery fee</span>
+                    <span className={cn("font-medium", deliveryFee === 0 && "text-emerald-600")}>
+                      {deliveryFee === 0 ? "Free" : formatGHS(deliveryFee)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Service fee (2%)</span>
+                    <span className="font-medium">{formatGHS(serviceFee)}</span>
+                  </div>
+                </div>
+
+                <Separator className="my-4" />
+
+                <div className="flex items-center justify-between">
+                  <span className="font-bold">Total</span>
+                  <span className="text-lg font-bold text-vm-tangerine">{formatGHS(total)}</span>
+                </div>
+
+                {/* Desktop submit */}
+                <div className="mt-5 hidden lg:block">
+                  <SubmitButton />
+                </div>
+
+                {/* Trust badge */}
+                <div className="mt-4 flex items-start gap-2.5 rounded-xl bg-muted/60 px-3.5 py-3">
+                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    Your payment is held securely in escrow and only released when you confirm delivery.
+                  </p>
+                </div>
+              </div>
             </div>
+
           </div>
-        </div>
+        </form>
       </div>
     </div>
   )

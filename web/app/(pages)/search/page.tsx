@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { SlidersHorizontal, Loader2 } from "lucide-react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { SlidersHorizontal } from "lucide-react"
 
 import { ProductCard } from "@/components/main/product-card"
 import { RestaurantCard } from "@/components/main/restaurant-card"
@@ -36,8 +36,6 @@ import type {
 	ProductCondition,
 } from "@/lib/api/types"
 
-const RECENT_SEARCHES_KEY = "vm-recent-searches"
-const DEFAULT_RECENT_SEARCHES = ["jollof", "macbook", "sneakers", "indomie", "books"]
 const TRENDING_SEARCHES = [
 	"macbook", "jollof", "hostel mattress", "calculator",
 	"indomie", "sneakers", "phone", "books",
@@ -131,45 +129,25 @@ export default function SearchPage() {
 
 function SearchPageClient() {
 	const router = useRouter()
-	const pathname = usePathname()
 	const searchParams = useSearchParams()
-	const inputRef = React.useRef<HTMLInputElement>(null)
 
-	const [query, setQuery] = React.useState(searchParams.get("query") ?? "")
+	// Query is always driven by the URL — header navigation updates it automatically
+	const query = searchParams.get("query") ?? ""
+	const hasQuery = query.length > 0
+
 	const [filters, setFilters] = React.useState<SearchFilters>(defaultFilters)
 	const [sort, setSort] = React.useState<SortOption>("relevance")
 	const [view, setView] = React.useState<"grid" | "list">("grid")
-	const [isInputFocused, setIsInputFocused] = React.useState(false)
 	const [isMobileFiltersOpen, setIsMobileFiltersOpen] = React.useState(false)
-	const [recentSearches, setRecentSearches] = React.useState<string[]>(() => {
-		if (typeof window === "undefined") return DEFAULT_RECENT_SEARCHES
-		try {
-			const stored = window.localStorage.getItem(RECENT_SEARCHES_KEY)
-			if (!stored) return DEFAULT_RECENT_SEARCHES
-			const parsed = JSON.parse(stored) as string[]
-			return Array.isArray(parsed) && parsed.length > 0 ? parsed.slice(0, 5) : DEFAULT_RECENT_SEARCHES
-		} catch { return DEFAULT_RECENT_SEARCHES }
-	})
-	const [debouncedQuery, setDebouncedQuery] = React.useState(query.trim())
 
-	React.useEffect(() => {
-		const timer = window.setTimeout(() => {
-			const next = query.trim()
-			setDebouncedQuery(next)
-			if (next) {
-				setRecentSearches((prev) => [next, ...prev.filter((s) => s !== next)].slice(0, 5))
-			}
-		}, 300)
-		return () => window.clearTimeout(timer)
-	}, [query])
-
-	React.useEffect(() => {
-		try { window.localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(recentSearches)) } catch { }
-	}, [recentSearches])
-
-	const hasQuery = debouncedQuery.length > 0
-
-	const searchType = filters.type === "food" ? "restaurants" : filters.type === "stores" ? "stores" : filters.type === "products" ? "products" : "all"
+	const searchType =
+		filters.type === "food"
+			? "restaurants"
+			: filters.type === "stores"
+				? "stores"
+				: filters.type === "products"
+					? "products"
+					: "all"
 
 	const sortByApi =
 		sort === "newest"
@@ -182,7 +160,7 @@ function SearchPageClient() {
 
 	const { data: searchData, isLoading } = useSearch(
 		{
-			query: debouncedQuery,
+			query,
 			type: searchType as "products" | "stores" | "restaurants" | "all",
 			category: filters.category !== "all" ? filters.category : undefined,
 			minPrice: filters.priceMin !== PRICE_RANGE_MIN ? filters.priceMin : undefined,
@@ -207,118 +185,135 @@ function SearchPageClient() {
 		(searchData?.totals?.stores ?? 0) +
 		(searchData?.totals?.restaurants ?? 0)
 
-	const activeFilterCount = React.useMemo(() =>
-		Number(filters.category !== "all") +
-		Number(filters.priceMin !== PRICE_RANGE_MIN || filters.priceMax !== PRICE_RANGE_MAX) +
-		Number(filters.conditions.length > 0) +
-		Number(filters.rating !== null) +
-		Number(filters.openNow) +
-		Number(filters.freeDelivery),
-	[filters])
+	const activeFilterCount = React.useMemo(
+		() =>
+			Number(filters.category !== "all") +
+			Number(filters.priceMin !== PRICE_RANGE_MIN || filters.priceMax !== PRICE_RANGE_MAX) +
+			Number(filters.conditions.length > 0) +
+			Number(filters.rating !== null) +
+			Number(filters.openNow) +
+			Number(filters.freeDelivery),
+		[filters]
+	)
 
 	const clearFilters = () => setFilters((prev) => ({ ...defaultFilters, type: prev.type }))
-	const handleFilterChange = (updates: Partial<SearchFilters>) => setFilters((prev) => ({ ...prev, ...updates }))
+	const handleFilterChange = (updates: Partial<SearchFilters>) =>
+		setFilters((prev) => ({ ...prev, ...updates }))
 
 	const sidebarProps = {
-		filters, onChange: handleFilterChange, onClearFilters: clearFilters,
-		activeFilterCount, categoryOptions: [], conditionOptions: [],
-	}
-
-	const utilityBarProps = {
-		query, onQueryChange: setQuery, debouncedQuery, totalCount,
-		sort, onSortChange: setSort, view, onViewChange: setView,
-		recentSearches, isInputFocused,
-		onFocus: () => setIsInputFocused(true),
-		onBlur: () => window.setTimeout(() => setIsInputFocused(false), 100),
-		hasQuery, inputRef,
+		filters,
+		onChange: handleFilterChange,
+		onClearFilters: clearFilters,
+		activeFilterCount,
+		categoryOptions: [],
+		conditionOptions: [],
 	}
 
 	const popularProducts = (popularProductsData?.products || []).map(mapApiProductToCard)
 
-	return (
-		<main className="pb-16 max-w-7xl mx-auto">
-			<div className="border-b border-border bg-background px-4 py-4">
-				<div className="my-5 mx-auto max-w-8xl">
-					<SearchUtilityBar {...utilityBarProps} />
-				</div>
-			</div>
+	const MobileFilterTrigger = () => (
+		<div className="lg:hidden">
+			<Sheet open={isMobileFiltersOpen} onOpenChange={setIsMobileFiltersOpen}>
+				<SheetTrigger asChild>
+					<Button variant="outline" size="sm" className="rounded-md bg-card">
+						<SlidersHorizontal className="h-4 w-4" />
+						Filters
+						{activeFilterCount > 0 && (
+							<span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-vm-tangerine text-[11px] font-bold text-vm-tangerine-foreground">
+								{activeFilterCount}
+							</span>
+						)}
+					</Button>
+				</SheetTrigger>
+				<SheetContent side="left" className="flex w-[85vw] max-w-sm flex-col bg-card p-0">
+					<SheetHeader className="border-b border-border px-4 py-4">
+						<SheetTitle>Filters</SheetTitle>
+					</SheetHeader>
+					<div className="flex-1 overflow-y-auto p-4">
+						<FilterSidebar {...sidebarProps} />
+					</div>
+					<div className="border-t border-border p-4">
+						<Button
+							className="w-full rounded-md bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
+							onClick={() => setIsMobileFiltersOpen(false)}
+						>
+							Apply Filters
+						</Button>
+					</div>
+				</SheetContent>
+			</Sheet>
+		</div>
+	)
 
-			<div className="mx-auto max-w-8xl px-4">
+	return (
+		<main className="min-h-svh pb-16">
+			<div className="mx-auto max-w-7xl px-4 pt-6">
 				{!hasQuery ? (
 					<SearchEmptyState
 						trendingSearches={TRENDING_SEARCHES}
-						onSelectTrending={setQuery}
+						onSelectTrending={(q) => router.push(`/search?query=${encodeURIComponent(q)}`)}
 						recentlyViewed={popularProducts}
 					/>
 				) : (
-					<div className="mt-6 flex gap-6">
+					<div className="flex gap-6">
+						{/* Desktop filter sidebar */}
 						<aside className="hidden shrink-0 lg:block">
-							<div className="top-20">
-								<FilterSidebar {...sidebarProps} />
-							</div>
+							<FilterSidebar {...sidebarProps} />
 						</aside>
 
 						<div className="min-w-0 flex-1 space-y-4">
-							<div className="flex items-center lg:hidden">
-								<Sheet open={isMobileFiltersOpen} onOpenChange={setIsMobileFiltersOpen}>
-									<SheetTrigger asChild>
-										<Button variant="outline" size="sm" className="rounded-md bg-card">
-											<SlidersHorizontal className="h-4 w-4" />
-											Filters
-											{activeFilterCount > 0 && (
-												<span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-vm-tangerine text-[11px] font-bold text-vm-tangerine-foreground">
-													{activeFilterCount}
-												</span>
-											)}
-										</Button>
-									</SheetTrigger>
-									<SheetContent side="left" className="flex w-[85vw] max-w-sm flex-col bg-card p-0">
-										<SheetHeader className="border-b border-border px-4 py-4">
-											<SheetTitle>Filters</SheetTitle>
-										</SheetHeader>
-										<div className="flex-1 overflow-y-auto p-4">
-											<FilterSidebar {...sidebarProps} />
-										</div>
-										<div className="border-t border-border p-4">
-											<Button
-												className="w-full rounded-md bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
-												onClick={() => setIsMobileFiltersOpen(false)}
-											>
-												Apply Filters
-											</Button>
-										</div>
-									</SheetContent>
-								</Sheet>
-							</div>
-
 							{isLoading ? (
-								<SkeletonGrid type={filters.type} />
+								<>
+									<MobileFilterTrigger />
+									<SkeletonGrid type={filters.type} />
+								</>
 							) : totalCount === 0 ? (
-								<SearchNoResults
-									query={debouncedQuery}
-									popularProducts={popularProducts}
-									onClearFilters={clearFilters}
-									hasActiveFilters={activeFilterCount > 0}
-								/>
-							) : filters.type === "all" ? (
-								<AllResultsView
-									products={products.map(mapApiProductToCard)}
-									food={restaurants.map(mapApiRestaurantToCard)}
-									stores={stores.map(mapApiStoreToCard)}
-									view={view}
-									onViewAll={(type) => handleFilterChange({ type })}
-									productTotal={searchData?.totals?.products ?? 0}
-									foodTotal={searchData?.totals?.restaurants ?? 0}
-									storeTotal={searchData?.totals?.stores ?? 0}
-								/>
+								<>
+									<MobileFilterTrigger />
+									<SearchNoResults
+										query={query}
+										popularProducts={popularProducts}
+										onClearFilters={clearFilters}
+										hasActiveFilters={activeFilterCount > 0}
+									/>
+								</>
 							) : (
-								<TypeResultsView
-									type={filters.type}
-									products={products.map(mapApiProductToCard)}
-									food={restaurants.map(mapApiRestaurantToCard)}
-									stores={stores.map(mapApiStoreToCard)}
-									view={view}
-								/>
+								<>
+									<div className="flex flex-wrap items-center gap-3">
+										<MobileFilterTrigger />
+										<div className="min-w-0 flex-1">
+											<SearchUtilityBar
+												query={query}
+												totalCount={totalCount}
+												sort={sort}
+												onSortChange={setSort}
+												view={view}
+												onViewChange={setView}
+											/>
+										</div>
+									</div>
+
+									{filters.type === "all" ? (
+										<AllResultsView
+											products={products.map(mapApiProductToCard)}
+											food={restaurants.map(mapApiRestaurantToCard)}
+											stores={stores.map(mapApiStoreToCard)}
+											view={view}
+											onViewAll={(type) => handleFilterChange({ type })}
+											productTotal={searchData?.totals?.products ?? 0}
+											foodTotal={searchData?.totals?.restaurants ?? 0}
+											storeTotal={searchData?.totals?.stores ?? 0}
+										/>
+									) : (
+										<TypeResultsView
+											type={filters.type}
+											products={products.map(mapApiProductToCard)}
+											food={restaurants.map(mapApiRestaurantToCard)}
+											stores={stores.map(mapApiStoreToCard)}
+											view={view}
+										/>
+									)}
+								</>
 							)}
 						</div>
 					</div>
@@ -328,7 +323,9 @@ function SearchPageClient() {
 	)
 }
 
-function AllResultsView({ products, food, stores, view, onViewAll, productTotal, foodTotal, storeTotal }: {
+function AllResultsView({
+	products, food, stores, view, onViewAll, productTotal, foodTotal, storeTotal,
+}: {
 	products: ReturnType<typeof mapApiProductToCard>[]
 	food: ReturnType<typeof mapApiRestaurantToCard>[]
 	stores: ReturnType<typeof mapApiStoreToCard>[]
@@ -339,21 +336,36 @@ function AllResultsView({ products, food, stores, view, onViewAll, productTotal,
 	storeTotal: number
 }) {
 	const sections = [
-		{ key: "products" as SearchType, title: "Products", total: productTotal, content: products.length > 0 ? (
-			<div className={cn("grid gap-3", view === "list" ? "grid-cols-1" : "grid-cols-2 md:grid-cols-3 xl:grid-cols-4")}>
-				{products.slice(0, 8).map((item) => <ProductCard key={item.id} product={item} />)}
-			</div>
-		) : null },
-		{ key: "food" as SearchType, title: "Food", total: foodTotal, content: food.length > 0 ? (
-			<div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-				{food.slice(0, 6).map((item) => <RestaurantCard key={item.id} restaurant={item} />)}
-			</div>
-		) : null },
-		{ key: "stores" as SearchType, title: "Stores", total: storeTotal, content: stores.length > 0 ? (
-			<div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-				{stores.slice(0, 6).map((item) => <StoreCard key={item.id} store={item} />)}
-			</div>
-		) : null },
+		{
+			key: "products" as SearchType,
+			title: "Products",
+			total: productTotal,
+			content: products.length > 0 ? (
+				<div className={cn("grid gap-3", view === "list" ? "grid-cols-1" : "grid-cols-2 md:grid-cols-3 xl:grid-cols-4")}>
+					{products.slice(0, 8).map((item) => <ProductCard key={item.id} product={item} />)}
+				</div>
+			) : null,
+		},
+		{
+			key: "food" as SearchType,
+			title: "Food",
+			total: foodTotal,
+			content: food.length > 0 ? (
+				<div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+					{food.slice(0, 6).map((item) => <RestaurantCard key={item.id} restaurant={item} />)}
+				</div>
+			) : null,
+		},
+		{
+			key: "stores" as SearchType,
+			title: "Stores",
+			total: storeTotal,
+			content: stores.length > 0 ? (
+				<div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+					{stores.slice(0, 6).map((item) => <StoreCard key={item.id} store={item} />)}
+				</div>
+			) : null,
+		},
 	].filter((s) => s.total > 0)
 
 	return (
@@ -361,13 +373,20 @@ function AllResultsView({ products, food, stores, view, onViewAll, productTotal,
 			{sections.map((section, index) => (
 				<section key={section.key}>
 					{index > 0 && <div className="border-b border-border" />}
-					<div className="space-y-4 py-8">
+					<div className="space-y-4 py-6">
 						<div className="flex items-center justify-between">
 							<h2 className="font-heading text-xl font-bold text-foreground">
-								{section.title} <span className="text-base font-normal text-muted-foreground">({section.total})</span>
+								{section.title}{" "}
+								<span className="text-base font-normal text-muted-foreground">
+									({section.total})
+								</span>
 							</h2>
 							{section.total > 6 && (
-								<button type="button" onClick={() => onViewAll(section.key)} className="text-sm font-semibold text-vm-tangerine hover:underline">
+								<button
+									type="button"
+									onClick={() => onViewAll(section.key)}
+									className="text-sm font-semibold text-vm-tangerine hover:underline"
+								>
 									View all {section.total} →
 								</button>
 							)}
@@ -380,7 +399,9 @@ function AllResultsView({ products, food, stores, view, onViewAll, productTotal,
 	)
 }
 
-function TypeResultsView({ type, products, food, stores, view }: {
+function TypeResultsView({
+	type, products, food, stores, view,
+}: {
 	type: SearchType
 	products: ReturnType<typeof mapApiProductToCard>[]
 	food: ReturnType<typeof mapApiRestaurantToCard>[]
@@ -411,8 +432,19 @@ function TypeResultsView({ type, products, food, stores, view }: {
 function SkeletonGrid({ type, count }: { type: SearchType; count?: number }) {
 	const n = count ?? (type === "products" || type === "all" ? 8 : type === "food" ? 6 : 4)
 	return (
-		<div className={cn("grid gap-3", type === "products" || type === "all" ? "grid-cols-2 md:grid-cols-3 xl:grid-cols-4" : type === "food" ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 lg:grid-cols-2")}>
-			{Array.from({ length: n }, (_, i) => <Skeleton key={i} className="h-48 w-full rounded-lg" />)}
+		<div
+			className={cn(
+				"grid gap-3",
+				type === "products" || type === "all"
+					? "grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
+					: type === "food"
+						? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
+						: "grid-cols-1 lg:grid-cols-2"
+			)}
+		>
+			{Array.from({ length: n }, (_, i) => (
+				<Skeleton key={i} className="h-48 w-full rounded-lg" />
+			))}
 		</div>
 	)
 }

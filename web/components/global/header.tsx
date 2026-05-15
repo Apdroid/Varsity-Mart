@@ -25,7 +25,7 @@ import {
 	GearIcon,
 	PackageIcon,
 } from "@phosphor-icons/react"
-import { Loader2, MessageCircleIcon, Moon, Sun } from "lucide-react"
+import { Clock, Loader2, MessageCircleIcon, Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 import {
 	Tooltip,
@@ -74,7 +74,137 @@ import { FoodCartSheet } from "@/components/cart/food-cart-sheet";
 import { useAuth } from "@/providers/auth-provider";
 import { useCurrentUser } from "@/hooks/queries/use-user";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+
+const RECENT_SEARCHES_KEY = "vm-recent-searches"
+const TRENDING_SEARCHES = [
+	"jollof", "macbook", "hostel mattress", "calculator",
+	"indomie", "sneakers", "phone", "books",
+]
+
+function loadRecentSearches(): string[] {
+	try {
+		const stored = localStorage.getItem(RECENT_SEARCHES_KEY)
+		if (!stored) return []
+		const parsed = JSON.parse(stored) as string[]
+		return Array.isArray(parsed) ? parsed.slice(0, 5) : []
+	} catch { return [] }
+}
+
+function saveRecentSearch(query: string, current: string[]): string[] {
+	const next = [query, ...current.filter((s) => s !== query)].slice(0, 5)
+	try { localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next)) } catch {}
+	return next
+}
+
+function SuggestionButton({
+	icon,
+	label,
+	onSelect,
+}: {
+	icon: React.ReactNode
+	label: string
+	onSelect: () => void
+}) {
+	return (
+		<button
+			type="button"
+			onMouseDown={(e) => e.preventDefault()}
+			onClick={onSelect}
+			className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-foreground transition-colors hover:bg-muted"
+		>
+			{icon}
+			<span className="truncate">{label}</span>
+		</button>
+	)
+}
+
+function SearchSuggestionsDropdown({
+	query,
+	recentSearches,
+	onSelect,
+}: {
+	query: string
+	recentSearches: string[]
+	onSelect: (q: string) => void
+}) {
+	const q = query.toLowerCase().trim()
+
+	const filteredRecent = q
+		? recentSearches.filter((s) => s.toLowerCase().includes(q))
+		: recentSearches
+
+	const filteredTrending = (
+		q ? TRENDING_SEARCHES.filter((s) => s.toLowerCase().includes(q)) : TRENDING_SEARCHES
+	).filter((s) => !filteredRecent.includes(s))
+
+	const isExactMatch =
+		filteredRecent.some((s) => s.toLowerCase() === q) ||
+		filteredTrending.some((s) => s.toLowerCase() === q)
+
+	const showQueryRow = q.length > 0 && !isExactMatch
+
+	const hasResults = showQueryRow || filteredRecent.length > 0 || filteredTrending.length > 0
+
+	return (
+		<div className="absolute left-0 right-0 top-full z-50 mt-1.5 overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
+			{showQueryRow && (
+				<>
+					<SuggestionButton
+						icon={<MagnifyingGlassIcon className="h-3.5 w-3.5 shrink-0 text-vm-tangerine" />}
+						label={`Search "${query.trim()}"`}
+						onSelect={() => onSelect(query.trim())}
+					/>
+					{(filteredRecent.length > 0 || filteredTrending.length > 0) && (
+						<div className="mx-3 border-t border-border/60" />
+					)}
+				</>
+			)}
+
+			{filteredRecent.length > 0 && (
+				<>
+					<p className="px-4 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+						Recent
+					</p>
+					{filteredRecent.map((s) => (
+						<SuggestionButton
+							key={s}
+							icon={<Clock className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
+							label={s}
+							onSelect={() => onSelect(s)}
+						/>
+					))}
+					{filteredTrending.length > 0 && <div className="mx-3 my-1 border-t border-border/60" />}
+				</>
+			)}
+
+			{filteredTrending.length > 0 && (
+				<>
+					<p className="px-4 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+						Trending on Campus
+					</p>
+					{filteredTrending.map((s) => (
+						<SuggestionButton
+							key={s}
+							icon={<FireIcon className="h-3.5 w-3.5 shrink-0 text-vm-tangerine" />}
+							label={s}
+							onSelect={() => onSelect(s)}
+						/>
+					))}
+				</>
+			)}
+
+			{!hasResults && (
+				<p className="px-4 py-6 text-center text-sm text-muted-foreground">
+					No suggestions found
+				</p>
+			)}
+
+			<div className="h-2" />
+		</div>
+	)
+}
 
 function ThemeToggleButton({ className = "" }: { className?: string }) {
 	const { resolvedTheme, setTheme } = useTheme()
@@ -254,6 +384,12 @@ function MainBar() {
 	const { data: currentUserData } = useCurrentUser({ enabled: isAuthenticated })
 	const [desktopQuery, setDesktopQuery] = useState("")
 	const [desktopCategory, setDesktopCategory] = useState("All Categories")
+	const [isDesktopFocused, setIsDesktopFocused] = useState(false)
+	const [desktopRecentSearches, setDesktopRecentSearches] = useState<string[]>([])
+
+	useEffect(() => {
+		setDesktopRecentSearches(loadRecentSearches())
+	}, [])
 
 	const wishlistCount = getWishlistCount(currentUserData?.data, user)
 	const displayName = user ? `${user.firstName} ${user.lastName} `.trim() : ""
@@ -265,8 +401,20 @@ function MainBar() {
 	}
 
 	const handleDesktopSearch = useCallback(() => {
+		const trimmed = desktopQuery.trim()
+		if (trimmed) {
+			setDesktopRecentSearches((prev) => saveRecentSearch(trimmed, prev))
+		}
+		setIsDesktopFocused(false)
 		router.push(buildGlobalSearchHref(desktopQuery, desktopCategory))
 	}, [router, desktopCategory, desktopQuery])
+
+	const handleSelectDesktopSuggestion = useCallback((suggestion: string) => {
+		setDesktopQuery(suggestion)
+		setDesktopRecentSearches((prev) => saveRecentSearch(suggestion, prev))
+		setIsDesktopFocused(false)
+		router.push(buildGlobalSearchHref(suggestion, desktopCategory))
+	}, [router, desktopCategory])
 
 	return (
 		<div className=" bg-card">
@@ -305,23 +453,26 @@ function MainBar() {
 					<Logo variant="header" />
 				</Link>
 
-				<div className="hidden flex-1 md:block">
-					<div className="relative flex h-11 w-full items-center overflow-hidden rounded-full  bg-accent transition-all focus-within:border-primary/30 focus-within:bg-background focus-within:shadow-sm">
+				<div className="relative hidden flex-1 md:block">
+					<div className="relative flex h-11 w-full items-center overflow-hidden rounded-full bg-accent transition-all focus-within:bg-background focus-within:shadow-sm">
 						<MagnifyingGlassIcon className="ml-4 h-4 w-4 shrink-0 text-muted-foreground" />
 						<Input
 							placeholder="Search for jollof, hoodies, textbooks…"
 							value={desktopQuery}
 							onChange={(event) => setDesktopQuery(event.target.value)}
+							onFocus={() => setIsDesktopFocused(true)}
+							onBlur={() => setTimeout(() => setIsDesktopFocused(false), 150)}
 							onKeyDown={(event) => {
 								if (event.key === "Enter") {
 									event.preventDefault()
 									handleDesktopSearch()
 								}
+								if (event.key === "Escape") setIsDesktopFocused(false)
 							}}
-							className="h-full border-0 bg-inherit dark:bg-inherit shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+							className="h-full border-0 bg-inherit shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-inherit"
 						/>
 						<Select value={desktopCategory} onValueChange={setDesktopCategory}>
-							<SelectTrigger className="h-full w-38.75 border-0 dark:bg-inherit bg-transparent text-sm shadow-none focus:ring-0 focus:ring-offset-0">
+							<SelectTrigger className="h-full w-38.75 border-0 bg-transparent text-sm shadow-none focus:ring-0 focus:ring-offset-0 dark:bg-inherit">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent align="end">
@@ -335,11 +486,25 @@ function MainBar() {
 						<button
 							type="button"
 							onClick={handleDesktopSearch}
-							className="mr-1.5 ml-1 flex h-8 shrink-0 cursor-pointer bg-vm-tangerine items-center rounded-full px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+							className="ml-1 mr-1.5 flex h-8 shrink-0 cursor-pointer items-center rounded-full bg-vm-tangerine px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
 						>
 							Search
 						</button>
 					</div>
+					{isDesktopFocused && (
+						<SearchSuggestionsDropdown
+							query={desktopQuery}
+							recentSearches={desktopRecentSearches}
+							onSelect={handleSelectDesktopSuggestion}
+						/>
+					)}
+					{isDesktopFocused && typeof document !== "undefined" && createPortal(
+						<div
+							className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
+							onClick={() => setIsDesktopFocused(false)}
+						/>,
+						document.body
+					)}
 				</div>
 
 
@@ -613,34 +778,71 @@ function NavBar() {
 function MobileSearchBar() {
 	const router = useRouter()
 	const [mobileQuery, setMobileQuery] = useState("")
+	const [isMobileFocused, setIsMobileFocused] = useState(false)
+	const [mobileRecentSearches, setMobileRecentSearches] = useState<string[]>([])
+
+	useEffect(() => {
+		setMobileRecentSearches(loadRecentSearches())
+	}, [])
 
 	const handleMobileSearch = useCallback(() => {
+		const trimmed = mobileQuery.trim()
+		if (trimmed) {
+			setMobileRecentSearches((prev) => saveRecentSearch(trimmed, prev))
+		}
+		setIsMobileFocused(false)
 		router.push(buildGlobalSearchHref(mobileQuery))
 	}, [router, mobileQuery])
 
+	const handleSelectMobileSuggestion = useCallback((suggestion: string) => {
+		setMobileQuery(suggestion)
+		setMobileRecentSearches((prev) => saveRecentSearch(suggestion, prev))
+		setIsMobileFocused(false)
+		router.push(buildGlobalSearchHref(suggestion))
+	}, [router])
+
 	return (
 		<div className="md:hidden bg-card border-t border-border/40 px-4 pb-3 pt-2">
-			<div className="relative flex h-11 items-center overflow-hidden rounded-full bg-accent transition-all focus-within:bg-background focus-within:shadow-sm">
-				<MagnifyingGlassIcon className="ml-4 h-4 w-4 shrink-0 text-muted-foreground" />
-				<Input
-					placeholder="Search products, food, stores…"
-					value={mobileQuery}
-					onChange={(event) => setMobileQuery(event.target.value)}
-					onKeyDown={(event) => {
-						if (event.key === "Enter") {
-							event.preventDefault()
-							handleMobileSearch()
-						}
-					}}
-					className="h-full border-0 bg-inherit dark:bg-inherit shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-				/>
-				<button
-					type="button"
-					onClick={handleMobileSearch}
-					className="mr-1.5 ml-1 flex h-8 shrink-0 cursor-pointer items-center rounded-full bg-vm-tangerine px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-				>
-					Search
-				</button>
+			<div className="relative">
+				<div className="relative flex h-11 items-center overflow-hidden rounded-full bg-accent transition-all focus-within:bg-background focus-within:shadow-sm">
+					<MagnifyingGlassIcon className="ml-4 h-4 w-4 shrink-0 text-muted-foreground" />
+					<Input
+						placeholder="Search products, food, stores…"
+						value={mobileQuery}
+						onChange={(event) => setMobileQuery(event.target.value)}
+						onFocus={() => setIsMobileFocused(true)}
+						onBlur={() => setTimeout(() => setIsMobileFocused(false), 150)}
+						onKeyDown={(event) => {
+							if (event.key === "Enter") {
+								event.preventDefault()
+								handleMobileSearch()
+							}
+							if (event.key === "Escape") setIsMobileFocused(false)
+						}}
+						className="h-full border-0 bg-inherit shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-inherit"
+					/>
+					<button
+						type="button"
+						onClick={handleMobileSearch}
+						className="ml-1 mr-1.5 flex h-8 shrink-0 cursor-pointer items-center rounded-full bg-vm-tangerine px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+					>
+						Search
+					</button>
+				</div>
+				{isMobileFocused && (
+					<SearchSuggestionsDropdown
+						query={mobileQuery}
+						recentSearches={mobileRecentSearches}
+						onSelect={handleSelectMobileSuggestion}
+					/>
+				)}
+			{isMobileFocused && typeof document !== "undefined" && createPortal(
+				<div
+					className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
+					onClick={() => setIsMobileFocused(false)}
+				/>,
+				document.body
+			)}
 			</div>
 
 			<div className="mt-2.5 flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
