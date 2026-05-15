@@ -124,7 +124,7 @@ export function FoodCartSheet() {
 							</p>
 							<Button
 								className="w-full bg-vm-tangerine font-semibold text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
-								onClick={() => { setOpen(false); router.push("/checkout") }}
+								onClick={() => { setOpen(false); router.push("/food-checkout") }}
 							>
 								Proceed to Checkout
 								<ArrowRight className="ml-2 h-4 w-4" />
