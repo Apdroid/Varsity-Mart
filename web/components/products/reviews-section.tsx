@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { MessageSquareOff } from "lucide-react"
+import { MessageSquareOff, Star } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -58,6 +58,24 @@ function TabPanel({ reviews }: TabPanelProps) {
 	const [sort, setSort] = React.useState<SortKey>("newest")
 	const sorted = filterAndSort(reviews, sort)
 
+	if (reviews.length === 0) {
+		return (
+			<div className="flex flex-col items-center justify-center gap-8 py-10 sm:flex-row">
+				<div className="flex flex-col items-center">
+					<span className="text-5xl font-extrabold leading-none">0.0</span>
+					<div className="mt-1.5 flex gap-0.5">
+						{[1, 2, 3, 4, 5].map((s) => (
+							<Star key={s} className="h-4 w-4 fill-muted text-muted" />
+						))}
+					</div>
+					<span className="mt-1 text-xs text-muted-foreground">0 reviews</span>
+				</div>
+				<div className="hidden h-16 w-px bg-border sm:block" />
+				<EmptyReviews />
+			</div>
+		)
+	}
+
 	return (
 		<div>
 			<div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
@@ -75,30 +93,25 @@ function TabPanel({ reviews }: TabPanelProps) {
 					</Select>
 				</div>
 			</div>
-
-			{sorted.length === 0 ? (
-				<EmptyReviews />
-			) : (
-				<div>
-					{sorted.map((review, i) => (
-						<React.Fragment key={review.id}>
-							<ReviewCard review={review} />
-							{i < sorted.length - 1 && <Separator />}
-						</React.Fragment>
-					))}
-				</div>
-			)}
+			<div>
+				{sorted.map((review, i) => (
+					<React.Fragment key={review.id}>
+						<ReviewCard review={review} />
+						{i < sorted.length - 1 && <Separator />}
+					</React.Fragment>
+				))}
+			</div>
 		</div>
 	)
 }
 
-export function ReviewsSection({ productId, seller, allReviews, className, ...props }: Props & ComponentProps<"div">) {
+export function ReviewsSection({ productId, seller, allReviews, className }: Props & ComponentProps<"div">) {
 	const productReviews = allReviews.filter((r) => r.productId === productId)
 	const storeReviews = allReviews.filter((r) => r.storeId === seller.id)
 
 	return (
-		<section className={cn("mt-10", className)}>
-			<h2 className="mb-4 text-xl font-bold">Reviews</h2>
+		<section className={cn(className)}>
+			<h2 className="mb-6 text-xl font-bold font-heading">Reviews</h2>
 			<Tabs defaultValue="product">
 				<TabsList className="mb-6 h-10 rounded-full bg-muted p-1">
 					<TabsTrigger value="product" className="rounded-full px-5 text-sm font-medium">

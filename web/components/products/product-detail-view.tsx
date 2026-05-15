@@ -179,44 +179,45 @@ function ProductInfo({ product, quantity, onQuantityChange, actionsRef }: Produc
 	const showStepper = hasStock && product.stock! > 1
 
 	return (
-		<div className="space-y-5">
+		<div className="space-y-3">
 			{/* a. Category badge */}
+			<span className="inline-flex rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
+				{product.category.name}
+			</span>
+
+			{/* b. Title + condition badge inline */}
 			<div>
-				<span className="inline-flex rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
-					{product.category.name}
+				<h1 className="text-2xl font-bold font-heading leading-snug md:text-[1.6rem]">
+					{product.title}
+				</h1>
+				<span className="mt-1 inline-flex rounded-full border border-vm-tangerine/20 bg-vm-tangerine/10 px-2.5 py-0.5 text-xs font-medium text-vm-tangerine">
+					{product.condition}
 				</span>
 			</div>
 
-			{/* b. Title */}
-			<h1 className="text-2xl font-bold font-heading leading-snug md:text-[1.6rem]">
-				{product.title}
-			</h1>
-
-			{/* c. Condition badge */}
-			<span className="inline-flex rounded-full border border-vm-tangerine/20 bg-vm-tangerine/10 px-2.5 py-0.5 text-xs font-medium text-vm-tangerine">
-				{product.condition}
-			</span>
-
-			{/* d. Price block */}
+			{/* c. Price block */}
 			<PriceBlock price={product.price} originalPrice={product.originalPrice} />
 
-			{/* e. Stock pill */}
+			{/* d. Stock pill */}
 			<StockPill stock={product.stock} quantity={quantity} />
 
 			<Separator />
 
-			{/* f. Description */}
-			{product.description && <DescriptionSection description={product.description} />}
+			{/* e. Description */}
+			{product.description && (
+				product.description.length < 40
+					? <p className="text-sm italic text-muted-foreground/80">{product.description}</p>
+					: <DescriptionSection description={product.description} />
+			)}
 
-			{/* g. Product details */}
+			{/* f. Product details */}
 			<ProductDetailsGrid product={product} />
 
 			<Separator />
 
-			{/* h. Quantity stepper */}
+			{/* g. Quantity stepper — no label, directly above actions */}
 			{showStepper && (
-				<div className="space-y-2">
-					<p className="text-sm font-medium text-foreground">Quantity</p>
+				<div>
 					<QuantityStepper
 						value={quantity}
 						min={1}
@@ -224,7 +225,7 @@ function ProductInfo({ product, quantity, onQuantityChange, actionsRef }: Produc
 						onChange={onQuantityChange}
 					/>
 					{quantity > 1 && (
-						<p className="text-sm text-muted-foreground">
+						<p className="mt-1.5 text-xs text-muted-foreground">
 							{quantity} × {formatGHS(Number(product.price))} ={" "}
 							<span className="font-semibold text-foreground">
 								{formatGHS(quantity * Number(product.price))}
@@ -234,7 +235,7 @@ function ProductInfo({ product, quantity, onQuantityChange, actionsRef }: Produc
 				</div>
 			)}
 
-			{/* i. Actions card */}
+			{/* h. Actions card */}
 			<div ref={actionsRef}>
 				<ActionsCard
 					productId={product.id}
@@ -331,8 +332,8 @@ export function ProductDetailView({ product, related, sellerProducts, reviews }:
 
 				{/* ── Below the fold ─────────────────────────────────────── */}
 
-				{/* Reviews (moved below fold) */}
-				<div className="grid grid-cols-5 gap-6 w-full mt-12 border-t border-border pt-12">
+				{/* Reviews + Seller */}
+				<section className="grid grid-cols-5 gap-6 w-full border-t border-border py-12">
 					<ReviewsSection
 						className="col-span-3"
 						productId={product.id}
@@ -341,7 +342,7 @@ export function ProductDetailView({ product, related, sellerProducts, reviews }:
 					/>
 
 					<div className="col-span-2">
-						<h2 className="text-xl font-bold mt-12 mb-6">Seller</h2>		
+						<h2 className="text-xl font-bold font-heading mb-6">Seller</h2>
 						<SellerCard
 							seller={product.seller}
 							location={product.location}
@@ -350,8 +351,7 @@ export function ProductDetailView({ product, related, sellerProducts, reviews }:
 							productImage={product.images?.[0]?.thumbnail_url}
 						/>
 					</div>
-
-				</div>
+				</section>
 
 				{/* Similar products */}
 				<SimilarProducts products={related} categoryId={categoryId} />

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ChevronLeft, ChevronRight, X, Eye } from "lucide-react"
+import { Camera, ChevronLeft, ChevronRight, X, Eye } from "lucide-react"
 import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 import type { ProductImage } from "@/components/main/product-card"
@@ -11,6 +11,30 @@ type Props = {
 	images: ProductImage[]
 	title: string
 	views: number
+}
+
+function SafeImage({ src, alt, className }: { src: string; alt: string; className?: string }) {
+	const [error, setError] = React.useState(false)
+
+	if (error) {
+		return (
+			<div className={cn("flex flex-col items-center justify-center gap-1.5 bg-muted", className)}>
+				<Camera className="h-6 w-6 text-muted-foreground/40" />
+				<span className="text-[10px] text-muted-foreground">Unavailable</span>
+			</div>
+		)
+	}
+
+	return (
+		<Image
+			width={1200}
+			height={1200}
+			src={src}
+			alt={alt}
+			className={className}
+			onError={() => setError(true)}
+		/>
+	)
 }
 
 export function ProductGallery({ images, title, views }: Props) {
@@ -55,9 +79,7 @@ export function ProductGallery({ images, title, views }: Props) {
 									: "border-transparent opacity-60 hover:opacity-100"
 							)}
 						>
-							<Image
-								width={1200}
-								height={1200}
+							<SafeImage
 								src={img.thumbnail_url}
 								alt={`Image ${i + 1}`}
 								className="h-full w-full object-cover"
@@ -72,10 +94,7 @@ export function ProductGallery({ images, title, views }: Props) {
 				className="relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-2xl bg-muted"
 				onClick={() => openLightbox(selected)}
 			>
-				<Image
-
-					width={1200}
-					height={1200}
+				<SafeImage
 					src={current.optimized_url}
 					alt={title}
 					className="h-full w-full object-cover object-center transition-transform duration-300 hover:scale-105"
@@ -100,11 +119,8 @@ export function ProductGallery({ images, title, views }: Props) {
 			<Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
 				<DialogContent className="max-w-3xl border-0 bg-black/95 p-0">
 					<div className="relative flex items-center justify-center">
-						<Image
-
-							width={1200}
-							height={1200}
-							src={images[lightboxIndex]?.url}
+						<SafeImage
+							src={images[lightboxIndex]?.url ?? ""}
 							alt={`${title} — image ${lightboxIndex + 1}`}
 							className="max-h-[80vh] w-full object-contain"
 						/>
