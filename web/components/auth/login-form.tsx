@@ -17,17 +17,18 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowLeft, Loader2, Mail } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { GoogleLogin } from "@react-oauth/google"
 import type { ComponentProps } from "react"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import PasswordInput from "../ui/password-input"
 import { useAuth } from "@/providers/auth-provider"
-import { getGoogleIdToken } from "@/lib/auth/google"
 
 export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 	const [emailMode, setEmailMode] = useState(false)
 	const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false)
+	const googleBtnRef = useRef<HTMLDivElement>(null)
 	const router = useRouter()
 	const { googleLogin, login } = useAuth()
 
@@ -51,22 +52,18 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 		}
 	}
 
-	const handleGoogleSignIn = async () => {
-		const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-		if (!clientId) {
-			toast.error("Google sign-in is not configured")
-			return
-		}
+	const handleGoogleSignIn = () => {
+		googleBtnRef.current?.querySelector<HTMLElement>("div[role='button']")?.click()
+	}
 
+	const handleGoogleSuccess = async (credential: string) => {
 		setIsGoogleSubmitting(true)
 		try {
-			const idToken = await getGoogleIdToken(clientId)
-			const result = await googleLogin(idToken)
+			const result = await googleLogin(credential)
 			if (!result.success) {
 				toast.error(result.error || "Google sign-in failed")
 				return
 			}
-
 			toast.success("Signed in with Google")
 			if (result.profileComplete === false) {
 				router.push("/account/settings")
@@ -96,6 +93,17 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 		>
 			{!emailMode ? (
 				<div className="mt-6 flex animate-in fade-in flex-col gap-4 duration-200">
+					<div ref={googleBtnRef} className="hidden">
+						<GoogleLogin
+							onSuccess={(res) => {
+								if (res.credential) handleGoogleSuccess(res.credential)
+							}}
+							onError={() => {
+								toast.error("Google sign-in failed")
+								setIsGoogleSubmitting(false)
+							}}
+						/>
+					</div>
 					<Button
 						variant="outline"
 						type="button"

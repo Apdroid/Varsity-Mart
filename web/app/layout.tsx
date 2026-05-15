@@ -9,13 +9,13 @@ import { DownloadAppCard } from "@/components/global/download-app-card";
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/providers/query-provider";
 import { AuthProvider } from "@/providers/auth-provider";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 
 const fontSans = Plus_Jakarta_Sans({
 	subsets: ["latin"],
 	variable: "--font-jarkata",
 })
-
 const fontMono = Inter({
 	subsets: ["latin"],
 	variable: "--font-inter",
@@ -43,13 +43,15 @@ export default function RootLayout({
 			<body>
 				<QueryProvider>
 					<AuthProvider>
-						<TooltipProvider>
-							<ThemeProvider>
-								{children}
-								<DownloadAppCard />
-								<Toaster richColors theme="system" position="bottom-right" />
-							</ThemeProvider>
-						</TooltipProvider>
+						<GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
+							<TooltipProvider>
+								<ThemeProvider>
+									{children}
+									<DownloadAppCard />
+									<Toaster richColors theme="system" position="bottom-right" />
+								</ThemeProvider>
+							</TooltipProvider>
+						</GoogleOAuthProvider>
 					</AuthProvider>
 				</QueryProvider>
 			</body>
