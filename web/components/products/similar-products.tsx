@@ -30,7 +30,7 @@ export function SimilarProducts({ products, heading = "Similar Products", catego
       </div>
 
       {/* Mobile: horizontal scroll; desktop: grid */}
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 md:grid-cols-4">
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 md:grid-cols-6">
         {products.slice(0, 8).map((p) => (
           <div key={p.id} className="w-48 shrink-0 sm:w-auto">
             <ProductCard product={p} />
