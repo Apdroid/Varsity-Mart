@@ -63,32 +63,7 @@ export function ProductGallery({ images, title, views }: Props) {
 	}, [lightboxOpen])
 
 	return (
-		<div className="flex gap-8">
-
-			{images.length > 1 && (
-				<div className="mt-3 grid grid-cols-5 gap-2 md:grid-cols-1">
-					{images.map((img, i) => (
-						<button
-							key={img.id}
-							type="button"
-							onClick={() => setSelected(i)}
-							className={cn(
-								"relative aspect-square overflow-hidden rounded-lg border-2 transition-all",
-								i === selected
-									? "border-vm-tangerine"
-									: "border-transparent opacity-60 hover:opacity-100"
-							)}
-						>
-							<SafeImage
-								src={img.thumbnail_url}
-								alt={`Image ${i + 1}`}
-								className="h-full w-full object-cover"
-							/>
-						</button>
-					))}
-				</div>
-			)}
-
+		<div className="flex flex-col gap-3">
 			{/* Main image */}
 			<div
 				className="relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-2xl bg-muted"
@@ -114,7 +89,31 @@ export function ProductGallery({ images, title, views }: Props) {
 				)}
 			</div>
 
-			{/* Thumbnails */}
+			{/* Thumbnails — horizontal strip below */}
+			{images.length > 1 && (
+				<div className="flex gap-2 overflow-x-auto scrollbar-none pb-1">
+					{images.map((img, i) => (
+						<button
+							key={img.id}
+							type="button"
+							onClick={() => setSelected(i)}
+							className={cn(
+								"relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-all",
+								i === selected
+									? "border-vm-tangerine"
+									: "border-transparent opacity-60 hover:opacity-100"
+							)}
+						>
+							<SafeImage
+								src={img.thumbnail_url}
+								alt={`Image ${i + 1}`}
+								className="h-full w-full object-cover"
+							/>
+						</button>
+					))}
+				</div>
+			)}
+
 			{/* Lightbox */}
 			<Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
 				<DialogContent className="max-w-3xl border-0 bg-black/95 p-0">

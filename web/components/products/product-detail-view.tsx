@@ -165,91 +165,96 @@ function ProductDetailsGrid({ product }: { product: Product }) {
 	)
 }
 
-// ── Right column (ProductInfo) ─────────────────────────────────────────────────
-type ProductInfoProps = {
-	product: Product
-	quantity: number
-	onQuantityChange: (v: number) => void
-	actionsRef: React.RefObject<HTMLDivElement | null>
-}
-
-function ProductInfo({ product, quantity, onQuantityChange, actionsRef }: ProductInfoProps) {
-	const hasStock = product.stock !== undefined && product.stock > 0
-	const maxQty = product.stock ? Math.min(product.stock, 99) : 99
-	const showStepper = hasStock && product.stock! > 1
-
+// ── Middle column — product meta ───────────────────────────────────────────────
+function ProductMeta({ product }: { product: Product }) {
 	return (
-		<div className="space-y-3">
-			{/* a. Category badge */}
+		<div className="space-y-4">
+			{/* Category */}
 			<span className="inline-flex rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
 				{product.category.name}
 			</span>
 
-			{/* b. Title + condition badge inline */}
+			{/* Title + condition + seller */}
 			<div>
-				<h1 className="text-2xl font-bold font-heading leading-snug md:text-[1.6rem]">
+				<h1 className="text-2xl font-bold font-heading leading-snug">
 					{product.title}
 				</h1>
-				<span className="mt-1 inline-flex rounded-full border border-vm-tangerine/20 bg-vm-tangerine/10 px-2.5 py-0.5 text-xs font-medium text-vm-tangerine">
-					{product.condition}
-				</span>
+				<div className="mt-1.5 flex flex-wrap items-center gap-2">
+					<span className="inline-flex rounded-full border border-vm-tangerine/20 bg-vm-tangerine/10 px-2.5 py-0.5 text-xs font-medium text-vm-tangerine">
+						{product.condition}
+					</span>
+					<span className="text-xs text-muted-foreground">
+						by <span className="font-medium text-foreground">{product.seller.name}</span>
+					</span>
+				</div>
 			</div>
-
-			{/* c. Price block */}
-			<PriceBlock price={product.price} originalPrice={product.originalPrice} />
-
-			{/* d. Stock pill */}
-			<StockPill stock={product.stock} quantity={quantity} />
 
 			<Separator />
 
-			{/* e. Description */}
+			{/* Description */}
 			{product.description && (
 				product.description.length < 40
 					? <p className="text-sm italic text-muted-foreground/80">{product.description}</p>
 					: <DescriptionSection description={product.description} />
 			)}
 
-			{/* f. Product details */}
+			{/* Product details */}
 			<ProductDetailsGrid product={product} />
+		</div>
+	)
+}
+
+// ── Right column — buy box ─────────────────────────────────────────────────────
+type BuyBoxProps = {
+	product: Product
+	quantity: number
+	onQuantityChange: (v: number) => void
+	actionsRef: React.RefObject<HTMLDivElement | null>
+}
+
+function BuyBox({ product, quantity, onQuantityChange, actionsRef }: BuyBoxProps) {
+	const hasStock = product.stock !== undefined && product.stock > 0
+	const maxQty = product.stock ? Math.min(product.stock, 99) : 99
+	const showStepper = hasStock && product.stock! > 1
+
+	return (
+		<div ref={actionsRef} className="rounded-xl border border-border bg-muted/30 p-5 space-y-4">
+			{/* Price */}
+			<PriceBlock price={product.price} originalPrice={product.originalPrice} />
+
+			{/* Stock */}
+			<StockPill stock={product.stock} quantity={quantity} />
 
 			<Separator />
 
-			{/* g. Quantity stepper — no label, directly above actions */}
+			{/* Quantity stepper */}
 			{showStepper && (
-				<div>
-					<QuantityStepper
-						value={quantity}
-						min={1}
-						max={maxQty}
-						onChange={onQuantityChange}
-					/>
-					{quantity > 1 && (
-						<p className="mt-1.5 text-xs text-muted-foreground">
-							{quantity} × {formatGHS(Number(product.price))} ={" "}
-							<span className="font-semibold text-foreground">
-								{formatGHS(quantity * Number(product.price))}
-							</span>
-						</p>
-					)}
+				<div className="flex items-center justify-between">
+					<span className="text-sm font-medium text-foreground">Quantity</span>
+					<div className="flex flex-col items-end gap-1">
+						<QuantityStepper value={quantity} min={1} max={maxQty} onChange={onQuantityChange} />
+						{quantity > 1 && (
+							<p className="text-xs text-muted-foreground">
+								{quantity} × {formatGHS(Number(product.price))} ={" "}
+								<span className="font-semibold text-foreground">
+									{formatGHS(quantity * Number(product.price))}
+								</span>
+							</p>
+						)}
+					</div>
 				</div>
 			)}
 
-			{/* h. Actions card */}
-			<div ref={actionsRef}>
-				<ActionsCard
-					productId={product.id}
-					price={product.price}
-					stock={product.stock}
-					title={product.title}
-					quantity={quantity}
-				/>
-			</div>
+			{/* CTAs */}
+			<ActionsCard
+				productId={product.id}
+				price={product.price}
+				stock={product.stock}
+				title={product.title}
+				quantity={quantity}
+			/>
 
-			{/* j. Trust signals */}
 			<TrustSignals />
-
-			{/* k. Seller card */}
 		</div>
 	)
 }
@@ -306,10 +311,10 @@ export function ProductDetailView({ product, related, sellerProducts, reviews }:
 					</BreadcrumbList>
 				</Breadcrumb>
 
-				{/* Hero grid — gallery left, info right */}
-				<div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
-					{/* Left — gallery */}
-					<div className="lg:col-span-2">
+				{/* Hero grid — 3 columns: gallery | meta | buy box */}
+				<div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+					{/* Col 1 — gallery */}
+					<div className="lg:col-span-5">
 						<ProductGallery
 							images={product.images}
 							title={product.title}
@@ -317,10 +322,17 @@ export function ProductDetailView({ product, related, sellerProducts, reviews }:
 						/>
 					</div>
 
-					{/* Right — info */}
+					{/* Col 2 — product meta */}
+					<div className="lg:col-span-4">
+						<div className="lg:sticky lg:top-20 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:pr-1">
+							<ProductMeta product={product} />
+						</div>
+					</div>
+
+					{/* Col 3 — buy box */}
 					<div className="lg:col-span-3">
-						<div className="lg:sticky lg:top-20 lg:max-h-[calc(100vh-5rem)]  lg:pr-1">
-							<ProductInfo
+						<div className="lg:sticky lg:top-20">
+							<BuyBox
 								product={product}
 								quantity={quantity}
 								onQuantityChange={setQuantity}

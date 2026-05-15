@@ -70,6 +70,7 @@ import {
 import Logo from "./logo";
 import Link from "next/link";
 import { CartSheet } from "@/components/cart/cart-sheet";
+import { FoodCartSheet } from "@/components/cart/food-cart-sheet";
 import { useAuth } from "@/providers/auth-provider";
 import { useCurrentUser } from "@/hooks/queries/use-user";
 import { useRouter } from "next/navigation";
@@ -80,16 +81,14 @@ function ThemeToggleButton({ className = "" }: { className?: string }) {
 	const isDark = resolvedTheme === "dark"
 
 	return (
-		<Button
+		<button
 			type="button"
-			variant="ghost"
-			size="icon"
 			aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
 			onClick={() => setTheme(isDark ? "light" : "dark")}
-			className={className}
+			className={`h-10 w-10 inline-flex items-center justify-center ${className}`}
 		>
-			{isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-		</Button>
+			{isDark ? <Sun className="h-7 w-7" /> : <Moon className="h-7 w-7" />}
+		</button>
 	)
 }
 
@@ -456,6 +455,7 @@ function MainBar() {
 						</TooltipContent>
 					</Tooltip>
 
+					<FoodCartSheet />
 					<CartSheet />
 				</div>
 			</div>
