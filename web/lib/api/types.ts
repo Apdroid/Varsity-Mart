@@ -343,7 +343,7 @@ export interface StoreDetail {
 	logo?: string
 	banner?: string
 	category: string
-	alocation: string
+	location: string
 	phone?: string
 	isOpen: boolean
 	openingTime?: string
