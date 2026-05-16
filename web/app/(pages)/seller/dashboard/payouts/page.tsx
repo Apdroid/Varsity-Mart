@@ -49,7 +49,7 @@ function formatGHS(n: number) {
 }
 
 const payoutSchema = z.object({
-  amount: z.number({ error: "Please enter an amount" }).min(10, "Minimum payout is GHS 10"),
+  amount: z.coerce.number().min(10, "Minimum payout is GHS 10"),
   bank_code: z.string().min(1, "Please select a bank"),
   account_number: z.string().min(10, "Account number must be at least 10 digits").max(13),
   account_name: z.string().min(2, "Please enter the account holder name"),
@@ -108,8 +108,9 @@ export default function SellerPayoutsPage() {
   const { data: banks, isLoading: banksLoading } = useBanks()
   const { mutateAsync: requestPayout, isPending: payoutPending } = useRequestPayout()
 
-  const form = useForm<PayoutForm>({
-    resolver: zodResolver(payoutSchema),
+  const form = useForm<PayoutForm, unknown, PayoutForm>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(payoutSchema) as any,
     defaultValues: {
       amount: 0,
       bank_code: "",
@@ -119,7 +120,12 @@ export default function SellerPayoutsPage() {
   })
 
   React.useEffect(() => {
-    if (!authLoading && !user?.hasStore) {
+    if (authLoading) return
+    if (!user) {
+      router.replace("/login?redirect=/seller/dashboard/payouts")
+      return
+    }
+    if (!user.hasStore) {
       router.replace("/seller/status")
     }
   }, [authLoading, user, router])
