@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { useForm } from "react-hook-form"
+import { useForm, type Resolver } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "sonner"
@@ -108,9 +108,8 @@ export default function SellerPayoutsPage() {
   const { data: banks, isLoading: banksLoading } = useBanks()
   const { mutateAsync: requestPayout, isPending: payoutPending } = useRequestPayout()
 
-  const form = useForm<PayoutForm, unknown, PayoutForm>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(payoutSchema) as any,
+  const form = useForm<PayoutForm>({
+    resolver: zodResolver(payoutSchema) as Resolver<PayoutForm>,
     defaultValues: {
       amount: 0,
       bank_code: "",
