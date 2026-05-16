@@ -1,0 +1,222 @@
+meta {
+  name: Checkout cart
+  type: http
+  seq: 5
+  tags: [
+    Cart
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/cart/checkout/
+  body: json
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "deliveryMethod": "campus_delivery",
+    "deliveryAddress": "",
+    "deliveryInstructions": "",
+    "paymentMethod": "momo",
+    "momoNumber": "",
+    "momoProvider": "",
+    "items": [
+      {}
+    ]
+  }
+}
+
+docs {
+  
+  Checkout all or selected items in the authenticated user's cart.
+  Creates one Order per cart item (each product has its own seller).
+  Order rows and cart removal run in one database transaction; online payment
+  is initiated afterward (a separate Paystack step).
+  
+  **Modes:**
+  - Omit `items` → checkout entire cart
+  - Include `items` array → checkout only those specific cart items
+  
+  **Stock validation** happens before any order is created. If any item
+  has insufficient stock, the full list of issues is returned so the user
+  can fix their cart before retrying.
+          
+}
+
+example {
+  name: 201 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/cart/checkout/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "",
+        "deliveryInstructions": "",
+        "paymentMethod": "momo",
+        "momoNumber": "",
+        "momoProvider": "",
+        "items": [
+          {}
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "",
+          "data": {
+            "orders": [
+              {
+                "orderId": "",
+                "productTitle": "",
+                "seller": "",
+                "quantity": 0,
+                "total": "",
+                "status": ""
+              }
+            ],
+            "grandTotal": "",
+            "orderCount": 0,
+            "paymentUrl": ""
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/cart/checkout/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "",
+        "deliveryInstructions": "",
+        "paymentMethod": "momo",
+        "momoNumber": "",
+        "momoProvider": "",
+        "items": [
+          {}
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "code": "",
+          "message": "",
+          "items": [],
+          "errors": {},
+          "missing": [],
+          "error": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 402 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/cart/checkout/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "",
+        "deliveryInstructions": "",
+        "paymentMethod": "momo",
+        "momoNumber": "",
+        "momoProvider": "",
+        "items": [
+          {}
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 402
+      text: Payment Required
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "code": "",
+          "message": "",
+          "data": {},
+          "error": ""
+        }
+      '''
+    }
+  }
+}

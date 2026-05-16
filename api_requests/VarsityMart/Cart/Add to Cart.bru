@@ -8,7 +8,7 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/v1/cart/add
+  url: {{baseUrl}}/v1/cart/add/
   body: json
   auth: apikey
 }
@@ -25,9 +25,13 @@ auth:apikey {
 
 body:json {
   {
-    "productId": "d594b988-8a82-454f-a42e-60d6c6de520",
-    "quantity": 2
-  } 
+    "items": [
+      {
+        "productId": "",
+        "quantity": 0
+      }
+    ]
+  }
 }
 
 docs {
