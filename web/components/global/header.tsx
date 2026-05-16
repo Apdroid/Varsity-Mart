@@ -75,7 +75,6 @@ import { cn } from "@/lib/utils";
 const CartSheet = dynamic(() => import("@/components/cart/cart-sheet").then(m => m.CartSheet), { ssr: false })
 const FoodCartSheet = dynamic(() => import("@/components/cart/food-cart-sheet").then(m => m.FoodCartSheet), { ssr: false })
 import { useAuth } from "@/providers/auth-provider";
-import { useCurrentUser } from "@/hooks/queries/use-user";
 import { useRouter } from "next/navigation";
 import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -435,7 +434,6 @@ function AnnouncementBar() {
 function MainBar() {
 	const router = useRouter()
 	const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth()
-	const { data: currentUserData } = useCurrentUser({ enabled: isAuthenticated })
 	const [desktopQuery, setDesktopQuery] = useState("")
 	const [desktopCategory, setDesktopCategory] = useState("All Categories")
 	const [isDesktopFocused, setIsDesktopFocused] = useState(false)
@@ -445,7 +443,6 @@ function MainBar() {
 		setDesktopRecentSearches(loadRecentSearches())
 	}, [])
 
-	const wishlistCount = getWishlistCount(currentUserData?.data, user)
 	const displayName = user ? `${user.firstName} ${user.lastName} `.trim() : ""
 	const initials = user ? `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`.toUpperCase() : "U"
 
@@ -580,6 +577,9 @@ function MainBar() {
 				<div className="flex items-center gap-0.5 sm:gap-1">
 					{/* <ThemeToggleButton className="hidden h-10 w-10 sm:inline-flex" /> */}
 
+					<FoodCartSheet />
+					<CartSheet />
+					<span className="w-5"></span>
 					{authLoading ? (
 						<div
 							className="h-10 w-10 items-center justify-center inline-flex"
@@ -695,7 +695,6 @@ function MainBar() {
 									aria-label="Sign in"
 									className="h-10 w-10 items-center justify-center inline-flex"
 								>
-								 <small>Hello There,</small>
 									<UserCircleIcon className="h-7 w-7" weight="regular" />
 								</Link>
 							</TooltipTrigger>
@@ -728,8 +727,6 @@ function MainBar() {
 						</TooltipContent>
 					</Tooltip>
 */}
-					<FoodCartSheet />
-					<CartSheet />
 				</div>
 			</div>
 		</div>
