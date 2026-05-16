@@ -77,7 +77,7 @@ const FoodCartSheet = dynamic(() => import("@/components/cart/food-cart-sheet").
 import { useAuth } from "@/providers/auth-provider";
 import { useCurrentUser } from "@/hooks/queries/use-user";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 function useScrollDirection() {
@@ -118,7 +118,7 @@ function loadRecentSearches(): string[] {
 
 function saveRecentSearch(query: string, current: string[]): string[] {
 	const next = [query, ...current.filter((s) => s !== query)].slice(0, 5)
-	try { localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next)) } catch {}
+	try { localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next)) } catch { }
 	return next
 }
 
@@ -454,21 +454,36 @@ function MainBar() {
 		router.push("/")
 	}
 
+	const navigate = useCallback((url: string) => {
+		const targetUrl = new URL(url, window.location.origin)
+		const currentUrl = new URL(window.location.href)
+		const isSameUrl =
+			currentUrl.pathname === targetUrl.pathname &&
+			targetUrl.searchParams.get("query") === currentUrl.searchParams.get("query")
+		startTransition(() => {
+			if (isSameUrl) {
+				router.refresh()
+			} else {
+				router.push(url)
+			}
+		})
+	}, [router])
+
 	const handleDesktopSearch = useCallback(() => {
 		const trimmed = desktopQuery.trim()
 		if (trimmed) {
 			setDesktopRecentSearches((prev) => saveRecentSearch(trimmed, prev))
 		}
 		setIsDesktopFocused(false)
-		router.push(buildGlobalSearchHref(desktopQuery, desktopCategory))
-	}, [router, desktopCategory, desktopQuery])
+		navigate(buildGlobalSearchHref(desktopQuery, desktopCategory))
+	}, [navigate, desktopCategory, desktopQuery])
 
 	const handleSelectDesktopSuggestion = useCallback((suggestion: string) => {
 		setDesktopQuery(suggestion)
 		setDesktopRecentSearches((prev) => saveRecentSearch(suggestion, prev))
 		setIsDesktopFocused(false)
-		router.push(buildGlobalSearchHref(suggestion, desktopCategory))
-	}, [router, desktopCategory])
+		navigate(buildGlobalSearchHref(suggestion, desktopCategory))
+	}, [navigate, desktopCategory])
 
 	return (
 		<div className=" bg-card">
@@ -563,7 +578,7 @@ function MainBar() {
 
 
 				<div className="flex items-center gap-0.5 sm:gap-1">
-					<ThemeToggleButton className="hidden h-10 w-10 sm:inline-flex" />
+					{/* <ThemeToggleButton className="hidden h-10 w-10 sm:inline-flex" /> */}
 
 					{authLoading ? (
 						<div
@@ -641,12 +656,14 @@ function MainBar() {
 											)}
 										</>
 									)}
+									{ /*	
 									<DropdownMenuItem asChild>
 										<Link href="/account/wishlist">
 											<HeartIcon className="mr-2.5 h-4 w-4" />
 											Wishlist
 										</Link>
 									</DropdownMenuItem>
+							*/		}
 									<DropdownMenuItem asChild>
 										<Link href="/messages">
 											<MessageCircleIcon className="mr-2.5 h-4 w-4" />
@@ -678,6 +695,7 @@ function MainBar() {
 									aria-label="Sign in"
 									className="h-10 w-10 items-center justify-center inline-flex"
 								>
+								 <small>Hello There,</small>
 									<UserCircleIcon className="h-7 w-7" weight="regular" />
 								</Link>
 							</TooltipTrigger>
@@ -687,6 +705,7 @@ function MainBar() {
 						</Tooltip>
 					)}
 
+					{/*
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<Link
@@ -708,7 +727,7 @@ function MainBar() {
 							<p>Wishlist</p>
 						</TooltipContent>
 					</Tooltip>
-
+*/}
 					<FoodCartSheet />
 					<CartSheet />
 				</div>
@@ -874,21 +893,36 @@ function MobileSearchBar() {
 		setMobileRecentSearches(loadRecentSearches())
 	}, [])
 
+	const navigate = useCallback((url: string) => {
+		const targetUrl = new URL(url, window.location.origin)
+		const currentUrl = new URL(window.location.href)
+		const isSameUrl =
+			currentUrl.pathname === targetUrl.pathname &&
+			targetUrl.searchParams.get("query") === currentUrl.searchParams.get("query")
+		startTransition(() => {
+			if (isSameUrl) {
+				router.refresh()
+			} else {
+				router.push(url)
+			}
+		})
+	}, [router])
+
 	const handleMobileSearch = useCallback(() => {
 		const trimmed = mobileQuery.trim()
 		if (trimmed) {
 			setMobileRecentSearches((prev) => saveRecentSearch(trimmed, prev))
 		}
 		setIsMobileFocused(false)
-		router.push(buildGlobalSearchHref(mobileQuery))
-	}, [router, mobileQuery])
+		navigate(buildGlobalSearchHref(mobileQuery))
+	}, [navigate, mobileQuery])
 
 	const handleSelectMobileSuggestion = useCallback((suggestion: string) => {
 		setMobileQuery(suggestion)
 		setMobileRecentSearches((prev) => saveRecentSearch(suggestion, prev))
 		setIsMobileFocused(false)
-		router.push(buildGlobalSearchHref(suggestion))
-	}, [router])
+		navigate(buildGlobalSearchHref(suggestion))
+	}, [navigate])
 
 	return (
 		<div className="md:hidden bg-card border-t border-border/40 px-4 pb-3 pt-2">
@@ -925,13 +959,13 @@ function MobileSearchBar() {
 						onSelect={handleSelectMobileSuggestion}
 					/>
 				)}
-			{isMobileFocused && typeof document !== "undefined" && createPortal(
-				<div
-					className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
-					onClick={() => setIsMobileFocused(false)}
-				/>,
-				document.body
-			)}
+				{isMobileFocused && typeof document !== "undefined" && createPortal(
+					<div
+						className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
+						onClick={() => setIsMobileFocused(false)}
+					/>,
+					document.body
+				)}
 			</div>
 
 			<div className="mt-2.5 flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -970,9 +1004,8 @@ export default function VarsityMartHeader() {
 	return (
 		<>
 			<header
-				className={`sticky top-0 z-50 w-full shadow-sm transition-transform duration-300 will-change-transform ${
-					headerHidden ? "-translate-y-full" : "translate-y-0"
-				}`}
+				className={`sticky top-0 z-50 w-full shadow-sm transition-transform duration-300 will-change-transform ${headerHidden ? "-translate-y-full" : "translate-y-0"
+					}`}
 			>
 				<AnnouncementBar />
 				<MainBar />
