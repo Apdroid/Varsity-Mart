@@ -113,10 +113,13 @@ export default function SellerDashboardPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
-            <Link href="/seller/products">Manage Products</Link>
+            <Link href="/seller/dashboard/payouts">Payouts</Link>
           </Button>
-          <Button asChild>
-            <Link href="/seller/products/new">Add Product</Link>
+          <Button variant="outline" asChild>
+            <Link href="/seller/store">My Store</Link>
+          </Button>
+          <Button asChild className="bg-vm-tangerine text-white hover:bg-vm-tangerine/90">
+            <Link href="/seller/products/add">Add Product</Link>
           </Button>
         </div>
       </div>

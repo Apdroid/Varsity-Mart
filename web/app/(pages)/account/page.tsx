@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Bell, LogOut, Package, Settings, ShoppingBag, Store, User, ChevronRight, Loader2 } from "lucide-react"
+import { Bell, CreditCard, LogOut, Package, Settings, ShoppingBag, Store, User, ChevronRight, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
@@ -43,6 +43,7 @@ export default function AccountPage() {
     { href: "/account/orders", icon: Package, label: "Orders", description: "View your order history" },
     { href: "/account/settings", icon: Settings, label: "Settings", description: "Manage your account" },
     { href: "/account/notifications", icon: Bell, label: "Notifications", description: "View your notifications" },
+    { href: "/account/payments", icon: CreditCard, label: "Payment Methods", description: "Manage your saved payment methods" },
     ...(user.hasStore ? [{ href: "/seller/dashboard", icon: Store, label: "Seller Dashboard", description: "Manage your store" }] : []),
     ...(user.hasRestaurant ? [{ href: "/restaurant/dashboard", icon: ShoppingBag, label: "Restaurant Dashboard", description: "Manage your restaurant" }] : []),
   ]
