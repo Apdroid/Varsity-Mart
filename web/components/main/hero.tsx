@@ -11,11 +11,18 @@ import {
 	ShieldCheck,
 	RotateCcw,
 	Smartphone,
+	Star,
+	Clock,
+	Package,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel"
 import { cn } from "@/lib/utils"
+import { useFeaturedProducts } from "@/hooks/queries/use-products"
+import { useFeaturedStores } from "@/hooks/queries/use-stores"
+import { useRestaurants } from "@/hooks/queries/use-restaurants"
+import type { RestaurantListItem, StoreListItem } from "@/lib/api/types"
 
 type Slide = {
 	eyebrow: string
@@ -29,7 +36,7 @@ type Slide = {
 	bgClass: string
 }
 
-const slides: Slide[] = [
+const fallbackSlides: Slide[] = [
 	{
 		eyebrow: "Campus Product Picks",
 		title: "Top",
@@ -71,7 +78,7 @@ const slides: Slide[] = [
 /* -----------------------------------------------------------
 	 Hero slider — left 2/3 of bento
 ----------------------------------------------------------- */
-function HeroSlider() {
+function HeroSlider({ slides }: { slides: Slide[] }) {
 	const [index, setIndex] = React.useState(0)
 	const [paused, setPaused] = React.useState(false)
 
@@ -192,7 +199,7 @@ function HeroSlider() {
 /* -----------------------------------------------------------
 	 Mobile app-style hero carousel (shown below lg breakpoint)
 ----------------------------------------------------------- */
-function MobileHeroCarousel() {
+function MobileHeroCarousel({ slides }: { slides: Slide[] }) {
 	const [api, setApi] = React.useState<CarouselApi>()
 	const [current, setCurrent] = React.useState(0)
 
@@ -275,62 +282,59 @@ function MobileHeroCarousel() {
 }
 
 /* -----------------------------------------------------------
-	 Promo card — used twice on the right column
+	 Live restaurant promo — right column, top slot
 ----------------------------------------------------------- */
-type PromoProps = {
-	eyebrow: string
-	title: string
-	subtitle?: string
-	cta: string
-	href: string
-	image: string
-	bgClass: string
-	accent?: "graphite" | "tangerine"
-}
+const FALLBACK_RESTAURANT_IMAGE = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=400&fit=crop"
+const FALLBACK_STORE_IMAGE = "https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=400&h=400&fit=crop"
 
-function PromoCard({
-	eyebrow,
-	title,
-	subtitle,
-	cta,
-	href,
-	image,
-	bgClass,
-	accent = "graphite",
-}: PromoProps) {
-	const accentColor =
-		accent === "tangerine" ? "text-vm-tangerine" : "text-vm-graphite"
+function LiveRestaurantPromo({ restaurant }: { restaurant: RestaurantListItem | undefined }) {
+	const image = restaurant?.banner || restaurant?.logo || FALLBACK_RESTAURANT_IMAGE
 
 	return (
 		<Link
-			href={href}
-			className={cn(
-				"group/card relative flex h-full overflow-hidden rounded-2xl transition-transform duration-300 hover:-translate-y-0.5",
-				bgClass
-			)}
+			href="/restaurants"
+			className="group/card relative flex h-full overflow-hidden rounded-2xl bg-[#ededed] transition-transform duration-300 hover:-translate-y-0.5"
 		>
 			{/* Copy */}
 			<div className="flex flex-1 flex-col justify-center px-6 py-6">
-				<span
-					className="text-[10px] font-semibold uppercase tracking-[0.2em] text-vm-graphite opacity-70"
-				>
-					{eyebrow}
+				<span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-vm-graphite opacity-70">
+					Restaurant Rush
 				</span>
-				<h3
-					className="mt-1.5 text-xl text-vm-graphite font-bold leading-tight tracking-tight"
-				>
-					{title}
-				</h3>
-				{subtitle && (
-					<p
-						className="text-xl font-bold  text-vm-graphite leading-tight tracking-tight"
-					>
-						{subtitle}
-					</p>
+
+				{restaurant ? (
+					<>
+						<div className="mt-2 flex items-center gap-1.5">
+							<span className={cn("h-2 w-2 rounded-full", restaurant.isOpen ? "bg-green-500" : "bg-rose-400")} />
+							<span className="text-[10px] font-medium text-vm-graphite opacity-60">
+								{restaurant.isOpen ? "Open now" : "Closed"}
+							</span>
+						</div>
+						<h3 className="mt-1 line-clamp-2 text-xl font-bold leading-tight tracking-tight text-vm-graphite">
+							{restaurant.name}
+						</h3>
+						<p className="mt-0.5 text-xs text-vm-graphite opacity-60">{restaurant.category}</p>
+						<div className="mt-2 flex items-center gap-3">
+							<div className="flex items-center gap-1">
+								<Star className="h-3 w-3 fill-vm-tangerine text-vm-tangerine" />
+								<span className="text-xs font-semibold text-vm-graphite">{restaurant.rating}</span>
+							</div>
+							{restaurant.deliveryTime && (
+								<div className="flex items-center gap-1">
+									<Clock className="h-3 w-3 text-vm-graphite opacity-50" />
+									<span className="text-xs text-vm-graphite opacity-60">{restaurant.deliveryTime}</span>
+								</div>
+							)}
+						</div>
+					</>
+				) : (
+					<>
+						<h3 className="mt-1.5 text-xl font-bold leading-tight tracking-tight text-vm-graphite">Campus</h3>
+						<p className="text-xl font-bold leading-tight tracking-tight text-vm-graphite">Food Deals</p>
+					</>
 				)}
-				<span
-					className={cn(`mt-3 inline-flex items-center  gap-1.5 text-xs font-semibold transition-all group-hover/card:gap-2`, accentColor)}				>
-					{cta}
+
+				<span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-vm-graphite transition-all group-hover/card:gap-2">
+					View Restaurants
 					<ArrowRight className="h-3.5 w-3.5" />
 				</span>
 			</div>
@@ -339,9 +343,77 @@ function PromoCard({
 			<div className="relative w-1/2 shrink-0">
 				<Image
 					src={image}
-					alt=""
-					width={1200}
-					height={1200}
+					alt={restaurant?.name ?? ""}
+					width={400}
+					height={400}
+					className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-500 group-hover/card:scale-105"
+				/>
+			</div>
+		</Link>
+	)
+}
+
+/* -----------------------------------------------------------
+	 Live store promo — right column, bottom slot
+----------------------------------------------------------- */
+function LiveStorePromo({ store }: { store: StoreListItem | undefined }) {
+	const href = store ? `/stores/${store.id}` : "/stores"
+	const image = store?.logo || FALLBACK_STORE_IMAGE
+
+	return (
+		<Link
+			href={href}
+			className="group/card relative flex h-full overflow-hidden rounded-2xl bg-[#f5e9dd] transition-transform duration-300 hover:-translate-y-0.5"
+		>
+			{/* Copy */}
+			<div className="flex flex-1 flex-col justify-center px-6 py-6">
+				<span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-vm-graphite opacity-70">
+					Top Stores
+				</span>
+
+				{store ? (
+					<>
+						<div className="mt-2 flex items-center gap-1.5">
+							<span className={cn("h-2 w-2 rounded-full", store.isOpen ? "bg-green-500" : "bg-rose-400")} />
+							<span className="text-[10px] font-medium text-vm-graphite opacity-60">
+								{store.isOpen ? "Open now" : "Closed"}
+							</span>
+						</div>
+						<h3 className="mt-1 line-clamp-2 text-xl font-bold leading-tight tracking-tight text-vm-graphite">
+							{store.name}
+						</h3>
+						<p className="mt-0.5 text-xs text-vm-graphite opacity-60">{store.category}</p>
+						<div className="mt-2 flex items-center gap-3">
+							<div className="flex items-center gap-1">
+								<Star className="h-3 w-3 fill-vm-tangerine text-vm-tangerine" />
+								<span className="text-xs font-semibold text-vm-graphite">{store.rating}</span>
+							</div>
+							<div className="flex items-center gap-1">
+								<Package className="h-3 w-3 text-vm-graphite opacity-50" />
+								<span className="text-xs text-vm-graphite opacity-60">{store.totalProducts} items</span>
+							</div>
+						</div>
+					</>
+				) : (
+					<>
+						<h3 className="mt-1.5 text-xl font-bold leading-tight tracking-tight text-vm-graphite">Vendor</h3>
+						<p className="text-xl font-bold leading-tight tracking-tight text-vm-graphite">Spotlight</p>
+					</>
+				)}
+
+				<span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-vm-tangerine transition-all group-hover/card:gap-2">
+					Browse Store
+					<ArrowRight className="h-3.5 w-3.5" />
+				</span>
+			</div>
+
+			{/* Image / Logo */}
+			<div className="relative w-1/2 shrink-0">
+				<Image
+					src={image}
+					alt={store?.name ?? ""}
+					width={400}
+					height={400}
 					className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-500 group-hover/card:scale-105"
 				/>
 			</div>
@@ -411,11 +483,28 @@ function FeaturesStrip() {
 	 Composed bento
 ----------------------------------------------------------- */
 export default function VarsityMartHeroBento() {
+	const { data: featuredProducts } = useFeaturedProducts()
+	const { data: featuredStores } = useFeaturedStores()
+	const { data: restaurantsData } = useRestaurants({ limit: 4 })
+
+	const slides = React.useMemo(() => fallbackSlides.map((slide, i) => {
+		if (i === 0) {
+			const img = featuredProducts?.[0]?.images?.[0]?.optimized_url
+			return img ? { ...slide, image: img } : slide
+		}
+		if (i === 1) {
+			const img = restaurantsData?.restaurants?.[0]?.banner || restaurantsData?.restaurants?.[0]?.logo
+			return img ? { ...slide, image: img } : slide
+		}
+		const img = featuredStores?.[0]?.logo
+		return img ? { ...slide, image: img } : slide
+	}), [featuredProducts, featuredStores, restaurantsData])
+
 	return (
 		<section>
 			{/* Mobile: app-style carousel */}
 			<div className="px-4 pt-4 pb-2 lg:hidden">
-				<MobileHeroCarousel />
+				<MobileHeroCarousel slides={slides} />
 			</div>
 
 			{/* Desktop: bento grid */}
@@ -423,31 +512,13 @@ export default function VarsityMartHeroBento() {
 				<div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
 					{/* Slider — spans 2 columns */}
 					<div className="lg:col-span-2">
-						<HeroSlider />
+						<HeroSlider slides={slides} />
 					</div>
 
-					{/* Right column — 2 stacked promos */}
+					{/* Right column — 2 live promo cards */}
 					<div className="grid grid-cols-1 gap-4">
-						<PromoCard
-							eyebrow="Restaurant Rush"
-							title="Campus"
-							subtitle="Food Deals"
-							cta="View Restaurants"
-							href="/restaurants"
-							bgClass="bg-[#ededed]"
-							accent="graphite"
-							image="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=400&fit=crop"
-						/>
-						<PromoCard
-							eyebrow="Top Stores"
-							title="Vendor"
-							subtitle="Spotlight"
-							cta="Browse Stores"
-							href="/stores"
-							bgClass="bg-[#f5e9dd]"
-							accent="tangerine"
-							image="https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=400&h=400&fit=crop"
-						/>
+						<LiveRestaurantPromo restaurant={restaurantsData?.restaurants?.[0]} />
+						<LiveStorePromo store={featuredStores?.[0]} />
 					</div>
 				</div>
 			</div>

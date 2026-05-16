@@ -1,0 +1,211 @@
+meta {
+  name: Get Admin Store Detail
+  type: http
+  seq: 11
+  tags: [
+    Admin
+    Stores
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/admin/stores/:store_id/
+  body: none
+  auth: apikey
+}
+
+params:path {
+  store_id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Retrieve full details for a single store including owner info, stats, and recent activity.
+}
+
+example {
+  name: 200 Response
+  description: Store detail retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/stores/:store_id/
+    method: GET
+    mode: none
+    params:path: {
+      store_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "data": {
+            "id": "",
+            "name": "",
+            "logo": "",
+            "status": "",
+            "revenue": 0,
+            "orders": 0,
+            "products": 0,
+            "rating": 0,
+            "owner": {
+              "id": "",
+              "name": "",
+              "email": "",
+              "campus": "",
+              "joinedDate": ""
+            },
+            "recentOrders": [
+              {
+                "orderId": "",
+                "customer": "",
+                "amount": 0,
+                "status": "",
+                "date": ""
+              }
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/stores/:store_id/
+    method: GET
+    mode: none
+    params:path: {
+      store_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Admin permission required
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/stores/:store_id/
+    method: GET
+    mode: none
+    params:path: {
+      store_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Store not found
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/stores/:store_id/
+    method: GET
+    mode: none
+    params:path: {
+      store_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

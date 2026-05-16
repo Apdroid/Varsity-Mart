@@ -70,7 +70,7 @@ function mapApiProductToCard(product: ApiProduct) {
 			id: product.seller.id,
 			name: product.seller.name,
 			email: product.seller.email ?? "",
-			avatar: product.seller.avatar,
+			avatar: product.seller.avatarUrl,
 			rating: String(product.seller.rating),
 		},
 		badges: product.badges,
@@ -125,17 +125,18 @@ function StoreHeader({ store }: { store: StoreDetail }) {
 		<div>
 			{/* Banner */}
 			<div className="relative h-52 w-full overflow-hidden bg-muted md:h-64">
-				{store.banner ? (
+				{ // store.banner ? (
 					<Image
-						src={store.banner}
+						src={store.banner || "https://placehold.net/800x600.png"}
 						alt={store.storeName}
 						fill
 						className="object-cover"
 						priority
 					/>
-				) : (
-					<div className="h-full w-full bg-gradient-to-br from-vm-tangerine/20 to-muted" />
-				)}
+					// ) : (
+					// 	<div className="h-full w-full bg-linear-to-br from-vm-tangerine/20 to-muted" />
+					//) 
+				}
 				{/* Back button */}
 				<div className="absolute left-4 top-4">
 					<Link
@@ -379,7 +380,7 @@ export default function StoreDetailPage() {
 					<ShoppingBag className="h-7 w-7 text-muted-foreground" />
 				</div>
 				<p className="font-semibold text-foreground">Store not found</p>
-				<p className="text-sm text-muted-foreground">This store may have been removed or doesn't exist.</p>
+				<p className="text-sm text-muted-foreground">This store may have been removed or doesn&apos;t exist.</p>
 				<Link href="/stores">
 					<Button variant="outline">Browse stores</Button>
 				</Link>

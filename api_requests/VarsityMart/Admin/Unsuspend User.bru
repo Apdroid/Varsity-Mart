@@ -1,0 +1,227 @@
+meta {
+  name: Unsuspend User
+  type: http
+  seq: 15
+  tags: [
+    Admin
+    Users
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/admin/users/:user_id/unsuspend/
+  body: none
+  auth: apikey
+}
+
+params:path {
+  user_id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Lift an active suspension from a user account, restoring their ability to log in. Works for 7d, 30d, and permanent suspensions.
+}
+
+example {
+  name: 200 Response
+  description: User unsuspended successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/users/:user_id/unsuspend/
+    method: POST
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "User unsuspended successfully",
+          "data": {
+            "userId": ""
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: User has no active suspension
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/users/:user_id/unsuspend/
+    method: POST
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/users/:user_id/unsuspend/
+    method: POST
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Admin permission required
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/users/:user_id/unsuspend/
+    method: POST
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: User not found
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/users/:user_id/unsuspend/
+    method: POST
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

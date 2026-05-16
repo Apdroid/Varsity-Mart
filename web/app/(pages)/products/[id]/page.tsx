@@ -54,7 +54,7 @@ function mapApiProductToCard(product: ApiProduct | ProductDetail) {
 			id: product.seller.id,
 			name: product.seller.name,
 			email: product.seller.email ?? "",
-			avatarUrl: product.seller.avatar,
+			avatarUrl: product.seller.avatarUrl,
 			rating: String(product.seller.rating),
 		},
 		badges,

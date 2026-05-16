@@ -247,7 +247,7 @@ export interface ProductSeller {
 	id: string
 	name: string
 	email?: string
-	avatar?: string
+	avatarUrl?: string
 	rating: number
 	total_sales?: number
 	response_rate?: string
@@ -342,7 +342,7 @@ export interface StoreDetail {
 	logo?: string
 	banner?: string
 	category: string
-	location: string
+	alocation: string
 	phone?: string
 	isOpen: boolean
 	openingTime?: string

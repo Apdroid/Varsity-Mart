@@ -1,0 +1,191 @@
+meta {
+  name: Get Admin Stores
+  type: http
+  seq: 10
+  tags: [
+    Admin
+    Stores
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/admin/stores/
+  body: none
+  auth: apikey
+}
+
+params:query {
+  limit: 10
+  page: 1
+  ~search: 
+  ~status: active
+  ~status: inactive
+  ~status: pending
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Retrieve all stores with stat counts and optional filtering by subscription status.
+}
+
+example {
+  name: 200 Response
+  description: Stores retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/stores/
+    method: GET
+    mode: none
+    params:query: {
+      limit: 10
+      page: 1
+      ~search: 
+      ~status: active
+      ~status: inactive
+      ~status: pending
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "data": {
+            "stats": {
+              "total": 0,
+              "active": 0,
+              "pending": 0,
+              "inactive": 0
+            },
+            "stores": [
+              {
+                "id": "",
+                "name": "QuickBite GH",
+                "owner": "Kwame Mensah",
+                "category": "Food",
+                "revenue": 12450,
+                "status": "active",
+                "logo": ""
+              }
+            ],
+            "pagination": {
+              "currentPage": 0,
+              "totalPages": 0,
+              "totalItems": 0
+            }
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/stores/
+    method: GET
+    mode: none
+    params:query: {
+      limit: 10
+      page: 1
+      ~search: 
+      ~status: active
+      ~status: inactive
+      ~status: pending
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Admin permission required
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/stores/
+    method: GET
+    mode: none
+    params:query: {
+      limit: 10
+      page: 1
+      ~search: 
+      ~status: active
+      ~status: inactive
+      ~status: pending
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

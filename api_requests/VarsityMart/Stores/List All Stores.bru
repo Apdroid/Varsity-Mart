@@ -8,15 +8,15 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/v1/stores/
+  url: {{baseUrl}}/v1/stores/?page=2
   body: none
   auth: inherit
 }
 
 params:query {
+  page: 2
   ~category: 
   ~limit: 
-  ~page: 
   ~search: 
   ~sortBy: newest
   ~sortBy: popular

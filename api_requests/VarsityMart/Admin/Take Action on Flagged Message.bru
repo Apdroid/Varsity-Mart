@@ -1,0 +1,169 @@
+meta {
+  name: Take Action on Flagged Message
+  type: http
+  seq: 5
+  tags: [
+    Admin
+    Messages
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/admin/flagged-messages/:message_id/action/
+  body: json
+  auth: apikey
+}
+
+params:path {
+  message_id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "action": "warned",
+    "notes": ""
+  }
+}
+
+docs {
+  Admin takes an action on a flagged message. warn=send warning, suspend=temporarily disable account, dismiss=false positive, ban=permanently ban the sender.
+}
+
+example {
+  name: 200 Response
+  description: Action applied successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/flagged-messages/:message_id/action/
+    method: POST
+    mode: json
+    params:path: {
+      message_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "action": "warned",
+        "notes": ""
+      }
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Invalid action or already reviewed
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/flagged-messages/:message_id/action/
+    method: POST
+    mode: json
+    params:path: {
+      message_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "action": "warned",
+        "notes": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Message not found
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/flagged-messages/:message_id/action/
+    method: POST
+    mode: json
+    params:path: {
+      message_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "action": "warned",
+        "notes": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

@@ -252,7 +252,7 @@
     "/v1/admin/dashboard/": {
       "get": {
         "operationId": "v1_admin_dashboard_retrieve",
-        "description": "Retrieve admin dashboard overview with platform statistics, recent activity, and popular categories",
+        "description": "Retrieve admin dashboard overview including platform statistics, recent orders, top stores, flagged messages, and activity summaries.",
         "summary": "Get Admin Dashboard",
         "tags": [
           "Admin"
@@ -289,25 +289,56 @@
                           "type": "object",
                           "properties": {
                             "totalUsers": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": "Total registered users"
+                            },
+                            "registeredStores": {
+                              "type": "integer",
+                              "description": "Total number of stores created on the platform"
                             },
                             "activeStores": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": "Stores with an active subscription"
                             },
                             "activeRestaurants": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": "Total registered restaurants"
                             },
                             "totalProducts": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": "Total product listings"
                             },
                             "totalOrders": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": "Total orders placed"
+                            },
+                            "pendingOrders": {
+                              "type": "integer",
+                              "description": "Orders currently pending payment or processing"
                             },
                             "totalRevenue": {
-                              "type": "number"
+                              "type": "number",
+                              "description": "Total platform revenue (GHS)"
                             },
                             "platformCommission": {
-                              "type": "number"
+                              "type": "number",
+                              "description": "Platform commission earned from total revenue"
+                            },
+                            "avgOrderValue": {
+                              "type": "number",
+                              "description": "Average order value across all orders (GHS)"
+                            },
+                            "deliverySuccessRate": {
+                              "type": "number",
+                              "description": "Percentage of closed orders that were successfully delivered"
+                            },
+                            "campuses": {
+                              "type": "integer",
+                              "description": "Number of distinct campuses with registered users"
+                            },
+                            "flaggedMessagesCount": {
+                              "type": "integer",
+                              "description": "Total number of flagged chat messages"
                             }
                           }
                         },
@@ -315,21 +346,110 @@
                           "type": "object",
                           "properties": {
                             "newUsers": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": "New users in the last 30 days"
                             },
                             "newOrders": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": "New orders in the last 30 days"
                             },
                             "newListings": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": "New product listings in the last 30 days"
                             },
                             "pendingDisputes": {
-                              "type": "integer"
+                              "type": "integer",
+                              "description": "Open disputes awaiting resolution"
+                            }
+                          }
+                        },
+                        "recentOrders": {
+                          "type": "array",
+                          "description": "Last 10 orders placed on the platform",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "orderId": {
+                                "type": "string",
+                                "example": "ORD-20260101-ABCD"
+                              },
+                              "customer": {
+                                "type": "string",
+                                "example": "Kwame Mensah"
+                              },
+                              "store": {
+                                "type": "string",
+                                "example": "QuickBite GH"
+                              },
+                              "amount": {
+                                "type": "number",
+                                "example": 45.5
+                              },
+                              "status": {
+                                "type": "string",
+                                "example": "delivered"
+                              },
+                              "date": {
+                                "type": "string",
+                                "example": "Apr 29"
+                              }
+                            }
+                          }
+                        },
+                        "topStores": {
+                          "type": "array",
+                          "description": "Top 5 stores by total revenue",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "example": "Campus Eats"
+                              },
+                              "rating": {
+                                "type": "number",
+                                "example": 4.5
+                              },
+                              "revenue": {
+                                "type": "number",
+                                "example": 12400
+                              },
+                              "orderCount": {
+                                "type": "integer",
+                                "example": 84
+                              }
+                            }
+                          }
+                        },
+                        "flaggedMessages": {
+                          "type": "array",
+                          "description": "5 most recent flagged chat messages",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "user": {
+                                "type": "string",
+                                "description": "Sender email",
+                                "example": "user@example.com"
+                              },
+                              "preview": {
+                                "type": "string",
+                                "description": "First 60 characters of the message"
+                              },
+                              "time": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "status": {
+                                "type": "string",
+                                "example": "pending"
+                              }
                             }
                           }
                         },
                         "popularCategories": {
                           "type": "array",
+                          "description": "Top 5 product categories by listing count",
                           "items": {
                             "type": "object"
                           }
@@ -776,6 +896,194 @@
               }
             },
             "description": "Admin privileges required"
+          }
+        }
+      }
+    },
+    "/v1/admin/flagged-messages/{message_id}/action/": {
+      "post": {
+        "operationId": "v1_admin_flagged_messages_action_create",
+        "description": "Admin takes an action on a flagged message. warn=send warning, suspend=temporarily disable account, dismiss=false positive, ban=permanently ban the sender.",
+        "summary": "Take Action on Flagged Message",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "message_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Flagged message ID",
+            "required": true
+          }
+        ],
+        "tags": [
+          "Admin",
+          "Messages"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "action"
+                ],
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "description": "Action to take on the sender",
+                    "enum": [
+                      "warned",
+                      "suspended",
+                      "dismissed",
+                      "banned"
+                    ]
+                  },
+                  "notes": {
+                    "type": "string",
+                    "description": "Optional notes about the decision"
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "action"
+                ],
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "description": "Action to take on the sender",
+                    "enum": [
+                      "warned",
+                      "suspended",
+                      "dismissed",
+                      "banned"
+                    ]
+                  },
+                  "notes": {
+                    "type": "string",
+                    "description": "Optional notes about the decision"
+                  }
+                }
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "action"
+                ],
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "description": "Action to take on the sender",
+                    "enum": [
+                      "warned",
+                      "suspended",
+                      "dismissed",
+                      "banned"
+                    ]
+                  },
+                  "notes": {
+                    "type": "string",
+                    "description": "Optional notes about the decision"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "jwtAuth": []
+          },
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Action applied successfully"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid action or already reviewed"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Message not found"
+          }
+        }
+      }
+    },
+    "/v1/admin/flagged-messages/{message_id}/conversation/": {
+      "get": {
+        "operationId": "v1_admin_flagged_messages_conversation_retrieve",
+        "description": "Retrieve the full conversation context for a flagged message, with flagged messages marked.",
+        "summary": "Get Flagged Message Conversation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "message_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Flagged message ID",
+            "required": true
+          }
+        ],
+        "tags": [
+          "Admin",
+          "Messages"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "jwtAuth": []
+          },
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conversation retrieved successfully"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Message not found"
           }
         }
       }
@@ -1279,6 +1587,728 @@
         }
       }
     },
+    "/v1/admin/orders/": {
+      "get": {
+        "operationId": "v1_admin_orders_retrieve",
+        "description": "Retrieve all orders with stat counts and optional filtering by status. Pass ?export=csv to download as CSV.",
+        "summary": "Get Admin Orders",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "export",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pass 'csv' to download orders as a CSV file"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of items per page (default 10, max 100)"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by status tab. One of: delivered, pending, cancelled, today"
+          }
+        ],
+        "tags": [
+          "Admin",
+          "Orders"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "jwtAuth": []
+          },
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "stats": {
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "integer",
+                              "description": "All time total orders"
+                            },
+                            "delivered": {
+                              "type": "integer",
+                              "description": "Total delivered orders"
+                            },
+                            "pending": {
+                              "type": "integer",
+                              "description": "Orders pending payment or processing"
+                            },
+                            "cancelled": {
+                              "type": "integer",
+                              "description": "Cancelled, refunded, or returned orders"
+                            }
+                          }
+                        },
+                        "orders": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "orderId": {
+                                "type": "string",
+                                "example": "ORD-20260101-ABCD"
+                              },
+                              "customer": {
+                                "type": "string",
+                                "example": "Kwame Mensah"
+                              },
+                              "customerAvatar": {
+                                "type": "string",
+                                "description": "Customer avatar URL or null"
+                              },
+                              "store": {
+                                "type": "string",
+                                "example": "Campus Eats"
+                              },
+                              "qty": {
+                                "type": "integer",
+                                "example": 2
+                              },
+                              "amount": {
+                                "type": "number",
+                                "example": 45.5
+                              },
+                              "status": {
+                                "type": "string",
+                                "example": "delivered"
+                              },
+                              "deliveryMethod": {
+                                "type": "string",
+                                "example": "campus_delivery"
+                              },
+                              "date": {
+                                "type": "string",
+                                "example": "Apr 29"
+                              }
+                            }
+                          }
+                        },
+                        "pagination": {
+                          "type": "object",
+                          "properties": {
+                            "currentPage": {
+                              "type": "integer"
+                            },
+                            "totalPages": {
+                              "type": "integer"
+                            },
+                            "totalItems": {
+                              "type": "integer"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Orders retrieved successfully"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication credentials were not provided"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Admin permission required"
+          }
+        }
+      }
+    },
+    "/v1/admin/products/": {
+      "get": {
+        "operationId": "v1_admin_products_retrieve",
+        "description": "Retrieve all products with stat counts and optional filtering by category or status.",
+        "summary": "Get Admin Products",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "category",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by category name (case-insensitive)"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of items per page (default 10, max 100)"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number"
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search by product title"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "inactive",
+                "sold"
+              ]
+            },
+            "description": "Filter by product status. One of: active, inactive, sold"
+          }
+        ],
+        "tags": [
+          "Admin",
+          "Products"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "jwtAuth": []
+          },
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "stats": {
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "integer",
+                              "description": "Total product listings"
+                            },
+                            "active": {
+                              "type": "integer",
+                              "description": "Active products"
+                            },
+                            "inactive": {
+                              "type": "integer",
+                              "description": "Inactive or sold products"
+                            },
+                            "avgPrice": {
+                              "type": "number",
+                              "description": "Average product price across all listings (GHS)"
+                            }
+                          }
+                        },
+                        "products": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string",
+                                "example": "Jollof Rice (Large)"
+                              },
+                              "store": {
+                                "type": "string",
+                                "example": "QuickBite GH"
+                              },
+                              "category": {
+                                "type": "string",
+                                "example": "Food"
+                              },
+                              "price": {
+                                "type": "number",
+                                "example": 28
+                              },
+                              "stock": {
+                                "type": "integer",
+                                "example": 42
+                              },
+                              "stockStatus": {
+                                "type": "string",
+                                "description": "Stock level status",
+                                "enum": [
+                                  "active",
+                                  "low_stock",
+                                  "out_of_stock"
+                                ]
+                              },
+                              "status": {
+                                "type": "string",
+                                "example": "active"
+                              },
+                              "campus": {
+                                "type": "string",
+                                "example": "KNUST"
+                              },
+                              "approvalStatus": {
+                                "type": "string",
+                                "example": "approved"
+                              }
+                            }
+                          }
+                        },
+                        "pagination": {
+                          "type": "object",
+                          "properties": {
+                            "currentPage": {
+                              "type": "integer"
+                            },
+                            "totalPages": {
+                              "type": "integer"
+                            },
+                            "totalItems": {
+                              "type": "integer"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Products retrieved successfully"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication credentials were not provided"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Admin permission required"
+          }
+        }
+      }
+    },
+    "/v1/admin/stores/": {
+      "get": {
+        "operationId": "admin_stores_list",
+        "description": "Retrieve all stores with stat counts and optional filtering by subscription status.",
+        "summary": "Get Admin Stores",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of items per page (default 10, max 100)"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number"
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search by store name or owner email"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "inactive",
+                "pending"
+              ]
+            },
+            "description": "Filter by subscription status. One of: active, inactive, pending"
+          }
+        ],
+        "tags": [
+          "Admin",
+          "Stores"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "jwtAuth": []
+          },
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "stats": {
+                          "type": "object",
+                          "properties": {
+                            "total": {
+                              "type": "integer"
+                            },
+                            "active": {
+                              "type": "integer"
+                            },
+                            "pending": {
+                              "type": "integer"
+                            },
+                            "inactive": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        "stores": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string",
+                                "example": "QuickBite GH"
+                              },
+                              "owner": {
+                                "type": "string",
+                                "example": "Kwame Mensah"
+                              },
+                              "category": {
+                                "type": "string",
+                                "example": "Food"
+                              },
+                              "revenue": {
+                                "type": "number",
+                                "example": 12450
+                              },
+                              "status": {
+                                "type": "string",
+                                "example": "active"
+                              },
+                              "logo": {
+                                "type": "string",
+                                "description": "Store logo URL or null"
+                              }
+                            }
+                          }
+                        },
+                        "pagination": {
+                          "type": "object",
+                          "properties": {
+                            "currentPage": {
+                              "type": "integer"
+                            },
+                            "totalPages": {
+                              "type": "integer"
+                            },
+                            "totalItems": {
+                              "type": "integer"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Stores retrieved successfully"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication credentials were not provided"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Admin permission required"
+          }
+        }
+      }
+    },
+    "/v1/admin/stores/{store_id}/": {
+      "get": {
+        "operationId": "admin_stores_detail",
+        "description": "Retrieve full details for a single store including owner info, stats, and recent activity.",
+        "summary": "Get Admin Store Detail",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "store_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Store ID",
+            "required": true
+          }
+        ],
+        "tags": [
+          "Admin",
+          "Stores"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "jwtAuth": []
+          },
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "logo": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "revenue": {
+                          "type": "number",
+                          "description": "Total store revenue (GHS)"
+                        },
+                        "orders": {
+                          "type": "integer",
+                          "description": "Total orders"
+                        },
+                        "products": {
+                          "type": "integer",
+                          "description": "Total active products"
+                        },
+                        "rating": {
+                          "type": "number",
+                          "description": "Average rating"
+                        },
+                        "owner": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "email": {
+                              "type": "string"
+                            },
+                            "campus": {
+                              "type": "string"
+                            },
+                            "joinedDate": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "recentOrders": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "orderId": {
+                                "type": "string"
+                              },
+                              "customer": {
+                                "type": "string"
+                              },
+                              "amount": {
+                                "type": "number"
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "date": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Store detail retrieved successfully"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication credentials were not provided"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Admin permission required"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Store not found"
+          }
+        }
+      }
+    },
     "/v1/admin/trigger-cleanup/": {
       "post": {
         "operationId": "v1_admin_trigger_cleanup_create",
@@ -1334,7 +2364,6 @@
     "/v1/admin/users/": {
       "get": {
         "operationId": "v1_admin_users_list",
-        "description": "List all users with optional filters",
         "parameters": [
           {
             "name": "limit",
@@ -1382,6 +2411,168 @@
               }
             },
             "description": ""
+          }
+        }
+      }
+    },
+    "/v1/admin/users/{user_id}/": {
+      "get": {
+        "operationId": "v1_admin_users_retrieve",
+        "description": "Retrieve full details for a single user including contact info, order stats, products listed, and recent orders.",
+        "summary": "Get Admin User Detail",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "User ID",
+            "required": true
+          }
+        ],
+        "tags": [
+          "Admin",
+          "Users"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "jwtAuth": []
+          },
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "fullName": {
+                          "type": "string"
+                        },
+                        "avatar": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "isActive": {
+                          "type": "boolean"
+                        },
+                        "memberSince": {
+                          "type": "string",
+                          "example": "Jan 2023"
+                        },
+                        "stats": {
+                          "type": "object",
+                          "properties": {
+                            "orders": {
+                              "type": "integer"
+                            },
+                            "totalSpent": {
+                              "type": "number"
+                            },
+                            "productsListed": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        "contact": {
+                          "type": "object",
+                          "properties": {
+                            "email": {
+                              "type": "string"
+                            },
+                            "phone": {
+                              "type": "string"
+                            },
+                            "campus": {
+                              "type": "string"
+                            },
+                            "university": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "recentOrders": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "orderId": {
+                                "type": "string"
+                              },
+                              "store": {
+                                "type": "string"
+                              },
+                              "amount": {
+                                "type": "number"
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "date": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "User detail retrieved successfully"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication credentials were not provided"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Admin permission required"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "User not found"
           }
         }
       }
@@ -1559,6 +2750,112 @@
               }
             },
             "description": "Validation failed"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Authentication credentials were not provided"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Admin permission required"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/v1/admin/users/{user_id}/unsuspend/": {
+      "post": {
+        "operationId": "v1_admin_users_unsuspend_create",
+        "description": "Lift an active suspension from a user account, restoring their ability to log in. Works for 7d, 30d, and permanent suspensions.",
+        "summary": "Unsuspend User",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the user to unsuspend",
+            "required": true
+          }
+        ],
+        "tags": [
+          "Admin",
+          "Users"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "jwtAuth": []
+          },
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User unsuspended successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "userId": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "User unsuspended successfully"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "User has no active suspension"
           },
           "401": {
             "content": {
@@ -2779,7 +4076,7 @@
         }
       }
     },
-    "/v1/cart": {
+    "/v1/cart/": {
       "get": {
         "operationId": "v1_cart_retrieve",
         "description": "Retrieve the authenticated user's shopping cart with all items, totals, and counts.",
@@ -2926,7 +4223,7 @@
         }
       }
     },
-    "/v1/cart/{itemId}": {
+    "/v1/cart/{itemId}/": {
       "patch": {
         "operationId": "v1_cart_partial_update",
         "description": "Update the quantity of a specific item in the user's cart. Only the owner of the cart can update items.",
@@ -3136,7 +4433,7 @@
         }
       }
     },
-    "/v1/cart/{itemId}/remove": {
+    "/v1/cart/{itemId}/remove/": {
       "delete": {
         "operationId": "v1_cart_remove_destroy",
         "description": "Remove a specific item from the user's shopping cart. Only the owner of the cart can remove items.",
@@ -3242,7 +4539,7 @@
         }
       }
     },
-    "/v1/cart/add": {
+    "/v1/cart/add/": {
       "post": {
         "operationId": "v1_cart_add_create",
         "description": "Add a product to the user's shopping cart. If the product already exists in the cart, the quantity will be updated to the new value.",
@@ -3487,7 +4784,7 @@
         }
       }
     },
-    "/v1/cart/clear": {
+    "/v1/cart/clear/": {
       "delete": {
         "operationId": "v1_cart_clear_destroy",
         "description": "Remove all items from the authenticated user's shopping cart. This action cannot be undone.",
@@ -4354,7 +5651,7 @@
         }
       }
     },
-    "/v1/food-orders": {
+    "/v1/food-orders/": {
       "post": {
         "operationId": "v1_food_orders_create",
         "description": "Create a new food order. Calculates subtotal, delivery fee, and service fee automatically. Returns payment URL for checkout.",
@@ -4504,7 +5801,7 @@
         }
       }
     },
-    "/v1/food-orders/{orderId}": {
+    "/v1/food-orders/{orderId}/": {
       "get": {
         "operationId": "v1_food_orders_retrieve",
         "description": "Retrieve detailed information about a specific food order. Users can only retrieve orders where they are the customer.",
@@ -4692,7 +5989,7 @@
         }
       }
     },
-    "/v1/food-orders/{orderId}/rate": {
+    "/v1/food-orders/{orderId}/rate/": {
       "post": {
         "operationId": "v1_food_orders_rate_create",
         "description": "Submit a rating and review for a completed food order. Only customers can rate their orders. Order must be delivered.",
@@ -4817,7 +6114,7 @@
         }
       }
     },
-    "/v1/food-orders/{orderId}/status": {
+    "/v1/food-orders/{orderId}/status/": {
       "patch": {
         "operationId": "v1_food_orders_status_partial_update",
         "description": "Update the status of a food order. Only the restaurant owner can update order status. Updates status and creates a timeline entry.",
@@ -4944,7 +6241,7 @@
         }
       }
     },
-    "/v1/food-orders/my-orders": {
+    "/v1/food-orders/my-orders/": {
       "get": {
         "operationId": "v1_food_orders_my_orders_retrieve",
         "description": "Retrieve all food orders for the authenticated user with optional status filtering and pagination.",
@@ -5456,7 +6753,7 @@
         }
       }
     },
-    "/v1/orders": {
+    "/v1/orders/": {
       "post": {
         "operationId": "v1_orders_create",
         "description": "\nCreate a new marketplace order for the authenticated verified user.\n\nPreconditions:\n- Buyer must be authenticated and verified\n- Product must be purchasable for requested quantity\n\nWhat happens on success:\n1. Order is created inside an atomic transaction\n2. If payment method is not cash, Paystack initialisation is attempted\n3. On payment failure, order creation is rolled back\n4. Response includes `paymentUrl` for checkout when online payment is required\n        ",
@@ -5624,7 +6921,7 @@
         }
       }
     },
-    "/v1/orders/{orderId}": {
+    "/v1/orders/{orderId}/": {
       "get": {
         "operationId": "v1_orders_retrieve",
         "parameters": [
@@ -5668,7 +6965,7 @@
         }
       }
     },
-    "/v1/orders/{orderId}/cancel": {
+    "/v1/orders/{orderId}/cancel/": {
       "post": {
         "operationId": "v1_orders_cancel_create",
         "description": "Cancel an order. Both buyer and seller can cancel orders, but with different restrictions based on order status and timing.",
@@ -5890,7 +7187,7 @@
         }
       }
     },
-    "/v1/orders/{orderId}/confirm-delivery": {
+    "/v1/orders/{orderId}/confirm-delivery/": {
       "post": {
         "operationId": "v1_orders_confirm_delivery_create",
         "description": "\nConfirm delivery of an order as the buyer and release escrow funds.\n\nOnly the buyer can call this endpoint. The order must be in a deliverable state and satisfy\nbusiness checks (`can_confirm_delivery`) before confirmation proceeds.\n\nSide effects:\n- Order transitions to delivered via `confirm_delivery()`\n- Escrow moves from held to released for eligible paid orders\n- Response includes updated order and escrow status\n\nIf preconditions are not met, the endpoint returns a 400 response with explanatory context,\nincluding auto-confirmation related timing details where applicable.\n        ",
@@ -6093,7 +7390,7 @@
         }
       }
     },
-    "/v1/orders/{orderId}/rate": {
+    "/v1/orders/{orderId}/rate/": {
       "post": {
         "operationId": "v1_orders_rate_create",
         "description": "\nSubmit a post-delivery review for an order as a verified purchase.\n\nOnly authenticated verified buyers can rate an order they own. Order must be delivered and not\nalready rated. `rating` is required; `review`, `rateProduct`, and `rateSeller` are optional.\n\nSide effects:\n- Creates a `Review` record with `verified=True`\n- Marks order as rated (`is_rated=True`, `rated_at` set)\n- Recalculates product/store aggregate ratings when selected\n        ",
@@ -6316,7 +7613,7 @@
         }
       }
     },
-    "/v1/orders/{orderId}/status": {
+    "/v1/orders/{orderId}/status/": {
       "patch": {
         "operationId": "v1_orders_status_partial_update",
         "description": "Update the status of an order. Only the seller of the order can perform this action.",
@@ -6533,7 +7830,7 @@
         }
       }
     },
-    "/v1/orders/my-orders": {
+    "/v1/orders/my-orders/": {
       "get": {
         "operationId": "v1_orders_my_orders_retrieve",
         "description": "Retrieve orders for the authenticated user with filtering and pagination options. Users can view their orders as buyer or seller.",
@@ -6755,7 +8052,7 @@
         }
       }
     },
-    "/v1/payments/{paymentId}/verify": {
+    "/v1/payments/{paymentId}/verify/": {
       "get": {
         "operationId": "v1_payments_verify_retrieve",
         "description": "Verify payment status by payment ID",
@@ -6805,7 +8102,7 @@
         }
       }
     },
-    "/v1/payments/banks": {
+    "/v1/payments/banks/": {
       "get": {
         "operationId": "v1_payments_banks_retrieve",
         "description": "Get list of supported banks for Ghana",
@@ -6834,7 +8131,7 @@
         }
       }
     },
-    "/v1/payments/escrow/balance": {
+    "/v1/payments/escrow/balance/": {
       "get": {
         "operationId": "v1_payments_escrow_balance_retrieve",
         "description": "Get escrow balance and transaction history for sellers",
@@ -6863,7 +8160,7 @@
         }
       }
     },
-    "/v1/payments/initiate": {
+    "/v1/payments/initiate/": {
       "post": {
         "operationId": "v1_payments_initiate_create",
         "description": "Initiate a payment for order, subscription, or food order",
@@ -6975,7 +8272,7 @@
         }
       }
     },
-    "/v1/payments/methods": {
+    "/v1/payments/methods/": {
       "get": {
         "operationId": "v1_payments_methods_retrieve",
         "description": "Get all payment methods for the authenticated user",
@@ -7061,7 +8358,7 @@
         }
       }
     },
-    "/v1/payments/methods/{methodId}": {
+    "/v1/payments/methods/{methodId}/": {
       "delete": {
         "operationId": "v1_payments_methods_destroy",
         "description": "Delete a payment method",
@@ -7111,7 +8408,7 @@
         }
       }
     },
-    "/v1/payments/payout": {
+    "/v1/payments/payout/": {
       "post": {
         "operationId": "v1_payments_payout_create",
         "description": "Request a payout from released escrow funds",

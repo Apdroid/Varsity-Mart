@@ -1,0 +1,213 @@
+meta {
+  name: Get Admin User Detail
+  type: http
+  seq: 13
+  tags: [
+    Admin
+    Users
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/admin/users/:user_id/
+  body: none
+  auth: apikey
+}
+
+params:path {
+  user_id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Retrieve full details for a single user including contact info, order stats, products listed, and recent orders.
+}
+
+example {
+  name: 200 Response
+  description: User detail retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/users/:user_id/
+    method: GET
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "data": {
+            "id": "",
+            "fullName": "",
+            "avatar": "",
+            "role": "",
+            "isActive": false,
+            "memberSince": "Jan 2023",
+            "stats": {
+              "orders": 0,
+              "totalSpent": 0,
+              "productsListed": 0
+            },
+            "contact": {
+              "email": "",
+              "phone": "",
+              "campus": "",
+              "university": ""
+            },
+            "recentOrders": [
+              {
+                "orderId": "",
+                "store": "",
+                "amount": 0,
+                "status": "",
+                "date": ""
+              }
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/users/:user_id/
+    method: GET
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: Admin permission required
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/users/:user_id/
+    method: GET
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: User not found
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/users/:user_id/
+    method: GET
+    mode: none
+    params:path: {
+      user_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

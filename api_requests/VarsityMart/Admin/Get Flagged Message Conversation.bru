@@ -1,0 +1,103 @@
+meta {
+  name: Get Flagged Message Conversation
+  type: http
+  seq: 6
+  tags: [
+    Admin
+    Messages
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/admin/flagged-messages/:message_id/conversation/
+  body: none
+  auth: apikey
+}
+
+params:path {
+  message_id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Retrieve the full conversation context for a flagged message, with flagged messages marked.
+}
+
+example {
+  name: 200 Response
+  description: Conversation retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/flagged-messages/:message_id/conversation/
+    method: GET
+    mode: none
+    params:path: {
+      message_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Message not found
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/flagged-messages/:message_id/conversation/
+    method: GET
+    mode: none
+    params:path: {
+      message_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

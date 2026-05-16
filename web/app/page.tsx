@@ -20,6 +20,16 @@ export default async function Page() {
 			},
 		}),
 		queryClient.prefetchQuery({
+			queryKey: ["restaurants", "list", { limit: 4 }],
+			queryFn: async () => {
+				const response = await restaurantsApi.list({ limit: 4 })
+				return {
+					restaurants: response.data.restaurants,
+					pagination: response.data.pagination,
+				}
+			},
+		}),
+		queryClient.prefetchQuery({
 			queryKey: ["stores", "featured"],
 			queryFn: async () => {
 				const response = await storesApi.featured(6)
@@ -47,8 +57,8 @@ export default async function Page() {
 
 	return (
 		<div className="max-w-8xl mx-auto min-h-svh">
-			<HeroSlider />
 			<HydrationBoundary state={dehydrate(queryClient)}>
+				<HeroSlider />
 				<HomepageContent />
 			</HydrationBoundary>
 			<Newsletter />
