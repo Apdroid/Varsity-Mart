@@ -132,7 +132,7 @@ function AddMethodDialog() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(next) => { if (!next) form.reset(); setOpen(next) }}>
       <DialogTrigger asChild>
         <Button size="sm">
           <Plus className="mr-2 h-4 w-4" />
@@ -367,6 +367,8 @@ export default function PaymentsPage() {
   }, [isAuthLoading, isAuthenticated, router])
 
   const isLoading = isAuthLoading || isMethodsLoading
+
+  if (!isAuthLoading && !isAuthenticated) return null
 
   return (
     <div className="container mx-auto px-4 py-8">
