@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { paymentsApi } from "@/lib/api/payments"
-import type { AddPaymentMethodRequest, EscrowBalance, Bank, PaymentMethod, PayoutRequest } from "@/lib/api/types"
+import type { AddPaymentMethodRequest, PaymentMethod, PayoutRequest } from "@/lib/api/types"
 
 export const paymentKeys = {
   all: ["payments"] as const,
