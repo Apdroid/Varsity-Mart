@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import {
   ImageIcon,
   Loader2,
@@ -27,7 +28,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { useIsMutating } from "@tanstack/react-query"
-import { useCart, useUpdateCartItem, useRemoveFromCart, useClearCart } from "@/hooks/queries/use-cart"
+import { useCart, useUpdateCartItem, useRemoveFromCart, useClearCart, cartKeys } from "@/hooks/queries/use-cart"
 import type { NormalizedCartItem } from "@/hooks/queries/use-cart"
 import { useAuth } from "@/providers/auth-provider"
 import { toast } from "sonner"
@@ -163,10 +164,9 @@ function CartItemRow({ item }: { item: NormalizedCartItem }) {
 export default function CartPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth()
   const { data: cart, isLoading: cartLoading } = useCart({ enabled: isAuthenticated })
+  const router = useRouter()
   const { mutate: clearCart, isPending: clearing } = useClearCart()
-  const isMutating = useIsMutating() > 0
-  const updating = isMutating
-  const removing = isMutating
+  const isCartMutating = useIsMutating({ mutationKey: cartKeys.all }) > 0
 
   const items = cart?.items ?? []
   const subtotal = cart?.total ?? 0
@@ -292,14 +292,12 @@ export default function CartPage() {
             <p className="mt-1 text-[11px] text-muted-foreground">Delivery &amp; service fee added at checkout</p>
 
             <Button
-              asChild
-              disabled={clearing || updating || removing}
+              disabled={clearing || isCartMutating}
+              onClick={() => router.push("/checkout")}
               className="mt-5 w-full h-11 bg-vm-tangerine text-white hover:bg-vm-tangerine/90"
             >
-              <Link href="/checkout" className="flex items-center justify-center gap-2">
-                <Lock className="h-4 w-4" />
-                Proceed to Checkout
-              </Link>
+              <Lock className="h-4 w-4 mr-2" />
+              Proceed to Checkout
             </Button>
 
             <Link

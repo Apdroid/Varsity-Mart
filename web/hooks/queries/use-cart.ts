@@ -109,6 +109,7 @@ export function useAddToCart() {
 	const queryClient = useQueryClient()
 
 	return useMutation({
+		mutationKey: cartKeys.all,
 		mutationFn: (data: AddToCartRequest) => cartApi.add(data),
 		onSettled: () => {
 			// Need real server data for newly added item (ID, stock status, etc.)
@@ -121,6 +122,7 @@ export function useUpdateCartItem() {
 	const queryClient = useQueryClient()
 
 	return useMutation({
+		mutationKey: cartKeys.all,
 		mutationFn: ({ itemId, data }: { itemId: string; data: UpdateCartItemRequest }) =>
 			cartApi.update(itemId, data),
 		onMutate: async ({ itemId, data }) => {
@@ -156,6 +158,7 @@ export function useRemoveFromCart() {
 	const queryClient = useQueryClient()
 
 	return useMutation({
+		mutationKey: cartKeys.all,
 		mutationFn: (itemId: string) => cartApi.remove(itemId),
 		onMutate: async (itemId) => {
 			await queryClient.cancelQueries({ queryKey: cartKeys.cart() })
@@ -186,6 +189,7 @@ export function useClearCart() {
 	const queryClient = useQueryClient()
 
 	return useMutation({
+		mutationKey: cartKeys.all,
 		mutationFn: () => cartApi.clear(),
 		onSuccess: () => {
 			queryClient.setQueryData<NormalizedCart>(cartKeys.cart(), {
