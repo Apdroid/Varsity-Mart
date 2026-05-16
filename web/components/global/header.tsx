@@ -1,14 +1,12 @@
 'use client';
 import dynamic from "next/dynamic"
+import type { Icon as PhosphorIcon } from "@phosphor-icons/react"
 import {
 	MagnifyingGlassIcon,
-	ShoppingBagIcon,
-	HeartIcon,
 	CaretDownIcon,
 	CaretRightIcon,
 	ListIcon,
 	PhoneIcon,
-	MapPinIcon,
 	FireIcon,
 	TruckIcon,
 	TShirtIcon,
@@ -34,7 +32,6 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -42,7 +39,6 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -75,7 +71,7 @@ import { cn } from "@/lib/utils";
 const CartSheet = dynamic(() => import("@/components/cart/cart-sheet").then(m => m.CartSheet), { ssr: false })
 const FoodCartSheet = dynamic(() => import("@/components/cart/food-cart-sheet").then(m => m.FoodCartSheet), { ssr: false })
 import { useAuth } from "@/providers/auth-provider";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -229,32 +225,16 @@ function SearchSuggestionsDropdown({
 	)
 }
 
-function ThemeToggleButton({ className = "" }: { className?: string }) {
-	const { resolvedTheme, setTheme } = useTheme()
-	const isDark = resolvedTheme === "dark"
-
-	return (
-		<button
-			type="button"
-			aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-			onClick={() => setTheme(isDark ? "light" : "dark")}
-			className={`h-10 w-10 inline-flex items-center justify-center ${className}`}
-		>
-			{isDark ? <Sun className="h-7 w-7" /> : <Moon className="h-7 w-7" />}
-		</button>
-	)
-}
 
 function ThemeSwitcher() {
 	const { theme, setTheme } = useTheme()
 	const options = [
 		{ value: "light", icon: Sun, label: "Light" },
 		{ value: "dark", icon: Moon, label: "Dark" },
-		{ value: "system", icon: Monitor, label: "System" },
 	] as const
 
 	return (
-		<div className="flex items-center gap-0.5 rounded-lg border border-border bg-muted/50 p-0.5">
+		<div className="flex items-center gap-1 rounded-full border border-border bg-muted p-0.5">
 			{options.map(({ value, icon: Icon, label }) => (
 				<button
 					key={value}
@@ -262,13 +242,13 @@ function ThemeSwitcher() {
 					aria-label={label}
 					onClick={() => setTheme(value)}
 					className={cn(
-						"flex h-7 w-7 items-center justify-center rounded-md transition-colors",
+						"flex h-10 w-10 items-center justify-center rounded-full  transition-colors",
 						theme === value
-							? "bg-background text-foreground shadow-sm"
+							? "bg-background text-vm-tangerine shadow-sm"
 							: "text-muted-foreground hover:text-foreground"
 					)}
 				>
-					<Icon className="h-3.5 w-3.5" />
+					<Icon className="h-5 w-5" />
 				</button>
 			))}
 		</div>
@@ -297,6 +277,34 @@ const searchCategories = [
 	"Home & Hostel Supplies",
 ] as const
 
+type AnyIcon = React.ComponentType<{ className?: string }>
+
+const announcementDropdowns = [
+	{ label: "EN", options: ["English", "Twi", "Ga", "Ewe"] },
+	{ label: "GHS", options: ["GHS — Ghana Cedi", "USD — US Dollar"] },
+]
+
+const socialLinks: { href: string; label: string; Icon: PhosphorIcon }[] = [
+	{ href: "https://x.com", label: "Twitter", Icon: XLogoIcon },
+	{ href: "https://facebook.com", label: "Facebook", Icon: FacebookLogoIcon },
+]
+
+const quickFilters = [
+	{ href: "/search", prefix: "/search", label: "Products" },
+	{ href: "/restaurants", prefix: "/restaurants", label: "Food" },
+	{ href: "/stores", prefix: "/stores", label: "Stores" },
+]
+
+const topAccountItems: { href: string; label: string; Icon: AnyIcon }[] = [
+	{ href: "/account", Icon: UserCircleIcon, label: "My Account" },
+	{ href: "/account/orders", Icon: PackageIcon, label: "Orders" },
+]
+
+const bottomAccountItems: { href: string; label: string; Icon: AnyIcon }[] = [
+	{ href: "/messages", Icon: MessageCircleIcon as AnyIcon, label: "Chats" },
+	{ href: "/account/settings", Icon: GearIcon, label: "Settings" },
+]
+
 function getCategoryHref(label: string) {
 	return `/search?category=${encodeURIComponent(label.toLowerCase())}`
 }
@@ -316,38 +324,38 @@ function buildGlobalSearchHref(query: string, category?: string) {
 	return next ? `/search?${next}` : "/search"
 }
 
-function getWishlistCount(...sources: Array<unknown>): number {
-	for (const source of sources) {
-		if (!source || typeof source !== "object") continue
-		const data = source as Record<string, unknown>
-		const value =
-			data.wishlistCount ??
-			data.wishlist_count ??
-			data.likedCount ??
-			data.liked_count ??
-			data.savedCount ??
-			data.saved_count
-
-		if (typeof value === "number" && Number.isFinite(value)) {
-			return Math.max(0, value)
-		}
-		if (typeof value === "string") {
-			const parsed = Number(value)
-			if (Number.isFinite(parsed)) {
-				return Math.max(0, parsed)
-			}
-		}
-	}
-	return 0
-}
-
+// function getWishlistCount(...sources: Array<unknown>): number {
+// 	for (const source of sources) {
+// 		if (!source || typeof source !== "object") continue
+// 		const data = source as Record<string, unknown>
+// 		const value =
+// 			data.wishlistCount ??
+// 			data.wishlist_count ??
+// 			data.likedCount ??
+// 			data.liked_count ??
+// 			data.savedCount ??
+// 			data.saved_count
+//
+// 		if (typeof value === "number" && Number.isFinite(value)) {
+// 			return Math.max(0, value)
+// 		}
+// 		if (typeof value === "string") {
+// 			const parsed = Number(value)
+// 			if (Number.isFinite(parsed)) {
+// 				return Math.max(0, parsed)
+// 			}
+// 		}
+// 	}
+// 	return 0
+// }
+//
 /* -----------------------------------------------------------
 	 1. Announcement bar — graphite background
 ----------------------------------------------------------- */
 function AnnouncementBar() {
 	return (
 		<div
-			className="w-full text-xs text-white bg-vm-graphite"
+			className="hidden w-full bg-vm-graphite text-xs text-white md:block"
 		>
 			<div className="container mx-auto flex h-9 items-center justify-between px-4">
 				<div className="flex items-center gap-4">
@@ -368,59 +376,37 @@ function AnnouncementBar() {
 				</div>
 
 				<div className="hidden items-center gap-4 md:flex">
-					<a
+					<Link
 						href="tel:+233240000000"
 						className="flex items-center gap-1.5 text-white/75 transition hover:text-white"
 					>
 						<PhoneIcon className="h-3.5 w-3.5" />
 						+233 24 000 0000
-					</a>
+					</Link>
 
 					<Separator orientation="vertical" className="h-3 bg-white/15" />
 
-					<DropdownMenu>
-						<DropdownMenuTrigger className="flex items-center gap-1 text-white/75 transition hover:text-white">
-							EN <CaretDownIcon className="h-3 w-3" />
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="min-w-32">
-							<DropdownMenuItem>English</DropdownMenuItem>
-							<DropdownMenuItem>Twi</DropdownMenuItem>
-							<DropdownMenuItem>Ga</DropdownMenuItem>
-							<DropdownMenuItem>Ewe</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
-
-					<DropdownMenu>
-						<DropdownMenuTrigger className="flex items-center gap-1 text-white/75 transition hover:text-white">
-							GHS <CaretDownIcon className="h-3 w-3" />
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="min-w-32">
-							<DropdownMenuItem>GHS — Ghana Cedi</DropdownMenuItem>
-							<DropdownMenuItem>USD — US Dollar</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+					{announcementDropdowns.map(({ label, options }) => (
+						<DropdownMenu key={label}>
+							<DropdownMenuTrigger className="flex items-center gap-1 text-white/75 transition hover:text-white">
+								{label} <CaretDownIcon className="h-3 w-3" />
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end" className="min-w-32">
+								{options.map((option) => (
+									<DropdownMenuItem key={option}>{option}</DropdownMenuItem>
+								))}
+							</DropdownMenuContent>
+						</DropdownMenu>
+					))}
 
 					<Separator orientation="vertical" className="h-3 bg-white/15" />
 
 					<div className="flex items-center gap-3 text-white/75">
-						<a
-							href="https://x.com"
-							target="_blank"
-							rel="noreferrer"
-							aria-label="Twitter"
-							className="transition hover:text-white"
-						>
-							<XLogoIcon className="h-4 w-4" weight="bold" />
-						</a>
-						<a
-							href="https://facebook.com"
-							target="_blank"
-							rel="noreferrer"
-							aria-label="Facebook"
-							className="transition hover:text-white"
-						>
-							<FacebookLogoIcon className="h-4 w-4" weight="bold" size={32} />
-						</a>
+						{socialLinks.map(({ href, label, Icon }) => (
+							<Link key={href} href={href} target="_blank" rel="noreferrer" aria-label={label} className="transition hover:text-white">
+								<Icon className="h-4 w-4" weight="bold" />
+							</Link>
+						))}
 					</div>
 				</div>
 			</div>
@@ -440,6 +426,7 @@ function MainBar() {
 	const [desktopRecentSearches, setDesktopRecentSearches] = useState<string[]>([])
 
 	useEffect(() => {
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setDesktopRecentSearches(loadRecentSearches())
 	}, [])
 
@@ -484,19 +471,16 @@ function MainBar() {
 
 	return (
 		<div className=" bg-card">
-			<div className="container mx-auto flex justify-between h-20 items-center gap-6 px-4">
+			<div className="container mx-auto flex h-18 items-center justify-between gap-2 px-3 md:h-20 md:gap-6 md:px-4">
 				{/* Mobile Navigation Menu */}
 				<Sheet>
 					<SheetTrigger asChild>
-						<Button variant="ghost" size="icon" className="lg:hidden">
-							<ListIcon className="h-5 w-5" />
-							<span className="sr-only">Open menu</span>
-						</Button>
+						<ListIcon className=" md:hidden h-9 w-9 " />
 					</SheetTrigger>
 					<SheetContent side="left" className="w-80 p-0 border-none">
 						<SheetHeader className="p-4">
 							<SheetTitle className="text-left">
-								<Logo variant="header" />
+								<Logo variant="auth" className="" />
 							</SheetTitle>
 						</SheetHeader>
 						<nav className="flex flex-col p-2">
@@ -516,7 +500,7 @@ function MainBar() {
 
 
 				<Link href="/" className="shrink-0">
-					<Logo variant="header" />
+					<Logo variant="header" className="w-32 md:w-auto" />
 				</Link>
 
 				<div className="relative hidden flex-1 md:block">
@@ -535,7 +519,7 @@ function MainBar() {
 								}
 								if (event.key === "Escape") setIsDesktopFocused(false)
 							}}
-							className="h-full border-0 bg-inherit shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-inherit"
+							className="h-full border-0 bg-inherit shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-graphite"
 						/>
 						<Select value={desktopCategory} onValueChange={setDesktopCategory}>
 							<SelectTrigger className="h-full w-38.75 border-0 bg-transparent text-sm shadow-none focus:ring-0 focus:ring-offset-0 dark:bg-inherit">
@@ -579,7 +563,6 @@ function MainBar() {
 
 					<FoodCartSheet />
 					<CartSheet />
-					<span className="w-5"></span>
 					{authLoading ? (
 						<div
 							className="h-10 w-10 items-center justify-center inline-flex"
@@ -589,13 +572,14 @@ function MainBar() {
 						</div>
 					) : isAuthenticated && user ? (
 						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
+							<DropdownMenuTrigger asChild className="border-2 border-vm-tangerine after:border-vm-tangerine after:border-2">
 								<button
 									type="button"
 									className="h-10 w-10 items-center justify-center inline-flex"
 									aria-label="Open account menu"
 								>
-									<Avatar className="h-7 w-7">
+									<Avatar className={cn("h-10 w-10",
+										"after:absolute after:bottom-0 after:left-2 after:right-2 after:h-0.5 after:rounded-full after:transition-colors")}>
 										<AvatarImage src={user.avatar || user.avatarUrl || user.profilePic} alt={displayName || "User"} />
 										<AvatarFallback className="text-[11px] font-semibold">{initials}</AvatarFallback>
 									</Avatar>
@@ -604,7 +588,7 @@ function MainBar() {
 							<DropdownMenuContent align="end" className="w-64 p-0">
 								{/* ── Profile header ── */}
 								<div className="flex flex-col items-center gap-2 px-4 py-5 border-b border-border">
-									<Avatar className="h-14 w-14">
+									<Avatar className="h-20 w-20">
 										<AvatarImage src={user.avatar || user.avatarUrl || user.profilePic} alt={displayName || "User"} />
 										<AvatarFallback className="text-base font-bold">{initials}</AvatarFallback>
 									</Avatar>
@@ -616,72 +600,58 @@ function MainBar() {
 								</div>
 
 								{/* ── Menu items ── */}
-								<div className="py-1.5">
-									<DropdownMenuItem asChild>
-										<Link href="/account">
-											<UserCircleIcon className="mr-2.5 h-4 w-4" />
-											My Account
-										</Link>
-									</DropdownMenuItem>
-									<DropdownMenuItem asChild>
-										<Link href="/account/orders">
-											<PackageIcon className="mr-2.5 h-4 w-4" />
-											Orders
-										</Link>
-									</DropdownMenuItem>
+								<div className="py-1.5 px-4">
+									{topAccountItems.map(({ href, Icon, label }) => (
+										<DropdownMenuItem key={href} asChild className="text-base">
+											<Link href={href}>
+												<Icon className="mr-2.5 size-5" />
+												{label}
+											</Link>
+										</DropdownMenuItem>
+									))}
+
 									{!user.hasStore && !user.hasRestaurant ? (
-										<DropdownMenuItem asChild>
+										<DropdownMenuItem asChild className="text-base">
 											<Link href="/seller/start">
-												<StorefrontIcon className="mr-2.5 h-4 w-4" />
+												<StorefrontIcon className="mr-2.5 size-5" />
 												Start Selling
 											</Link>
 										</DropdownMenuItem>
 									) : (
 										<>
 											{user.hasStore && (
-												<DropdownMenuItem asChild>
+												<DropdownMenuItem asChild className="text-base">
 													<Link href="/seller/store">
-														<StorefrontIcon className="mr-2.5 h-4 w-4" />
+														<StorefrontIcon className="mr-2.5 size-5" />
 														My Store
 													</Link>
 												</DropdownMenuItem>
 											)}
 											{user.hasRestaurant && (
-												<DropdownMenuItem asChild>
+												<DropdownMenuItem asChild className="text-base">
 													<Link href="/seller/restaurant">
-														<ForkKnifeIcon className="mr-2.5 h-4 w-4" />
+														<ForkKnifeIcon className="mr-2.5 size-5" />
 														My Restaurant
 													</Link>
 												</DropdownMenuItem>
 											)}
 										</>
 									)}
-									{ /*	
-									<DropdownMenuItem asChild>
-										<Link href="/account/wishlist">
-											<HeartIcon className="mr-2.5 h-4 w-4" />
-											Wishlist
-										</Link>
-									</DropdownMenuItem>
-							*/		}
-									<DropdownMenuItem asChild>
-										<Link href="/messages">
-											<MessageCircleIcon className="mr-2.5 h-4 w-4" />
-											Chats
-										</Link>
-									</DropdownMenuItem>
-									<DropdownMenuItem asChild>
-										<Link href="/account/settings">
-											<GearIcon className="mr-2.5 h-4 w-4" />
-											Settings
-										</Link>
-									</DropdownMenuItem>
+
+									{bottomAccountItems.map(({ href, Icon, label }) => (
+										<DropdownMenuItem key={href} asChild className="text-base">
+											<Link href={href}>
+												<Icon className="mr-2.5 size-5" />
+												{label}
+											</Link>
+										</DropdownMenuItem>
+									))}
 								</div>
 
 								<DropdownMenuSeparator className="my-0" />
 								<div className="py-1.5">
 									<DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
-										<SignOutIcon className="mr-2.5 h-4 w-4" />
+										<SignOutIcon className="mr-2.5 size-5" />
 										Sign Out
 									</DropdownMenuItem>
 								</div>
@@ -729,65 +699,57 @@ function MainBar() {
 */}
 				</div>
 			</div>
-		</div>
+		</div >
 	)
 }
 
 /* -----------------------------------------------------------
 	 3. Nav row — categories + main links
 ----------------------------------------------------------- */
+function NavLink({ href, children, exact }: { href: string; children: React.ReactNode; exact?: boolean }) {
+	const pathname = usePathname()
+	const isActive = exact ? pathname === href : pathname.startsWith(href)
+	return (
+		<NavigationMenuItem>
+			<NavigationMenuLink
+				href={href}
+				className={cn(
+					"relative inline-flex h-10 items-center px-3 hover:bg-none text-sm font-medium transition-colors hover:text-vm-tangerine",
+					"after:absolute after:bottom-0 after:left-2 after:right-2 after:h-0.5 after:rounded-full after:transition-colors",
+					isActive
+						? "text-foreground font-semibold after:bg-vm-tangerine"
+						: "text-foreground/60 after:bg-transparent"
+				)}
+			>
+				{children}
+			</NavigationMenuLink>
+		</NavigationMenuItem>
+	)
+}
+
 function NavBar() {
 	return (
-		<div className="hidden bg-card pb-4 shadow-lg lg:block">
-			<div className="container mx-auto flex h-12 items-center gap-2 px-4">
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button
-							className="h-10 gap-2.5 rounded-full  px-4 bg-vm-graphite font-semibold text-white"
-						>
-							<ListIcon className="h-4 w-4" />
-							All Categories
-							<CaretDownIcon className="ml-1 h-3.5 w-3.5 opacity-60" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent
-						align="start"
-						className="w-[240px] p-1"
-						sideOffset={4}
-					>
-						<DropdownMenuLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-							Browse Campus Marketplace
-						</DropdownMenuLabel>
-						<DropdownMenuSeparator />
-						{categories.map(({ label, icon: Icon }) => (
-							<DropdownMenuItem
-								key={label}
-								className="cursor-pointer gap-2.5 py-2 text-sm"
-							>
-								<Icon className="h-4 w-4 text-muted-foreground" />
-								{label}
-							</DropdownMenuItem>
-						))}
-					</DropdownMenuContent>
-				</DropdownMenu>
+		<div className="hidden bg-card pb-4 shadow-sm lg:block">
+			<div className="container mx-auto flex h-12 items-center justify-between px-4">
+				{/* Left — primary nav with active-state awareness */}
+				<NavigationMenu>
+					<NavigationMenuList className="gap-3">
+						<NavLink href="/" exact>Home</NavLink>
+						<NavLink href="/search">Products</NavLink>
+						<NavLink href="/restaurants">Food</NavLink>
+						<NavLink href="/stores">Stores</NavLink>
+					</NavigationMenuList>
+				</NavigationMenu>
 
-				<NavigationMenu className="ml-1">
+				{/* Right — category dropdowns + CTA */}
+				<NavigationMenu>
 					<NavigationMenuList className="gap-0">
 						<NavigationMenuItem>
-							<NavigationMenuLink
-								href="/"
-								className="inline-flex h-10 items-center px-3 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
-							>
-								Home
-							</NavigationMenuLink>
-						</NavigationMenuItem>
-
-						<NavigationMenuItem>
-							<NavigationMenuTrigger className="h-10 bg-transparent text-sm font-medium text-foreground/70 hover:text-foreground data-[state=open]:text-foreground">
+							<NavigationMenuTrigger className="h-10 bg-transparent text-sm font-medium text-foreground/60 hover:text-foreground data-[state=open]:text-foreground">
 								Shop
 							</NavigationMenuTrigger>
 							<NavigationMenuContent>
-								<div className="grid w-[560px] grid-cols-2 gap-1 p-3">
+								<div className="grid w-120 grid-cols-2 gap-1 p-3">
 									{[
 										"Today's Deals",
 										"New Arrivals",
@@ -811,11 +773,11 @@ function NavBar() {
 						</NavigationMenuItem>
 
 						<NavigationMenuItem>
-							<NavigationMenuTrigger className="h-10 bg-transparent text-sm font-medium text-foreground/70 hover:text-foreground data-[state=open]:text-foreground">
+							<NavigationMenuTrigger className="h-10 bg-transparent text-sm font-medium text-foreground/60 hover:text-foreground data-[state=open]:text-foreground">
 								Food Court
 							</NavigationMenuTrigger>
 							<NavigationMenuContent>
-								<div className="grid w-[480px] grid-cols-2 gap-0.5 p-2">
+								<div className="grid w-120 grid-cols-2 gap-0.5 p-2">
 									{[
 										"Order Now",
 										"Popular Vendors",
@@ -838,28 +800,13 @@ function NavBar() {
 							</NavigationMenuContent>
 						</NavigationMenuItem>
 
-						<NavigationMenuItem>
-							<NavigationMenuLink
-								href="/stores"
-								className="inline-flex h-10 items-center px-3 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
-							>
-								Vendors
-							</NavigationMenuLink>
-						</NavigationMenuItem>
-
-						<NavigationMenuItem>
-							<NavigationMenuLink
-								href="/help"
-								className="inline-flex h-10 items-center px-3 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
-							>
-								Track Order
-							</NavigationMenuLink>
-						</NavigationMenuItem>
+						<NavLink href="/stores">Vendors</NavLink>
+						<NavLink href="/help">Track Order</NavLink>
 
 						<NavigationMenuItem>
 							<NavigationMenuLink
 								href="/sell"
-								className="ml-1 inline-flex h-8 items-center bg-vm-tangerine gap-1.5 rounded-full px-4 text-sm font-semibold hover:text-black dark:hover:text-white text-white transition-opacity hover:opacity-90"
+								className="ml-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-vm-tangerine px-4 text-sm font-semibold text-white transition-opacity hover:border-2  hover:text-vm-tangerine"
 							>
 								Become a Seller
 								<CaretRightIcon className="h-3.5 w-3.5" />
@@ -867,11 +814,6 @@ function NavBar() {
 						</NavigationMenuItem>
 					</NavigationMenuList>
 				</NavigationMenu>
-
-				<div className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground">
-					<MapPinIcon className="h-3.5 w-3.5" />
-					Delivering to <span className="font-medium text-foreground">KNUST Campus</span>
-				</div>
 			</div>
 		</div>
 	)
@@ -882,11 +824,13 @@ function NavBar() {
 ----------------------------------------------------------- */
 function MobileSearchBar() {
 	const router = useRouter()
+	const pathname = usePathname()
 	const [mobileQuery, setMobileQuery] = useState("")
 	const [isMobileFocused, setIsMobileFocused] = useState(false)
 	const [mobileRecentSearches, setMobileRecentSearches] = useState<string[]>([])
 
 	useEffect(() => {
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setMobileRecentSearches(loadRecentSearches())
 	}, [])
 
@@ -922,10 +866,9 @@ function MobileSearchBar() {
 	}, [navigate])
 
 	return (
-		<div className="md:hidden bg-card border-t border-border/40 px-4 pb-3 pt-2">
+		<div className="border-t border-border/40 bg-card px-3 pb-2 pt-1.5 md:hidden">
 			<div className="relative">
-				<div className="relative flex h-11 items-center overflow-hidden rounded-full bg-accent transition-all focus-within:bg-background focus-within:shadow-sm">
-					<MagnifyingGlassIcon className="ml-4 h-4 w-4 shrink-0 text-muted-foreground" />
+				<div className="relative flex h-14 items-center overflow-hidden rounded-tl-full rounded-bl-full justify-between  transition-all ">
 					<Input
 						placeholder="Search products, food, stores…"
 						value={mobileQuery}
@@ -939,14 +882,15 @@ function MobileSearchBar() {
 							}
 							if (event.key === "Escape") setIsMobileFocused(false)
 						}}
-						className="h-full border-0 bg-inherit shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-inherit"
+						className="h-full border-0 bg-accent rounded-br-none rounded-tr-none  shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-graphite px-6 py-9"
 					/>
 					<button
 						type="button"
 						onClick={handleMobileSearch}
-						className="ml-1 mr-1.5 flex h-8 shrink-0 cursor-pointer items-center rounded-full bg-vm-tangerine px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+						className="mr-1 flex h-full w-14 shrink-0 cursor-pointer items-center justify-center rounded-br-full rounded-tr-full bg-vm-tangerine text-white transition-opacity hover:opacity-90"
+						aria-label="Search"
 					>
-						Search
+						<MagnifyingGlassIcon className="h-4 w-4" />
 					</button>
 				</div>
 				{isMobileFocused && (
@@ -965,28 +909,16 @@ function MobileSearchBar() {
 				)}
 			</div>
 
-			<div className="mt-2.5 flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-				<Link
-					href="/search"
-					className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
-				>
-					<ShoppingBagIcon className="h-3.5 w-3.5 text-vm-tangerine" />
-					Products
-				</Link>
-				<Link
-					href="/restaurants"
-					className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
-				>
-					<ForkKnifeIcon className="h-3.5 w-3.5 text-vm-tangerine" />
-					Food
-				</Link>
-				<Link
-					href="/stores"
-					className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
-				>
-					<MapPinIcon className="h-3.5 w-3.5 text-vm-tangerine" />
-					Stores
-				</Link>
+			<div className="mt-1.5 flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-none [&::-webkit-scrollbar]:hidden">
+				{quickFilters.map(({ href, prefix, label }) => (
+					<Link
+						key={href}
+						href={href}
+						className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors hover:text-vm-tangerine ${pathname.startsWith(prefix) ? "text-vm-graphite font-semibold" : "text-foreground"}`}
+					>
+						{label}
+					</Link>
+				))}
 			</div>
 		</div>
 	)
@@ -1001,10 +933,10 @@ export default function VarsityMartHeader() {
 	return (
 		<>
 			<header
-				className={`sticky top-0 z-50 w-full shadow-sm transition-transform duration-300 will-change-transform ${headerHidden ? "-translate-y-full" : "translate-y-0"
+				className={`sticky top-0 z-50 w-full  transition-transform duration-300 will-change-transform ${headerHidden ? "-translate-y-full" : "translate-y-0"
 					}`}
 			>
-				<AnnouncementBar />
+				{/* <AnnouncementBar /> */}
 				<MainBar />
 				<MobileSearchBar />
 				<NavBar />

@@ -1,3 +1,4 @@
+import Image from "next/image"
 import { Star } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { Review } from "@/components/products/product-detail-view"
@@ -22,9 +23,11 @@ export function ReviewCard({ review, className }: Props) {
   return (
     <div className={cn("py-4", className)}>
       <div className="flex items-start gap-3">
-        <img
+        <Image
           src={review.user.avatar}
           alt={review.user.name}
+          width={36}
+          height={36}
           className="h-9 w-9 shrink-0 rounded-full object-cover"
         />
         <div className="min-w-0 flex-1">

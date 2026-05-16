@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { Minus, Plus, Trash2 } from "lucide-react"
 import { useCartStore } from "@/store/cart-store"
 import type { CartLine as CartLineType } from "@/store/cart-store"
@@ -37,7 +38,17 @@ export function CartLine({ line }: Props) {
   return (
     <div className="flex gap-3 py-3">
       <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-muted">
-        <img src={line.itemImage} alt={line.itemName} className="h-full w-full object-cover" />
+        {line.itemImage ? (
+          <Image
+            src={line.itemImage}
+            alt={line.itemName}
+            width={56}
+            height={56}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="h-full w-full" />
+        )}
       </div>
 
       <div className="min-w-0 flex-1">

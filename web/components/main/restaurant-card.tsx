@@ -1,4 +1,5 @@
 "use client"
+import Link from "next/link"
 import Image from "next/image"
 import {
 	Star,
@@ -88,7 +89,7 @@ export function RestaurantCard({ restaurant, className }: RestaurantCardProps) {
 	const free = isFreeDelivery(String(restaurant.deliveryFee))
 
 	return (
-		<a
+		<Link
 			href={`/restaurants/${restaurant.id}`}
 			className={cn(
 				"group relative flex flex-col overflow-hidden rounded-md p-2 transition-all duration-300",
@@ -101,7 +102,8 @@ export function RestaurantCard({ restaurant, className }: RestaurantCardProps) {
 			<div className="relative aspect-5/3 sm:aspect-video overflow-hidden bg-muted">
 				<Image
 					src={restaurant.banner || "https://placehold.net/800x600.png"}
-					fill
+					width={800}
+					height={500}
 					alt=""
 					sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
 					className={cn(
@@ -226,6 +228,6 @@ export function RestaurantCard({ restaurant, className }: RestaurantCardProps) {
 					</div>
 				</div>
 			</div>
-		</a>
+		</Link>
 	)
 }

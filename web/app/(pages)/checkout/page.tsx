@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import {
   ArrowLeft,
   Check,
@@ -424,9 +425,11 @@ export default function CheckoutPage() {
                     <div key={item.id} className="flex gap-3">
                       <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-muted">
                         {item.image ? (
-                          <img
+                          <Image
                             src={item.image}
                             alt={item.name}
+                            width={56}
+                            height={56}
                             className="h-full w-full object-cover"
                           />
                         ) : (

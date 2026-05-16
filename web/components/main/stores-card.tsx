@@ -3,6 +3,7 @@
 import * as React from "react"
 import { Star, Package, ChevronRight } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 import { cn } from "@/lib/utils"
 
@@ -54,7 +55,7 @@ export function StoreCard({ store, className }: StoreCardProps) {
   const [imgError, setImgError] = React.useState(false)
 
   return (
-    <a
+    <Link
       href={`/stores/${store.id}`}
       className={cn(
         "group relative flex items-center gap-3 rounded-lg p-3 transition-all hover:border-foreground/20 hover:bg-card hover:shadow-sm",
@@ -135,6 +136,6 @@ export function StoreCard({ store, className }: StoreCardProps) {
           </div>
         </div>
       </div>
-    </a>
+    </Link>
   )
 }

@@ -5,27 +5,46 @@ import Link from "next/link"
 import { Download, Smartphone, XIcon } from "lucide-react"
 import Logo from "@/components/global/logo"
 
+const STORAGE_KEY = "vm-download-modal-seen"
+
 export function DownloadAppCard() {
-	const [isVisible, setIsVisible] = React.useState(true)
+	const [isVisible, setIsVisible] = React.useState(false)
+
+	React.useEffect(() => {
+		try {
+			const hasSeen = localStorage.getItem(STORAGE_KEY)
+			if (hasSeen) return
+			localStorage.setItem(STORAGE_KEY, "1")
+			setIsVisible(true)
+		} catch {
+			setIsVisible(true)
+		}
+	}, [])
 
 	if (!isVisible) {
 		return null
 	}
 
 	return (
-		<div className="fixed md:hidden bottom-4 right-4 z-50">
-			<div className="w-70 rounded-lg bg-card p-3 shadow-lg backdrop-blur supports-backdrop-filter:bg-card/95">
-				<div className="cancel-btn absolute p-0.5 right-1 top-0 rounded-lg">
+		<div className="fixed inset-0 z-50 flex items-end bg-black/45 p-4 md:hidden">
+			<div
+				role="dialog"
+				aria-modal="true"
+				aria-label="Download Varsity Mart app"
+				className="relative w-full rounded-2xl bg-card p-4 shadow-2xl backdrop-blur supports-backdrop-filter:bg-card/95"
+			>
+				<div className="cancel-btn absolute p-0.5 right-2 top-2 rounded-lg">
 					<button
 						type="button"
 						onClick={() => setIsVisible(false)}
+						aria-label="Close download prompt"
 					>
 						<XIcon />
 					</button>
 				</div>
-				<div className="mb-2 mt-2 flex  flex-col-reverse  justify-between gap-2">
+				<div className="mb-2 mt-2 flex flex-col-reverse justify-between gap-2">
 					<Logo width={96} height={28} className="w-24" />
-					<span className="inline-flex mt-3 items-center gap-1 rounded-full  px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+					<span className="inline-flex mt-3 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
 						<Smartphone className="h-3 w-3 text-vm-tangerine" />
 						Mobile app
 					</span>
@@ -40,6 +59,7 @@ export function DownloadAppCard() {
 
 				<Link
 					href="/download"
+					onClick={() => setIsVisible(false)}
 					className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md bg-vm-tangerine px-3 py-2 text-sm font-semibold text-vm-tangerine-foreground transition-opacity hover:opacity-90"
 				>
 					<Download className="h-4 w-4" />

@@ -1,5 +1,6 @@
 "use client";
 import * as React from "react"
+import Link from "next/link"
 import { Heart, Star, MapPin, Moon } from "lucide-react"
 import Image from "next/image"
 
@@ -114,7 +115,7 @@ export function ProductCard({
 	}
 
 	return (
-		<a
+		<Link
 			href={`/products/${product.id}`}
 			className={cn(
 				"group rounded-md hover:bg-card p-2 relative flex flex-col bg-background transition-colors",
@@ -225,6 +226,6 @@ export function ProductCard({
 					</span>
 				</div>
 			</div>
-		</a>
+		</Link>
 	)
 }

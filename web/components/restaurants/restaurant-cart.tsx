@@ -104,7 +104,7 @@ export function RestaurantCart() {
 
 	const handleCheckout = () => {
 		setOpen(false)
-		router.push("/checkout")
+		router.push("/food-checkout")
 	}
 
 	if (isDesktop) {

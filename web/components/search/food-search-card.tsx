@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Flame, Clock, Star } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -27,9 +28,11 @@ export function FoodSearchCard({ item }: { item: FoodSearchItem }) {
 		>
 			{/* Restaurant logo */}
 			<div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-muted md:h-24 md:w-24">
-				<img
+				<Image
 					src={item.restaurant_logo}
 					alt={item.restaurant_name}
+					width={96}
+					height={96}
 					className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
 				/>
 			</div>

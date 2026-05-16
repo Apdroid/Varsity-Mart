@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { Plus, Flame, Clock } from "lucide-react"
 import { toast } from "sonner"
 import { useCartStore } from "@/store/cart-store"
@@ -44,9 +45,11 @@ export function MenuItemCard({ item, restaurant }: Props) {
   return (
     <div className="group flex gap-3 rounded-xl border border-border bg-card p-3 transition-shadow hover:shadow-sm">
       <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-muted md:h-24 md:w-24">
-        <img
+        <Image
           src={item.image}
           alt={item.name}
+          width={96}
+          height={96}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       </div>

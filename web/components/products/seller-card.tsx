@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { MessageCircle, Phone, Store, MapPin, Star, Send, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -29,11 +30,14 @@ type Props = {
 
 function SellerAvatar({ seller, size = "md" }: { seller: ProductSeller; size?: "sm" | "md" }) {
 	const dim = size === "sm" ? "h-8 w-8 text-xs" : "h-10 w-10 text-sm"
+	const imageSize = size === "sm" ? 32 : 40
 	if (seller.avatarUrl) {
 		return (
-			<img
+			<Image
 				src={seller.avatarUrl}
 				alt={seller.name}
+				width={imageSize}
+				height={imageSize}
 				className={cn("shrink-0 rounded-full object-cover", dim)}
 			/>
 		)
@@ -147,9 +151,11 @@ function ComposeDialog({
 					{productTitle && (
 						<div className="flex items-center gap-2.5 rounded-lg bg-muted/70 px-3 py-2">
 							{productImage ? (
-								<img
+								<Image
 									src={productImage}
 									alt=""
+									width={36}
+									height={36}
 									className="h-9 w-9 rounded-md object-cover shrink-0"
 								/>
 							) : (

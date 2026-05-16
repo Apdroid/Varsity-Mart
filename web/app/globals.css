@@ -135,7 +135,7 @@
 	}
 
 	body {
-		@apply font-body bg-background text-foreground antialiased;
+		@apply font-body bg-background text-foreground antialiased overflow-x-hidden;
 	}
 
 	h1,
@@ -161,4 +161,7 @@
 		display: none;
 	}
 
+}
+body{
+	overflow-x:hidden;
 }

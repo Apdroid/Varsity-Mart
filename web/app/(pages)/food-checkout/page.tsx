@@ -515,9 +515,11 @@ export default function FoodCheckoutPage() {
                     <div key={line.lineId} className="flex gap-3">
                       <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-muted">
                         {line.itemImage ? (
-                          <img
+                          <Image
                             src={line.itemImage}
                             alt={line.itemName}
+                            width={56}
+                            height={56}
                             className="h-full w-full object-cover"
                           />
                         ) : (
