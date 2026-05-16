@@ -12,14 +12,14 @@ export const cartApi = {
     api.get<ApiResponse<Cart>>("/cart"),
 
   add: (data: AddToCartRequest) =>
-    api.post<ApiResponse<CartItem>>("/cart/add", data),
+    api.post<ApiResponse<CartItem>>("/cart/add/", {items:[data]}),
 
   update: (itemId: string, data: UpdateCartItemRequest) =>
-    api.patch<ApiResponse<CartItem>>(`/cart/${itemId}`, data),
+    api.patch<ApiResponse<CartItem>>(`/cart/${itemId}/`, data),
 
   remove: (itemId: string) =>
-    api.delete<ApiResponse<null>>(`/cart/${itemId}/remove`),
+    api.delete<ApiResponse<null>>(`/cart/${itemId}/remove/`),
 
   clear: () =>
-    api.delete<ApiResponse<null>>("/cart/clear"),
+    api.delete<ApiResponse<null>>("/cart/clear/"),
 }

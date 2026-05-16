@@ -54,10 +54,10 @@ export const ordersApi = {
 
 export const foodOrdersApi = {
   myOrders: (filters?: OrderFilters) =>
-    api.get<ApiResponse<{ orders: FoodOrder[]; total: number }>>(`/food-orders/my-orders${buildQueryString(filters || {})}`),
+    api.get<ApiResponse<{ orders: FoodOrder[]; total: number }>>(`/food-orders/my-orders${buildQueryString(filters || {})}/`),
 
   get: (orderId: string) =>
-    api.get<ApiResponse<FoodOrder>>(`/food-orders/${orderId}`),
+    api.get<ApiResponse<FoodOrder>>(`/food-orders/${orderId}/`),
 
   create: (data: CreateFoodOrderRequest) =>
     api.post<ApiResponse<{
@@ -69,7 +69,7 @@ export const foodOrdersApi = {
       total: number
       estimatedDelivery: string
       paymentUrl: string
-    }>>("/food-orders", data),
+    }>>("/food-orders/", data),
 
   updateStatus: (orderId: string, status: string, estimatedDeliveryTime?: string) =>
     api.patch<ApiResponse<FoodOrder>>(`/food-orders/${orderId}/status`, { status, estimatedDeliveryTime }),

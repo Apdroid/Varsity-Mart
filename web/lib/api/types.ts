@@ -594,12 +594,13 @@ export interface Order {
 }
 
 export interface CreateOrderRequest {
-	delivery_method?: "campus_delivery" | "pickup"
-	delivery_address?: string
-	delivery_instructions?: string
-	payment_method: "momo" | "card"
-	momo_number?: string
-	momo_provider?: string
+	productId: string,
+	deliveryMethod?: "campus_delivery" | "pickup"
+	deliveryAddress?: string
+	deliveryInstructions?: string
+	paymentMethod: "momo" | "card"
+	momoNumber?: string
+	momoProvider?: string
 }
 
 export interface OrderFilters {

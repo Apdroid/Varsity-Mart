@@ -155,11 +155,11 @@ export default function FoodCheckoutPage() {
 
     try {
       const payload = {
-        restaurant_id: restaurantId,
+        restaurantId,
         items: lines
           .filter((l) => l.restaurantId === restaurantId)
           .map((line) => ({
-            menu_item_id: line.itemId,
+            itemId: line.itemId,
             quantity: line.quantity,
             selected_size: line.selectedSize ?? undefined,
             selected_protein: line.selectedProtein ?? undefined,
@@ -167,12 +167,13 @@ export default function FoodCheckoutPage() {
             selected_modifiers: line.selectedModifiers.length ? line.selectedModifiers : undefined,
             notes: line.notes || undefined,
           })),
-        delivery_address: deliveryMethod === "campus_delivery" ? deliveryAddress : undefined,
-        delivery_instructions: deliveryInstructions || undefined,
-        payment_method: paymentMethod,
+        deliveryAddress: deliveryMethod === "campus_delivery" ? deliveryAddress : undefined,
+        deliveryInstructions: deliveryInstructions || undefined,
+        paymentMethod: paymentMethod,
+				deliveryMethod:deliveryMethod,
         // Passed through; backend uses these for MoMo prompt
-        momo_number: paymentMethod === "momo" ? momoNumber : undefined,
-        momo_provider: paymentMethod === "momo" ? momoProvider : undefined,
+        momoNumber: paymentMethod === "momo" ? momoNumber : undefined,
+        momoProvider: paymentMethod === "momo" ? momoProvider : undefined,
       }
 
       const result = await createFoodOrder.mutateAsync(payload as unknown as CreateFoodOrderRequest)

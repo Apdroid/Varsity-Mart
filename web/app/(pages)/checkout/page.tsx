@@ -5,19 +5,19 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import {
-  ArrowLeft,
-  Check,
-  CreditCard,
-  ImageIcon,
-  Loader2,
-  Lock,
-  MapPin,
-  MessageSquare,
-  Phone,
-  ShieldCheck,
-  Smartphone,
-  Store,
-  Truck,
+	ArrowLeft,
+	Check,
+	CreditCard,
+	ImageIcon,
+	Loader2,
+	Lock,
+	MapPin,
+	MessageSquare,
+	Phone,
+	ShieldCheck,
+	Smartphone,
+	Store,
+	Truck,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,22 +31,22 @@ import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
 function formatGHS(n: number) {
-  return new Intl.NumberFormat("en-GH", {
-    style: "currency",
-    currency: "GHS",
-    maximumFractionDigits: 2,
-  }).format(n)
+	return new Intl.NumberFormat("en-GH", {
+		style: "currency",
+		currency: "GHS",
+		maximumFractionDigits: 2,
+	}).format(n)
 }
 
 function StepHeader({ step, label }: { step: number; label: string }) {
-  return (
-    <div className="mb-5 flex items-center gap-3">
-      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-vm-tangerine text-xs font-bold text-white">
-        {step}
-      </div>
-      <h2 className="text-base font-semibold">{label}</h2>
-    </div>
-  )
+	return (
+		<div className="mb-5 flex items-center gap-3">
+			<div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-vm-tangerine text-xs font-bold text-white">
+				{step}
+			</div>
+			<h2 className="text-base font-semibold">{label}</h2>
+		</div>
+	)
 }
 
 type DeliveryMethod = "campus_delivery" | "pickup"
@@ -54,449 +54,450 @@ type PaymentMethod = "momo" | "card"
 type MomoProvider = "mtn" | "vodafone" | "airteltigo"
 
 const MOMO_PROVIDERS: { value: MomoProvider; label: string; activeClass: string }[] = [
-  {
-    value: "mtn",
-    label: "MTN MoMo",
-    activeClass: "border-yellow-400 bg-yellow-50 text-yellow-800 dark:bg-yellow-950/30 dark:text-yellow-400",
-  },
-  {
-    value: "vodafone",
-    label: "Vodafone",
-    activeClass: "border-red-400 bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400",
-  },
-  {
-    value: "airteltigo",
-    label: "AirtelTigo",
-    activeClass: "border-blue-400 bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400",
-  },
+	{
+		value: "mtn",
+		label: "MTN MoMo",
+		activeClass: "border-yellow-400 bg-yellow-50 text-yellow-800 dark:bg-yellow-950/30 dark:text-yellow-400",
+	},
+	{
+		value: "vodafone",
+		label: "Vodafone",
+		activeClass: "border-red-400 bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400",
+	},
+	{
+		value: "airteltigo",
+		label: "AirtelTigo",
+		activeClass: "border-blue-400 bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400",
+	},
 ]
 
 export default function CheckoutPage() {
-  const router = useRouter()
-  const { isAuthenticated, isLoading: authLoading } = useAuth()
-  const { data: cart, isLoading: cartLoading } = useCart({ enabled: isAuthenticated })
-  const createOrderMutation = useCreateOrder()
+	const router = useRouter()
+	const { isAuthenticated, isLoading: authLoading } = useAuth()
+	const { data: cart, isLoading: cartLoading } = useCart({ enabled: isAuthenticated })
+	const createOrderMutation = useCreateOrder()
 
-  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("campus_delivery")
-  const [deliveryAddress, setDeliveryAddress] = useState("")
-  const [deliveryInstructions, setDeliveryInstructions] = useState("")
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("momo")
-  const [momoNumber, setMomoNumber] = useState("")
-  const [momoProvider, setMomoProvider] = useState<MomoProvider>("mtn")
+	const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>("campus_delivery")
+	const [deliveryAddress, setDeliveryAddress] = useState("")
+	const [deliveryInstructions, setDeliveryInstructions] = useState("")
+	const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("momo")
+	const [momoNumber, setMomoNumber] = useState("")
+	const [momoProvider, setMomoProvider] = useState<MomoProvider>("mtn")
 
-  const items = cart?.items ?? []
-  const subtotal = cart?.total ?? 0
-  const deliveryFee = deliveryMethod === "campus_delivery" ? 5 : 0
-  const serviceFee = Math.round(subtotal * 0.02 * 100) / 100
-  const total = subtotal + deliveryFee + serviceFee
+	const items = cart?.items ?? []
+	const subtotal = cart?.total ?? 0
+	const deliveryFee = deliveryMethod === "campus_delivery" ? 5 : 0
+	const serviceFee = Math.round(subtotal * 0.02 * 100) / 100
+	const total = subtotal + deliveryFee + serviceFee
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (items.length === 0) { toast.error("Your cart is empty"); return }
-    if (deliveryMethod === "campus_delivery" && !deliveryAddress.trim()) {
-      toast.error("Please enter a delivery address"); return
-    }
-    if (paymentMethod === "momo" && !momoNumber.trim()) {
-      toast.error("Please enter your mobile money number"); return
-    }
-    try {
-      const result = await createOrderMutation.mutateAsync({
-        delivery_method: deliveryMethod,
-        delivery_address: deliveryMethod === "campus_delivery" ? deliveryAddress : undefined,
-        delivery_instructions: deliveryInstructions || undefined,
-        payment_method: paymentMethod,
-        momo_number: paymentMethod === "momo" ? momoNumber : undefined,
-        momo_provider: paymentMethod === "momo" ? momoProvider : undefined,
-      })
-      if (result.data?.paymentUrl) {
-        window.location.href = result.data.paymentUrl
-      } else {
-        toast.success("Order placed successfully!")
-        router.push(`/orders/${result.data?.orderId}`)
-      }
-    } catch {
-      toast.error("Failed to place order. Please try again.")
-    }
-  }
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		if (items.length === 0) { toast.error("Your cart is empty"); return }
+		if (deliveryMethod === "campus_delivery" && !deliveryAddress.trim()) {
+			toast.error("Please enter a delivery address"); return
+		}
+		if (paymentMethod === "momo" && !momoNumber.trim()) {
+			toast.error("Please enter your mobile money number"); return
+		}
+		try {
+			const result = await createOrderMutation.mutateAsync({
+				productId: items[0].productId,
+				deliveryMethod: deliveryMethod,
+				deliveryAddress: deliveryMethod === "campus_delivery" ? deliveryAddress : undefined,
+				deliveryInstructions: deliveryInstructions || undefined,
+				paymentMethod: paymentMethod,
+				momoNumber: paymentMethod === "momo" ? momoNumber : undefined,
+				momoProvider: paymentMethod === "momo" ? momoProvider.toUpperCase() : undefined,
+			})
+			if (result.data?.paymentUrl) {
+				window.location.href = result.data.paymentUrl
+			} else {
+				toast.success("Order placed successfully!")
+				router.push(`/orders/${result.data?.orderId}`)
+			}
+		} catch {
+			toast.error("Failed to place order. Please try again.")
+		}
+	}
 
-  if (authLoading || cartLoading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    )
-  }
+	if (authLoading || cartLoading) {
+		return (
+			<div className="flex min-h-[60vh] items-center justify-center">
+				<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+			</div>
+		)
+	}
 
-  if (!isAuthenticated) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center px-4">
-        <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-vm-tangerine/10">
-            <Lock className="h-6 w-6 text-vm-tangerine" />
-          </div>
-          <h1 className="text-xl font-bold">Sign in to checkout</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            You need to be signed in to complete your purchase
-          </p>
-          <Button asChild className="mt-6 w-full rounded-full bg-vm-tangerine hover:bg-vm-tangerine/90">
-            <Link href="/login?redirect=/checkout">Sign in</Link>
-          </Button>
-        </div>
-      </div>
-    )
-  }
+	if (!isAuthenticated) {
+		return (
+			<div className="flex min-h-[60vh] items-center justify-center px-4">
+				<div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-center">
+					<div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-vm-tangerine/10">
+						<Lock className="h-6 w-6 text-vm-tangerine" />
+					</div>
+					<h1 className="text-xl font-bold">Sign in to checkout</h1>
+					<p className="mt-2 text-sm text-muted-foreground">
+						You need to be signed in to complete your purchase
+					</p>
+					<Button asChild className="mt-6 w-full rounded-full bg-vm-tangerine hover:bg-vm-tangerine/90">
+						<Link href="/login?redirect=/checkout">Sign in</Link>
+					</Button>
+				</div>
+			</div>
+		)
+	}
 
-  if (items.length === 0) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center px-4">
-        <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
-            <ShieldCheck className="h-6 w-6 text-muted-foreground" />
-          </div>
-          <h1 className="text-xl font-bold">Your cart is empty</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Add some products to your cart before checking out
-          </p>
-          <Button asChild className="mt-6 w-full rounded-full bg-vm-tangerine hover:bg-vm-tangerine/90">
-            <Link href="/products">Browse Products</Link>
-          </Button>
-        </div>
-      </div>
-    )
-  }
+	if (items.length === 0) {
+		return (
+			<div className="flex min-h-[60vh] items-center justify-center px-4">
+				<div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-center">
+					<div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+						<ShieldCheck className="h-6 w-6 text-muted-foreground" />
+					</div>
+					<h1 className="text-xl font-bold">Your cart is empty</h1>
+					<p className="mt-2 text-sm text-muted-foreground">
+						Add some products to your cart before checking out
+					</p>
+					<Button asChild className="mt-6 w-full rounded-full bg-vm-tangerine hover:bg-vm-tangerine/90">
+						<Link href="/products">Browse Products</Link>
+					</Button>
+				</div>
+			</div>
+		)
+	}
 
-  const SubmitButton = ({ className }: { className?: string }) => (
-    <Button
-      type="submit"
-      disabled={createOrderMutation.isPending}
-      className={cn(
-        "w-full rounded-full bg-vm-tangerine py-6 text-base font-semibold text-white hover:bg-vm-tangerine/90",
-        className
-      )}
-    >
-      {createOrderMutation.isPending ? (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      ) : (
-        <Lock className="mr-2 h-4 w-4" />
-      )}
-      Place Order · {formatGHS(total)}
-    </Button>
-  )
+	const SubmitButton = ({ className }: { className?: string }) => (
+		<Button
+			type="submit"
+			disabled={createOrderMutation.isPending}
+			className={cn(
+				"w-full rounded-full bg-vm-tangerine py-6 text-base font-semibold text-white hover:bg-vm-tangerine/90",
+				className
+			)}
+		>
+			{createOrderMutation.isPending ? (
+				<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+			) : (
+				<Lock className="mr-2 h-4 w-4" />
+			)}
+			Place Order · {formatGHS(total)}
+		</Button>
+	)
 
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:py-10">
+	return (
+		<div className="min-h-screen bg-background">
+			<div className="mx-auto max-w-6xl px-4 py-6 sm:py-10">
 
-        {/* Back link + title */}
-        <div className="mb-8 flex items-center justify-between">
-          <Link
-            href="/cart"
-            className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Cart
-          </Link>
-          <span className="text-sm text-muted-foreground">
-            {items.length} item{items.length !== 1 ? "s" : ""}
-          </span>
-        </div>
+				{/* Back link + title */}
+				<div className="mb-8 flex items-center justify-between">
+					<Link
+						href="/cart"
+						className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+					>
+						<ArrowLeft className="h-4 w-4" />
+						Back to Cart
+					</Link>
+					<span className="text-sm text-muted-foreground">
+						{items.length} item{items.length !== 1 ? "s" : ""}
+					</span>
+				</div>
 
-        <h1 className="mb-8 text-2xl font-bold tracking-tight sm:text-3xl">Checkout</h1>
+				<h1 className="mb-8 text-2xl font-bold tracking-tight sm:text-3xl">Checkout</h1>
 
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-8 lg:grid-cols-[1fr_22rem]">
+				<form onSubmit={handleSubmit}>
+					<div className="grid gap-8 lg:grid-cols-[1fr_22rem]">
 
-            {/* ── LEFT: Steps ── */}
-            <div className="space-y-5">
+						{/* ── LEFT: Steps ── */}
+						<div className="space-y-5">
 
-              {/* Step 1 — Delivery Method */}
-              <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
-                <StepHeader step={1} label="Delivery Method" />
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {[
-                    {
-                      value: "campus_delivery" as DeliveryMethod,
-                      icon: Truck,
-                      title: "Campus Delivery",
-                      desc: "Delivered to your hostel or campus location",
-                      badge: formatGHS(5),
-                      badgeClass: "text-vm-tangerine",
-                    },
-                    {
-                      value: "pickup" as DeliveryMethod,
-                      icon: Store,
-                      title: "Pickup",
-                      desc: "Collect from the seller's location at your convenience",
-                      badge: "Free",
-                      badgeClass: "text-emerald-600",
-                    },
-                  ].map(({ value, icon: Icon, title, desc, badge, badgeClass }) => {
-                    const selected = deliveryMethod === value
-                    return (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => setDeliveryMethod(value)}
-                        className={cn(
-                          "relative flex items-start gap-3 rounded-xl border-2 p-4 text-left transition-all",
-                          selected
-                            ? "border-vm-tangerine bg-vm-tangerine/5"
-                            : "border-border hover:border-vm-tangerine/40 hover:bg-muted/40"
-                        )}
-                      >
-                        <div className={cn(
-                          "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-                          selected ? "bg-vm-tangerine/15 text-vm-tangerine" : "bg-muted text-muted-foreground"
-                        )}>
-                          <Icon className="h-4 w-4" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-sm">{title}</span>
-                            {selected && (
-                              <span className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-vm-tangerine">
-                                <Check className="h-3 w-3 text-white" />
-                              </span>
-                            )}
-                          </div>
-                          <span className={cn("text-xs font-bold", badgeClass)}>{badge}</span>
-                          <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{desc}</p>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
+							{/* Step 1 — Delivery Method */}
+							<div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+								<StepHeader step={1} label="Delivery Method" />
+								<div className="grid gap-3 sm:grid-cols-2">
+									{[
+										{
+											value: "campus_delivery" as DeliveryMethod,
+											icon: Truck,
+											title: "Campus Delivery",
+											desc: "Delivered to your hostel or campus location",
+											badge: formatGHS(5),
+											badgeClass: "text-vm-tangerine",
+										},
+										{
+											value: "pickup" as DeliveryMethod,
+											icon: Store,
+											title: "Pickup",
+											desc: "Collect from the seller's location at your convenience",
+											badge: "Free",
+											badgeClass: "text-emerald-600",
+										},
+									].map(({ value, icon: Icon, title, desc, badge, badgeClass }) => {
+										const selected = deliveryMethod === value
+										return (
+											<button
+												key={value}
+												type="button"
+												onClick={() => setDeliveryMethod(value)}
+												className={cn(
+													"relative flex items-start gap-3 rounded-xl border-2 p-4 text-left transition-all",
+													selected
+														? "border-vm-tangerine bg-vm-tangerine/5"
+														: "border-border hover:border-vm-tangerine/40 hover:bg-muted/40"
+												)}
+											>
+												<div className={cn(
+													"mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+													selected ? "bg-vm-tangerine/15 text-vm-tangerine" : "bg-muted text-muted-foreground"
+												)}>
+													<Icon className="h-4 w-4" />
+												</div>
+												<div className="min-w-0 flex-1">
+													<div className="flex items-center gap-2">
+														<span className="font-semibold text-sm">{title}</span>
+														{selected && (
+															<span className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-vm-tangerine">
+																<Check className="h-3 w-3 text-white" />
+															</span>
+														)}
+													</div>
+													<span className={cn("text-xs font-bold", badgeClass)}>{badge}</span>
+													<p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{desc}</p>
+												</div>
+											</button>
+										)
+									})}
+								</div>
+							</div>
 
-              {/* Step 2 — Delivery Details (conditional) */}
-              {deliveryMethod === "campus_delivery" && (
-                <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
-                  <StepHeader step={2} label="Delivery Details" />
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="address" className="flex items-center gap-1.5 text-sm font-medium">
-                        <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                        Delivery Address
-                      </Label>
-                      <Input
-                        id="address"
-                        placeholder="e.g., Room 205, Unity Hall, KNUST"
-                        value={deliveryAddress}
-                        onChange={(e) => setDeliveryAddress(e.target.value)}
-                        className="mt-1.5 h-11 rounded-xl"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="instructions" className="flex items-center gap-1.5 text-sm font-medium">
-                        <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
-                        Instructions
-                        <span className="ml-1 font-normal text-muted-foreground">(optional)</span>
-                      </Label>
-                      <Textarea
-                        id="instructions"
-                        placeholder="Any special instructions for the delivery rider…"
-                        value={deliveryInstructions}
-                        onChange={(e) => setDeliveryInstructions(e.target.value)}
-                        className="mt-1.5 min-h-[80px] rounded-xl resize-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
+							{/* Step 2 — Delivery Details (conditional) */}
+							{deliveryMethod === "campus_delivery" && (
+								<div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+									<StepHeader step={2} label="Delivery Details" />
+									<div className="space-y-4">
+										<div>
+											<Label htmlFor="address" className="flex items-center gap-1.5 text-sm font-medium">
+												<MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+												Delivery Address
+											</Label>
+											<Input
+												id="address"
+												placeholder="e.g., Room 205, Unity Hall, KNUST"
+												value={deliveryAddress}
+												onChange={(e) => setDeliveryAddress(e.target.value)}
+												className="mt-1.5 h-11 rounded-xl"
+											/>
+										</div>
+										<div>
+											<Label htmlFor="instructions" className="flex items-center gap-1.5 text-sm font-medium">
+												<MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
+												Instructions
+												<span className="ml-1 font-normal text-muted-foreground">(optional)</span>
+											</Label>
+											<Textarea
+												id="instructions"
+												placeholder="Any special instructions for the delivery rider…"
+												value={deliveryInstructions}
+												onChange={(e) => setDeliveryInstructions(e.target.value)}
+												className="mt-1.5 min-h-[80px] rounded-xl resize-none"
+											/>
+										</div>
+									</div>
+								</div>
+							)}
 
-              {/* Step 3 — Payment */}
-              <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
-                <StepHeader step={deliveryMethod === "campus_delivery" ? 3 : 2} label="Payment Method" />
+							{/* Step 3 — Payment */}
+							<div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+								<StepHeader step={deliveryMethod === "campus_delivery" ? 3 : 2} label="Payment Method" />
 
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {[
-                    {
-                      value: "momo" as PaymentMethod,
-                      icon: Smartphone,
-                      title: "Mobile Money",
-                      desc: "MTN MoMo, Vodafone Cash, or AirtelTigo",
-                    },
-                    {
-                      value: "card" as PaymentMethod,
-                      icon: CreditCard,
-                      title: "Debit / Credit Card",
-                      desc: "Visa, Mastercard, and more",
-                    },
-                  ].map(({ value, icon: Icon, title, desc }) => {
-                    const selected = paymentMethod === value
-                    return (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => setPaymentMethod(value)}
-                        className={cn(
-                          "relative flex items-start gap-3 rounded-xl border-2 p-4 text-left transition-all",
-                          selected
-                            ? "border-vm-tangerine bg-vm-tangerine/5"
-                            : "border-border hover:border-vm-tangerine/40 hover:bg-muted/40"
-                        )}
-                      >
-                        <div className={cn(
-                          "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-                          selected ? "bg-vm-tangerine/15 text-vm-tangerine" : "bg-muted text-muted-foreground"
-                        )}>
-                          <Icon className="h-4 w-4" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="font-semibold text-sm">{title}</p>
-                            {selected && (
-                              <span className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-vm-tangerine">
-                                <Check className="h-3 w-3 text-white" />
-                              </span>
-                            )}
-                          </div>
-                          <p className="mt-0.5 text-xs text-muted-foreground">{desc}</p>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
+								<div className="grid gap-3 sm:grid-cols-2">
+									{[
+										{
+											value: "momo" as PaymentMethod,
+											icon: Smartphone,
+											title: "Mobile Money",
+											desc: "MTN MoMo, Vodafone Cash, or AirtelTigo",
+										},
+										{
+											value: "card" as PaymentMethod,
+											icon: CreditCard,
+											title: "Debit / Credit Card",
+											desc: "Visa, Mastercard, and more",
+										},
+									].map(({ value, icon: Icon, title, desc }) => {
+										const selected = paymentMethod === value
+										return (
+											<button
+												key={value}
+												type="button"
+												onClick={() => setPaymentMethod(value)}
+												className={cn(
+													"relative flex items-start gap-3 rounded-xl border-2 p-4 text-left transition-all",
+													selected
+														? "border-vm-tangerine bg-vm-tangerine/5"
+														: "border-border hover:border-vm-tangerine/40 hover:bg-muted/40"
+												)}
+											>
+												<div className={cn(
+													"mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+													selected ? "bg-vm-tangerine/15 text-vm-tangerine" : "bg-muted text-muted-foreground"
+												)}>
+													<Icon className="h-4 w-4" />
+												</div>
+												<div className="min-w-0 flex-1">
+													<div className="flex items-center gap-2">
+														<p className="font-semibold text-sm">{title}</p>
+														{selected && (
+															<span className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-vm-tangerine">
+																<Check className="h-3 w-3 text-white" />
+															</span>
+														)}
+													</div>
+													<p className="mt-0.5 text-xs text-muted-foreground">{desc}</p>
+												</div>
+											</button>
+										)
+									})}
+								</div>
 
-                {paymentMethod === "momo" && (
-                  <div className="mt-5 space-y-4">
-                    <div>
-                      <p className="mb-2 text-sm font-medium">Network Provider</p>
-                      <div className="grid grid-cols-3 gap-2">
-                        {MOMO_PROVIDERS.map(({ value, label, activeClass }) => (
-                          <button
-                            key={value}
-                            type="button"
-                            onClick={() => setMomoProvider(value)}
-                            className={cn(
-                              "rounded-xl border-2 py-2.5 text-xs font-semibold transition-all",
-                              momoProvider === value
-                                ? activeClass
-                                : "border-border text-muted-foreground hover:border-border/60 hover:bg-muted/40"
-                            )}
-                          >
-                            {label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="momoNumber" className="flex items-center gap-1.5 text-sm font-medium">
-                        <Phone className="h-3.5 w-3.5 text-muted-foreground" />
-                        Mobile Money Number
-                      </Label>
-                      <div className="relative mt-1.5">
-                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">
-                          +233
-                        </span>
-                        <Input
-                          id="momoNumber"
-                          type="tel"
-                          placeholder="20 123 4567"
-                          value={momoNumber}
-                          onChange={(e) => setMomoNumber(e.target.value)}
-                          className="h-11 rounded-xl pl-14"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+								{paymentMethod === "momo" && (
+									<div className="mt-5 space-y-4">
+										<div>
+											<p className="mb-2 text-sm font-medium">Network Provider</p>
+											<div className="grid grid-cols-3 gap-2">
+												{MOMO_PROVIDERS.map(({ value, label, activeClass }) => (
+													<button
+														key={value}
+														type="button"
+														onClick={() => setMomoProvider(value)}
+														className={cn(
+															"rounded-xl border-2 py-2.5 text-xs font-semibold transition-all",
+															momoProvider === value
+																? activeClass
+																: "border-border text-muted-foreground hover:border-border/60 hover:bg-muted/40"
+														)}
+													>
+														{label}
+													</button>
+												))}
+											</div>
+										</div>
+										<div>
+											<Label htmlFor="momoNumber" className="flex items-center gap-1.5 text-sm font-medium">
+												<Phone className="h-3.5 w-3.5 text-muted-foreground" />
+												Mobile Money Number
+											</Label>
+											<div className="relative mt-1.5">
+												<span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">
+													+233
+												</span>
+												<Input
+													id="momoNumber"
+													type="tel"
+													placeholder="20 123 4567"
+													value={momoNumber}
+													onChange={(e) => setMomoNumber(e.target.value)}
+													className="h-11 rounded-xl pl-14"
+												/>
+											</div>
+										</div>
+									</div>
+								)}
+							</div>
 
-              {/* Mobile submit */}
-              <div className="lg:hidden">
-                <SubmitButton />
-              </div>
-            </div>
+							{/* Mobile submit */}
+							<div className="lg:hidden">
+								<SubmitButton />
+							</div>
+						</div>
 
-            {/* ── RIGHT: Order Summary ── */}
-            <div className="lg:sticky lg:top-8 lg:self-start">
-              <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="font-semibold">Order Summary</h2>
-                  <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
-                    {items.length} item{items.length !== 1 ? "s" : ""}
-                  </span>
-                </div>
+						{/* ── RIGHT: Order Summary ── */}
+						<div className="lg:sticky lg:top-8 lg:self-start">
+							<div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+								<div className="mb-4 flex items-center justify-between">
+									<h2 className="font-semibold">Order Summary</h2>
+									<span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
+										{items.length} item{items.length !== 1 ? "s" : ""}
+									</span>
+								</div>
 
-                {/* Items */}
-                <div className="max-h-64 space-y-3 overflow-y-auto pr-1 [scrollbar-width:thin]">
-                  {items.map((item) => (
-                    <div key={item.id} className="flex gap-3">
-                      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-muted">
-                        {item.image ? (
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            width={56}
-                            height={56}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center">
-                            <ImageIcon className="h-5 w-5 text-muted-foreground/50" />
-                          </div>
-                        )}
-                        <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-background bg-vm-tangerine text-[10px] font-bold text-white">
-                          {item.quantity}
-                        </span>
-                      </div>
-                      <div className="min-w-0 flex-1 pt-0.5">
-                        <p className="line-clamp-1 text-sm font-medium">{item.name}</p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">
-                          {formatGHS(item.unitPrice)} × {item.quantity}
-                        </p>
-                      </div>
-                      <p className="shrink-0 pt-0.5 text-sm font-semibold">{formatGHS(item.subtotal)}</p>
-                    </div>
-                  ))}
-                </div>
+								{/* Items */}
+								<div className="max-h-64 space-y-3 overflow-y-auto pr-1 [scrollbar-width:thin]">
+									{items.map((item) => (
+										<div key={item.id} className="flex gap-3">
+											<div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-muted">
+												{item.image ? (
+													<Image
+														src={item.image}
+														alt={item.name}
+														width={56}
+														height={56}
+														className="h-full w-full object-cover"
+													/>
+												) : (
+													<div className="flex h-full w-full items-center justify-center">
+														<ImageIcon className="h-5 w-5 text-muted-foreground/50" />
+													</div>
+												)}
+												<span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-background bg-vm-tangerine text-[10px] font-bold text-white">
+													{item.quantity}
+												</span>
+											</div>
+											<div className="min-w-0 flex-1 pt-0.5">
+												<p className="line-clamp-1 text-sm font-medium">{item.name}</p>
+												<p className="mt-0.5 text-xs text-muted-foreground">
+													{formatGHS(item.unitPrice)} × {item.quantity}
+												</p>
+											</div>
+											<p className="shrink-0 pt-0.5 text-sm font-semibold">{formatGHS(item.subtotal)}</p>
+										</div>
+									))}
+								</div>
 
-                <Separator className="my-4" />
+								<Separator className="my-4" />
 
-                {/* Fee breakdown */}
-                <div className="space-y-2.5 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-medium">{formatGHS(subtotal)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Delivery fee</span>
-                    <span className={cn("font-medium", deliveryFee === 0 && "text-emerald-600")}>
-                      {deliveryFee === 0 ? "Free" : formatGHS(deliveryFee)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Service fee (2%)</span>
-                    <span className="font-medium">{formatGHS(serviceFee)}</span>
-                  </div>
-                </div>
+								{/* Fee breakdown */}
+								<div className="space-y-2.5 text-sm">
+									<div className="flex justify-between">
+										<span className="text-muted-foreground">Subtotal</span>
+										<span className="font-medium">{formatGHS(subtotal)}</span>
+									</div>
+									<div className="flex justify-between">
+										<span className="text-muted-foreground">Delivery fee</span>
+										<span className={cn("font-medium", deliveryFee === 0 && "text-emerald-600")}>
+											{deliveryFee === 0 ? "Free" : formatGHS(deliveryFee)}
+										</span>
+									</div>
+									<div className="flex justify-between">
+										<span className="text-muted-foreground">Service fee (2%)</span>
+										<span className="font-medium">{formatGHS(serviceFee)}</span>
+									</div>
+								</div>
 
-                <Separator className="my-4" />
+								<Separator className="my-4" />
 
-                <div className="flex items-center justify-between">
-                  <span className="font-bold">Total</span>
-                  <span className="text-lg font-bold text-vm-tangerine">{formatGHS(total)}</span>
-                </div>
+								<div className="flex items-center justify-between">
+									<span className="font-bold">Total</span>
+									<span className="text-lg font-bold text-vm-tangerine">{formatGHS(total)}</span>
+								</div>
 
-                {/* Desktop submit */}
-                <div className="mt-5 hidden lg:block">
-                  <SubmitButton />
-                </div>
+								{/* Desktop submit */}
+								<div className="mt-5 hidden lg:block">
+									<SubmitButton />
+								</div>
 
-                {/* Trust badge */}
-                <div className="mt-4 flex items-start gap-2.5 rounded-xl bg-muted/60 px-3.5 py-3">
-                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-                  <p className="text-xs leading-relaxed text-muted-foreground">
-                    Your payment is held securely in escrow and only released when you confirm delivery.
-                  </p>
-                </div>
-              </div>
-            </div>
+								{/* Trust badge */}
+								<div className="mt-4 flex items-start gap-2.5 rounded-xl bg-muted/60 px-3.5 py-3">
+									<ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+									<p className="text-xs leading-relaxed text-muted-foreground">
+										Your payment is held securely in escrow and only released when you confirm delivery.
+									</p>
+								</div>
+							</div>
+						</div>
 
-          </div>
-        </form>
-      </div>
-    </div>
-  )
+					</div>
+				</form>
+			</div>
+		</div>
+	)
 }
