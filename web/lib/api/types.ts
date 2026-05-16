@@ -916,3 +916,17 @@ export interface PayoutRequest {
 	account_number: string
 	account_name: string
 }
+
+export interface AddPaymentMethodRequest {
+	type: "momo"
+	provider: "mtn" | "vodafone" | "airteltigo"
+	phone: string
+}
+
+export interface VerifyPaymentResponse {
+	success: boolean
+	status: string
+	orderId?: string
+	amount?: number
+	message?: string
+}
