@@ -17,7 +17,7 @@ export function usePaymentMethods() {
     queryKey: paymentKeys.methods(),
     queryFn: async () => {
       const response = await paymentsApi.methods.list()
-      return response.data as PaymentMethod[]
+      return response.data
     },
   })
 }
@@ -52,6 +52,9 @@ export function useRemovePaymentMethod() {
         queryClient.setQueryData(paymentKeys.methods(), context.previous)
       }
     },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: paymentKeys.methods() })
+    },
   })
 }
 
@@ -75,6 +78,9 @@ export function useSetDefaultPaymentMethod() {
         queryClient.setQueryData(paymentKeys.methods(), context.previous)
       }
     },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: paymentKeys.methods() })
+    },
   })
 }
 
@@ -82,7 +88,8 @@ export function useVerifyPayment(reference: string | null) {
   return useQuery({
     queryKey: paymentKeys.verify(reference ?? ""),
     queryFn: async () => {
-      const response = await paymentsApi.verify(reference!)
+      if (!reference) throw new Error("reference is required")
+      const response = await paymentsApi.verify(reference)
       return response.data
     },
     enabled: !!reference,
@@ -95,7 +102,7 @@ export function useEscrowBalance() {
     queryKey: paymentKeys.escrow(),
     queryFn: async () => {
       const response = await paymentsApi.escrowBalance()
-      return response.data as EscrowBalance
+      return response.data
     },
   })
 }
@@ -105,7 +112,7 @@ export function useBanks() {
     queryKey: paymentKeys.banks(),
     queryFn: async () => {
       const response = await paymentsApi.banks()
-      return response.data as Bank[]
+      return response.data
     },
     staleTime: 10 * 60 * 1000,
   })
