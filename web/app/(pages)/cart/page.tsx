@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import {
@@ -27,6 +26,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
+import { useIsMutating } from "@tanstack/react-query"
 import { useCart, useUpdateCartItem, useRemoveFromCart, useClearCart } from "@/hooks/queries/use-cart"
 import type { NormalizedCartItem } from "@/hooks/queries/use-cart"
 import { useAuth } from "@/providers/auth-provider"
@@ -121,6 +121,10 @@ function CartItemRow({ item }: { item: NormalizedCartItem }) {
 
         <p className="mt-0.5 text-sm text-muted-foreground">{formatGHS(item.unitPrice)}</p>
 
+        {item.storeName && (
+          <p className="text-xs text-muted-foreground">{item.storeName}</p>
+        )}
+
         {!item.inStock && (
           <Badge variant="secondary" className="mt-1 text-[10px]">Out of stock</Badge>
         )}
@@ -160,9 +164,13 @@ export default function CartPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth()
   const { data: cart, isLoading: cartLoading } = useCart({ enabled: isAuthenticated })
   const { mutate: clearCart, isPending: clearing } = useClearCart()
+  const isMutating = useIsMutating() > 0
+  const updating = isMutating
+  const removing = isMutating
 
   const items = cart?.items ?? []
   const subtotal = cart?.total ?? 0
+  const itemCount = items.reduce((sum, i) => sum + i.quantity, 0)
 
   if (authLoading || cartLoading) return <CartSkeleton />
 
@@ -257,6 +265,10 @@ export default function CartPage() {
             <h2 className="mb-4 text-base font-semibold">Order summary</h2>
 
             <div className="space-y-2.5 text-sm">
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <span>Items</span>
+                <span>{itemCount}</span>
+              </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
                 <span className="font-medium">{formatGHS(subtotal)}</span>
@@ -281,9 +293,13 @@ export default function CartPage() {
 
             <Button
               asChild
-              className="mt-5 w-full rounded-full bg-vm-tangerine py-5 text-sm font-semibold text-white hover:bg-vm-tangerine/90"
+              disabled={clearing || updating || removing}
+              className="mt-5 w-full h-11 bg-vm-tangerine text-white hover:bg-vm-tangerine/90"
             >
-              <Link href="/checkout">Proceed to Checkout</Link>
+              <Link href="/checkout" className="flex items-center justify-center gap-2">
+                <Lock className="h-4 w-4" />
+                Proceed to Checkout
+              </Link>
             </Button>
 
             <Link

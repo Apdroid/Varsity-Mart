@@ -33,6 +33,7 @@ export type NormalizedCartItem = {
 	productId: string
 	name: string
 	image: string
+	storeName?: string
 	inStock?: boolean
 	quantity: number
 	unitPrice: number
@@ -62,6 +63,7 @@ export function normalizeCartData(rawCart: unknown): NormalizedCart {
 				productId: asString(cartItem.product),
 				name: asString(cartItem.product_title),
 				image: asString(cartItem.product_image),
+				storeName: asString(cartItem.store_name || cartItem.seller_name || cartItem.store || ""),
 				inStock: typeof cartItem.inStock === "boolean"
 					? cartItem.inStock
 					: typeof cartItem.in_stock === "boolean"
@@ -144,7 +146,9 @@ export function useUpdateCartItem() {
 				queryClient.setQueryData(cartKeys.cart(), context.previousCart)
 			}
 		},
-		// No onSettled invalidation — our math is exact, no need to re-fetch
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: cartKeys.cart() })
+		},
 	})
 }
 
@@ -172,7 +176,9 @@ export function useRemoveFromCart() {
 				queryClient.setQueryData(cartKeys.cart(), context.previousCart)
 			}
 		},
-		// No onSettled invalidation — trust the optimistic removal
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: cartKeys.cart() })
+		},
 	})
 }
 
