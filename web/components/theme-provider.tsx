@@ -12,7 +12,7 @@ function ThemeProvider({
 }: React.ComponentProps<typeof NextThemesProvider>) {
 	const pathname = usePathname()
 	const hideExact = React.useMemo(
-		() => new Set(["/login", "/register", "/forgot", "/reset", "/verify-email"]),
+		() => new Set(["/login", "/register", "/forgot", "/reset", "/verify-email","/complete-profile"]),
 		[]
 	)
 	const hidePrefix = ["/messages"]

@@ -26,7 +26,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { registerSchema, type RegisterSchema } from "@/lib/validation/auth"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -49,7 +48,16 @@ const universities = [
 	"Ashesi University",
 ] as const
 
-const campuses = ["Legon", "Main Campus", "Kumasi", "Cape Coast", "Berekuso"] as const
+const CAMPUS_MAP: Record<string, string[]> = {
+	"KNUST": ["Kumasi", "Obuasi"],
+	"University of Ghana": ["Legon Main", "Korle-bu", "Accra City", "Kumasi City", "Takoradi City"],
+	"University of Cape Coast": ["Cape Coast"],
+	"Ashesi University": ["Berekuso"],
+}
+
+function getCampuses(university: string): string[] {
+	return CAMPUS_MAP[university] ?? []
+}
 
 const STEP1_FIELDS: (keyof RegisterSchema)[] = ["firstName", "lastName", "email", "password"]
 
@@ -61,7 +69,6 @@ type GoogleCompletionFormData = {
 	phone: string
 	university: string
 	campus: string
-	studentId: string
 }
 
 function hasValue(value?: string | null) {
@@ -91,7 +98,6 @@ function getMissingFlags(user: User | null) {
 		phone: !hasValue(user?.phone),
 		university: !hasValue(user?.university),
 		campus: !hasValue(user?.campus),
-		studentId: Boolean(user?.isStudent) && !hasValue(user?.studentId),
 	}
 }
 
@@ -111,13 +117,10 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 			firstName: "",
 			lastName: "",
 			email: "",
-			studentEmail: "",
 			phone: "",
 			password: "",
-			studentId: "",
-			isStudent: true,
 			university: "University of Ghana",
-			campus: "Legon",
+			campus: "Legon Main",
 			agreeToTerms: false,
 			authMethod: "credentials",
 			profilePic: "string",
@@ -131,16 +134,18 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 			lastName: "",
 			phone: "",
 			university: "University of Ghana",
-			campus: "Legon",
-			studentId: "",
+			campus: "Legon Main",
 		},
 	})
 
 	const missing = useMemo(() => getMissingFlags(googleUser), [googleUser])
 	const manualErrors = manualForm.formState.errors
 	const manualIsSubmitting = manualForm.formState.isSubmitting
-	const isStudent = manualForm.watch("isStudent")
 	const password = manualForm.watch("password")
+	const manualUniversity = manualForm.watch("university")
+	const googleUniversity = googleCompletionForm.watch("university")
+	const manualCampuses = getCampuses(manualUniversity)
+	const googleCampuses = getCampuses(googleUniversity)
 	const { score, label, color } = getPasswordStrength(password)
 
 	const handleManualSubmit = async (values: RegisterSchema) => {
@@ -151,8 +156,6 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 			phone: values.phone,
 			password: values.password,
 			confirmPassword: values.password,
-			studentId: values.studentId || undefined,
-			isStudent: values.isStudent,
 			university: values.university,
 			campus: values.campus,
 			agreeToTerms: values.agreeToTerms,
@@ -196,7 +199,6 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 				phone: user?.phone || "",
 				university: user?.university || "University of Ghana",
 				campus: user?.campus || "Legon",
-				studentId: user?.studentId || "",
 			})
 
 			const requiredMissing = getMissingFlags(user)
@@ -206,8 +208,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 				requiredMissing.lastName ||
 				requiredMissing.phone ||
 				requiredMissing.university ||
-				requiredMissing.campus ||
-				requiredMissing.studentId
+				requiredMissing.campus
 
 			if (!needsCompletion) {
 				toast.success("Account ready! Signed in with Google.")
@@ -248,11 +249,6 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 			googleCompletionForm.setError("campus", { message: "Select your campus." })
 			return
 		}
-		if (missing.studentId && values.studentId.trim().length < 3) {
-			googleCompletionForm.setError("studentId", { message: "Student ID must be at least 3 characters." })
-			return
-		}
-
 		try {
 			await updateProfileMutation.mutateAsync({
 				firstName: missing.firstName ? values.firstName.trim() : undefined,
@@ -260,7 +256,6 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 				phone: missing.phone ? phone : undefined,
 				university: missing.university ? university : undefined,
 				campus: missing.campus ? campus : undefined,
-				studentId: missing.studentId ? values.studentId.trim() : undefined,
 			})
 			await refreshUser()
 			toast.success("Profile completed successfully.")
@@ -379,17 +374,21 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 									render={({ field }) => (
 										<FormItem>
 											<FormLabel>University</FormLabel>
-											<Select value={field.value} onValueChange={field.onChange}>
+											<Select
+												value={field.value}
+												onValueChange={(val) => {
+													field.onChange(val)
+													googleCompletionForm.setValue("campus", "")
+												}}
+											>
 												<FormControl>
-													<SelectTrigger className="h-12 w-full px-4">
+													<SelectTrigger className="h-auto w-full rounded-full px-6 py-4">
 														<SelectValue placeholder="Select university" />
 													</SelectTrigger>
 												</FormControl>
 												<SelectContent>
-													{universities.map((university) => (
-														<SelectItem key={university} value={university}>
-															{university}
-														</SelectItem>
+													{universities.map((u) => (
+														<SelectItem key={u} value={u}>{u}</SelectItem>
 													))}
 												</SelectContent>
 											</Select>
@@ -407,33 +406,16 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 											<FormLabel>Campus</FormLabel>
 											<Select value={field.value} onValueChange={field.onChange}>
 												<FormControl>
-													<SelectTrigger className="h-12 w-full px-4">
+													<SelectTrigger className="h-auto w-full rounded-full px-6 py-4">
 														<SelectValue placeholder="Select campus" />
 													</SelectTrigger>
 												</FormControl>
 												<SelectContent>
-													{campuses.map((campus) => (
-														<SelectItem key={campus} value={campus}>
-															{campus}
-														</SelectItem>
+													{googleCampuses.map((c) => (
+														<SelectItem key={c} value={c}>{c}</SelectItem>
 													))}
 												</SelectContent>
 											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							)}
-							{missing.studentId && (
-								<FormField
-									control={googleCompletionForm.control}
-									name="studentId"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Student ID</FormLabel>
-											<FormControl>
-												<Input placeholder="UGBS123456" className="rounded-full p-6" {...field} />
-											</FormControl>
 											<FormMessage />
 										</FormItem>
 									)}
@@ -619,91 +601,25 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 										/>
 										<FormField
 											control={manualForm.control}
-											name="isStudent"
-											render={({ field }) => (
-												<FormItem className="flex-row items-center justify-between rounded-lg border border-border/70 px-4 py-3">
-													<div className="space-y-1">
-														<FormLabel>I am a student</FormLabel>
-														<FormDescription className="text-xs">
-															Switch off if you are registering as a vendor or staff.
-														</FormDescription>
-													</div>
-													<FormControl>
-														<Switch
-															checked={field.value}
-															onCheckedChange={(checked) => {
-																const nextValue = checked === true
-																field.onChange(nextValue)
-																if (!nextValue) {
-																	manualForm.setValue("studentEmail", "")
-																	manualForm.setValue("studentId", "")
-																}
-															}}
-														/>
-													</FormControl>
-												</FormItem>
-											)}
-										/>
-										{isStudent && (
-											<FormField
-												control={manualForm.control}
-												name="studentEmail"
-												render={({ field }) => (
-													<FormItem data-invalid={!!manualErrors.studentEmail}>
-														<FormLabel>Student email (optional)</FormLabel>
-														<FormControl>
-															<Input
-																type="email"
-																placeholder="john.doe@university.edu.gh"
-																autoComplete="email"
-																className="p-6 rounded-full"
-																{...field}
-															/>
-														</FormControl>
-														<FormDescription>
-															Add your student email to unlock student-only benefits.
-														</FormDescription>
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
-										)}
-										<FormField
-											control={manualForm.control}
-											name="studentId"
-											render={({ field }) => (
-												<FormItem data-invalid={!!manualErrors.studentId}>
-													<FormLabel>Student ID</FormLabel>
-													<FormControl>
-														<Input
-															type="text"
-															placeholder="UGBS123456"
-															className="p-6 rounded-full"
-															disabled={!isStudent}
-															{...field}
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={manualForm.control}
 											name="university"
 											render={({ field }) => (
 												<FormItem data-invalid={!!manualErrors.university}>
 													<FormLabel>University</FormLabel>
-													<Select value={field.value} onValueChange={field.onChange}>
+													<Select
+														value={field.value}
+														onValueChange={(val) => {
+															field.onChange(val)
+															manualForm.setValue("campus", "")
+														}}
+													>
 														<FormControl>
-															<SelectTrigger className="h-12 w-full px-4">
+															<SelectTrigger className="h-auto w-full rounded-full px-6 py-4">
 																<SelectValue placeholder="Select university" />
 															</SelectTrigger>
 														</FormControl>
 														<SelectContent>
-															{universities.map((university) => (
-																<SelectItem key={university} value={university}>
-																	{university}
-																</SelectItem>
+															{universities.map((u) => (
+																<SelectItem key={u} value={u}>{u}</SelectItem>
 															))}
 														</SelectContent>
 													</Select>
@@ -719,15 +635,13 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 													<FormLabel>Campus</FormLabel>
 													<Select value={field.value} onValueChange={field.onChange}>
 														<FormControl>
-															<SelectTrigger className="h-12 w-full px-4">
+															<SelectTrigger className="h-auto w-full rounded-full px-6 py-4">
 																<SelectValue placeholder="Select campus" />
 															</SelectTrigger>
 														</FormControl>
 														<SelectContent>
-															{campuses.map((campus) => (
-																<SelectItem key={campus} value={campus}>
-																	{campus}
-																</SelectItem>
+															{manualCampuses.map((c) => (
+																<SelectItem key={c} value={c}>{c}</SelectItem>
 															))}
 														</SelectContent>
 													</Select>

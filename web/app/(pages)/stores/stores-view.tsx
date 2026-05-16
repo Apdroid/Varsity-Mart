@@ -157,7 +157,7 @@ export function StoresView() {
         )}
       </section>
 
-      <section className="sticky top-16 z-20 rounded-lg p-3 backdrop-blur-sm">
+      <section className=" top-16 z-20 rounded-lg p-3 backdrop-blur-sm">
         <div className="hidden items-center gap-2 md:flex">
           <div className="relative min-w-0 flex-1">
             <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

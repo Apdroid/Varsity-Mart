@@ -35,7 +35,16 @@ const universities = [
 	"Ashesi University",
 ] as const
 
-const campuses = ["Legon", "Main Campus", "Kumasi", "Cape Coast", "Berekuso"] as const
+const CAMPUS_MAP: Record<string, string[]> = {
+	"KNUST": ["Kumasi", "Obuasi"],
+	"University of Ghana": ["Legon Main", "Korle-bu", "Accra City", "Kumasi City", "Takoradi City"],
+	"University of Cape Coast": ["Cape Coast"],
+	"Ashesi University": ["Berekuso"],
+}
+
+function getCampuses(university?: string): string[] {
+	return CAMPUS_MAP[university ?? ""] ?? []
+}
 
 function hasValue(value?: string | null) {
 	return Boolean(value && value.trim().length > 0)
@@ -45,7 +54,6 @@ const schema = z.object({
 	phone: z.string().optional(),
 	university: z.string().optional(),
 	campus: z.string().optional(),
-	studentId: z.string().optional(),
 })
 
 type FormData = z.infer<typeof schema>
@@ -59,7 +67,6 @@ export function CompleteProfileForm() {
 		phone: !hasValue(user?.phone),
 		university: !hasValue(user?.university),
 		campus: !hasValue(user?.campus),
-		studentId: Boolean(user?.isStudent) && !hasValue(user?.studentId),
 	}), [user])
 
 	const form = useForm<FormData>({
@@ -69,9 +76,11 @@ export function CompleteProfileForm() {
 			phone: user?.phone || "",
 			university: user?.university || "KNUST",
 			campus: user?.campus || "Kumasi",
-			studentId: user?.studentId || "",
 		},
 	})
+
+	const selectedUniversity = form.watch("university") ?? user?.university
+	const campusOptions = getCampuses(selectedUniversity)
 
 	const onSubmit = async (values: FormData) => {
 		const phone = values.phone?.trim() ?? ""
@@ -90,17 +99,11 @@ export function CompleteProfileForm() {
 			form.setError("campus", { message: "Select your campus." })
 			return
 		}
-		if (missing.studentId && (values.studentId?.trim().length ?? 0) < 3) {
-			form.setError("studentId", { message: "Student ID must be at least 3 characters." })
-			return
-		}
-
 		try {
 			await updateProfileMutation.mutateAsync({
 				phone: missing.phone ? phone : undefined,
 				university: missing.university ? university : undefined,
 				campus: missing.campus ? campus : undefined,
-				studentId: missing.studentId ? values.studentId?.trim() : undefined,
 			})
 			await refreshUser()
 			toast.success("Profile completed!")
@@ -147,9 +150,15 @@ export function CompleteProfileForm() {
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>University</FormLabel>
-								<Select value={field.value} onValueChange={field.onChange}>
+								<Select
+									value={field.value}
+									onValueChange={(val) => {
+										field.onChange(val)
+										form.setValue("campus", "")
+									}}
+								>
 									<FormControl>
-										<SelectTrigger className="h-12 w-full px-4">
+										<SelectTrigger className="h-auto w-full rounded-full px-6 py-6">
 											<SelectValue placeholder="Select university" />
 										</SelectTrigger>
 									</FormControl>
@@ -174,13 +183,13 @@ export function CompleteProfileForm() {
 								<FormLabel>Campus</FormLabel>
 								<Select value={field.value} onValueChange={field.onChange}>
 									<FormControl>
-										<SelectTrigger className="h-12 w-full px-4">
+										<SelectTrigger className="h-auto w-full rounded-full px-6 py-6">
 											<SelectValue placeholder="Select campus" />
 										</SelectTrigger>
 									</FormControl>
 									<SelectContent>
-										{campuses.map((c) => (
-											<SelectItem key={c} value={c}>{c}</SelectItem>
+										{campusOptions.map((c) => (
+											<SelectItem key={c} value={c} >{c}</SelectItem>
 										))}
 									</SelectContent>
 								</Select>
@@ -190,26 +199,10 @@ export function CompleteProfileForm() {
 					/>
 				)}
 
-				{missing.studentId && (
-					<FormField
-						control={form.control}
-						name="studentId"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Student ID</FormLabel>
-								<FormControl>
-									<Input placeholder="UGBS123456" className="rounded-full p-6" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				)}
-
 				<Button
 					type="submit"
 					disabled={updateProfileMutation.isPending}
-					className="w-full rounded-full p-6 text-base"
+					className="w-full rounded-full p-6 text-base my-6"
 				>
 					{updateProfileMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
 					Complete profile
