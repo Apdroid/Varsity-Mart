@@ -51,7 +51,7 @@ export interface MessageListResponse {
 export interface ProductsListResponse {
 	success: boolean
 	data: {
-		stores: Product[]
+		products: Product[]
 		pagination: Pagination
 	}
 }
@@ -285,6 +285,7 @@ export interface ProductDetail extends Omit<Product, 'category' | 'badges'> {
 	isLiked: boolean
 	deliveryOptions: string[]
 	specifications: string[]
+	store?: { id: string; name: string }
 	updatedAt: string
 }
 
@@ -841,6 +842,26 @@ export interface PaymentResponse {
 }
 
 // Search Types
+export interface FoodSearchItem {
+	id: string
+	name: string
+	description: string
+	price: string
+	isAvailable: boolean
+	preparationTime: string
+	spicyLevel: number
+	isVegetarian: boolean
+	tags: string[]
+	total_sales: number
+	restaurant_id: string
+	restaurant_name: string
+	restaurant_logo: string
+	restaurant_rating: string
+	restaurant_is_open: boolean
+	restaurant_delivery_fee: string
+	restaurant_location: string
+}
+
 export interface SearchFilters {
 	query: string
 	type?: "all" | "products" | "stores" | "food"

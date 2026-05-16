@@ -5,8 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { SlidersHorizontal } from "lucide-react"
 
 import { ProductCard } from "@/components/main/product-card"
-import { RestaurantCard } from "@/components/main/restaurant-card"
 import { StoreCard } from "@/components/main/stores-card"
+import { FoodSearchCard } from "@/components/search/food-search-card"
 import {
 	FilterSidebar,
 	PRICE_RANGE_MAX,
@@ -31,7 +31,7 @@ import { useSearch } from "@/hooks/queries/use-search"
 import { useProducts } from "@/hooks/queries/use-products"
 import type {
 	Product as ApiProduct,
-	RestaurantListItem,
+	FoodSearchItem,
 	StoreListItem,
 	ProductCondition,
 } from "@/lib/api/types"
@@ -89,22 +89,6 @@ function mapApiProductToCard(product: ApiProduct) {
 	}
 }
 
-function mapApiRestaurantToCard(restaurant: RestaurantListItem) {
-	return {
-		id: restaurant.id,
-		name: restaurant.name,
-		logo: restaurant.logo || "",
-		banner: restaurant.banner || restaurant.logo || "",
-		category: restaurant.category,
-		rating: restaurant.rating,
-		totalReviews: restaurant.totalReviews,
-		deliveryTime: restaurant.deliveryTime,
-		deliveryFee: restaurant.deliveryFee,
-		minOrder: restaurant.minOrder,
-		isOpen: restaurant.isOpen,
-		badge: restaurant.badge,
-	}
-}
 
 function mapApiStoreToCard(store: StoreListItem) {
 	return {
@@ -288,7 +272,7 @@ function SearchPageClient() {
 									{filters.type === "all" ? (
 										<AllResultsView
 											products={products.map(mapApiProductToCard)}
-											food={food.map(mapApiRestaurantToCard)}
+											food={food}
 											stores={stores.map(mapApiStoreToCard)}
 											view={view}
 											onViewAll={(type) => handleFilterChange({ type })}
@@ -300,7 +284,7 @@ function SearchPageClient() {
 										<TypeResultsView
 											type={filters.type}
 											products={products.map(mapApiProductToCard)}
-											food={food.map(mapApiRestaurantToCard)}
+											food={food}
 											stores={stores.map(mapApiStoreToCard)}
 											view={view}
 										/>
@@ -319,7 +303,7 @@ function AllResultsView({
 	products, food, stores, view, onViewAll, productTotal, foodTotal, storeTotal,
 }: {
 	products: ReturnType<typeof mapApiProductToCard>[]
-	food: ReturnType<typeof mapApiRestaurantToCard>[]
+	food: FoodSearchItem[]
 	stores: ReturnType<typeof mapApiStoreToCard>[]
 	view: "grid" | "list"
 	onViewAll: (type: SearchType) => void
@@ -344,7 +328,7 @@ function AllResultsView({
 			total: foodTotal,
 			content: food.length > 0 ? (
 				<div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-					{food.slice(0, 6).map((item) => <RestaurantCard key={item.id} restaurant={item} />)}
+					{food.slice(0, 6).map((item) => <FoodSearchCard key={item.id} item={item} />)}
 				</div>
 			) : null,
 		},
@@ -396,7 +380,7 @@ function TypeResultsView({
 }: {
 	type: SearchType
 	products: ReturnType<typeof mapApiProductToCard>[]
-	food: ReturnType<typeof mapApiRestaurantToCard>[]
+	food: FoodSearchItem[]
 	stores: ReturnType<typeof mapApiStoreToCard>[]
 	view: "grid" | "list"
 }) {
@@ -410,7 +394,7 @@ function TypeResultsView({
 	if (type === "food") {
 		return (
 			<div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-				{food.map((item) => <RestaurantCard key={item.id} restaurant={item} />)}
+				{food.map((item) => <FoodSearchCard key={item.id} item={item} />)}
 			</div>
 		)
 	}

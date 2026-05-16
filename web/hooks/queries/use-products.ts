@@ -22,7 +22,7 @@ export function useProducts(filters?: ProductFilters) {
     queryFn: async () => {
       const response = await productsApi.list(filters)
       return {
-        products: response.data.stores,
+        products: response.data.products,
         pagination: response.data.pagination,
       }
     },
@@ -46,7 +46,7 @@ export function useMyProducts(filters?: ProductFilters) {
     queryFn: async () => {
       const response = await productsApi.myProducts(filters)
       return {
-        products: response.data.stores,
+        products: response.data.products,
         pagination: response.data.pagination,
       }
     },

@@ -71,7 +71,7 @@ export function useStoreProducts(storeId: string, page = 1, limit = 20) {
     queryFn: async () => {
       const response = await storesApi.products(storeId, page, limit)
       return {
-        products: response.data.stores,
+        products: response.data.products,
         pagination: response.data.pagination,
       }
     },

@@ -47,6 +47,7 @@ export type Product = {
 	condition: string
 	location: string
 	seller: ProductSeller
+	store?: { id: string; name: string }
 	badges?: string
 	status: string
 	stock?: number

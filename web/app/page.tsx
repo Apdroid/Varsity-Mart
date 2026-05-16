@@ -48,7 +48,7 @@ export default async function Page() {
 			queryFn: async () => {
 				const response = await productsApi.list({ category: "hostel-supplies", limit: 12 })
 				return {
-					products: response.data.stores,
+					products: response.data.products,
 					pagination: response.data.pagination,
 				}
 			},

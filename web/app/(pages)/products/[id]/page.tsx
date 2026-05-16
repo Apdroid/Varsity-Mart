@@ -57,6 +57,7 @@ function mapApiProductToCard(product: ApiProduct | ProductDetail) {
 			avatarUrl: product.seller.avatarUrl,
 			rating: String(product.seller.rating),
 		},
+		store: "store" in product && product.store ? { id: product.store.id, name: product.store.name } : undefined,
 		badges,
 		status: product.status,
 		stock: "stock" in product ? product.stock : undefined,

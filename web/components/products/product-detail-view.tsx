@@ -358,9 +358,11 @@ export function ProductDetailView({ product, related, sellerProducts, reviews }:
 						<SellerCard
 							seller={product.seller}
 							location={product.location}
+							store={product.store}
 							productId={product.id}
 							productTitle={product.title}
 							productImage={product.images?.[0]?.thumbnail_url}
+							productPrice={product.price}
 						/>
 					</div>
 				</section>

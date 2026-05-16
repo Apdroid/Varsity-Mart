@@ -3,7 +3,7 @@ import type {
   SearchFilters,
   Product,
   StoreListItem,
-  RestaurantListItem,
+  FoodSearchItem,
   Pagination,
 } from "./types"
 
@@ -34,7 +34,7 @@ interface SearchResponse {
   results: {
     products: Product[]
     stores: StoreListItem[]
-    food: RestaurantListItem[]
+    food: FoodSearchItem[]
   }
   pagination: Pagination
   facets?: SearchFacets

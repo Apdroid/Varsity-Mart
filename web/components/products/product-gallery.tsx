@@ -70,7 +70,7 @@ export function ProductGallery({ images, title, views }: Props) {
 				onClick={() => openLightbox(selected)}
 			>
 				<SafeImage
-					src={current.optimized_url}
+					src={current.url}
 					alt={title}
 					className="h-full w-full object-cover object-center transition-transform duration-300 hover:scale-105"
 				/>
@@ -105,7 +105,7 @@ export function ProductGallery({ images, title, views }: Props) {
 							)}
 						>
 							<SafeImage
-								src={img.thumbnail_url}
+								src={img.url}
 								alt={`Image ${i + 1}`}
 								className="h-full w-full object-cover"
 							/>

@@ -10,7 +10,7 @@ export default async function ProductsPage() {
     queryFn: async () => {
       const response = await productsApi.list({ page: 1, limit: 20 })
       return {
-        products: response.data.stores,
+        products: response.data.products,
         pagination: response.data.pagination,
       }
     },
