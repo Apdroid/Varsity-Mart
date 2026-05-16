@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Bell, CreditCard, LogOut, Package, Settings, ShoppingBag, Store, User, ChevronRight, Loader2 } from "lucide-react"
+import { Bell, CreditCard, LogOut, Package, Settings, ShoppingBag, Store, ChevronRight, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
