@@ -918,7 +918,6 @@ export interface PayoutRequest {
 }
 
 export interface AddPaymentMethodRequest {
-	type: "momo"
 	provider: "mtn" | "vodafone" | "airteltigo"
 	phone: string
 }

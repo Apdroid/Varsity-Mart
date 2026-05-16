@@ -15,7 +15,7 @@ export const paymentsApi = {
 			api.get<ApiResponse<PaymentMethod[]>>("/payments/methods/"),
 
 		add: (data: AddPaymentMethodRequest) =>
-			api.post<ApiResponse<PaymentMethod>>("/payments/methods/", data),
+			api.post<ApiResponse<PaymentMethod>>("/payments/methods/", { ...data, type: "momo" }),
 
 		remove: (methodId: string) =>
 			api.delete<ApiResponse<null>>(`/payments/methods/${methodId}/`),
