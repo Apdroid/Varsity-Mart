@@ -99,13 +99,12 @@ export function RestaurantCard({ restaurant, className }: RestaurantCardProps) {
 			)}
 		>
 			{/* ─── Banner ───────────────────────────────────────── */}
-			<div className="relative aspect-5/3 sm:aspect-video overflow-hidden bg-muted">
+			<div className="relative  sm:aspect-video overflow-hidden bg-muted">
 				<Image
 					src={restaurant.banner || "https://placehold.net/800x600.png"}
-					width={800}
-					height={500}
+					width={1200}
+					height={900}
 					alt=""
-					sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
 					className={cn(
 						"rounded-lg object-cover transition-all duration-700 ease-out group-hover:scale-105",
 						!restaurant.isOpen && "grayscale"

@@ -8,15 +8,17 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/v1/stores/?page=2
+  url: {{baseUrl}}/v1/stores/
   body: none
   auth: inherit
 }
 
 params:query {
-  page: 2
+  campus: Legon
+  university: University of Ghana
   ~category: 
   ~limit: 
+  ~page: 
   ~search: 
   ~sortBy: newest
   ~sortBy: popular

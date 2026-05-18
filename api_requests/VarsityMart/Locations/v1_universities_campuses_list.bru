@@ -1,0 +1,77 @@
+meta {
+  name: v1_universities_campuses_list
+  type: http
+  seq: 5
+  tags: [
+    Locations
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/universities/:university_id/campuses/
+  body: none
+  auth: apikey
+}
+
+params:path {
+  university_id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  `GET /v1/universities/<id>/campuses/` — list campuses for one university.
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/universities/:university_id/campuses/
+    method: GET
+    mode: none
+    params:path: {
+      university_id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        [
+          {
+            "id": "",
+            "name": "",
+            "short_name": "",
+            "is_active": false,
+            "university": "",
+            "created_at": "",
+            "updated_at": ""
+          }
+        ]
+      '''
+    }
+  }
+}

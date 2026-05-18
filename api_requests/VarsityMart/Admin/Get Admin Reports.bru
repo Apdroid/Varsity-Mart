@@ -1,21 +1,26 @@
 meta {
-  name: Get Featured Stores
+  name: Get Admin Reports
   type: http
   seq: 10
   tags: [
-    Stores
+    Admin
+    Reports
   ]
 }
 
 get {
-  url: {{baseUrl}}/v1/stores/featured/
+  url: {{baseUrl}}/v1/admin/reports/
   body: none
   auth: apikey
 }
 
 params:query {
-  campus: Legon
-  university: University of Ghana
+  ~end: 
+  ~export: 
+  ~range: 30d
+  ~range: 7d
+  ~range: 90d
+  ~start: 
 }
 
 headers {
@@ -29,22 +34,26 @@ auth:apikey {
 }
 
 docs {
-  
-  ### Get Featured Stores
-  
-  Returns up to 10 stores that are featured in their respective categories.
-  No authentication required.
-          
+  Comprehensive platform analytics. Supports date range filtering and CSV export.
 }
 
 example {
   name: 200 Response
-  description: Featured stores retrieved successfully
+  description: Reports data retrieved successfully
   
   request: {
-    url: {{baseUrl}}/v1/stores/featured/
+    url: {{baseUrl}}/v1/admin/reports/
     method: GET
     mode: none
+    params:query: {
+      ~end: 
+      ~export: 
+      ~range: 30d
+      ~range: 7d
+      ~range: 90d
+      ~start: 
+    }
+  
     headers: {
       access_token: {{apiKey}}
     }

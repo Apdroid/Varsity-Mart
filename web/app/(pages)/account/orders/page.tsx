@@ -27,6 +27,15 @@ function formatGHS(n: number) {
   }).format(n)
 }
 
+function toNumber(value: number | string | undefined) {
+  if (typeof value === "number") return value
+  if (typeof value === "string") {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : 0
+  }
+  return 0
+}
+
 function getStatusColor(status: OrderStatus | FoodOrderStatus) {
   switch (status) {
     case "delivered":
@@ -119,6 +128,12 @@ export default function OrdersPage() {
             ) : (
               <div className="space-y-3">
                 {orders.map((order) => (
+                  (() => {
+                    const orderNumber = order.order_number || order.orderNumber || order.id
+                    const createdAt = order.created_at || order.createdAt || new Date().toISOString()
+                    const itemCount = order.quantity ?? order.items?.length ?? 1
+                    const total = toNumber(order.total)
+                    return (
                   <Link
                     key={order.id}
                     href={`/orders/${order.id}`}
@@ -126,10 +141,10 @@ export default function OrdersPage() {
                   >
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="font-medium">Order #{order.orderNumber}</p>
-                        <p className="text-sm text-muted-foreground">{formatDate(order.createdAt)}</p>
+                        <p className="font-medium">Order #{orderNumber}</p>
+                        <p className="text-sm text-muted-foreground">{formatDate(createdAt)}</p>
                         <p className="mt-1 text-sm">
-                          {order.items.length} item{order.items.length !== 1 ? "s" : ""} • {formatGHS(order.total)}
+                          {itemCount} item{itemCount !== 1 ? "s" : ""} • {formatGHS(total)}
                         </p>
                       </div>
                       <span className={`rounded-full px-3 py-1 text-xs font-medium capitalize ${getStatusColor(order.status)}`}>
@@ -137,6 +152,8 @@ export default function OrdersPage() {
                       </span>
                     </div>
                   </Link>
+                    )
+                  })()
                 ))}
               </div>
             )}
@@ -159,24 +176,33 @@ export default function OrdersPage() {
             ) : (
               <div className="space-y-3">
                 {foodOrders.map((order) => (
+                  (() => {
+                    const orderId = order.id || order.orderId
+                    const createdAt = order.createdAt || order.created_at || new Date().toISOString()
+                    const restaurantName = order.restaurantName || order.restaurant?.name || "Restaurant"
+                    const orderNumber = order.orderNumber || order.order_number || order.orderId
+                    const total = toNumber(order.total)
+                    return (
                   <Link
-                    key={order.id}
-                    href={`/orders/food/${order.id}`}
+                    key={orderId}
+                    href={`/orders/food/${orderId}`}
                     className="block rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
                   >
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="font-medium">{order.restaurant.name}</p>
+                        <p className="font-medium">{restaurantName}</p>
                         <p className="text-sm text-muted-foreground">
-                          Order #{order.orderNumber} • {formatDate(order.createdAt)}
+                          Order #{orderNumber} • {formatDate(createdAt)}
                         </p>
-                        <p className="mt-1 text-sm">{formatGHS(order.total)}</p>
+                        <p className="mt-1 text-sm">{formatGHS(total)}</p>
                       </div>
                       <span className={`rounded-full px-3 py-1 text-xs font-medium capitalize ${getStatusColor(order.status)}`}>
                         {order.status.replace(/_/g, " ")}
                       </span>
                     </div>
                   </Link>
+                    )
+                  })()
                 ))}
               </div>
             )}

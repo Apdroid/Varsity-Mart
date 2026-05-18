@@ -24,6 +24,7 @@ import {
 	GearIcon,
 	PackageIcon,
 	StorefrontIcon,
+	BellIcon,
 } from "@phosphor-icons/react"
 import { Clock, Loader2, MessageCircleIcon, Monitor, Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
@@ -71,6 +72,7 @@ import { cn } from "@/lib/utils";
 const CartSheet = dynamic(() => import("@/components/cart/cart-sheet").then(m => m.CartSheet), { ssr: false })
 const FoodCartSheet = dynamic(() => import("@/components/cart/food-cart-sheet").then(m => m.FoodCartSheet), { ssr: false })
 import { useAuth } from "@/providers/auth-provider";
+import { useNotifications } from "@/hooks/queries/use-user";
 import { useRouter, usePathname } from "next/navigation";
 import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -290,8 +292,8 @@ const socialLinks: { href: string; label: string; Icon: PhosphorIcon }[] = [
 ]
 
 const quickFilters = [
-	{ href: "/search", prefix: "/search", label: "Products" },
-	{ href: "/restaurants", prefix: "/restaurants", label: "Food" },
+	{ href: "/products", prefix: "/products", label: "Products" },
+	{ href: "/restaurants", prefix: "/restaurants", label: "Food & Drinks" },
 	{ href: "/stores", prefix: "/stores", label: "Stores" },
 ]
 
@@ -322,6 +324,41 @@ function buildGlobalSearchHref(query: string, category?: string) {
 
 	const next = params.toString()
 	return next ? `/search?${next}` : "/search"
+}
+
+function formatNotificationTime(dateStr: string) {
+	const date = new Date(dateStr)
+	const now = new Date()
+	const diffMs = now.getTime() - date.getTime()
+	const diffMins = Math.floor(diffMs / 60000)
+	const diffHours = Math.floor(diffMs / 3600000)
+	const diffDays = Math.floor(diffMs / 86400000)
+
+	if (diffMins < 1) return "Just now"
+	if (diffMins < 60) return `${diffMins}m`
+	if (diffHours < 24) return `${diffHours}h`
+	if (diffDays < 7) return `${diffDays}d`
+	return date.toLocaleDateString()
+}
+
+function getNotificationGlyph(type: string) {
+	switch (type) {
+		case "order_update":
+			return "📦"
+		case "new_message":
+		case "message":
+			return "💬"
+		case "promotion":
+			return "🎉"
+		case "price_drop":
+			return "💰"
+		case "new_follower":
+			return "👋"
+		case "review":
+			return "⭐"
+		default:
+			return "🔔"
+	}
 }
 
 // function getWishlistCount(...sources: Array<unknown>): number {
@@ -417,9 +454,13 @@ function AnnouncementBar() {
 /* -----------------------------------------------------------
 	 2. Main row — logo · search · account/cart
 ----------------------------------------------------------- */
-function MainBar() {
+function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void }) {
 	const router = useRouter()
 	const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth()
+	const shouldLoadNotifications = isAuthenticated && !authLoading
+	const { data: notificationsData, isLoading: notificationsLoading } = useNotifications(1, 8, false, {
+		enabled: shouldLoadNotifications,
+	})
 	const [desktopQuery, setDesktopQuery] = useState("")
 	const [desktopCategory, setDesktopCategory] = useState("All Categories")
 	const [isDesktopFocused, setIsDesktopFocused] = useState(false)
@@ -428,13 +469,16 @@ function MainBar() {
 	useEffect(() => {
 		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setDesktopRecentSearches(loadRecentSearches())
-	}, [])
+		checkHasStore(
+			Boolean(user?.hasStore)
+		)
+	}, [checkHasStore, user?.hasStore])
 
 	const displayName = user ? `${user.firstName} ${user.lastName} `.trim() : ""
 	const initials = user ? `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`.toUpperCase() : "U"
-	const hasStore = Boolean(user?.hasStore)
-	const sellerCtaLabel = hasStore ? "My Store" : "Become a Seller"
-	const sellerCtaHref = hasStore ? "/seller/store" : "/sell"
+	const notifications = notificationsData?.results ?? []
+	const unreadCount = notifications.filter((notification) => !notification.isRead).length
+	const unreadCountLabel = unreadCount > 99 ? "99+" : unreadCount
 
 	const handleLogout = async () => {
 		await logout()
@@ -561,16 +605,8 @@ function MainBar() {
 				</div>
 
 
-				<div className="flex items-center gap-0.5 sm:gap-1">
-					<Link
-						href={sellerCtaHref}
-						className="mr-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-vm-tangerine px-3 text-xs font-semibold text-white transition-opacity hover:opacity-90 md:hidden"
-					>
-						{sellerCtaLabel}
-						<CaretRightIcon className="h-3 w-3" />
-					</Link>
-					{/* <ThemeToggleButton className="hidden h-10 w-10 sm:inline-flex" /> */}
-
+				{/* <ThemeToggleButton className="hidden h-10 w-10 sm:inline-flex" /> */}
+				<div className="flex gap-4">
 					<FoodCartSheet />
 					<CartSheet />
 					{authLoading ? (
@@ -581,92 +617,161 @@ function MainBar() {
 							<Loader2 className="h-5 w-5 animate-spin" />
 						</div>
 					) : isAuthenticated && user ? (
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild className="border-2 border-vm-tangerine after:border-vm-tangerine after:border-2">
-								<button
-									type="button"
-									className="h-10 w-10 items-center justify-center inline-flex"
-									aria-label="Open account menu"
-								>
-									<Avatar className={cn("h-10 w-10",
-										"after:absolute after:bottom-0 after:left-2 after:right-2 after:h-0.5 after:rounded-full after:transition-colors")}>
-										<AvatarImage src={user.avatar || user.avatarUrl || user.profilePic} alt={displayName || "User"} />
-										<AvatarFallback className="text-[11px] font-semibold">{initials}</AvatarFallback>
-									</Avatar>
-								</button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end" className="w-64 p-0">
-								{/* ── Profile header ── */}
-								<div className="flex flex-col items-center gap-2 px-4 py-5 border-b border-border">
-									<Avatar className="h-20 w-20">
-										<AvatarImage src={user.avatar || user.avatarUrl || user.profilePic} alt={displayName || "User"} />
-										<AvatarFallback className="text-base font-bold">{initials}</AvatarFallback>
-									</Avatar>
-									<div className="text-center min-w-0 w-full">
-										<p className="truncate font-semibold text-sm">{displayName || "Account"}</p>
-										<p className="truncate text-xs text-muted-foreground">{user.email}</p>
+						<>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<button
+										type="button"
+										className="relative h-10 w-10 items-center justify-center inline-flex"
+										aria-label="Open notifications menu"
+									>
+										<BellIcon className="h-6 w-6" weight="regular" />
+										{unreadCount > 0 && (
+											<Badge className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-0 bg-vm-tangerine px-1.5 text-[10px] font-bold leading-none text-white">
+												{unreadCountLabel}
+											</Badge>
+										)}
+									</button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="end" className="w-88 p-0">
+									<div className="px-4 pt-4 pb-2">
+										<div className="flex items-center justify-between gap-2">
+											<p className="text-sm font-semibold">Notifications</p>
+											{unreadCount > 0 && (
+												<p className="text-xs text-muted-foreground">
+													{unreadCount} unread
+												</p>
+											)}
+										</div>
 									</div>
-									<ThemeSwitcher />
-								</div>
-
-								{/* ── Menu items ── */}
-								<div className="py-1.5 px-4">
-									{topAccountItems.map(({ href, Icon, label }) => (
-										<DropdownMenuItem key={href} asChild className="text-base">
-											<Link href={href}>
-												<Icon className="mr-2.5 size-5" />
-												{label}
-											</Link>
-										</DropdownMenuItem>
-									))}
-
-									{!user.hasStore && !user.hasRestaurant ? (
-										<DropdownMenuItem asChild className="text-base">
-											<Link href="/seller/start">
-												<StorefrontIcon className="mr-2.5 size-5" />
-												Start Selling
-											</Link>
-										</DropdownMenuItem>
-									) : (
-										<>
-											{user.hasStore && (
-												<DropdownMenuItem asChild className="text-base">
-													<Link href="/seller/store">
-														<StorefrontIcon className="mr-2.5 size-5" />
-														My Store
-													</Link>
+									<div className="px-2 pb-2">
+										{notificationsLoading ? (
+											<div className="flex items-center justify-center py-8 text-muted-foreground">
+												<Loader2 className="h-4 w-4 animate-spin" />
+											</div>
+										) : notifications.length === 0 ? (
+											<p className="px-2 py-8 text-center text-sm text-muted-foreground">
+												No notifications yet
+											</p>
+										) : (
+											<>
+												{notifications.slice(0, 5).map((notification) => (
+													<DropdownMenuItem key={notification.id} asChild className="py-2">
+														<Link href="/account/notifications" className="items-start">
+															<span className="mr-2 text-base">
+																{getNotificationGlyph(notification.type)}
+															</span>
+															<span className="min-w-0 flex-1">
+																<span className={cn("block truncate text-sm", !notification.isRead && "font-semibold")}>
+																	{notification.title}
+																</span>
+																<span className="block truncate text-xs text-muted-foreground">
+																	{notification.message}
+																</span>
+															</span>
+															<span className="ml-2 shrink-0 text-[11px] text-muted-foreground">
+																{formatNotificationTime(notification.createdAt)}
+															</span>
+														</Link>
+													</DropdownMenuItem>
+												))}
+												<DropdownMenuSeparator className="my-1" />
+												<DropdownMenuItem asChild className="justify-center py-2 text-sm font-medium text-vm-tangerine focus:text-vm-tangerine">
+													<Link href="/account/notifications">View all notifications</Link>
 												</DropdownMenuItem>
-											)}
-											{user.hasRestaurant && (
-												<DropdownMenuItem asChild className="text-base">
-													<Link href="/seller/restaurant">
-														<ForkKnifeIcon className="mr-2.5 size-5" />
-														My Restaurant
-													</Link>
-												</DropdownMenuItem>
-											)}
-										</>
-									)}
+											</>
+										)}
+									</div>
+								</DropdownMenuContent>
+							</DropdownMenu>
 
-									{bottomAccountItems.map(({ href, Icon, label }) => (
-										<DropdownMenuItem key={href} asChild className="text-base">
-											<Link href={href}>
-												<Icon className="mr-2.5 size-5" />
-												{label}
-											</Link>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild className="">
+									<button
+										type="button"
+										className="h-10 w-10 items-center justify-center inline-flex"
+										aria-label="Open account menu"
+									>
+										<Avatar className={cn("h-10 w-10",
+											"after:absolute after:bottom-0 after:left-2 after:right-2 after:h-0.5 after:rounded-full after:transition-colors")}>
+											<AvatarImage src={user.avatar || user.avatarUrl || user.profilePic} alt={displayName || "User"} />
+											<AvatarFallback className="text-[11px] font-semibold">{initials}</AvatarFallback>
+										</Avatar>
+									</button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="end" className="w-64 p-0">
+									{/* ── Profile header ── */}
+									<div className="flex flex-col items-center gap-2 px-4 py-5">
+										<Avatar className="h-20 w-20">
+											<AvatarImage src={user.avatar || user.avatarUrl || user.profilePic} alt={displayName || "User"} />
+											<AvatarFallback className="text-base font-bold">{initials}</AvatarFallback>
+										</Avatar>
+										<div className="text-center min-w-0 w-full">
+											<p className="truncate font-semibold text-sm">{displayName || "Account"}</p>
+											<p className="truncate text-xs text-muted-foreground">{user.email}</p>
+										</div>
+										<ThemeSwitcher />
+									</div>
+
+									{/* ── Menu items ── */}
+									<div className="py-1.5 px-4">
+										{topAccountItems.map(({ href, Icon, label }) => (
+											<DropdownMenuItem key={href} asChild className="text-base">
+												<Link href={href}>
+													<Icon className="mr-2.5 size-5" />
+													{label}
+												</Link>
+											</DropdownMenuItem>
+										))}
+
+										{!user.hasStore && !user.hasRestaurant ? (
+											<DropdownMenuItem asChild className="text-base">
+												<Link href="/seller/start">
+													<StorefrontIcon className="mr-2.5 size-5" />
+													Start Selling
+												</Link>
+											</DropdownMenuItem>
+										) : (
+											<>
+												{user.hasStore && (
+													<DropdownMenuItem asChild className="text-base">
+														<Link href="/seller/store">
+															<StorefrontIcon className="mr-2.5 size-5" />
+															My Store
+														</Link>
+													</DropdownMenuItem>
+												)}
+												{user.hasRestaurant && (
+													<DropdownMenuItem asChild className="text-base">
+														<Link href="/seller/restaurant">
+															<ForkKnifeIcon className="mr-2.5 size-5" />
+															My Restaurant
+														</Link>
+													</DropdownMenuItem>
+												)}
+											</>
+										)}
+
+										{bottomAccountItems.map(({ href, Icon, label }) => (
+											<DropdownMenuItem key={href} asChild className="text-base">
+												<Link href={href}>
+													<Icon className="mr-2.5 size-5" />
+													{label}
+												</Link>
+											</DropdownMenuItem>
+										))}
+									</div>
+
+									<DropdownMenuSeparator className="my-0" />
+									<div className="py-1.5">
+										<DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+											<SignOutIcon className="mr-2.5 size-5" />
+											Sign Out
 										</DropdownMenuItem>
-									))}
-								</div>
-
-								<DropdownMenuSeparator className="my-0" />
-								<div className="py-1.5">
-									<DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
-										<SignOutIcon className="mr-2.5 size-5" />
-										Sign Out
-									</DropdownMenuItem>
-								</div>
-							</DropdownMenuContent>
-						</DropdownMenu>
+									</div>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</>
 					) : (
 						<Tooltip>
 							<TooltipTrigger asChild>
@@ -708,8 +813,8 @@ function MainBar() {
 					</Tooltip>
 */}
 				</div>
-			</div>
-		</div >
+			</div >
+		</div>
 	)
 }
 
@@ -745,9 +850,9 @@ function NavBar() {
 				<NavigationMenu>
 					<NavigationMenuList className="gap-3">
 						<NavLink href="/" exact>Home</NavLink>
-						<NavLink href="/search">Products</NavLink>
+						<NavLink href="/products">Products</NavLink>
 						<NavLink href="/restaurants">Food</NavLink>
-						<NavLink href="/stores">Stores</NavLink>
+						<NavLink href="/stores">Stores & Vendors</NavLink>
 					</NavigationMenuList>
 				</NavigationMenu>
 
@@ -810,7 +915,6 @@ function NavBar() {
 							</NavigationMenuContent>
 						</NavigationMenuItem>
 
-						<NavLink href="/stores">Vendors</NavLink>
 						<NavLink href="/help">Track Order</NavLink>
 
 						<NavigationMenuItem>
@@ -832,7 +936,9 @@ function NavBar() {
 /* -----------------------------------------------------------
 	 Mobile search + quick-filter bar (below main row, mobile only)
 ----------------------------------------------------------- */
-function MobileSearchBar() {
+function MobileSearchBar({ hasStore }: { hasStore: boolean }) {
+	const sellerCtaLabel = hasStore ? "My Store" : "Become a Seller"
+	const sellerCtaHref = hasStore ? "/seller/store" : "/sell"
 	const router = useRouter()
 	const pathname = usePathname()
 	const [mobileQuery, setMobileQuery] = useState("")
@@ -919,17 +1025,31 @@ function MobileSearchBar() {
 				)}
 			</div>
 
-			<div className="mt-1.5 flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-none [&::-webkit-scrollbar]:hidden">
-				{quickFilters.map(({ href, prefix, label }) => (
+			<div className="mt-1.5 flex w-full justify-between gap-1.5 overflow-x-auto pb-0.5 scrollbar-none [&::-webkit-scrollbar]:hidden">
+				<div className="left flex gap-1.5 mt-1.5">
+					{quickFilters.map(({ href, prefix, label }) => (
+						<Link
+							key={href}
+							href={href}
+							className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors hover:text-vm-tangerine ${pathname.startsWith(prefix) ? "text-vm-graphite dark:text-vm-tangerine font-semibold" : "text-foreground"}`}
+						>
+							{label}
+						</Link>
+					))}
+				</div>
+
+				<div className="flex items-center gap-0.5 sm:gap-1">
 					<Link
-						key={href}
-						href={href}
-						className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors hover:text-vm-tangerine ${pathname.startsWith(prefix) ? "text-vm-graphite font-semibold" : "text-foreground"}`}
+						href={sellerCtaHref}
+						className="mr-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-vm-tangerine px-3 text-xs font-semibold text-white transition-opacity hover:opacity-90 md:hidden"
 					>
-						{label}
+						{sellerCtaLabel}
+						<CaretRightIcon className="h-3 w-3" />
 					</Link>
-				))}
+				</div>
+
 			</div>
+
 		</div>
 	)
 }
@@ -939,7 +1059,11 @@ function MobileSearchBar() {
 ----------------------------------------------------------- */
 export default function VarsityMartHeader() {
 	const headerHidden = useScrollDirection()
+	const [hasStore, setHasStore] = useState(false);
 
+	const handleStore = (hasStore: boolean) => {
+		setHasStore(hasStore)
+	}
 	return (
 		<>
 			<header
@@ -947,8 +1071,8 @@ export default function VarsityMartHeader() {
 					}`}
 			>
 				{/* <AnnouncementBar /> */}
-				<MainBar />
-				<MobileSearchBar />
+				<MainBar checkHasStore={handleStore} />
+				<MobileSearchBar hasStore={hasStore} />
 				<NavBar />
 			</header>
 		</>

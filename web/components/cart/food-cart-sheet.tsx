@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { ArrowRight } from "lucide-react"
-import { ForkKnifeIcon } from "@phosphor-icons/react"
+import { BowlSteamIcon, ForkKnifeIcon } from "@phosphor-icons/react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -53,7 +53,7 @@ export function FoodCartSheet() {
 					aria-label="Food order"
 					className="relative h-10 w-10 inline-flex items-center justify-center"
 				>
-					<ForkKnifeIcon className="h-7 w-7" weight="regular" />
+					<BowlSteamIcon className="h-7 w-7" weight="regular" />
 					{count > 0 && (
 						<Badge className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-2 border-background bg-vm-tangerine p-0 text-[10px] font-bold leading-none text-white">
 							{count}

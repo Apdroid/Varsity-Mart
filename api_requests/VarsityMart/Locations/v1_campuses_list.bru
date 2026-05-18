@@ -1,0 +1,84 @@
+meta {
+  name: v1_campuses_list
+  type: http
+  seq: 1
+  tags: [
+    Locations
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/campuses/
+  body: none
+  auth: apikey
+}
+
+params:query {
+  ~page: 
+  ~university: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Read-only access to campuses. Public.
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/campuses/
+    method: GET
+    mode: none
+    params:query: {
+      ~page: 
+      ~university: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "count": 123,
+          "next": "http://api.example.org/accounts/?page=4",
+          "previous": "http://api.example.org/accounts/?page=2",
+          "results": [
+            {
+              "id": "",
+              "name": "",
+              "short_name": "",
+              "is_active": false,
+              "university": "",
+              "created_at": "",
+              "updated_at": ""
+            }
+          ]
+        }
+      '''
+    }
+  }
+}

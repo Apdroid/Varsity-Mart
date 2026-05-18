@@ -1,6 +1,8 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
+import { conversationsApi } from "@/lib/api/conversations"
+import type { Message as ApiMessage } from "@/lib/api/types"
 
 const rawBase = process.env.NEXT_PUBLIC_WS_URL || "wss://api.varsitymart.org"
 // Ensure we use the WebSocket scheme
@@ -125,6 +127,31 @@ function fromIncoming(msg: ChatMessageEvent): ChatMessage {
 	}
 }
 
+function fromApiMessage(msg: ApiMessage): ChatMessage {
+	return {
+		id: msg.id,
+		senderId: msg.sender_id,
+		text: msg.text,
+		timestamp: msg.timestamp,
+		deliveredAt: msg.delivered_at ?? null,
+		isRead: msg.is_read,
+		readAt: msg.read_at ?? null,
+		flagged: msg.flagged,
+		flagReason: msg.flag_reason ?? null,
+	}
+}
+
+function mergeMessages(existing: ChatMessage[], incoming: ChatMessage[]) {
+	const mergedById = new Map(existing.map((message) => [message.id, message]))
+	for (const message of incoming) {
+		const previous = mergedById.get(message.id)
+		mergedById.set(message.id, previous ? { ...previous, ...message } : message)
+	}
+	return [...mergedById.values()].sort(
+		(a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+	)
+}
+
 // ── Hook types ─────────────────────────────────────────────────────────────────
 
 interface UseChatSocketOptions {
@@ -152,6 +179,7 @@ interface UseChatSocketReturn {
 const MAX_RECONNECT_ATTEMPTS = 5
 const BASE_DELAY_MS = 1000
 const MAX_DELAY_MS = 30000
+const HTTP_POLL_INTERVAL_MS = 5000
 
 export function useChatSocket({
 	conversationId,
@@ -165,8 +193,10 @@ export function useChatSocket({
 	const wsRef = useRef<WebSocket | null>(null)
 	const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+	const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
 	const attemptRef = useRef(0)
 	const unmountedRef = useRef(false)
+	const messagesRef = useRef<ChatMessage[]>([])
 
 	// Keep callback refs stable so changing them doesn't reconnect
 	const onMessageRef = useRef(onMessage)
@@ -183,8 +213,12 @@ export function useChatSocket({
 	const [messages, setMessages] = useState<ChatMessage[]>([])
 	const [isConnected, setIsConnected] = useState(false)
 	const [isConnecting, setIsConnecting] = useState(false)
+	const [usingHttpFallback, setUsingHttpFallback] = useState(false)
 	const [otherUserOnline, setOtherUserOnline] = useState(false)
 	const [otherUserTyping, setOtherUserTyping] = useState(false)
+	useEffect(() => {
+		messagesRef.current = messages
+	}, [messages])
 
 	// Expose a ref to sendRaw so emitters can access current socket without captures
 	const sendRaw = useCallback((payload: object) => {
@@ -193,9 +227,43 @@ export function useChatSocket({
 		}
 	}, [])
 
+	const syncMessagesFromHttp = useCallback(async () => {
+		try {
+			const response = await conversationsApi.messages(conversationId, 1, 100)
+			const incoming = response.results.messages.map(fromApiMessage)
+			const previous = messagesRef.current
+			const previousIds = new Set(previous.map((message) => message.id))
+			const merged = mergeMessages(previous, incoming)
+
+			if (!unmountedRef.current) {
+				setMessages(merged)
+				setIsConnected(true)
+				setIsConnecting(false)
+			}
+
+			for (const message of incoming) {
+				if (!previousIds.has(message.id) && message.senderId !== currentUserId) {
+					onMessageRef.current?.(message)
+				}
+			}
+
+			const unreadFromOtherUser = incoming
+				.filter((message) => message.senderId !== currentUserId && !message.isRead)
+				.map((message) => message.id)
+			if (unreadFromOtherUser.length > 0) {
+				await conversationsApi.markRead(conversationId)
+			}
+		} catch {
+			if (!unmountedRef.current) {
+				setIsConnected(false)
+				setIsConnecting(false)
+			}
+		}
+	}, [conversationId, currentUserId])
+
 	useEffect(() => {
-		if (!conversationId || !currentUserId) return
 		unmountedRef.current = false
+		if (!conversationId || !currentUserId || usingHttpFallback) return
 
 		function connect() {
 			if (unmountedRef.current) return
@@ -208,6 +276,7 @@ export function useChatSocket({
 			ws.onopen = () => {
 				if (unmountedRef.current) { ws.close(); return }
 				attemptRef.current = 0
+				setUsingHttpFallback(false)
 				setIsConnected(true)
 				setIsConnecting(false)
 				// Ask the server for current presence of all users already in the room.
@@ -218,9 +287,15 @@ export function useChatSocket({
 			ws.onclose = (event) => {
 				setIsConnected(false)
 				if (unmountedRef.current) return
-				// 1000 = normal close (server-initiated intentional close) — don't retry
-				if (event.code === 1000 || attemptRef.current >= MAX_RECONNECT_ATTEMPTS) {
+				const exhaustedReconnects = attemptRef.current >= MAX_RECONNECT_ATTEMPTS
+				// 1000 = normal close (intentional close) — don't retry
+				if (event.code === 1000) {
 					setIsConnecting(false)
+					return
+				}
+				if (exhaustedReconnects) {
+					setUsingHttpFallback(true)
+					setIsConnecting(true)
 					return
 				}
 				const delay = Math.min(BASE_DELAY_MS * 2 ** attemptRef.current, MAX_DELAY_MS)
@@ -316,29 +391,67 @@ export function useChatSocket({
 			unmountedRef.current = true
 			if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
 			if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+			if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
 			wsRef.current?.close(1000, "unmount")
 			wsRef.current = null
 			setIsConnected(false)
 			setIsConnecting(false)
 		}
-	}, [conversationId, currentUserId, sendRaw])
+	}, [conversationId, currentUserId, sendRaw, usingHttpFallback])
+
+	useEffect(() => {
+		if (!conversationId || !currentUserId || !usingHttpFallback) return
+		void syncMessagesFromHttp()
+		pollIntervalRef.current = setInterval(() => {
+			void syncMessagesFromHttp()
+		}, HTTP_POLL_INTERVAL_MS)
+
+		return () => {
+			if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
+		}
+	}, [conversationId, currentUserId, syncMessagesFromHttp, usingHttpFallback])
 
 	const sendMessage = useCallback((text: string) => {
-		if (!text.trim()) return
-		sendRaw({ type: "chat_message", text: text.trim() })
-	}, [sendRaw])
+		const trimmedText = text.trim()
+		if (!trimmedText) return
+		if (usingHttpFallback) {
+			void conversationsApi
+				.send(conversationId, { text: trimmedText })
+				.then((response) => {
+					const nextMessage = fromApiMessage(response.data)
+					setMessages((previous) => mergeMessages(previous, [nextMessage]))
+					setIsConnected(true)
+					setIsConnecting(false)
+				})
+				.catch(() => {
+					setIsConnected(false)
+				})
+			return
+		}
+		sendRaw({ type: "chat_message", text: trimmedText })
+	}, [conversationId, sendRaw, usingHttpFallback])
 
 	const sendTyping = useCallback((isTyping: boolean) => {
+		if (usingHttpFallback) return
 		sendRaw({ type: "typing", is_typing: isTyping })
-	}, [sendRaw])
+	}, [sendRaw, usingHttpFallback])
 
 	const sendReadReceipt = useCallback((messageIds: string[]) => {
 		if (messageIds.length === 0) return
+		if (usingHttpFallback) {
+			void conversationsApi.markRead(conversationId).catch(() => {
+				setIsConnected(false)
+			})
+			return
+		}
 		sendRaw({ type: "read_receipt", message_ids: messageIds })
-	}, [sendRaw])
+	}, [conversationId, sendRaw, usingHttpFallback])
 
 	const reconnect = useCallback(() => {
 		if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
+		if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
+		attemptRef.current = 0
+		setUsingHttpFallback(false)
 		wsRef.current?.close(1000, "manual reconnect")
 	}, [])
 

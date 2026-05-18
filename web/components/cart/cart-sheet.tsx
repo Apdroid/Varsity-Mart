@@ -18,6 +18,7 @@ import {
 import { useAuth } from "@/providers/auth-provider"
 import { useCart, useRemoveFromCart, useUpdateCartItem } from "@/hooks/queries/use-cart"
 import { toast } from "sonner"
+import { ShoppingCartIcon } from "@phosphor-icons/react"
 
 function formatGHS(amount: number) {
 	return new Intl.NumberFormat("en-GH", {
@@ -64,7 +65,7 @@ export function CartSheet() {
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger asChild>
 				<Button variant="ghost" size="icon" className="relative h-10 w-10" aria-label="Cart">
-					<ShoppingCart className="size-6" strokeWidth={2.2} />
+					<ShoppingCartIcon className="w-7 h-7" weight="regular" />
 					{!authLoading && itemCount > 0 && (
 						<Badge className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-2 border-background bg-vm-tangerine p-0 text-[10px] font-bold leading-none text-white">
 							{itemCount}
@@ -73,7 +74,7 @@ export function CartSheet() {
 				</Button>
 			</SheetTrigger>
 
-			<SheetContent className="flex h-[100dvh] w-full flex-col gap-0 p-0 sm:max-w-md">
+			<SheetContent className="flex h-dvh w-full flex-col gap-0 p-0 sm:max-w-md">
 				<SheetHeader className="shrink-0 border-b border-border px-5 py-4">
 					<SheetTitle className="flex items-center gap-2 text-base">
 						Your Cart

@@ -1,0 +1,74 @@
+meta {
+  name: v1_universities_retrieve
+  type: http
+  seq: 4
+  tags: [
+    Locations
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/universities/:id/
+  body: none
+  auth: apikey
+}
+
+params:path {
+  id: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Read-only access to universities. Public.
+}
+
+example {
+  name: 200 Response
+  
+  request: {
+    url: {{baseUrl}}/v1/universities/:id/
+    method: GET
+    mode: none
+    params:path: {
+      id: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "id": "",
+          "name": "",
+          "short_name": "",
+          "is_active": false,
+          "created_at": "",
+          "updated_at": ""
+        }
+      '''
+    }
+  }
+}

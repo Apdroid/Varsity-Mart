@@ -21,8 +21,8 @@ export function AuthFormShell({
 }: AuthFormShellProps) {
 	return (
 		<div className={cn("flex flex-col gap-6 border-none outline-none", className)} {...props}>
-			<Card className="overflow-hidden p-0 outline-none border-none ring-0">
-				<CardContent className=" border-none outline-none">
+			<div className="overflow-hidden p-0 outline-none border-none ring-0">
+				<div className=" border-none outline-none">
 					<div className="p-6 md:p-8">
 						<div className="flex flex-col items-center gap-2 text-center">
 							<h1 className="text-xl md:text-3xl font-extrabold">{title}</h1>
@@ -32,8 +32,8 @@ export function AuthFormShell({
 						</div>
 						{children}
 					</div>
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 			{showLegalNotice ? (
 				<FieldDescription className="px-6 text-center text-black dark:text-white">
 					By clicking continue, you agree to our{" "}

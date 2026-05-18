@@ -1,0 +1,220 @@
+meta {
+  name: Get KYC Application Detail
+  type: http
+  seq: 6
+  tags: [
+    Admin
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/admin/kyc/:userId/
+  body: none
+  auth: apikey
+}
+
+params:path {
+  userId: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  
+          Returns full KYC details for a single user.
+  
+          Returns 400 if user has `kyc_status=not_submitted` (hasn't applied yet).
+          
+}
+
+example {
+  name: 200 Response
+  description: KYC application detail
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/kyc/:userId/
+    method: GET
+    mode: none
+    params:path: {
+      userId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: User has not submitted a KYC application
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/kyc/:userId/
+    method: GET
+    mode: none
+    params:path: {
+      userId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided.
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/kyc/:userId/
+    method: GET
+    mode: none
+    params:path: {
+      userId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: You do not have permission to perform this action.
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/kyc/:userId/
+    method: GET
+    mode: none
+    params:path: {
+      userId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: User not found
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/kyc/:userId/
+    method: GET
+    mode: none
+    params:path: {
+      userId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

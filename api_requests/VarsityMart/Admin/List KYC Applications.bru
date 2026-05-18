@@ -1,0 +1,200 @@
+meta {
+  name: List KYC Applications
+  type: http
+  seq: 5
+  tags: [
+    Admin
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/admin/kyc/
+  body: none
+  auth: apikey
+}
+
+params:query {
+  ~ordering: 
+  ~page: 
+  ~page_size: 
+  ~status: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  
+          Returns KYC applications with optional filtering by status and ordering.
+  
+          **Status filter** (`?status=`): `pending`, `approved`, `rejected`, `not_submitted`
+          If no status is given, returns all users who have interacted with KYC (kyc_status ≠ not_submitted).
+  
+          **Ordering** (`?ordering=`): `submitted_at` (oldest first, default), `-submitted_at` (newest), `-verified_at`
+          
+}
+
+example {
+  name: 200 Response
+  description: List of KYC applications
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/kyc/
+    method: GET
+    mode: none
+    params:query: {
+      ~ordering: 
+      ~page: 
+      ~page_size: 
+      ~status: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Invalid status parameter
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/kyc/
+    method: GET
+    mode: none
+    params:query: {
+      ~ordering: 
+      ~page: 
+      ~page_size: 
+      ~status: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided.
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/kyc/
+    method: GET
+    mode: none
+    params:query: {
+      ~ordering: 
+      ~page: 
+      ~page_size: 
+      ~status: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: You do not have permission to perform this action.
+  
+  request: {
+    url: {{baseUrl}}/v1/admin/kyc/
+    method: GET
+    mode: none
+    params:query: {
+      ~ordering: 
+      ~page: 
+      ~page_size: 
+      ~status: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

@@ -4,6 +4,7 @@ import type { ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import Logo from "../global/logo"
+import Link from "next/link"
 
 type AuthPageShellProps = {
 	children: ReactNode
@@ -25,7 +26,10 @@ export function AuthPageShell({ children }: AuthPageShellProps) {
 					Back
 				</button>
 
-				<Logo variant="auth" className="my-10 mx-auto" />
+
+				<Link href="/">
+					<Logo variant="auth" className="my-10 mx-auto" />
+				</Link>
 				{children}
 			</div>
 		</div>

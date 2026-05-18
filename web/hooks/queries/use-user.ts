@@ -56,10 +56,16 @@ export function useUploadAvatar() {
   })
 }
 
-export function useNotifications(page = 1, limit = 20, unreadOnly = false) {
+export function useNotifications(
+  page = 1,
+  limit = 20,
+  unreadOnly = false,
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: notificationKeys.list(page),
     queryFn: () => notificationsApi.list(page, limit, unreadOnly),
+    enabled: options?.enabled ?? true,
   })
 }
 

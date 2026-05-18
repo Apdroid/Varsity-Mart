@@ -8,13 +8,15 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/v1/search/?query=campus
+  url: {{baseUrl}}/v1/search/
   body: none
   auth: inherit
 }
 
 params:query {
-  query: campus
+  campus: Legon
+  query: 
+  university: University of Ghana
   ~category: 
   ~condition: 
   ~freeDelivery: 
@@ -33,6 +35,7 @@ params:query {
   ~sort: rating
   ~sort: relevance
   ~type: all
+  ~type: food
   ~type: products
   ~type: stores
 }

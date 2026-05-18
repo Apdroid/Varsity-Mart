@@ -1,14 +1,14 @@
 meta {
-  name: List Pending KYC Applications
+  name: Get KYC Statistics
   type: http
-  seq: 2
+  seq: 9
   tags: [
-    Admin_KYC_Review
+    Admin
   ]
 }
 
 get {
-  url: {{baseUrl}}/v1/admin/kyc/pending/
+  url: {{baseUrl}}/v1/admin/kyc/stats/
   body: none
   auth: apikey
 }
@@ -24,28 +24,15 @@ auth:apikey {
 }
 
 docs {
-  
-          Returns every user whose KYC review is currently in `pending` state,
-          ordered by submission time (oldest first).
-  
-          ### Notes:
-          - Requires **staff / admin** credentials.
-          - `seller_type` is derived from any Store / Restaurant the user
-            already owns (`products` / `food`). At first-time KYC the user
-            will not own anything yet, so this field is typically `null`
-            during review — the seller type chosen on the application form
-            is informational and is not persisted.
-          - `kyc_document_type` is always `null` until a dedicated KYC
-            submission model is added; clients should degrade gracefully.
-          
+  Returns aggregated KYC statistics and metrics.
 }
 
 example {
   name: 200 Response
-  description: List of pending KYC applicants
+  description: KYC statistics
   
   request: {
-    url: {{baseUrl}}/v1/admin/kyc/pending/
+    url: {{baseUrl}}/v1/admin/kyc/stats/
     method: GET
     mode: none
     headers: {
@@ -73,7 +60,7 @@ example {
   description: Authentication credentials were not provided.
   
   request: {
-    url: {{baseUrl}}/v1/admin/kyc/pending/
+    url: {{baseUrl}}/v1/admin/kyc/stats/
     method: GET
     mode: none
     headers: {
@@ -107,7 +94,7 @@ example {
   description: You do not have permission to perform this action.
   
   request: {
-    url: {{baseUrl}}/v1/admin/kyc/pending/
+    url: {{baseUrl}}/v1/admin/kyc/stats/
     method: GET
     mode: none
     headers: {
