@@ -1,11 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { LayoutGrid, List, Search, SlidersHorizontal, Store } from "lucide-react"
+import { LayoutGrid, List, SlidersHorizontal, Store } from "lucide-react"
 
 import { StoreCard } from "@/components/main/stores-card"
 import { CategoryPill } from "@/components/stores/category-pill"
 import { FeaturedStoreCard } from "@/components/stores/featured-store-card"
+import MagnifierIcon from "@/components/ui/magnifier-icon"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -160,7 +161,10 @@ export function StoresView() {
       <section className=" top-16 z-20 rounded-lg p-3 backdrop-blur-sm">
         <div className="hidden items-center gap-2 md:flex">
           <div className="relative min-w-0 flex-1">
-            <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <MagnifierIcon
+              size={16}
+              className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 cursor-default text-muted-foreground"
+            />
             <Input
               value={search}
               onChange={(event) => handleSearchChange(event.target.value)}
@@ -220,7 +224,10 @@ export function StoresView() {
 
         <div className="flex items-center gap-2 md:hidden">
           <div className="relative min-w-0 flex-1">
-            <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <MagnifierIcon
+              size={16}
+              className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 cursor-default text-muted-foreground"
+            />
             <Input
               value={search}
               onChange={(event) => handleSearchChange(event.target.value)}

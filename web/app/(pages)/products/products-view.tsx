@@ -16,7 +16,8 @@ import {
 import { useProducts } from "@/hooks/queries/use-products"
 import { useProductCategories } from "@/hooks/queries/use-categories"
 import type { Product as ApiProduct, ProductCondition } from "@/lib/api/types"
-import { Search, SlidersHorizontal } from "lucide-react"
+import { SlidersHorizontal } from "lucide-react"
+import MagnifierIcon from "@/components/ui/magnifier-icon"
 
 function mapApiProductToCard(product: ApiProduct) {
 	return {
@@ -126,7 +127,10 @@ function ProductsPageContent() {
 			<div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<form onSubmit={handleSearch} className="flex gap-2">
 					<div className="relative flex-1 sm:w-80">
-						<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+						<MagnifierIcon
+							size={16}
+							className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 cursor-default text-muted-foreground"
+						/>
 						<Input
 							placeholder="Search products..."
 							value={searchInput}

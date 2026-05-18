@@ -1,10 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { ShoppingCart, Tag, Heart } from "lucide-react"
+import { Tag, Heart } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import CartIcon from "@/components/ui/cart-icon"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 import { useAddToCart } from "@/hooks/queries/use-cart"
@@ -153,7 +154,7 @@ export function ActionsCard({ productId, price, stock, title, quantity }: Props)
             disabled={isPending}
             onClick={handleAddToCart}
           >
-            <ShoppingCart className="mr-2 h-4 w-4" />
+            <CartIcon size={16} className="mr-2" />
             {isPending
               ? "Adding…"
               : quantity > 1

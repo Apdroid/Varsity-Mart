@@ -10,6 +10,7 @@ import {
 	type ReactNode,
 } from "react"
 import { authApi } from "@/lib/api/auth"
+import { getUserLocationValue } from "@/lib/user-location"
 import type {
 	LoginRequest,
 	RegisterRequest,
@@ -42,7 +43,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	const needsProfileCompletion = useMemo(() => {
 		if (!user) return false
-		return !user.phone?.trim() || !user.university?.trim() || !user.campus?.trim()
+		const university = getUserLocationValue(user.university)
+		const campus = getUserLocationValue(user.campus)
+
+		return !user.phone?.trim() || !university.trim() || !campus.trim()
 	}, [user])
 
 	const checkAuth = useCallback(async () => {

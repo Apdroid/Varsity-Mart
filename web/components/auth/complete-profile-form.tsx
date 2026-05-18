@@ -19,6 +19,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select"
 import { useUpdateProfile } from "@/hooks/queries/use-user"
+import { getUserLocationValue } from "@/lib/user-location"
 import { useAuth } from "@/providers/auth-provider"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
@@ -62,24 +63,26 @@ export function CompleteProfileForm() {
 	const { user, refreshUser } = useAuth()
 	const router = useRouter()
 	const updateProfileMutation = useUpdateProfile()
+	const currentUniversity = getUserLocationValue(user?.university)
+	const currentCampus = getUserLocationValue(user?.campus)
 
 	const missing = useMemo(() => ({
 		phone: !hasValue(user?.phone),
-		university: !hasValue(user?.university),
-		campus: !hasValue(user?.campus),
-	}), [user])
+		university: !hasValue(currentUniversity),
+		campus: !hasValue(currentCampus),
+	}), [currentCampus, currentUniversity, user?.phone])
 
 	const form = useForm<FormData>({
 		resolver: zodResolver(schema),
 		mode: "onBlur",
 		defaultValues: {
 			phone: user?.phone || "",
-			university: user?.university || "KNUST",
-			campus: user?.campus || "Kumasi",
+			university: currentUniversity || "KNUST",
+			campus: currentCampus || "Kumasi",
 		},
 	})
 
-	const selectedUniversity = form.watch("university") ?? user?.university
+	const selectedUniversity = form.watch("university") ?? currentUniversity
 	const campusOptions = getCampuses(selectedUniversity)
 
 	const onSubmit = async (values: FormData) => {

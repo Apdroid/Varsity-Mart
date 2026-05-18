@@ -5,6 +5,6 @@ export default function LoginPage() {
 	return (
 		<AuthPageShell>
 			<LoginForm />
-		</AuthPageShell>
+		ut</AuthPageShell>
 	)
 }

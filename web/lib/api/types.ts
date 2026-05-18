@@ -121,8 +121,21 @@ export interface User {
 	profilePic?: string
 	avatarUrl?: string
 	studentId?: string
-	campus: string
-	university: string
+	university: {
+		id: string
+		name?: string
+		short_name?: string
+	}
+	campus: {
+		id?: string
+		name?: string
+		short_name?: string
+		university: {
+			id: string
+			name?: string
+			short_name?: string
+		}
+	}
 	isStudent: boolean
 	isVerified: boolean
 	kycStatus: KycStatus

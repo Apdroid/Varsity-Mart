@@ -432,6 +432,9 @@ function MainBar() {
 
 	const displayName = user ? `${user.firstName} ${user.lastName} `.trim() : ""
 	const initials = user ? `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`.toUpperCase() : "U"
+	const hasStore = Boolean(user?.hasStore)
+	const sellerCtaLabel = hasStore ? "My Store" : "Become a Seller"
+	const sellerCtaHref = hasStore ? "/seller/store" : "/sell"
 
 	const handleLogout = async () => {
 		await logout()
@@ -559,6 +562,13 @@ function MainBar() {
 
 
 				<div className="flex items-center gap-0.5 sm:gap-1">
+					<Link
+						href={sellerCtaHref}
+						className="mr-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-vm-tangerine px-3 text-xs font-semibold text-white transition-opacity hover:opacity-90 md:hidden"
+					>
+						{sellerCtaLabel}
+						<CaretRightIcon className="h-3 w-3" />
+					</Link>
 					{/* <ThemeToggleButton className="hidden h-10 w-10 sm:inline-flex" /> */}
 
 					<FoodCartSheet />

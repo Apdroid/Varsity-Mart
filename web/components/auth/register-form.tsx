@@ -40,6 +40,7 @@ import { useAuth } from "@/providers/auth-provider"
 import { getGoogleIdToken } from "@/lib/auth/google"
 import { useUpdateProfile } from "@/hooks/queries/use-user"
 import type { User } from "@/lib/api/types"
+import { getUserLocationValue } from "@/lib/user-location"
 
 const universities = [
 	"University of Ghana",
@@ -92,12 +93,15 @@ function getPasswordStrength(password: string) {
 }
 
 function getMissingFlags(user: User | null) {
+	const university = getUserLocationValue(user?.university)
+	const campus = getUserLocationValue(user?.campus)
+
 	return {
 		firstName: !hasValue(user?.firstName),
 		lastName: !hasValue(user?.lastName),
 		phone: !hasValue(user?.phone),
-		university: !hasValue(user?.university),
-		campus: !hasValue(user?.campus),
+		university: !hasValue(university),
+		campus: !hasValue(campus),
 	}
 }
 
@@ -193,12 +197,14 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 
 			const user = result.user ?? null
 			setGoogleUser(user)
+			const universityValue = getUserLocationValue(user?.university)
+			const campusValue = getUserLocationValue(user?.campus)
 			googleCompletionForm.reset({
 				firstName: user?.firstName || "",
 				lastName: user?.lastName || "",
 				phone: user?.phone || "",
-				university: user?.university || "University of Ghana",
-				campus: user?.campus || "Legon",
+				university: universityValue || "University of Ghana",
+				campus: campusValue || "Legon Main",
 			})
 
 			const requiredMissing = getMissingFlags(user)

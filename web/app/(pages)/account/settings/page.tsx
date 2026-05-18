@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/form"
 import { useAuth } from "@/providers/auth-provider"
 import { useUpdateProfile, useUploadAvatar } from "@/hooks/queries/use-user"
+import { getUserLocationValue } from "@/lib/user-location"
 import { toast } from "sonner"
 
 const profileSchema = z.object({
@@ -46,7 +47,7 @@ export default function SettingsPage() {
 			firstName: user?.firstName || "",
 			lastName: user?.lastName || "",
 			phone: user?.phone || "",
-			campus: user?.campus || "",
+			campus: getUserLocationValue(user?.campus),
 			bio: user?.bio || "",
 		},
 	})

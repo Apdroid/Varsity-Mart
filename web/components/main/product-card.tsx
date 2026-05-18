@@ -1,9 +1,10 @@
 "use client";
 import * as React from "react"
 import Link from "next/link"
-import { Heart, Star, MapPin, Moon } from "lucide-react"
+import { Heart, Star, Moon } from "lucide-react"
 import Image from "next/image"
 
+import MapPinIcon from "@/components/ui/map-pin-icon"
 import { cn } from "@/lib/utils"
 
 /* -----------------------------------------------------------
@@ -218,7 +219,7 @@ export function ProductCard({
 				{/* Location + condition — single line, tiny */}
 				<div className="mt-1 flex items-center justify-between text-[10px] text-muted-foreground">
 					<div className="flex min-w-0 items-center gap-0.5">
-						<MapPin className="h-2.5 w-2.5 shrink-0" />
+						<MapPinIcon size={10} className="shrink-0 cursor-default" />
 						<span className="truncate">{product.location}</span>
 					</div>
 					<span className="shrink-0 font-medium uppercase tracking-wide text-foreground/70">
