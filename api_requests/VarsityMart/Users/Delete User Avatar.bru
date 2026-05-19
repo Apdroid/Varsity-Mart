@@ -1,0 +1,124 @@
+meta {
+  name: Delete User Avatar
+  type: http
+  seq: 8
+  tags: [
+    Users
+  ]
+}
+
+delete {
+  url: {{baseUrl}}/v1/users/me/avatar/
+  body: none
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Removes the user's current profile picture from Cloudinary and clears the profile_pic field. Returns 200 on success, 404 if no avatar exists.
+}
+
+example {
+  name: 200 Response
+  description: Avatar deleted successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/avatar/
+    method: DELETE
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Unauthorized - Authentication required
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/avatar/
+    method: DELETE
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: No avatar to delete
+  
+  request: {
+    url: {{baseUrl}}/v1/users/me/avatar/
+    method: DELETE
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

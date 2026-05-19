@@ -12,5 +12,5 @@ export const campusApi = {
 		api.get<DRFPaginatedList<Campus>>("/campuses/"),
 
 	campusesByUniversity: (universityId: string) =>
-		api.get<DRFPaginatedList<Campus>>(`/universities/${universityId}/campuses/`),
+		api.get<Campus[]>(`/universities/${universityId}/campuses/`),
 }

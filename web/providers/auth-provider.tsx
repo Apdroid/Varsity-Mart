@@ -57,7 +57,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				setUser(userInfo.data)
 				setNeedsVerification(!userInfo.data.isVerified)
 			} else {
-				setUser(null)
+				// Access token is expired or missing — attempt a silent refresh before giving up.
+				// check-status returns 200 with isAuthenticated:false (not 401), so the api
+				// client's auto-refresh never fires. We have to call it explicitly here.
+				await authApi.refreshToken()
+				const userInfo = await authApi.getUserInfo()
+				setUser(userInfo.data)
+				setNeedsVerification(!userInfo.data.isVerified)
 			}
 		} catch {
 			setUser(null)

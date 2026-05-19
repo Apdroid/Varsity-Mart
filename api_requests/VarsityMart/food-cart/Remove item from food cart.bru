@@ -1,0 +1,178 @@
+meta {
+  name: Remove item from food cart
+  type: http
+  seq: 3
+  tags: [
+    food-cart
+  ]
+}
+
+delete {
+  url: {{baseUrl}}/v1/food-cart/:itemId/remove/
+  body: none
+  auth: apikey
+}
+
+params:path {
+  itemId: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Remove a specific item from the user's food cart
+}
+
+example {
+  name: 200 Response
+  description: Item removed from cart successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/:itemId/remove/
+    method: DELETE
+    mode: none
+    params:path: {
+      itemId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/:itemId/remove/
+    method: DELETE
+    mode: none
+    params:path: {
+      itemId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: User account is not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/:itemId/remove/
+    method: DELETE
+    mode: none
+    params:path: {
+      itemId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Cart item not found
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/:itemId/remove/
+    method: DELETE
+    mode: none
+    params:path: {
+      itemId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

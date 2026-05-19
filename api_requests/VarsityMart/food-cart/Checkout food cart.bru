@@ -1,0 +1,459 @@
+meta {
+  name: Checkout food cart
+  type: http
+  seq: 5
+  tags: [
+    food-cart
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/food-cart/checkout/
+  body: json
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "paymentMethod": "momo",
+    "deliveryMethod": "campus_delivery",
+    "deliveryAddress": "Room 201, Block A",
+    "deliveryInstructions": "Call on arrival",
+    "momoNumber": "+233501234567",
+    "momoProvider": "MTN"
+  }
+}
+
+docs {
+  Create one food order per restaurant in the cart and initiate a single Paystack payment session for the grand total. Use `paymentMethod` as momo, card, bank, cash, or a saved method ID (`method_...`). Response includes order and restaurant details.
+}
+
+example {
+  name: Checkout success (Checkout with MoMo)
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/checkout/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "paymentMethod": "momo",
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "Room 201, Block A",
+        "deliveryInstructions": "Call on arrival",
+        "momoNumber": "+233501234567",
+        "momoProvider": "MTN"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "1 order(s) created successfully",
+          "data": {
+            "sessionRef": "FCART-20260519-2611",
+            "grandTotal": 35.5,
+            "paymentStatus": "pending",
+            "ordersCount": 1,
+            "paymentUrl": "https://checkout.paystack.com/idal9k615itnmzk",
+            "createdAt": "2026-05-19T09:59:18+00:00",
+            "orders": [
+              {
+                "orderId": "FOOD-20260519-1234",
+                "status": "pending_payment",
+                "paymentStatus": "pending",
+                "restaurant": {
+                  "restaurantId": "bb62d0dc-410f-46cc-850c-6d31d43f0ea6",
+                  "restaurantName": "Campus Kitchen",
+                  "logo": "https://res.cloudinary.com/example/image/upload/logo.jpg",
+                  "phone": "+233501234567"
+                },
+                "items": [
+                  {
+                    "itemId": "b7e9317b-6edb-4704-baad-264aab2be729",
+                    "name": "Jollof Rice",
+                    "image": "https://res.cloudinary.com/example/image/upload/jollof.jpg",
+                    "quantity": 2,
+                    "price": 25,
+                    "customizations": {},
+                    "specialInstructions": ""
+                  }
+                ],
+                "subtotal": "30.00",
+                "deliveryFee": "3.00",
+                "serviceFee": "2.50",
+                "total": "35.50"
+              }
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Checkout success (Checkout with saved payment method)
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/checkout/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "paymentMethod": "method_26051915732",
+        "deliveryMethod": "pickup"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "1 order(s) created successfully",
+          "data": {
+            "sessionRef": "FCART-20260519-2611",
+            "grandTotal": 35.5,
+            "paymentStatus": "pending",
+            "ordersCount": 1,
+            "paymentUrl": "https://checkout.paystack.com/idal9k615itnmzk",
+            "createdAt": "2026-05-19T09:59:18+00:00",
+            "orders": [
+              {
+                "orderId": "FOOD-20260519-1234",
+                "status": "pending_payment",
+                "paymentStatus": "pending",
+                "restaurant": {
+                  "restaurantId": "bb62d0dc-410f-46cc-850c-6d31d43f0ea6",
+                  "restaurantName": "Campus Kitchen",
+                  "logo": "https://res.cloudinary.com/example/image/upload/logo.jpg",
+                  "phone": "+233501234567"
+                },
+                "items": [
+                  {
+                    "itemId": "b7e9317b-6edb-4704-baad-264aab2be729",
+                    "name": "Jollof Rice",
+                    "image": "https://res.cloudinary.com/example/image/upload/jollof.jpg",
+                    "quantity": 2,
+                    "price": 25,
+                    "customizations": {},
+                    "specialInstructions": ""
+                  }
+                ],
+                "subtotal": "30.00",
+                "deliveryFee": "3.00",
+                "serviceFee": "2.50",
+                "total": "35.50"
+              }
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response (Checkout with MoMo)
+  description: Validation failed, cart empty, or payment initiation failed
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/checkout/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "paymentMethod": "momo",
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "Room 201, Block A",
+        "deliveryInstructions": "Call on arrival",
+        "momoNumber": "+233501234567",
+        "momoProvider": "MTN"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "",
+          "errors": {}
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response (Checkout with saved payment method)
+  description: Validation failed, cart empty, or payment initiation failed
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/checkout/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "paymentMethod": "method_26051915732",
+        "deliveryMethod": "pickup"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "",
+          "errors": {}
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response (Checkout with MoMo)
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/checkout/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "paymentMethod": "momo",
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "Room 201, Block A",
+        "deliveryInstructions": "Call on arrival",
+        "momoNumber": "+233501234567",
+        "momoProvider": "MTN"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response (Checkout with saved payment method)
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/checkout/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "paymentMethod": "method_26051915732",
+        "deliveryMethod": "pickup"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response (Checkout with MoMo)
+  description: User account is not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/checkout/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "paymentMethod": "momo",
+        "deliveryMethod": "campus_delivery",
+        "deliveryAddress": "Room 201, Block A",
+        "deliveryInstructions": "Call on arrival",
+        "momoNumber": "+233501234567",
+        "momoProvider": "MTN"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response (Checkout with saved payment method)
+  description: User account is not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/checkout/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "paymentMethod": "method_26051915732",
+        "deliveryMethod": "pickup"
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

@@ -1,0 +1,715 @@
+meta {
+  name: Add items to food cart
+  type: http
+  seq: 4
+  tags: [
+    food-cart
+  ]
+}
+
+post {
+  url: {{baseUrl}}/v1/food-cart/add/
+  body: json
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "restaurants": [
+      {
+        "restaurantId": "689eb4c6-de32-4370-8d87-1a277bcb307a",
+        "items": [
+          {
+            "itemId": "a8cf310d-1db1-40b6-89fb-50559a92940a",
+            "quantity": 1,
+            "customizations": {},
+            "specialInstructions": ""
+          }
+        ]
+      },
+      {
+        "restaurantId": "eecd5cef-3a62-4528-9d20-e5bf0d9ddb53",
+        "items": [
+          {
+            "itemId": "b7e9317b-6edb-4704-baad-264aab2be729",
+            "quantity": 2,
+            "customizations": {},
+            "specialInstructions": ""
+          }
+        ]
+      }
+    ]
+  }
+}
+
+docs {
+  Add menu items to the food cart.
+  
+  **Multiple restaurants** — send `restaurants` as an **array** of objects, each with `restaurantId` and `items`:
+  ```json
+  {
+    "restaurants": [
+      { "restaurantId": "<uuid>", "items": [{ "itemId": "<uuid>", "quantity": 1 }] },
+      { "restaurantId": "<uuid>", "items": [{ "itemId": "<uuid>", "quantity": 2 }] }
+    ]
+  }
+  ```
+  
+  **Single restaurant** — send `restaurantId` and `items` at the top level.
+  
+  Do not repeat keys in one object; use the array form for 2+ restaurants.
+}
+
+example {
+  name: Add to cart success (Multiple restaurants)
+  description: Preferred when adding items from 2+ restaurants.
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/add/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "restaurants": [
+          {
+            "restaurantId": "689eb4c6-de32-4370-8d87-1a277bcb307a",
+            "items": [
+              {
+                "itemId": "a8cf310d-1db1-40b6-89fb-50559a92940a",
+                "quantity": 1,
+                "customizations": {},
+                "specialInstructions": ""
+              }
+            ]
+          },
+          {
+            "restaurantId": "eecd5cef-3a62-4528-9d20-e5bf0d9ddb53",
+            "items": [
+              {
+                "itemId": "b7e9317b-6edb-4704-baad-264aab2be729",
+                "quantity": 2,
+                "customizations": {},
+                "specialInstructions": ""
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "2 item(s) added to cart",
+          "data": {
+            "itemsAdded": 2,
+            "restaurantsCount": 2,
+            "items": [
+              {
+                "cartItemId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                "itemId": "b7e9317b-6edb-4704-baad-264aab2be729",
+                "name": "Jollof Rice",
+                "image": "https://res.cloudinary.com/example/image/upload/jollof.jpg",
+                "quantity": 2,
+                "price": 25,
+                "subtotal": 50,
+                "customizations": {},
+                "specialInstructions": "",
+                "restaurantId": "bb62d0dc-410f-46cc-850c-6d31d43f0ea6",
+                "restaurantName": "Campus Kitchen"
+              }
+            ],
+            "restaurants": [
+              {
+                "restaurantId": "bb62d0dc-410f-46cc-850c-6d31d43f0ea6",
+                "restaurantName": "Campus Kitchen",
+                "logo": "https://res.cloudinary.com/example/image/upload/logo.jpg",
+                "items": [
+                  {
+                    "cartItemId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                    "itemId": "b7e9317b-6edb-4704-baad-264aab2be729",
+                    "name": "Jollof Rice",
+                    "image": "https://res.cloudinary.com/example/image/upload/jollof.jpg",
+                    "quantity": 2,
+                    "price": 25,
+                    "subtotal": 50,
+                    "customizations": {},
+                    "specialInstructions": "",
+                    "restaurantId": "bb62d0dc-410f-46cc-850c-6d31d43f0ea6",
+                    "restaurantName": "Campus Kitchen"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: Add to cart success (Single restaurant)
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/add/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "restaurantId": "689eb4c6-de32-4370-8d87-1a277bcb307a",
+        "items": [
+          {
+            "itemId": "a8cf310d-1db1-40b6-89fb-50559a92940a",
+            "quantity": 1,
+            "customizations": {},
+            "specialInstructions": ""
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 201
+      text: Created
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "message": "2 item(s) added to cart",
+          "data": {
+            "itemsAdded": 2,
+            "restaurantsCount": 2,
+            "items": [
+              {
+                "cartItemId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                "itemId": "b7e9317b-6edb-4704-baad-264aab2be729",
+                "name": "Jollof Rice",
+                "image": "https://res.cloudinary.com/example/image/upload/jollof.jpg",
+                "quantity": 2,
+                "price": 25,
+                "subtotal": 50,
+                "customizations": {},
+                "specialInstructions": "",
+                "restaurantId": "bb62d0dc-410f-46cc-850c-6d31d43f0ea6",
+                "restaurantName": "Campus Kitchen"
+              }
+            ],
+            "restaurants": [
+              {
+                "restaurantId": "bb62d0dc-410f-46cc-850c-6d31d43f0ea6",
+                "restaurantName": "Campus Kitchen",
+                "logo": "https://res.cloudinary.com/example/image/upload/logo.jpg",
+                "items": [
+                  {
+                    "cartItemId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                    "itemId": "b7e9317b-6edb-4704-baad-264aab2be729",
+                    "name": "Jollof Rice",
+                    "image": "https://res.cloudinary.com/example/image/upload/jollof.jpg",
+                    "quantity": 2,
+                    "price": 25,
+                    "subtotal": 50,
+                    "customizations": {},
+                    "specialInstructions": "",
+                    "restaurantId": "bb62d0dc-410f-46cc-850c-6d31d43f0ea6",
+                    "restaurantName": "Campus Kitchen"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response (Multiple restaurants)
+  description: Validation failed
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/add/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "restaurants": [
+          {
+            "restaurantId": "689eb4c6-de32-4370-8d87-1a277bcb307a",
+            "items": [
+              {
+                "itemId": "a8cf310d-1db1-40b6-89fb-50559a92940a",
+                "quantity": 1,
+                "customizations": {},
+                "specialInstructions": ""
+              }
+            ]
+          },
+          {
+            "restaurantId": "eecd5cef-3a62-4528-9d20-e5bf0d9ddb53",
+            "items": [
+              {
+                "itemId": "b7e9317b-6edb-4704-baad-264aab2be729",
+                "quantity": 2,
+                "customizations": {},
+                "specialInstructions": ""
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "",
+          "errors": {}
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response (Single restaurant)
+  description: Validation failed
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/add/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "restaurantId": "689eb4c6-de32-4370-8d87-1a277bcb307a",
+        "items": [
+          {
+            "itemId": "a8cf310d-1db1-40b6-89fb-50559a92940a",
+            "quantity": 1,
+            "customizations": {},
+            "specialInstructions": ""
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": "",
+          "errors": {}
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response (Multiple restaurants)
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/add/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "restaurants": [
+          {
+            "restaurantId": "689eb4c6-de32-4370-8d87-1a277bcb307a",
+            "items": [
+              {
+                "itemId": "a8cf310d-1db1-40b6-89fb-50559a92940a",
+                "quantity": 1,
+                "customizations": {},
+                "specialInstructions": ""
+              }
+            ]
+          },
+          {
+            "restaurantId": "eecd5cef-3a62-4528-9d20-e5bf0d9ddb53",
+            "items": [
+              {
+                "itemId": "b7e9317b-6edb-4704-baad-264aab2be729",
+                "quantity": 2,
+                "customizations": {},
+                "specialInstructions": ""
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response (Single restaurant)
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/add/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "restaurantId": "689eb4c6-de32-4370-8d87-1a277bcb307a",
+        "items": [
+          {
+            "itemId": "a8cf310d-1db1-40b6-89fb-50559a92940a",
+            "quantity": 1,
+            "customizations": {},
+            "specialInstructions": ""
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response (Multiple restaurants)
+  description: User account is not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/add/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "restaurants": [
+          {
+            "restaurantId": "689eb4c6-de32-4370-8d87-1a277bcb307a",
+            "items": [
+              {
+                "itemId": "a8cf310d-1db1-40b6-89fb-50559a92940a",
+                "quantity": 1,
+                "customizations": {},
+                "specialInstructions": ""
+              }
+            ]
+          },
+          {
+            "restaurantId": "eecd5cef-3a62-4528-9d20-e5bf0d9ddb53",
+            "items": [
+              {
+                "itemId": "b7e9317b-6edb-4704-baad-264aab2be729",
+                "quantity": 2,
+                "customizations": {},
+                "specialInstructions": ""
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response (Single restaurant)
+  description: User account is not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/add/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "restaurantId": "689eb4c6-de32-4370-8d87-1a277bcb307a",
+        "items": [
+          {
+            "itemId": "a8cf310d-1db1-40b6-89fb-50559a92940a",
+            "quantity": 1,
+            "customizations": {},
+            "specialInstructions": ""
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response (Multiple restaurants)
+  description: Restaurant or menu item not found
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/add/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "restaurants": [
+          {
+            "restaurantId": "689eb4c6-de32-4370-8d87-1a277bcb307a",
+            "items": [
+              {
+                "itemId": "a8cf310d-1db1-40b6-89fb-50559a92940a",
+                "quantity": 1,
+                "customizations": {},
+                "specialInstructions": ""
+              }
+            ]
+          },
+          {
+            "restaurantId": "eecd5cef-3a62-4528-9d20-e5bf0d9ddb53",
+            "items": [
+              {
+                "itemId": "b7e9317b-6edb-4704-baad-264aab2be729",
+                "quantity": 2,
+                "customizations": {},
+                "specialInstructions": ""
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response (Single restaurant)
+  description: Restaurant or menu item not found
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/add/
+    method: POST
+    mode: json
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "restaurantId": "689eb4c6-de32-4370-8d87-1a277bcb307a",
+        "items": [
+          {
+            "itemId": "a8cf310d-1db1-40b6-89fb-50559a92940a",
+            "quantity": 1,
+            "customizations": {},
+            "specialInstructions": ""
+          }
+        ]
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": false,
+          "message": ""
+        }
+      '''
+    }
+  }
+}

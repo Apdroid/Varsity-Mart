@@ -163,7 +163,7 @@ export function CampusPicker() {
 							</div>
 						) : (
 							<ul className="divide-y divide-foreground/6">
-								{(campuses ?? []).map((campus) => {
+								{(campuses ?? [] as Campus[]).map((campus) => {
 									const isSelected = selectedCampus?.id === campus.id
 									return (
 										<li key={campus.id}>

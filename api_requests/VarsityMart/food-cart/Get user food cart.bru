@@ -1,0 +1,135 @@
+meta {
+  name: Get user food cart
+  type: http
+  seq: 1
+  tags: [
+    food-cart
+  ]
+}
+
+get {
+  url: {{baseUrl}}/v1/food-cart/
+  body: none
+  auth: apikey
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+docs {
+  Retrieve all items in the user's food cart, grouped by restaurant
+}
+
+example {
+  name: 200 Response
+  description: Food cart items retrieved successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/
+    method: GET
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "success": true,
+          "data": {
+            "items": [],
+            "itemCount": 0,
+            "totalPrice": 0
+          }
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/
+    method: GET
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: User account is not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/
+    method: GET
+    mode: none
+    headers: {
+      access_token: {{apiKey}}
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

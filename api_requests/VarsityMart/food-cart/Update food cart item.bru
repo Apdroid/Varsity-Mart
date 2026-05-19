@@ -1,0 +1,264 @@
+meta {
+  name: Update food cart item
+  type: http
+  seq: 2
+  tags: [
+    food-cart
+  ]
+}
+
+patch {
+  url: {{baseUrl}}/v1/food-cart/:itemId/
+  body: json
+  auth: apikey
+}
+
+params:path {
+  itemId: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "quantity": 0,
+    "customizations": {},
+    "specialInstructions": ""
+  }
+}
+
+docs {
+  Update quantity or customizations for a specific cart item
+}
+
+example {
+  name: 200 Response
+  description: Cart item updated successfully
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/:itemId/
+    method: PATCH
+    mode: json
+    params:path: {
+      itemId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "quantity": 0,
+        "customizations": {},
+        "specialInstructions": ""
+      }
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation failed
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/:itemId/
+    method: PATCH
+    mode: json
+    params:path: {
+      itemId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "quantity": 0,
+        "customizations": {},
+        "specialInstructions": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 401 Response
+  description: Authentication credentials were not provided
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/:itemId/
+    method: PATCH
+    mode: json
+    params:path: {
+      itemId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "quantity": 0,
+        "customizations": {},
+        "specialInstructions": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 401
+      text: Unauthorized
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 403 Response
+  description: User account is not verified
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/:itemId/
+    method: PATCH
+    mode: json
+    params:path: {
+      itemId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "quantity": 0,
+        "customizations": {},
+        "specialInstructions": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 403
+      text: Forbidden
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Cart item not found
+  
+  request: {
+    url: {{baseUrl}}/v1/food-cart/:itemId/
+    method: PATCH
+    mode: json
+    params:path: {
+      itemId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "quantity": 0,
+        "customizations": {},
+        "specialInstructions": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

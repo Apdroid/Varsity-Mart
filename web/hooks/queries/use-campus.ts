@@ -41,8 +41,7 @@ export function useCampusesByUniversity(universityId: string) {
 	return useQuery({
 		queryKey: campusKeys.campusesByUniversity(universityId),
 		queryFn: async () => {
-			const res = await campusApi.campusesByUniversity(universityId)
-			return res.results
+			return campusApi.campusesByUniversity(universityId)
 		},
 		enabled: !!universityId,
 		staleTime: STALE,
