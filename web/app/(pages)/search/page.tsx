@@ -29,6 +29,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useSearch } from "@/hooks/queries/use-search"
 import { useProducts } from "@/hooks/queries/use-products"
+import { useCampus } from "@/providers/campus-provider"
 import type {
 	Product as ApiProduct,
 	FoodSearchItem,
@@ -119,6 +120,8 @@ function SearchPageClient() {
 	const query = searchParams.get("query") ?? ""
 	const hasQuery = query.length > 0
 
+	const { universityId, campusId } = useCampus()
+
 	const [filters, setFilters] = React.useState<SearchFilters>(defaultFilters)
 	const [sort, setSort] = React.useState<SortOption>("relevance")
 	const [view, setView] = React.useState<"grid" | "list">("grid")
@@ -145,6 +148,8 @@ function SearchPageClient() {
 					? (filters.conditions[0].toLowerCase() as ProductCondition)
 					: undefined,
 			sortBy: sortByApi,
+			university: universityId ?? undefined,
+			campus: campusId ?? undefined,
 		},
 		hasQuery
 	)
@@ -223,7 +228,7 @@ function SearchPageClient() {
 
 	return (
 		<main className="min-h-svh pb-16">
-			<div className="mx-auto max-w-7xl px-4 pt-6">
+			<div className="mx-auto vm-section px-4 pt-6">
 				{!hasQuery ? (
 					<SearchEmptyState
 						trendingSearches={TRENDING_SEARCHES}
@@ -317,8 +322,8 @@ function AllResultsView({
 			title: "Products",
 			total: productTotal,
 			content: products.length > 0 ? (
-				<div className={cn("grid gap-3", view === "list" ? "grid-cols-1" : "grid-cols-2 md:grid-cols-3 xl:grid-cols-4")}>
-					{products.slice(0, 8).map((item) => <ProductCard key={item.id} product={item} />)}
+				<div className={cn(view === "list" ? "flex flex-col divide-y divide-foreground/8" : "grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4")}>
+					{products.slice(0, 8).map((item) => <ProductCard key={item.id} product={item} variant={view} />)}
 				</div>
 			) : null,
 		},
@@ -386,8 +391,8 @@ function TypeResultsView({
 }) {
 	if (type === "products") {
 		return (
-			<div className={cn("grid gap-3", view === "list" ? "grid-cols-1" : "grid-cols-2 md:grid-cols-3 xl:grid-cols-4")}>
-				{products.map((item) => <ProductCard key={item.id} product={item} />)}
+			<div className={cn(view === "list" ? "flex flex-col divide-y divide-foreground/8" : "grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4")}>
+				{products.map((item) => <ProductCard key={item.id} product={item} variant={view} />)}
 			</div>
 		)
 	}

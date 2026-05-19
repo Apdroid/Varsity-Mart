@@ -130,7 +130,7 @@ export default function EditProductPage() {
 		reset({
 			title: product.title,
 			description: product.description,
-			category: product.category,
+			category: typeof product.category === "string" ? product.category : product.category.id,
 			condition: (product.condition as ProductCondition) ?? "new",
 			location: product.location,
 			price: Number(product.price),

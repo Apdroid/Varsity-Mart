@@ -275,10 +275,11 @@ export interface Product {
 	id: string
 	title: string
 	description: string
-	price: string
-	originalPrice?: string
+	price: number
+	originalPrice?: number
+	delivery_options: string
 	images: ProductImage[]
-	category: ProductCategorySimple
+	category: ProductCategory
 	condition: string
 	location: string
 	seller: ProductSeller
@@ -292,7 +293,7 @@ export interface Product {
 
 // Product detail response (single product)
 export interface ProductDetail extends Omit<Product, 'category' | 'badges'> {
-	category: string
+	category: ProductCategory
 	stock: number
 	badges: string[]
 	isLiked: boolean
@@ -333,8 +334,8 @@ export interface ProductFilters {
 export interface ProductCategory {
 	id: string
 	name: string
-	icon: string
-	count: number
+	icon?: string
+	count?: number
 }
 
 // Store Types - Match actual API
@@ -916,6 +917,19 @@ export interface FoodSearchItem {
 	restaurant_location: string
 }
 
+export interface University {
+	id: string
+	name: string
+	short_name?: string
+}
+
+export interface Campus {
+	id: string
+	name: string
+	short_name?: string
+	university: University
+}
+
 export interface SearchFilters {
 	query: string
 	type?: "all" | "products" | "stores" | "food"
@@ -926,6 +940,8 @@ export interface SearchFilters {
 	sortBy?: "relevance" | "newest" | "price_low" | "price_high"
 	page?: number
 	limit?: number
+	university?: string
+	campus?: string
 }
 
 export interface SearchResults {

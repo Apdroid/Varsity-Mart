@@ -84,8 +84,8 @@ function StockPill({ stock, quantity }: { stock?: number; quantity: number }) {
 				: `In stock (${stock} available)`
 
 	return (
-		<div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-			<span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+		<div className="inline-flex items-center gap-1.5 roundedfull px-3 py-1 text-xs font-bold text-emerald-500 dark:text-emerald-500">
+			<span className="h-1.5 w-1.5 rounded-full bg-emerald-500 " />
 			{label}
 		</div>
 	)
@@ -180,7 +180,7 @@ function ProductMeta({ product }: { product: Product }) {
 					{product.title}
 				</h1>
 				<div className="mt-1.5 flex flex-wrap items-center gap-2">
-					<span className="inline-flex rounded-full border border-vm-tangerine/20 bg-vm-tangerine/10 px-2.5 py-0.5 text-xs font-medium text-vm-tangerine">
+					<span className="inline-flex rounded-full border border-emerald-500 px-2.5 py-0.5 text-xs font-medium text-accent bg-emerald-500">
 						{product.condition}
 					</span>
 					<span className="text-xs text-muted-foreground">
@@ -218,7 +218,7 @@ function BuyBox({ product, quantity, onQuantityChange, actionsRef }: BuyBoxProps
 	const showStepper = hasStock && product.stock! > 1
 
 	return (
-		<div ref={actionsRef} className="rounded-xl border border-border bg-muted/30 p-5 space-y-4">
+		<div ref={actionsRef} className="rounded-xl border border-border bg-muted p-5 space-y-4">
 			{/* Price */}
 			<PriceBlock price={product.price} originalPrice={product.originalPrice} />
 
@@ -324,14 +324,14 @@ export function ProductDetailView({ product, related, sellerProducts, reviews }:
 
 					{/* Col 2 — product meta */}
 					<div className="lg:col-span-4">
-						<div className="lg:sticky lg:top-20 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:pr-1">
+						<div className=" lg:top-20 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:pr-1">
 							<ProductMeta product={product} />
 						</div>
 					</div>
 
 					{/* Col 3 — buy box */}
 					<div className="lg:col-span-3">
-						<div className="lg:sticky lg:top-20">
+						<div className=" lg:top-20">
 							<BuyBox
 								product={product}
 								quantity={quantity}
@@ -345,7 +345,7 @@ export function ProductDetailView({ product, related, sellerProducts, reviews }:
 				{/* ── Below the fold ─────────────────────────────────────── */}
 
 				{/* Reviews + Seller */}
-				<section className="grid grid-cols-5 gap-6 w-full border-t border-border py-12">
+				<section className="grid grid-cols-1  md:grid-cols-5 gap-6 w-full border-t border-border py-12">
 					<ReviewsSection
 						className="col-span-3"
 						productId={product.id}

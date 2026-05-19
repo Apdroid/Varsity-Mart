@@ -263,7 +263,7 @@ export function SellerCard({ seller, location, store, productId, productTitle, p
 					<Button
 						variant="outline"
 						size="sm"
-						className="flex-1 gap-1.5 text-xs h-9"
+						className="flex-1 vm-button gap-1.5 text-xs h-9"
 						onClick={() => setComposeOpen(true)}
 					>
 						<MessageCircle className="h-3.5 w-3.5" />
@@ -272,7 +272,7 @@ export function SellerCard({ seller, location, store, productId, productTitle, p
 					{store && (
 						<Button
 							size="sm"
-							className="flex-1 gap-1.5 text-xs h-9 bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
+							className="flex-1 gap-1.5 text-xs h-9 bg-vm-tangerine vm-button text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
 							asChild
 						>
 							<Link href={`/stores/${store.id}`}>

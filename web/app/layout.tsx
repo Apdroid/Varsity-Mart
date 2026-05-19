@@ -9,8 +9,10 @@ import { DownloadAppCard } from "@/components/global/download-app-card";
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/providers/query-provider";
 import { AuthProvider } from "@/providers/auth-provider";
+import { CampusProvider } from "@/providers/campus-provider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ProfileGate } from "@/components/global/profile-gate";
+import { CampusPicker } from "@/components/global/campus-picker";
 
 
 const fontSans = Plus_Jakarta_Sans({
@@ -44,17 +46,20 @@ export default function RootLayout({
 			<body>
 				<QueryProvider>
 					<AuthProvider>
-						<GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
-							<TooltipProvider>
-								<ThemeProvider>
-									<ProfileGate>
-										{children}
-									</ProfileGate>
-									<DownloadAppCard />
-									<Toaster richColors theme="system" position="bottom-right" />
-								</ThemeProvider>
-							</TooltipProvider>
-						</GoogleOAuthProvider>
+						<CampusProvider>
+							<GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
+								<TooltipProvider>
+									<ThemeProvider>
+										<ProfileGate>
+											{children}
+										</ProfileGate>
+										<CampusPicker />
+										<DownloadAppCard />
+										<Toaster richColors theme="system" position="bottom-right" />
+									</ThemeProvider>
+								</TooltipProvider>
+							</GoogleOAuthProvider>
+						</CampusProvider>
 					</AuthProvider>
 				</QueryProvider>
 			</body>

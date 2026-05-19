@@ -394,7 +394,7 @@ function AnnouncementBar() {
 		<div
 			className="hidden w-full bg-vm-graphite text-xs text-white md:block"
 		>
-			<div className="container mx-auto flex h-9 items-center justify-between px-4">
+			<div className="vm-section mx-auto flex h-9 items-center justify-between px-4">
 				<div className="flex items-center gap-4">
 					<Badge
 						className="h-5 gap-1 rounded-sm border-0 px-1.5 font-bold uppercase tracking-wide bg-vm-tangerine text-white"
@@ -465,6 +465,7 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 	const [desktopCategory, setDesktopCategory] = useState("All Categories")
 	const [isDesktopFocused, setIsDesktopFocused] = useState(false)
 	const [desktopRecentSearches, setDesktopRecentSearches] = useState<string[]>([])
+	const [isLoggingOut, setIsLoggingOut] = useState(false)
 
 	useEffect(() => {
 		// eslint-disable-next-line react-hooks/set-state-in-effect
@@ -481,6 +482,7 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 	const unreadCountLabel = unreadCount > 99 ? "99+" : unreadCount
 
 	const handleLogout = async () => {
+		setIsLoggingOut(true)
 		await logout()
 		router.push("/")
 	}
@@ -518,7 +520,13 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 
 	return (
 		<div className=" bg-card">
-			<div className="container mx-auto flex h-18 items-center justify-between gap-2 px-3 md:h-20 md:gap-6 md:px-4">
+			{isLoggingOut && (
+				<div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4 bg-background/80 backdrop-blur-sm">
+					<Loader2 className="size-10 animate-spin text-primary" />
+					<p className="text-sm font-medium text-muted-foreground">Signing out…</p>
+				</div>
+			)}
+			<div className="vm-section  mx-auto flex h-18 items-center justify-between gap-2 px-3 md:h-20 md:gap-6 md:px-4">
 				{/* Mobile Navigation Menu */}
 				<Sheet>
 					<SheetTrigger asChild>
@@ -845,7 +853,7 @@ function NavLink({ href, children, exact }: { href: string; children: React.Reac
 function NavBar() {
 	return (
 		<div className="hidden bg-card pb-4 shadow-sm lg:block">
-			<div className="container mx-auto flex h-12 items-center justify-between px-4">
+			<div className="vm-section mx-auto flex h-12 items-center justify-between px-4">
 				{/* Left — primary nav with active-state awareness */}
 				<NavigationMenu>
 					<NavigationMenuList className="gap-3">
@@ -919,7 +927,7 @@ function NavBar() {
 
 						<NavigationMenuItem>
 							<NavigationMenuLink
-								href="/sell"
+								href="/seller/start"
 								className="ml-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-vm-tangerine px-4 text-sm font-semibold text-white transition-opacity hover:border-2  hover:text-vm-tangerine"
 							>
 								Become a Seller

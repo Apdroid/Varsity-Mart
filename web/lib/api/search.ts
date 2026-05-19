@@ -58,6 +58,8 @@ export const searchApi = {
       sort_by: filters.sortBy,
       page: filters.page,
       limit: filters.limit,
+      university: filters.university,
+      campus: filters.campus,
     }
     return api.get<SearchResponse>(`/search/${buildQueryString(params)}`)
   },

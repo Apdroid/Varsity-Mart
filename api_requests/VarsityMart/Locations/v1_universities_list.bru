@@ -8,13 +8,13 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/v1/universities/
+  url: {{baseUrl}}/v1/universities/?page=
   body: none
   auth: apikey
 }
 
 params:query {
-  ~page: 
+  page: 
 }
 
 headers {

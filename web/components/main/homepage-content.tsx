@@ -179,7 +179,7 @@ export function HomepageContent() {
 
   return (
     <>
-      <section className="container mx-auto px-4 py-8">
+      <section className="vm-section">
         <SectionHeader
           title="Featured Restaurants"
           subtitle="Quick bites, late-night chops, and campus favorites."
@@ -188,7 +188,7 @@ export function HomepageContent() {
         {restaurantsLoading ? (
           <RestaurantsSkeleton />
         ) : (
-          <div className="flex gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] md:grid md:grid-cols-2 md:overflow-visible xl:grid-cols-4 [&::-webkit-scrollbar]:hidden">
+          <div className="flex gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] md:grid  sm:grid-cols-2 md:grid-cols-3 md:overflow-visible xl:grid-cols-4 [&::-webkit-scrollbar]:hidden">
             {restaurants.map((restaurant) => (
               <RestaurantCard
                 key={restaurant.id}
@@ -200,7 +200,7 @@ export function HomepageContent() {
         )}
       </section>
 
-      <section className="container mx-auto px-4 py-8">
+      <section className="vm-section">
         <SectionHeader
           title="Discover campus vendors"
           subtitle="Trusted student sellers and store owners across campus."
@@ -218,7 +218,7 @@ export function HomepageContent() {
         )}
       </section>
 
-      <section className="container mx-auto px-4 py-8">
+      <section className="vm-section">
         <SectionHeader
           title="Trending on Campus"
           subtitle="What students are buying this week."
@@ -240,7 +240,7 @@ export function HomepageContent() {
       </section>
 
       {spotlightStores.length > 0 && (
-        <section className="container mx-auto px-4 py-8">
+        <section className="vm-section">
           <SectionHeader
             title="Shop by Store"
             subtitle="Pick a vendor and browse their latest campus drops."
@@ -255,7 +255,7 @@ export function HomepageContent() {
       )}
 
       {hostelProducts.length > 0 && (
-        <section className="container mx-auto px-4 py-8">
+        <section className="vm-section">
           <SectionHeader
             title="Hostel Essentials"
             subtitle="Must-haves for room setup and everyday hostel life."

@@ -23,7 +23,7 @@ const choices = [
 
 export default function StartSellingPage() {
   return (
-    <div className="mx-auto max-w-lg px-4 py-16">
+    <div className="mx-auto max-w-2xl px-4 py-16">
       <div className="mb-10 text-center">
         <h1 className="text-2xl font-bold font-heading">Start selling on VarsityMart</h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -34,9 +34,9 @@ export default function StartSellingPage() {
       <div className="grid gap-4">
         {choices.map(({ href, icon: Icon, title, description }) => (
           <Link key={href} href={href} className="group block">
-            <Card className="transition-colors hover:border-vm-tangerine/60 hover:bg-vm-tangerine/5">
+            <Card className="transition-colors border-none outline- shadow-md ring-0 hover:border-vm-tangerine/60 hover:bg-vm-tangerine/5">
               <CardContent className="flex items-start gap-4 p-5">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-vm-tangerine/10 group-hover:bg-vm-tangerine/20 transition-colors">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-accent group-hover:bg-vm-tangerine/20 transition-colors">
                   <Icon className="h-6 w-6 text-vm-tangerine" />
                 </div>
                 <div className="flex-1 min-w-0">

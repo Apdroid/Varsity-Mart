@@ -120,16 +120,16 @@ function HeroSlider({ slides }: { slides: Slide[] }) {
 									{slide.eyebrow}
 								</span>
 								<h2
-									className="text-4xl font-bold text-vm-graphite leading-[1.05] tracking-tight md:text-5xl lg:text-6xl"
+									className="text-2xl font-black text-vm-graphite leading-[1.05] tracking-tight md:text-2xl lg:text-4xl "
 								>
 									{slide.title}
 									<br />
-									<span className="text-vm-tangerine">
+									<span className="text-vm-tangerine text-3xl">
 										{slide.highlight}
 									</span>
 								</h2>
 								<p
-									className="mt-4 text-lg font-semibold text-vm-graphite md:text-xl"
+									className="mt-4 text-lg leading-tight font-semibold text-vm-graphite md:text-xl"
 								>
 									{slide.subtitle}
 								</p>
@@ -166,7 +166,7 @@ function HeroSlider({ slides }: { slides: Slide[] }) {
 			<button
 				onClick={() => go(-1)}
 				aria-label="Previous slide"
-				className="absolute left-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/80 text-black opacity-0 shadow-md backdrop-blur-sm transition hover:bg-white group-hover:opacity-100"
+				className="absolute left-1 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/80 text-black opacity-0 shadow-md backdrop-blur-sm transition hover:bg-white group-hover:opacity-100"
 			>
 				<ChevronLeft className="h-5 w-5" />
 			</button>
@@ -456,13 +456,13 @@ const features = [
 
 function FeaturesStrip() {
 	return (
-		<div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-border md:grid-cols-4">
+		<div className="mt-6 grid grid-cols-2  overflow-hidden rounded-md bg-border md:grid-cols-4">
 			{features.map(({ icon: Icon, title, subtitle }) => (
 				<div
 					key={title}
 					className="flex items-center gap-3 bg-card px-5 py-5 transition-colors hover:bg-muted/40"
 				>
-					<div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-vm-tangerine/10">
+					<div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl  border-2 border-accent ">
 						<Icon className="h-5 w-5 text-vm-tangerine" />
 					</div>
 					<div className="min-w-0">
@@ -504,7 +504,7 @@ export default function VarsityMartHeroBento() {
 			</div>
 
 			{/* Desktop: bento grid — 3:2 ratio gives right cards enough room */}
-			<div className="container mx-auto hidden px-4 py-6 lg:block">
+			<div className="vm-section mx-auto hidden px-4 py-6 lg:block">
 				<div className="grid grid-cols-5 gap-4">
 					{/* Slider — spans 3 of 5 columns */}
 					<div className="col-span-3">
@@ -520,7 +520,7 @@ export default function VarsityMartHeroBento() {
 			</div>
 
 			{/* Features strip — both breakpoints */}
-			<div className="container mx-auto px-4 pb-6">
+			<div className="vm-section ">
 				<FeaturesStrip />
 			</div>
 		</section>

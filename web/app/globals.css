@@ -26,7 +26,7 @@
 	--accent: oklch(95.5% 0 0);
 	--accent-foreground: oklch(0.205 0 0);
 	--destructive: oklch(0.577 0.245 27.325);
-	--border: oklch(0.922 0 0);
+	--border: transparent;
 	--input: oklch(0.922 0 0);
 	--ring: oklch(0.708 0 0);
 	--chart-1: oklch(0.837 0.128 66.29);
@@ -61,7 +61,7 @@
 	--accent: oklch(0.269 0 0);
 	--accent-foreground: oklch(0.985 0 0);
 	--destructive: oklch(0.704 0.191 22.216);
-	--border: oklch(1 0 0 / 10%);
+	--border: transparent;
 	--input: oklch(1 0 0 / 15%);
 	--ring: oklch(0.556 0 0);
 	--chart-1: oklch(0.837 0.128 66.29);
@@ -128,15 +128,18 @@
 	--radius-4xl: calc(var(--radius) * 2.6);
 }
 
+
+
 @layer base {
 	* {
-		@apply leading-loose list-none border-none outline-none ring-0;
+		@apply leading-loose list-none border-0 outline-0 ring-0;
 
 	}
 
 	body {
-		@apply font-body bg-background text-foreground antialiased overflow-x-hidden;
+		@apply font-body bg-background border-none outline-0 ring-0 text-foreground antialiased overflow-x-hidden;
 	}
+
 
 	h1,
 	h2,
@@ -162,6 +165,16 @@
 	}
 
 }
-body{
-	overflow-x:hidden;
+
+@utility vm-section {
+	@apply lg:container mx-auto px-4 py-8;
 }
+
+@utility vm-button{
+	@apply px-6 py-6 !rounded-full !border-none;
+}
+
+body {
+	overflow-x: hidden;
+}
+

@@ -113,8 +113,8 @@ export function ReviewsSection({ productId, seller, allReviews, className }: Pro
 		<section className={cn(className)}>
 			<h2 className="mb-6 text-xl font-bold font-heading">Reviews</h2>
 			<Tabs defaultValue="product">
-				<TabsList className="mb-6 h-10 rounded-full bg-muted p-1">
-					<TabsTrigger value="product" className="rounded-full px-5 text-sm font-medium">
+				<TabsList className="mb-6  h-10 rounded-full bg-muted py-5">
+					<TabsTrigger value="product" className="rounded-md border-border px-5 py-5 text-sm font-medium">
 						Product Reviews
 						{productReviews.length > 0 && (
 							<span className="ml-1.5 rounded-full bg-vm-tangerine px-1.5 py-0.5 text-[10px] font-bold text-white">
@@ -122,7 +122,7 @@ export function ReviewsSection({ productId, seller, allReviews, className }: Pro
 							</span>
 						)}
 					</TabsTrigger>
-					<TabsTrigger value="store" className="rounded-full px-5 text-sm font-medium">
+					<TabsTrigger value="store" className="rounded-md px-5 py-5  text-sm font-medium">
 						Store Reviews
 						{storeReviews.length > 0 && (
 							<span className="ml-1.5 rounded-full bg-vm-tangerine px-1.5 py-0.5 text-[10px] font-bold text-white">

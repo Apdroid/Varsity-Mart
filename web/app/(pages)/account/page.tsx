@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Bell, CreditCard, LogOut, Package, Settings, ShoppingBag, Store, ChevronRight, Loader2 } from "lucide-react"
@@ -48,9 +49,21 @@ export default function AccountPage() {
     ...(user.hasRestaurant ? [{ href: "/restaurant/dashboard", icon: ShoppingBag, label: "Restaurant Dashboard", description: "Manage your restaurant" }] : []),
   ]
 
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
   const handleLogout = async () => {
+    setIsLoggingOut(true)
     await logout()
     router.push("/")
+  }
+
+  if (isLoggingOut) {
+    return (
+      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4 bg-background/80 backdrop-blur-sm">
+        <Loader2 className="size-10 animate-spin text-primary" />
+        <p className="text-sm font-medium text-muted-foreground">Signing out…</p>
+      </div>
+    )
   }
 
   return (

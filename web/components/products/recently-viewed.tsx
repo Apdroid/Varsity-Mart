@@ -33,7 +33,7 @@ export function RecentlyViewed({ currentProductId }: Props) {
   return (
     <section className="mt-12 border-t border-border pt-12">
       <h2 className="mb-5 text-xl font-bold font-heading">Recently Viewed</h2>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
+      <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
         {products.map((p) => (
           <ProductCard key={p.id} product={p} />
         ))}

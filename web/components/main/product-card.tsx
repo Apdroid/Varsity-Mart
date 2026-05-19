@@ -88,6 +88,7 @@ type ProductCardProps = {
 	onLike?: (id: string) => void
 	onAddToCart?: (id: string) => void
 	className?: string
+	variant?: "grid" | "list"
 }
 
 export function ProductCard({
@@ -95,6 +96,7 @@ export function ProductCard({
 	onLike,
 	onAddToCart,
 	className,
+	variant = "grid",
 }: ProductCardProps) {
 	const [liked, setLiked] = React.useState(false)
 	const primary = product.images[0]
@@ -113,6 +115,120 @@ export function ProductCard({
 		e.preventDefault()
 		e.stopPropagation()
 		onAddToCart?.(product.id)
+	}
+
+	if (variant === "list") {
+		return (
+			<Link
+				href={`/products/${product.id}`}
+				className={cn(
+					"group flex w-full flex-row gap-4 rounded-md bg-background p-3 transition-colors hover:bg-card",
+					isSoldOut && "opacity-70",
+					className
+				)}
+			>
+				{/* Image — fixed square on the left */}
+				<div className="relative h-36 w-36 shrink-0 overflow-hidden rounded-md bg-muted sm:h-40 sm:w-40">
+					{primary && (
+						<Image
+							fill
+							src={primary.url || primary.optimized_url || "https://placehold.net/800x600.png/"}
+							alt={product.title}
+							className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+							loading="lazy"
+						/>
+					)}
+					{discount && (
+						<div className="absolute left-0 top-2 bg-vm-tangerine px-2 py-0.5 text-[10px] font-bold text-vm-tangerine-foreground">
+							-{discount}%
+						</div>
+					)}
+					{isSoldOut && (
+						<div className="absolute inset-0 grid place-items-center bg-foreground/50 backdrop-blur-[1px]">
+							<span className="bg-card px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em] text-foreground">
+								Sold Out
+							</span>
+						</div>
+					)}
+				</div>
+
+				{/* Details — fills remaining width */}
+				<div className="flex min-w-0 flex-1 flex-col justify-between py-0.5">
+					<div>
+						<h3 className="line-clamp-2 text-[13px] font-bold leading-snug text-foreground sm:text-sm">
+							{product.title}
+						</h3>
+
+						{/* Badges */}
+						{(product.badges || product.isNightShop) && (
+							<div className="mt-1 flex flex-wrap gap-1">
+								{product.badges && (
+									<span className="bg-foreground/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-foreground">
+										{product.badges}
+									</span>
+								)}
+								{product.isNightShop && (
+									<span className="flex items-center gap-1 bg-foreground/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-foreground">
+										<Moon className="h-2.5 w-2.5" />
+										Night
+									</span>
+								)}
+							</div>
+						)}
+
+						{/* Rating */}
+						<div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+							<div className="flex items-center gap-0.5">
+								<Star className="h-3 w-3 fill-vm-tangerine text-vm-tangerine" />
+								<span className="font-semibold text-foreground">
+									{!Number.isNaN(rating) ? rating.toFixed(1) : "—"}
+								</span>
+							</div>
+							<span className="text-muted-foreground/50">|</span>
+							<span>{product.likes} sold</span>
+						</div>
+					</div>
+
+					<div>
+						{/* Price */}
+						<div className="mt-2 flex items-baseline gap-1.5">
+							<span className="text-base font-bold text-vm-tangerine">
+								{formatGHS(product.price)}
+							</span>
+							{discount && product.originalPrice && (
+								<span className="text-[11px] text-muted-foreground line-through">
+									{formatGHS(product.originalPrice)}
+								</span>
+							)}
+						</div>
+
+						{/* Location + condition + wishlist */}
+						<div className="mt-1 flex items-center justify-between text-[10px] text-muted-foreground">
+							<div className="flex min-w-0 items-center gap-0.5">
+								<MapPinIcon size={10} className="shrink-0 cursor-default" />
+								<span className="truncate">{product.location}</span>
+								<span className="mx-1 text-muted-foreground/40">·</span>
+								<span className="shrink-0 font-medium uppercase tracking-wide text-foreground/70">
+									{product.condition}
+								</span>
+							</div>
+							<button
+								type="button"
+								onClick={handleLike}
+								aria-label={liked ? "Remove from wishlist" : "Add to wishlist"}
+								aria-pressed={liked}
+								className={cn(
+									"ml-2 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-muted text-foreground transition-colors hover:text-vm-tangerine",
+									liked && "text-vm-tangerine"
+								)}
+							>
+								<Heart className={cn("h-3.5 w-3.5", liked && "fill-vm-tangerine")} />
+							</button>
+						</div>
+					</div>
+				</div>
+			</Link>
+		)
 	}
 
 	return (

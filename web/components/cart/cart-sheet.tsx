@@ -64,14 +64,16 @@ export function CartSheet() {
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger asChild>
-				<Button variant="ghost" size="icon" className="relative h-10 w-10" aria-label="Cart">
+				<button type="button"
+					className="relative h-10 w-10 inline-flex items-center justify-center"
+					aria-label="Cart">
 					<ShoppingCartIcon className="w-7 h-7" weight="regular" />
 					{!authLoading && itemCount > 0 && (
 						<Badge className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-2 border-background bg-vm-tangerine p-0 text-[10px] font-bold leading-none text-white">
 							{itemCount}
 						</Badge>
 					)}
-				</Button>
+				</button>
 			</SheetTrigger>
 
 			<SheetContent className="flex h-dvh w-full flex-col gap-0 p-0 sm:max-w-md">

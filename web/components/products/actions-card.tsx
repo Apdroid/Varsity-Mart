@@ -137,7 +137,7 @@ export function ActionsCard({ productId, price, stock, title, quantity }: Props)
             <span className="text-sm font-medium text-muted-foreground">Sold Out</span>
           </div>
           <Button
-            variant="outline"
+            variant="secondary"
             size="lg"
             className={cn("w-full h-11 font-semibold", liked && "border-red-300 text-red-500")}
             onClick={() => setLiked((v) => !v)}
@@ -149,7 +149,7 @@ export function ActionsCard({ productId, price, stock, title, quantity }: Props)
       ) : (
         <div className="space-y-2.5">
           <Button
-            className="w-full h-11 bg-vm-tangerine font-semibold text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
+            className="w-full h-11 bg-vm-tangerine font-semibold text-vm-tangerine-foreground hover:bg-vm-tangerine/90 vm-button"
             size="lg"
             disabled={isPending}
             onClick={handleAddToCart}
@@ -164,7 +164,7 @@ export function ActionsCard({ productId, price, stock, title, quantity }: Props)
           <Button
             variant="outline"
             size="lg"
-            className="w-full h-11 font-semibold"
+            className="vm-button  w-full h-11 font-semibold "
             onClick={() => setOfferOpen(true)}
           >
             <Tag className="mr-2 h-4 w-4" />
@@ -173,7 +173,7 @@ export function ActionsCard({ productId, price, stock, title, quantity }: Props)
           <Button
             variant="outline"
             size="lg"
-            className={cn("w-full h-11 font-semibold", liked && "border-red-300 text-red-500")}
+            className={cn("vm-button w-full h-11 font-semibold", liked && "border-red-300 text-red-500")}
             onClick={() => setLiked((v) => !v)}
           >
             <Heart className={cn("mr-2 h-4 w-4", liked && "fill-red-500 text-red-500")} />
