@@ -53,7 +53,7 @@ export default function NotFound() {
           {/* Sold-out stamp */}
           <div
             aria-hidden="true"
-            className="absolute -right-4 top-2 rotate-[18deg] rounded-sm border-4 border-red-500/70 px-2 py-0.5 text-[11px] font-black uppercase tracking-[0.3em] text-red-500/70 sm:-right-2 sm:top-4 sm:text-xs"
+            className="absolute -right-4 top-2 rotate-18 rounded-sm border-4 border-red-500/70 px-2 py-0.5 text-[11px] font-black uppercase tracking-[0.3em] text-red-500/70 sm:-right-2 sm:top-4 sm:text-xs"
           >
             Sold out
           </div>
