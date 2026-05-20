@@ -12,7 +12,7 @@ import type {
 export const paymentsApi = {
 	methods: {
 		list: () =>
-			api.get<ApiResponse<PaymentMethod[]>>("/payments/methods/"),
+			api.get<ApiResponse<{ methods: PaymentMethod[] }>>("/payments/methods/"),
 
 		add: (data: AddPaymentMethodRequest) =>
 			api.post<ApiResponse<PaymentMethod>>("/payments/methods/", { ...data, type: "momo" }),

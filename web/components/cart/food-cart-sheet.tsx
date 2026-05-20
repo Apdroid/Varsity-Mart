@@ -62,7 +62,7 @@ export function FoodCartSheet() {
 				</button>
 			</SheetTrigger>
 
-			<SheetContent className="flex w-full flex-col gap-0 p-0 sm:max-w-md">
+			<SheetContent className="border-none flex w-full flex-col gap-0 p-0 sm:max-w-md">
 				<SheetHeader className="border-b border-border px-5 py-4">
 					<SheetTitle className="flex items-center gap-2 text-base">
 						Food Order
@@ -86,7 +86,7 @@ export function FoodCartSheet() {
 							</p>
 						</div>
 						<Button
-							className="bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
+							className="bg-vm-tangerine text-vm-tangerine-foreground vm-button px-6 hover:bg-vm-tangerine/90"
 							onClick={() => { setOpen(false); router.push("/restaurants") }}
 						>
 							Browse food court

@@ -40,10 +40,9 @@ export default function PaymentVerifyPage() {
 		)
 	}
 
-	if (isError || !result?.success) {
+	if (isError || !result || result.status !== "success") {
 		const message =
 			(error instanceof Error ? error.message : null) ||
-			result?.message ||
 			"Your payment could not be verified. Please contact support if funds were deducted."
 
 		return (
@@ -76,26 +75,22 @@ export default function PaymentVerifyPage() {
 				<h1 className="text-xl font-bold">Payment confirmed!</h1>
 				<p className="mt-1 text-sm text-muted-foreground">Your order has been placed successfully.</p>
 
-				{(result.orderId || result.amount) && (
-					<div className="mt-4 rounded-xl border border-border bg-muted/30 px-4 py-3 text-left text-sm">
-						{result.orderId && (
-							<div className="flex justify-between">
-								<span className="text-muted-foreground">Order ID</span>
-								<span className="font-medium">#{result.orderId.slice(0, 8).toUpperCase()}</span>
-							</div>
-						)}
-						{result.amount && (
-							<div className="mt-1 flex justify-between">
-								<span className="text-muted-foreground">Amount paid</span>
-								<span className="font-medium text-emerald-600">{formatGHS(result.amount)}</span>
-							</div>
-						)}
+				<div className="mt-4 rounded-xl border border-border bg-muted/30 px-4 py-3 text-left text-sm">
+					<div className="flex justify-between">
+						<span className="text-muted-foreground">Transaction ID</span>
+						<span className="font-medium">#{result.transaction_id}</span>
 					</div>
-				)}
+					{result.amount && (
+						<div className="mt-1 flex justify-between">
+							<span className="text-muted-foreground">Amount paid</span>
+							<span className="font-medium text-emerald-600">{formatGHS(parseFloat(result.amount))}</span>
+						</div>
+					)}
+				</div>
 
 				<div className="mt-6 flex flex-col gap-2">
 					<Button asChild className="w-full rounded-full bg-vm-tangerine text-white hover:bg-vm-tangerine/90">
-						<Link href={result.orderId ? `/orders/${result.orderId}` : "/account/orders"}>
+						<Link href="/account/orders">
 							View your order
 						</Link>
 					</Button>

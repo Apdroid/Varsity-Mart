@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { DollarSign, Loader2, Package, ShoppingBag, Star, TrendingUp } from "lucide-react"
+import { DollarSign, Loader2, Package, ShoppingBag, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -11,12 +11,12 @@ import { useMyStore } from "@/hooks/queries/use-stores"
 import { useMyProducts } from "@/hooks/queries/use-products"
 import { useSellerOrders } from "@/hooks/queries/use-orders"
 
-function formatGHS(n: number) {
+function formatGHS(n: number | string) {
   return new Intl.NumberFormat("en-GH", {
     style: "currency",
     currency: "GHS",
     maximumFractionDigits: 0,
-  }).format(n)
+  }).format(typeof n === "string" ? parseFloat(n) : n)
 }
 
 function StatCard({ title, value, icon: Icon, description }: {
@@ -96,7 +96,7 @@ export default function SellerDashboardPage() {
 
   const totalRevenue = orders
     .filter((o) => o.status === "delivered")
-    .reduce((sum, o) => sum + o.total, 0)
+    .reduce((sum, o) => sum + parseFloat(String(o.total)), 0)
 
   const pendingOrders = orders.filter((o) =>
     ["pending_payment", "payment_confirmed", "processing", "shipped"].includes(o.status)
@@ -174,9 +174,9 @@ export default function SellerDashboardPage() {
                         className="flex items-center justify-between rounded-lg border p-3"
                       >
                         <div>
-                          <p className="font-medium">Order #{order.orderNumber}</p>
+                          <p className="font-medium">Order #{order.order_number || order.orderNumber}</p>
                           <p className="text-sm text-muted-foreground">
-                            {order.items.length} item{order.items.length !== 1 ? "s" : ""} • {formatGHS(order.total)}
+                            {order.quantity ?? order.items?.length ?? 1} item{(order.quantity ?? order.items?.length ?? 1) !== 1 ? "s" : ""} • {formatGHS(order.total)}
                           </p>
                         </div>
                         <Button variant="outline" size="sm" asChild>

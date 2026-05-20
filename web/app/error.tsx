@@ -28,27 +28,26 @@ export default function GlobalError({ error, reset }: ErrorProps) {
         className="pointer-events-none absolute left-1/2 top-1/2 h-[40vh] w-[40vh] -translate-x-1/2 -translate-y-1/2 rounded-full bg-vm-tangerine/5 blur-3xl"
       />
 
-      <div className="relative z-10 mx-auto w-full max-w-md text-center">
+      <div className="relative z-10 mx-auto w-full max-w-lg text-center">
         {/* Animated icon */}
         <div className="mb-8 flex justify-center">
           <div className="relative">
             {/* Pulsing ring */}
             <div className="absolute inset-0 animate-ping rounded-full bg-vm-tangerine/20" />
-            <div className="relative grid h-20 w-20 place-items-center rounded-full bg-vm-tangerine/10 ring-1 ring-vm-tangerine/30">
-              <AlertTriangle className="h-9 w-9 text-vm-tangerine" strokeWidth={1.5} />
+            <div className="relative grid h-30 w-30 place-items-center rounded-full  ">
+              <AlertTriangle className="h-12 w-12 text-red-600" strokeWidth={1.5} />
             </div>
           </div>
         </div>
 
         {/* Heading */}
-        <h1 className="font-heading text-3xl font-black leading-tight text-foreground sm:text-4xl">
+        <h1 className="font-heading text-3xl font-black leading-tight text-foreground capitalize sm:text-4xl">
           Something broke
-          <br />
           at the stall.
         </h1>
 
         {/* Subtext */}
-        <p className="mx-auto mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
+        <p className="mx-auto mt-4 max-w-md text-md leading-relaxed text-accent-foreground">
           One of our merchants is having a rough day. This isn&apos;t on you
           — give it a moment, then try again.
         </p>
@@ -66,7 +65,7 @@ export default function GlobalError({ error, reset }: ErrorProps) {
             type="button"
             onClick={handleReset}
             disabled={retrying}
-            className="inline-flex h-11 items-center gap-2 rounded-md bg-vm-tangerine px-6 text-sm font-semibold text-vm-tangerine-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+            className="inline-flex h-11 vm-button items-center gap-2 rounded-md bg-vm-tangerine px-6 text-sm font-semibold text-vm-tangerine-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
           >
             <RefreshCcw
               className={`h-4 w-4 transition-transform ${retrying ? "animate-spin" : ""}`}
@@ -75,7 +74,7 @@ export default function GlobalError({ error, reset }: ErrorProps) {
           </button>
           <Link
             href="/"
-            className="inline-flex h-11 items-center gap-2 rounded-md border border-border px-6 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+            className="inline-flex h-11 items-center  gap-2 border-2 border-vm-tangerine rounded-full px-6 text-sm font-medium text-foreground transition-colors hover:bg-muted"
           >
             <Home className="h-4 w-4" />
             Go home

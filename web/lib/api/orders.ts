@@ -6,6 +6,7 @@ import type {
   FoodOrder,
   Order,
   OrderFilters,
+  Pagination,
   PaginatedList,
   RateFoodOrderRequest,
 } from "./types"
@@ -23,7 +24,7 @@ function buildQueryString(params: object): string {
 
 export const ordersApi = {
   myOrders: (filters?: OrderFilters) =>
-    api.get<PaginatedList<Order>>(`/orders/my-orders/${buildQueryString(filters || {})}`),
+    api.get<ApiResponse<{ orders: Order[]; pagination: Pagination }>>(`/orders/my-orders/${buildQueryString(filters || {})}`),
 
   get: (orderId: string) =>
     api.get<ApiResponse<Order>>(`/orders/${orderId}/`),

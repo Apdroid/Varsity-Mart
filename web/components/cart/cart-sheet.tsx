@@ -76,7 +76,7 @@ export function CartSheet() {
 				</button>
 			</SheetTrigger>
 
-			<SheetContent className="flex h-dvh w-full flex-col gap-0 p-0 sm:max-w-md">
+			<SheetContent className="border-none flex h-dvh w-full flex-col gap-0 p-0 sm:max-w-md">
 				<SheetHeader className="shrink-0 border-b border-border px-5 py-4">
 					<SheetTitle className="flex items-center gap-2 text-base">
 						Your Cart
@@ -122,7 +122,7 @@ export function CartSheet() {
 							</p>
 						</div>
 						<Button
-							className="bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
+							className="vm-button px-4 bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
 							onClick={() => { setOpen(false); router.push("/search") }}
 						>
 							Browse products

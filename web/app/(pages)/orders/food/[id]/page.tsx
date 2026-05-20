@@ -3,13 +3,13 @@
 import { use } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Check, Clock, Loader2, MapPin, Package, Phone, Truck } from "lucide-react"
+import { ArrowLeft, Check, Clock, Loader2, MapPin, ShoppingBag, Truck, UtensilsCrossed } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useAuth } from "@/providers/auth-provider"
-import { useOrder, useConfirmOrderDelivery, useCancelOrder } from "@/hooks/queries/use-orders"
-import type { OrderStatus } from "@/lib/api/types"
+import { useFoodOrder, useConfirmFoodOrderDelivery } from "@/hooks/queries/use-orders"
+import type { FoodOrderStatus } from "@/lib/api/types"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
@@ -35,16 +35,16 @@ function formatGHS(n: number | string) {
   }).format(typeof n === "string" ? parseFloat(n) : n)
 }
 
-const ORDER_STEPS: { status: OrderStatus; label: string; icon: React.ElementType }[] = [
-  { status: "pending_payment", label: "Order Placed", icon: Package },
-  { status: "payment_confirmed", label: "Payment Confirmed", icon: Check },
-  { status: "processing", label: "Processing", icon: Clock },
-  { status: "shipped", label: "Shipped", icon: Truck },
-  { status: "in_delivery", label: "Out for Delivery", icon: Truck },
+const ORDER_STEPS: { status: FoodOrderStatus; label: string; icon: React.ElementType }[] = [
+  { status: "pending_payment", label: "Order Placed", icon: ShoppingBag },
+  { status: "confirmed", label: "Confirmed", icon: Check },
+  { status: "preparing", label: "Preparing", icon: UtensilsCrossed },
+  { status: "ready", label: "Ready", icon: Check },
+  { status: "in_delivery", label: "On the Way", icon: Truck },
   { status: "delivered", label: "Delivered", icon: Check },
 ]
 
-function getStepIndex(status: OrderStatus): number {
+function getStepIndex(status: FoodOrderStatus): number {
   const idx = ORDER_STEPS.findIndex((s) => s.status === status)
   return idx >= 0 ? idx : 0
 }
@@ -59,12 +59,11 @@ function OrderSkeleton() {
   )
 }
 
-function OrderContent({ id }: { id: string }) {
+function FoodOrderContent({ id }: { id: string }) {
   const router = useRouter()
   const { isLoading: authLoading, isAuthenticated } = useAuth()
-  const { data: orderData, isLoading, error } = useOrder(id)
-  const confirmDeliveryMutation = useConfirmOrderDelivery()
-  const cancelOrderMutation = useCancelOrder()
+  const { data: orderData, isLoading, error } = useFoodOrder(id)
+  const confirmDeliveryMutation = useConfirmFoodOrderDelivery()
 
   const order = orderData?.data
 
@@ -79,7 +78,7 @@ function OrderContent({ id }: { id: string }) {
   }
 
   if (!isAuthenticated) {
-    router.push(`/login?redirect=/orders/${id}`)
+    router.push(`/login?redirect=/orders/food/${id}`)
     return null
   }
 
@@ -100,9 +99,13 @@ function OrderContent({ id }: { id: string }) {
   }
 
   const currentStepIndex = getStepIndex(order.status)
-  const isCancelled = order.status === "cancelled" || order.status === "refunded"
+  const isCancelled = order.status === "cancelled"
   const canConfirmDelivery = order.status === "in_delivery"
-  const canCancel = ["pending_payment", "payment_confirmed", "processing"].includes(order.status)
+
+  const restaurantName = order.restaurant?.name || order.restaurantName || "Restaurant"
+  const restaurantPhone = order.restaurant?.phone
+  const deliveryFee = order.delivery_fee ?? order.deliveryFee
+  const createdAt = order.createdAt || order.created_at || ""
 
   const handleConfirmDelivery = async () => {
     try {
@@ -110,16 +113,6 @@ function OrderContent({ id }: { id: string }) {
       toast.success("Delivery confirmed!")
     } catch {
       toast.error("Failed to confirm delivery")
-    }
-  }
-
-  const handleCancel = async () => {
-    if (!confirm("Are you sure you want to cancel this order?")) return
-    try {
-      await cancelOrderMutation.mutateAsync({ orderId: order.id })
-      toast.success("Order cancelled")
-    } catch {
-      toast.error("Failed to cancel order")
     }
   }
 
@@ -138,19 +131,9 @@ function OrderContent({ id }: { id: string }) {
 
         <div className="mb-6 flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Order #{order.order_number || order.orderNumber}</h1>
-            <p className="text-muted-foreground">Placed on {formatDate(order.created_at || order.createdAt || "")}</p>
+            <h1 className="text-2xl font-bold">Order #{order.id}</h1>
+            <p className="text-muted-foreground">Placed on {formatDate(createdAt)}</p>
           </div>
-          {canCancel && (
-            <Button
-              variant="outline"
-              className="text-destructive hover:bg-destructive/10"
-              onClick={handleCancel}
-              disabled={cancelOrderMutation.isPending}
-            >
-              Cancel Order
-            </Button>
-          )}
         </div>
 
         {!isCancelled && (
@@ -212,9 +195,7 @@ function OrderContent({ id }: { id: string }) {
 
         {isCancelled && (
           <div className="mb-8 rounded-lg border-destructive/20 bg-destructive/5 p-6 text-center">
-            <p className="font-medium text-destructive">
-              This order has been {order.status === "refunded" ? "refunded" : "cancelled"}
-            </p>
+            <p className="font-medium text-destructive">This order has been cancelled</p>
           </div>
         )}
 
@@ -222,56 +203,54 @@ function OrderContent({ id }: { id: string }) {
           <div className="rounded-lg bg-card p-6">
             <h2 className="mb-4 font-semibold">Order Items</h2>
             <div className="space-y-4">
-              {order.items && order.items.length > 0 ? (
-                order.items.map((item) => (
-                  <div key={item.id} className="flex gap-3">
-                    <div className="h-16 w-16 rounded-lg bg-muted" />
-                    <div className="flex-1">
-                      <p className="font-medium line-clamp-1">{item.product.title}</p>
-                      <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
-                      <p className="text-sm font-medium">{formatGHS(item.subtotal)}</p>
-                    </div>
-                  </div>
-                ))
-              ) : order.product ? (
-                <div className="flex gap-3">
-                  {order.product.image && (
+              {(order.items ?? []).map((item, idx) => (
+                <div key={item.itemId ?? item.id ?? idx} className="flex gap-3">
+                  {(item.image ?? item.menuItem?.image) ? (
                     <img
-                      src={order.product.image}
-                      alt={order.product.title}
+                      src={item.image ?? item.menuItem?.image}
+                      alt={item.name ?? item.menuItem?.name}
                       className="h-16 w-16 rounded-lg object-cover bg-muted"
                     />
+                  ) : (
+                    <div className="h-16 w-16 rounded-lg bg-muted" />
                   )}
                   <div className="flex-1">
-                    <p className="font-medium line-clamp-1">{order.product.title}</p>
-                    <p className="text-sm text-muted-foreground">Qty: {order.quantity ?? 1}</p>
-                    <p className="text-sm font-medium">{formatGHS(order.subtotal)}</p>
+                    <p className="font-medium line-clamp-1">{item.name ?? item.menuItem?.name}</p>
+                    <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                    {item.specialInstructions && (
+                      <p className="text-xs text-muted-foreground italic">{item.specialInstructions}</p>
+                    )}
+                    <p className="text-sm font-medium">
+                      {formatGHS(item.price ?? item.unitPrice ?? 0)}
+                    </p>
                   </div>
                 </div>
-              ) : null}
+              ))}
             </div>
 
             <Separator className="my-4" />
 
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span>{formatGHS(order.subtotal)}</span>
-              </div>
-              {(order.delivery_fee ?? order.deliveryFee) !== undefined && (
+              {order.subtotal !== undefined && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>{formatGHS(order.subtotal)}</span>
+                </div>
+              )}
+              {deliveryFee !== undefined && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Delivery</span>
                   <span>
-                    {parseFloat(String(order.delivery_fee ?? order.deliveryFee ?? 0)) === 0
+                    {parseFloat(String(deliveryFee)) === 0
                       ? "Free"
-                      : formatGHS(order.delivery_fee ?? order.deliveryFee ?? 0)}
+                      : formatGHS(deliveryFee)}
                   </span>
                 </div>
               )}
-              {(order.service_fee ?? order.serviceFee) !== undefined && (
+              {order.serviceFee !== undefined && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Service Fee</span>
-                  <span>{formatGHS(order.service_fee ?? order.serviceFee ?? 0)}</span>
+                  <span>{formatGHS(order.serviceFee)}</span>
                 </div>
               )}
               <Separator className="my-2" />
@@ -290,19 +269,19 @@ function OrderContent({ id }: { id: string }) {
                   <MapPin className="mt-0.5 h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="font-medium">
-                      {(order.delivery_method ?? order.deliveryMethod) === "pickup" ? "Pickup" : "Delivery Address"}
+                      {order.deliveryMethod === "pickup" ? "Pickup" : "Delivery Address"}
                     </p>
                     <p className="text-muted-foreground">
-                      {order.delivery_address || order.deliveryAddress || "Pickup from seller"}
+                      {order.deliveryAddress || "Pickup from restaurant"}
                     </p>
                   </div>
                 </div>
-                {(order.delivery_instructions || order.deliveryInstructions) && (
+                {order.deliveryInstructions && (
                   <div className="flex items-start gap-3">
                     <Clock className="mt-0.5 h-4 w-4 text-muted-foreground" />
                     <div>
                       <p className="font-medium">Instructions</p>
-                      <p className="text-muted-foreground">{order.delivery_instructions || order.deliveryInstructions}</p>
+                      <p className="text-muted-foreground">{order.deliveryInstructions}</p>
                     </div>
                   </div>
                 )}
@@ -310,19 +289,22 @@ function OrderContent({ id }: { id: string }) {
             </div>
 
             <div className="rounded-lg bg-card p-6">
-              <h2 className="mb-4 font-semibold">Seller</h2>
-                <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-muted" />
+              <h2 className="mb-4 font-semibold">Restaurant</h2>
+              <div className="flex items-center gap-3">
+                {order.restaurant?.logo || order.restaurantLogo ? (
+                  <img
+                    src={order.restaurant?.logo ?? order.restaurantLogo}
+                    alt={restaurantName}
+                    className="h-12 w-12 rounded-full object-cover bg-muted"
+                  />
+                ) : (
+                  <div className="h-12 w-12 rounded-full bg-muted" />
+                )}
                 <div>
-                  <p className="font-medium">
-                    {[order.seller.firstName, order.seller.lastName].filter(Boolean).join(" ").trim() || order.seller.name}
-                  </p>
-                  <Link
-                    href={`/messages?user=${order.seller.id}`}
-                    className="text-sm text-primary hover:underline"
-                  >
-                    Contact seller
-                  </Link>
+                  <p className="font-medium">{restaurantName}</p>
+                  {restaurantPhone && (
+                    <p className="text-sm text-muted-foreground">{restaurantPhone}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -333,12 +315,12 @@ function OrderContent({ id }: { id: string }) {
                 <div className="space-y-4">
                   {(order.timeline ?? []).map((entry, idx) => (
                     <div key={idx} className="flex gap-3 text-sm">
-                      <div className="mt-1 h-2 w-2 rounded-full bg-primary" />
+                      <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" />
                       <div>
                         <p className="font-medium capitalize">{entry.status.replace(/_/g, " ")}</p>
                         <p className="text-muted-foreground">{formatDate(entry.timestamp)}</p>
-                        {(entry.description || entry.note) && (
-                          <p className="mt-1 text-muted-foreground">{entry.description || entry.note}</p>
+                        {entry.description && (
+                          <p className="mt-1 text-muted-foreground">{entry.description}</p>
                         )}
                       </div>
                     </div>
@@ -353,7 +335,7 @@ function OrderContent({ id }: { id: string }) {
   )
 }
 
-export default function OrderPage({ params }: Props) {
+export default function FoodOrderPage({ params }: Props) {
   const { id } = use(params)
-  return <OrderContent id={id} />
+  return <FoodOrderContent id={id} />
 }

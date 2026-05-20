@@ -9,6 +9,29 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { useAuth } from "@/providers/auth-provider"
 import { useMyOrders, useMyFoodOrders } from "@/hooks/queries/use-orders"
+import type { OrderStatus } from "@/lib/api/types"
+import { cn } from "@/lib/utils"
+
+function getStatusColor(status: OrderStatus | string) {
+  switch (status) {
+    case "delivered":
+    case "payment_confirmed":
+    case "paid":
+      return "bg-green-100 text-green-700"
+    case "cancelled":
+    case "refunded":
+      return "bg-red-100 text-red-700"
+    case "in_delivery":
+    case "shipped":
+    case "processing":
+      return "bg-blue-100 text-blue-700"
+    case "pending_payment":
+    case "pending":
+      return "bg-amber-100 text-amber-700"
+    default:
+      return "bg-muted text-muted-foreground"
+  }
+}
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("en-GH", {
@@ -24,7 +47,7 @@ export default function AccountPage() {
   const { data: ordersData } = useMyOrders({ limit: 3 })
   const { data: foodOrdersData } = useMyFoodOrders({ limit: 3 })
 
-  const recentOrders = ordersData?.results || []
+  const recentOrders = ordersData?.data?.orders || []
   const recentFoodOrders = foodOrdersData?.data?.orders || []
 
   if (isLoading) {
@@ -92,7 +115,7 @@ export default function AccountPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center justify-between rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
+              className="flex items-center justify-between rounded-lg  bg-card p-4 transition-colors hover:bg-muted/50"
             >
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
@@ -123,14 +146,14 @@ export default function AccountPage() {
                   <Link
                     key={order.id}
                     href={`/orders/${order.id}`}
-                    className="flex items-center justify-between rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
+                    className="flex items-center justify-between rounded-lg  bg-card p-4 transition-colors hover:bg-muted/50"
                   >
                     <div>
-                      <p className="font-medium">Order #{order.orderNumber}</p>
-                      <p className="text-sm text-muted-foreground">{formatDate(order.createdAt)}</p>
+                      <p className="font-medium">Order #{order.order_number || order.orderNumber}</p>
+                      <p className="text-sm text-muted-foreground">{formatDate(order.created_at || order.createdAt || "")}</p>
                     </div>
-                    <span className="rounded-full bg-muted px-3 py-1 text-sm capitalize">
-                      {order.status.replace("_", " ")}
+                    <span className={cn("rounded-full px-3 py-1 text-xs font-medium capitalize", getStatusColor(order.status))}>
+                      {order.status}
                     </span>
                   </Link>
                 ))}

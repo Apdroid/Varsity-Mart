@@ -578,25 +578,32 @@ export interface Order {
 	orderNumber?: string
 	status: OrderStatus
 	status_display?: string
-	payment_status?: string
-	payment_status_display?: string
-	product?: {
+	product: {
 		id: string
 		title: string
-		price: number
+		price: string | number
 		image?: string
 	}
 	quantity?: number
-	items: OrderItem[]
-	subtotal: number
-	deliveryFee: number
-	serviceFee: number
-	total: number
+	items?: OrderItem[]
+	subtotal: string | number
+	delivery_fee?: string | number
+	deliveryFee?: string | number
+	service_fee?: string | number
+	serviceFee?: string | number
+	total: string | number
+	store?: { id: string; name: string } | null
+	delivery_address?: string
 	deliveryAddress?: string
+	delivery_instructions?: string
 	deliveryInstructions?: string
+	delivery_method?: "campus_delivery" | "pickup"
 	deliveryMethod?: "campus_delivery" | "pickup"
-	paymentMethod: string
-	paymentStatus: string
+	payment_method?: string
+	paymentMethod?: string
+	payment_status?: string
+	payment_status_display?: string
+	paymentStatus?: string
 	seller: {
 		id: string
 		name: string
@@ -605,19 +612,28 @@ export interface Order {
 		avatar?: string
 		phone?: string
 	}
-	buyer: {
+	buyer?: {
 		id: string
 		name: string
+		phone?: string
 	}
 	created_at?: string
-	createdAt: string
-	updatedAt: string
+	createdAt?: string
+	updatedAt?: string
 	estimated_delivery?: string
 	estimatedDelivery?: string
 	deliveredAt?: string
 	cancelledAt?: string
 	cancelReason?: string
-	timeline?: { status: string; timestamp: string; note?: string }[]
+	timeline?: {
+		status: string
+		status_display?: string
+		timestamp: string
+		note?: string
+		description?: string
+	}[]
+	escrow_status?: string
+	escrow_status_display?: string
 }
 
 export interface CreateOrderRequest {
@@ -639,6 +655,7 @@ export interface OrderFilters {
 // Food Order Types
 export type FoodOrderStatus =
 	| "pending"
+	| "pending_payment"
 	| "confirmed"
 	| "preparing"
 	| "ready"
@@ -679,19 +696,19 @@ export interface FoodOrderTimelineEntry {
 }
 
 export interface FoodOrder {
-	id?: string
-	orderId: string
+	id: string
+	orderId?: string
 	orderNumber?: string
 	order_number?: string
 	status: FoodOrderStatus
-	restaurantName: string
-	restaurantLogo: string
-	restaurant?: {
+	restaurant: {
 		id?: string
-		name?: string
+		name: string
 		logo?: string
 		phone?: string
 	}
+	restaurantName?: string
+	restaurantLogo?: string
 	items?: FoodOrderItem[]
 	subtotal?: number | string
 	delivery_fee?: number | string
@@ -709,7 +726,7 @@ export interface FoodOrder {
 	paymentMethod?: string
 	paymentStatus?: string
 	created_at?: string
-	createdAt: string
+	createdAt?: string
 	updatedAt?: string
 	estimated_delivery?: string
 	estimatedDelivery?: string
@@ -993,9 +1010,9 @@ export interface AddPaymentMethodRequest {
 }
 
 export interface VerifyPaymentResponse {
-	success: boolean
-	status: string
-	orderId?: string
-	amount?: number
-	message?: string
+		payment_id: string
+		status: string
+		amount: string
+		transaction_id: string
+		paid_at: string
 }

@@ -28,7 +28,7 @@ export default function NotFound() {
       {/* Main card */}
       <div className="relative z-10 mx-auto w-full max-w-lg text-center">
         {/* Price tag badge */}
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-vm-tangerine/30 bg-vm-tangerine/10 px-4 py-1.5 text-sm font-semibold text-vm-tangerine">
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full -vm-tangerine/30 bg-vm-tangerine/10 px-4 py-1.5 text-sm font-semibold text-vm-tangerine">
           <Tag className="h-3.5 w-3.5" />
           Listing not found
         </div>
@@ -74,16 +74,16 @@ export default function NotFound() {
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/"
-            className="inline-flex h-11 items-center gap-2 rounded-md bg-vm-tangerine px-6 text-sm font-semibold text-vm-tangerine-foreground transition-opacity hover:opacity-90"
+            className="inline-flex vm-button h-11 items-center gap-2 rounded-md bg-vm-tangerine px-6 text-sm font-semibold text-vm-tangerine-foreground transition-opacity hover:opacity-90"
           >
             <ShoppingBag className="h-4 w-4" />
             Back to marketplace
           </Link>
           <Link
             href="/search"
-            className="inline-flex h-11 items-center gap-2 rounded-md border border-border px-6 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+            className="inline-flex h-11 rounded-full border-2 border-vm-tangerine items-center gap-2 py-6  px-6 text-sm font-medium text-foreground transition-colors hover:bg-muted"
           >
-            <Search className="h-4 w-4" />
+            <Search className="h-4 w-4 text-vm-tangerine" />
             Search instead
           </Link>
         </div>

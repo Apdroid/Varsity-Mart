@@ -17,8 +17,8 @@ export function usePaymentMethods() {
     queryKey: paymentKeys.methods(),
     queryFn: async () => {
       const response = await paymentsApi.methods.list()
-      return response.data
-    },
+      return response.data.methods   
+			},
   })
 }
 
