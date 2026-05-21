@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
@@ -8,13 +9,14 @@ import {
 	Building2,
 	CreditCard,
 	Loader2,
+	Pencil,
 	Plus,
 	Smartphone,
 	Star,
 	Trash2,
 	Wallet,
 } from "lucide-react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "sonner"
@@ -55,6 +57,7 @@ import {
 	useAddPaymentMethod,
 	useRemovePaymentMethod,
 	useSetDefaultPaymentMethod,
+	useUpdatePaymentMethod,
 } from "@/hooks/queries/use-payments"
 import { useAuth } from "@/providers/auth-provider"
 import { cn } from "@/lib/utils"
@@ -64,7 +67,7 @@ import type { PaymentMethod } from "@/lib/api/types"
 // Zod schema for adding a MoMo payment method
 // ---------------------------------------------------------------------------
 const momoSchema = z.object({
-	provider: z.enum(["mtn", "vodafone", "airteltigo"], {
+	provider: z.enum(["MTN", "Vodafone", "AirtelTigo"], {
 		message: "Please select a network provider",
 	}),
 	phone: z.string().min(9, "Phone number must be at least 9 digits"),
@@ -76,34 +79,51 @@ type MomoFormValues = z.infer<typeof momoSchema>
 // Provider pill config
 // ---------------------------------------------------------------------------
 const PROVIDERS = [
-	{ value: "mtn", label: "MTN", color: "bg-yellow-400 text-yellow-900 hover:bg-yellow-400" },
-	{ value: "vodafone", label: "Vodafone", color: "bg-red-500 text-white hover:bg-red-500" },
-	{ value: "airteltigo", label: "AirtelTigo", color: "bg-blue-500 text-white hover:bg-blue-500" },
+	{ value: "MTN", label: "MTN", color: "bg-yellow-400 text-yellow-900 hover:bg-yellow-400" },
+	{ value: "Vodafone", label: "Vodafone", color: "bg-red-500 text-white hover:bg-red-500" },
+	{ value: "AirtelTigo", label: "AirtelTigo", color: "bg-blue-500 text-white hover:bg-blue-500" },
 ] as const
 
 // ---------------------------------------------------------------------------
-// Helper: icon + label for a payment method row
+// Helper: icon + label for a payment method rowN
 // ---------------------------------------------------------------------------
-function methodIcon(method: PaymentMethod) {
-	if (method.type === "momo") return <Smartphone className="h-5 w-5 text-muted-foreground" />
-	if (method.type === "card") return <CreditCard className="h-5 w-5 text-muted-foreground" />
-	return <Building2 className="h-5 w-5 text-muted-foreground" />
+const PROVIDER_LOGOS: Record<string, { src: string; bg: string }> = {
+	MTN: { src: "/logo/mtn.svg", bg: "bg-yellow-400" },
+	Vodafone: { src: "/logo/Vodafone_Symbol_0.svg", bg: "bg-red-500" },
+	AirtelTigo: { src: "/logo/at.webp", bg: "bg-accent" },
 }
 
-function methodLabel(method: PaymentMethod) {
-	if (method.type === "momo") {
-		const providerLabel =
-			method.provider === "mtn"
-				? "MTN"
-				: method.provider === "vodafone"
-					? "Vodafone"
-					: method.provider === "airteltigo"
-						? "AirtelTigo"
-						: method.provider ?? "MoMo"
-		return `${providerLabel} · ••• ${method.last4 ?? "????"}`
+function MethodIcon({ method }: { method: PaymentMethod }) {
+	if (method.type === "momo" && method.provider && PROVIDER_LOGOS[method.provider]) {
+		const { src, bg } = PROVIDER_LOGOS[method.provider]
+		return (
+			<div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${bg}`}>
+				<Image src={src} alt={method.provider} width={24} height={24} className="object-contain" />
+			</div>
+		)
 	}
-	if (method.type === "card") return `Card · •••• ${method.last4 ?? "????"}`
+	const icon =
+		method.type === "card"
+			? <CreditCard className="h-5 w-5 text-muted-foreground" />
+			: method.type === "momo"
+				? <Smartphone className="h-5 w-5 text-muted-foreground" />
+				: <Building2 className="h-5 w-5 text-muted-foreground" />
+	return (
+		<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted">
+			{icon}
+		</div>
+	)
+}
+
+function methodTitle(method: PaymentMethod): string {
+	if (method.type === "momo") return method.provider ?? "MoMo"
+	if (method.type === "card") return `Card ···· ${method.last4 ?? "????"}`
 	return `Bank · ${method.last4 ?? "????"}`
+}
+
+function methodSubtitle(method: PaymentMethod): string | null {
+	if (method.type === "momo") return method.number ?? null
+	return null
 }
 
 // ---------------------------------------------------------------------------
@@ -118,11 +138,16 @@ function AddMethodDialog() {
 		defaultValues: { phone: "" },
 	})
 
-	const selectedProvider = form.watch("provider")
+	const selectedProvider = useWatch({ control: form.control, name: "provider" })
 
 	async function onSubmit(values: MomoFormValues) {
 		try {
-			await addMethod({ provider: values.provider, phone: values.phone })
+			await addMethod({
+				name: `${PROVIDERS.find(p => p.value === values.provider)?.label ?? values.provider} MoMo`,
+				is_default: false,
+				provider: values.provider,
+				number: values.phone,
+			})
 			toast.success("Payment method added")
 			form.reset()
 			setOpen(false)
@@ -198,13 +223,10 @@ function AddMethodDialog() {
 											<FormLabel>Phone number</FormLabel>
 											<FormControl>
 												<div className="flex">
-													<span className="inline-flex items-center rounded-l-md border border-r-0 bg-muted px-3 text-sm text-muted-foreground">
-														+233
-													</span>
 													<Input
 														{...field}
 														type="tel"
-														placeholder="XX XXX XXXX"
+														placeholder="+233 XX XXX XXXX"
 														className="rounded-l-none"
 														inputMode="numeric"
 													/>
@@ -241,38 +263,147 @@ function AddMethodDialog() {
 }
 
 // ---------------------------------------------------------------------------
+// Edit method dialog
+// ---------------------------------------------------------------------------
+const editSchema = z.object({
+	provider: z.enum(["MTN", "Vodafone", "AirtelTigo"], { message: "Please select a network provider" }),
+	phone: z.string().min(9, "Phone number must be at least 9 digits"),
+})
+type EditFormValues = z.infer<typeof editSchema>
+
+function EditMethodDialog({ method }: { method: PaymentMethod }) {
+	const [open, setOpen] = React.useState(false)
+	const { mutateAsync: updateMethod, isPending } = useUpdatePaymentMethod()
+
+	const form = useForm<EditFormValues>({
+		resolver: zodResolver(editSchema),
+		defaultValues: {
+			provider: (method.provider as EditFormValues["provider"]) ?? "MTN",
+			phone: method.number ?? "",
+		},
+	})
+
+	async function onSubmit(values: EditFormValues) {
+		try {
+			await updateMethod({
+				methodId: method.method_id,
+				data: {
+					provider: values.provider,
+					number: values.phone,
+				},
+			})
+			toast.success("Payment method updated")
+			setOpen(false)
+		} catch {
+			toast.error("Failed to update payment method")
+		}
+	}
+
+	return (
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogTrigger asChild>
+				<Button variant="ghost" size="icon">
+					<Pencil className="h-4 w-4" />
+				</Button>
+			</DialogTrigger>
+			<DialogContent className="sm:max-w-md">
+				<DialogHeader>
+					<DialogTitle>Edit payment method</DialogTitle>
+				</DialogHeader>
+				<Form {...form}>
+					<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 mt-2">
+						<FormField
+							control={form.control}
+							name="provider"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Network provider</FormLabel>
+									<FormControl>
+										<div className="flex gap-2">
+											{PROVIDERS.map((p) => (
+												<button
+													key={p.value}
+													type="button"
+													onClick={() => field.onChange(p.value)}
+													className={cn(
+														"rounded-full px-4 py-1.5 text-sm font-medium ring-2 ring-transparent transition-all",
+														field.value === p.value
+															? `${p.color} ring-offset-1 ring-foreground/30`
+															: "bg-muted text-muted-foreground"
+													)}
+												>
+													{p.label}
+												</button>
+											))}
+										</div>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="phone"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Phone number</FormLabel>
+									<FormControl>
+										<Input
+											{...field}
+											type="tel"
+											placeholder="+233 XX XXX XXXX"
+											inputMode="numeric"
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<Button type="submit" className="w-full vm-button" disabled={isPending}>
+							{isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+							Save changes
+						</Button>
+					</form>
+				</Form>
+			</DialogContent>
+		</Dialog>
+	)
+}
+
+// ---------------------------------------------------------------------------
 // Method row
 // ---------------------------------------------------------------------------
 function MethodRow({ method }: { method: PaymentMethod }) {
 	const { mutate: setDefault, isPending: isSettingDefault } = useSetDefaultPaymentMethod()
 	const { mutate: remove, isPending: isRemoving } = useRemovePaymentMethod()
+	const isDefault = method.isDefault || method.is_default
 
 	function handleSetDefault() {
-		setDefault(method.id, {
+		setDefault(method.method_id, {
 			onSuccess: () => toast.success("Default payment method updated"),
 			onError: () => toast.error("Failed to update default method"),
 		})
 	}
 
 	function handleRemove() {
-		remove(method.id, {
+		remove(method.method_id, {
 			onSuccess: () => toast.success("Payment method removed"),
 			onError: () => toast.error("Failed to remove payment method"),
 		})
 	}
 
 	return (
-		<div className="flex items-center gap-4 rounded-lg border bg-card p-4">
-			{/* Icon */}
-			<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted">
-				{methodIcon(method)}
-			</div>
+		<div className="flex items-center gap-4 rounded-lg bg-card p-4">
+			<MethodIcon method={method} />
 
-			{/* Label + default badge */}
+			{/* Label + number + default badge */}
 			<div className="min-w-0 flex-1">
-				<p className="truncate font-medium">{methodLabel(method)}</p>
-				{method.isDefault && (
-					<Badge variant="secondary" className="mt-1 gap-1 text-xs">
+				<p className="truncate font-medium">{methodTitle(method)}</p>
+				{methodSubtitle(method) && (
+					<p className="text-sm text-muted-foreground">{methodSubtitle(method)}</p>
+				)}
+				{isDefault && (
+					<Badge className="mt-1 gap-1 bg-amber-100 text-amber-800 text-xs hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400">
 						<Star className="h-3 w-3 fill-current" />
 						Default
 					</Badge>
@@ -281,29 +412,18 @@ function MethodRow({ method }: { method: PaymentMethod }) {
 
 			{/* Actions */}
 			<div className="flex shrink-0 items-center gap-2">
-				{!method.isDefault && (
-					<Button
-						variant="ghost"
-						size="sm"
-						onClick={handleSetDefault}
-						disabled={isSettingDefault}
-					>
-						{isSettingDefault ? (
-							<Loader2 className="h-4 w-4 animate-spin" />
-						) : (
-							"Set default"
-						)}
+				{!isDefault && (
+					<Button variant="ghost" size="sm" onClick={handleSetDefault} disabled={isSettingDefault}>
+						{isSettingDefault ? <Loader2 className="h-4 w-4 animate-spin" /> : "Set default"}
 					</Button>
 				)}
+
+				{method.type === "momo" && <EditMethodDialog method={method} />}
 
 				<AlertDialog>
 					<AlertDialogTrigger asChild>
 						<Button variant="ghost" size="icon" disabled={isRemoving} className="text-destructive hover:text-destructive">
-							{isRemoving ? (
-								<Loader2 className="h-4 w-4 animate-spin" />
-							) : (
-								<Trash2 className="h-4 w-4" />
-							)}
+							{isRemoving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
 						</Button>
 					</AlertDialogTrigger>
 					<AlertDialogContent>
@@ -311,8 +431,7 @@ function MethodRow({ method }: { method: PaymentMethod }) {
 							<AlertDialogTitle>Remove payment method?</AlertDialogTitle>
 							<AlertDialogDescription>
 								This will permanently remove{" "}
-								<span className="font-medium">{methodLabel(method)}</span> from your
-								account.
+								<span className="font-medium">{methodTitle(method)}</span> from your account.
 							</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter>
@@ -338,7 +457,7 @@ function PaymentsSkeleton() {
 	return (
 		<div className="space-y-3">
 			{[1, 2].map((i) => (
-				<div key={i} className="flex items-center gap-4 rounded-lg border bg-card p-4">
+				<div key={i} className="flex items-center gap-4 rounded-lg  bg-card p-4">
 					<Skeleton className="h-10 w-10 rounded-full" />
 					<div className="flex-1 space-y-2">
 						<Skeleton className="h-4 w-40" />
@@ -357,7 +476,8 @@ function PaymentsSkeleton() {
 export default function PaymentsPage() {
 	const router = useRouter()
 	const { isLoading: isAuthLoading, isAuthenticated } = useAuth()
-	const { data: { methods }, isLoading: isMethodsLoading } = usePaymentMethods()
+	const { data: methodsData, isLoading: isMethodsLoading } = usePaymentMethods()
+	const methods = methodsData?.methods ?? []
 
 	// Redirect if not authenticated
 	React.useEffect(() => {

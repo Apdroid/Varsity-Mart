@@ -2,12 +2,14 @@ import { api } from "./client"
 import type {
 	ApiResponse,
 	AddPaymentMethodRequest,
+	UpdatePaymentMethodRequest,
 	Bank,
 	EscrowBalance,
 	PaymentMethod,
 	PayoutRequest,
 	VerifyPaymentResponse,
 } from "./types"
+
 
 export const paymentsApi = {
 	methods: {
@@ -22,6 +24,9 @@ export const paymentsApi = {
 
 		setDefault: (methodId: string) =>
 			api.patch<ApiResponse<PaymentMethod>>(`/payments/methods/${methodId}/`, { is_default: true }),
+
+		update: (methodId: string, data: UpdatePaymentMethodRequest) =>
+			api.patch<ApiResponse<PaymentMethod>>(`/payments/methods/${methodId}/`, data),
 	},
 
 	verify: (reference: string) =>

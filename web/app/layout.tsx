@@ -51,7 +51,9 @@ export default function RootLayout({
 								<TooltipProvider>
 									<ThemeProvider>
 										<ProfileGate>
-											{children}
+											<main className="min-h-screen">
+												{children}
+											</main>
 										</ProfileGate>
 										<CampusPicker />
 										<DownloadAppCard />

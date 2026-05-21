@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { paymentsApi } from "@/lib/api/payments"
-import type { AddPaymentMethodRequest, PaymentMethod, PayoutRequest } from "@/lib/api/types"
+import type { AddPaymentMethodRequest, UpdatePaymentMethodRequest, PaymentMethod, PayoutRequest } from "@/lib/api/types"
 
 export const paymentKeys = {
   all: ["payments"] as const,
@@ -17,7 +17,7 @@ export function usePaymentMethods() {
     queryKey: paymentKeys.methods(),
     queryFn: async () => {
       const response = await paymentsApi.methods.list()
-      return response.data.methods   
+      return response.data   
 			},
   })
 }
@@ -38,11 +38,11 @@ export function useRemovePaymentMethod() {
     mutationFn: (methodId: string) => paymentsApi.methods.remove(methodId),
     onMutate: async (methodId) => {
       await queryClient.cancelQueries({ queryKey: paymentKeys.methods() })
-      const previous = queryClient.getQueryData<PaymentMethod[]>(paymentKeys.methods())
+      const previous = queryClient.getQueryData<{ methods: PaymentMethod[] }>(paymentKeys.methods())
       if (previous) {
-        queryClient.setQueryData<PaymentMethod[]>(
+        queryClient.setQueryData<{ methods: PaymentMethod[] }>(
           paymentKeys.methods(),
-          previous.filter((m) => m.id !== methodId)
+          { methods: previous.methods.filter((m) => m.id !== methodId) }
         )
       }
       return { previous }
@@ -64,11 +64,11 @@ export function useSetDefaultPaymentMethod() {
     mutationFn: (methodId: string) => paymentsApi.methods.setDefault(methodId),
     onMutate: async (methodId) => {
       await queryClient.cancelQueries({ queryKey: paymentKeys.methods() })
-      const previous = queryClient.getQueryData<PaymentMethod[]>(paymentKeys.methods())
+      const previous = queryClient.getQueryData<{ methods: PaymentMethod[] }>(paymentKeys.methods())
       if (previous) {
-        queryClient.setQueryData<PaymentMethod[]>(
+        queryClient.setQueryData<{ methods: PaymentMethod[] }>(
           paymentKeys.methods(),
-          previous.map((m) => ({ ...m, isDefault: m.id === methodId }))
+          { methods: previous.methods.map((m) => ({ ...m, isDefault: m.id === methodId })) }
         )
       }
       return { previous }
@@ -79,6 +79,17 @@ export function useSetDefaultPaymentMethod() {
       }
     },
     onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: paymentKeys.methods() })
+    },
+  })
+}
+
+export function useUpdatePaymentMethod() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ methodId, data }: { methodId: string; data: UpdatePaymentMethodRequest }) =>
+      paymentsApi.methods.update(methodId, data),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: paymentKeys.methods() })
     },
   })

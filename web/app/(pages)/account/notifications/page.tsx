@@ -123,7 +123,7 @@ export default function NotificationsPage() {
         {isLoading ? (
           <NotificationsSkeleton />
         ) : notifications.length === 0 ? (
-          <div className="rounded-lg border bg-card p-8 text-center">
+          <div className="rounded-lg bg-card p-8 text-center">
             <Bell className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
             <h2 className="text-lg font-semibold">No notifications yet</h2>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -137,7 +137,7 @@ export default function NotificationsPage() {
                 key={notification.id}
                 onClick={() => !notification.isRead && handleMarkAsRead(notification.id)}
                 className={cn(
-                  "w-full rounded-lg border bg-card p-4 text-left transition-colors hover:bg-muted/50",
+                  "w-full rounded-lg bg-card p-4 text-left transition-colors hover:bg-muted/50",
                   !notification.isRead && "border-primary/20 bg-primary/5"
                 )}
               >

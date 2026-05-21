@@ -890,12 +890,15 @@ export interface SendMessageRequest {
 // Payment Types
 export interface PaymentMethod {
 	id: string
+	method_id:string
 	type: "momo" | "card" | "bank"
 	provider?: string
-	last4?: string
+	last4?:string
+	number:string
 	expiryMonth?: number
 	expiryYear?: number
 	isDefault: boolean
+	is_default?: boolean
 	createdAt: string
 }
 
@@ -1005,14 +1008,25 @@ export interface PayoutRequest {
 }
 
 export interface AddPaymentMethodRequest {
-	provider: "mtn" | "vodafone" | "airteltigo"
-	phone: string
+	type?: string
+	name: string
+	bank_code?: string
+	is_default: boolean
+	provider: string
+	number: string
+}
+
+export interface UpdatePaymentMethodRequest {
+	is_default?: boolean
+	provider?: string
+	number?: string
+	bank_code?: string
 }
 
 export interface VerifyPaymentResponse {
-		payment_id: string
-		status: string
-		amount: string
-		transaction_id: string
-		paid_at: string
+	payment_id: string
+	status: string
+	amount: string
+	transaction_id: string
+	paid_at: string
 }
