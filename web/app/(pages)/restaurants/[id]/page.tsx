@@ -43,7 +43,7 @@ function RestaurantHeaderSkeleton() {
   return (
     <div>
       <Skeleton className="h-52 w-full md:h-64" />
-      <div className="relative mx-4 -mt-14 rounded-2xl border bg-card px-4 py-4 shadow-md md:mx-6">
+      <div className="relative mx-4 -mt-14 rounded-2xl  bg-card px-4 py-4 shadow-md md:mx-6">
         <div className="flex items-start gap-3">
           <Skeleton className="h-14 w-14 rounded-xl" />
           <div className="flex-1 space-y-2">
@@ -77,10 +77,10 @@ function RestaurantHeader({ restaurant }: { restaurant: RestaurantDetail }) {
         </Link>
       </div>
 
-      <div className="relative mx-4 -mt-14 rounded-2xl border border-border bg-card px-4 py-4 shadow-md md:mx-6">
+      <div className="relative mx-4 -mt-14 rounded-2xl bg-card px-4 py-4 shadow-md md:mx-6">
         <div className="flex items-start gap-3">
           {restaurant.logo && (
-            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
+            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl  bg-muted">
               <Image src={restaurant.logo} alt={restaurant.name} fill className="object-cover" />
             </div>
           )}
@@ -207,7 +207,7 @@ export default function RestaurantPage() {
 
       <div
         ref={tabsRef}
-        className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-md"
+        className="sticky top-0 z-30  bg-background/95 backdrop-blur-md"
       >
         {/* Category tabs */}
         <div className="flex overflow-x-auto px-4 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
