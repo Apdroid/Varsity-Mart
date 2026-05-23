@@ -16,6 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { CartLine } from "./cart-line"
 import { useCartStore, useCartCount, useCartTotal } from "@/store/cart-store"
+import { useAuthGate } from "@/providers/auth-gate-provider"
 
 function formatGHS(n: number) {
 	return new Intl.NumberFormat("en-GH", {
@@ -92,6 +93,7 @@ function CartContent({
 
 export function RestaurantCart() {
 	const router = useRouter()
+	const { requireAuth } = useAuthGate()
 	const [open, setOpen] = React.useState(false)
 	const lines = useCartStore((s) => s.lines)
 	const count = useCartCount()
@@ -103,8 +105,10 @@ export function RestaurantCart() {
 	)
 
 	const handleCheckout = () => {
-		setOpen(false)
-		router.push("/food-checkout")
+		requireAuth(() => {
+			setOpen(false)
+			router.push("/food-checkout")
+		})
 	}
 
 	if (isDesktop) {

@@ -9,6 +9,7 @@ import CartIcon from "@/components/ui/cart-icon"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 import { useAddToCart } from "@/hooks/queries/use-cart"
+import { useAuthGate } from "@/providers/auth-gate-provider"
 
 type Props = {
   productId: string
@@ -114,18 +115,21 @@ export function ActionsCard({ productId, price, stock, title, quantity }: Props)
   const total = priceNum * quantity
 
   const { mutate: addToCart, isPending } = useAddToCart()
+  const { requireAuth } = useAuthGate()
 
   const handleAddToCart = () => {
-    addToCart(
-      { productId, quantity },
-      {
-        onSuccess: () =>
-          toast.success(quantity > 1 ? `${quantity} items added to cart` : "Added to cart", {
-            description: title,
-            action: { label: "View Cart", onClick: () => {} },
-          }),
-        onError: () => toast.error("Failed to add to cart"),
-      }
+    requireAuth(() =>
+      addToCart(
+        { productId, quantity },
+        {
+          onSuccess: () =>
+            toast.success(quantity > 1 ? `${quantity} items added to cart` : "Added to cart", {
+              description: title,
+              action: { label: "View Cart", onClick: () => {} },
+            }),
+          onError: () => toast.error("Failed to add to cart"),
+        }
+      )
     )
   }
 
@@ -140,7 +144,7 @@ export function ActionsCard({ productId, price, stock, title, quantity }: Props)
             variant="secondary"
             size="lg"
             className={cn("w-full h-11 font-semibold", liked && "border-red-300 text-red-500")}
-            onClick={() => setLiked((v) => !v)}
+            onClick={() => requireAuth(() => setLiked((v) => !v))}
           >
             <Heart className={cn("mr-2 h-4 w-4", liked && "fill-red-500 text-red-500")} />
             {liked ? "Saved to Favourites" : "Save to Favourites"}
@@ -165,7 +169,7 @@ export function ActionsCard({ productId, price, stock, title, quantity }: Props)
             variant="outline"
             size="lg"
             className="vm-button  w-full h-11 font-semibold "
-            onClick={() => setOfferOpen(true)}
+            onClick={() => requireAuth(() => setOfferOpen(true))}
           >
             <Tag className="mr-2 h-4 w-4" />
             {quantity > 1 ? `Make Offer for ${quantity} items` : "Make an Offer"}
@@ -174,7 +178,7 @@ export function ActionsCard({ productId, price, stock, title, quantity }: Props)
             variant="outline"
             size="lg"
             className={cn("vm-button w-full h-11 font-semibold", liked && "border-red-300 text-red-500")}
-            onClick={() => setLiked((v) => !v)}
+            onClick={() => requireAuth(() => setLiked((v) => !v))}
           >
             <Heart className={cn("mr-2 h-4 w-4", liked && "fill-red-500 text-red-500")} />
             {liked ? "Saved to Favourites" : "Save to Favourites"}

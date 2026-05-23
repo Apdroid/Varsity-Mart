@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/sheet"
 import { CartLine } from "@/components/restaurants/cart-line"
 import { useCartStore, useCartCount, useCartTotal } from "@/store/cart-store"
+import { useAuthGate } from "@/providers/auth-gate-provider"
 
 function formatGHS(n: number) {
 	return new Intl.NumberFormat("en-GH", {
@@ -28,6 +29,7 @@ function formatGHS(n: number) {
 
 export function FoodCartSheet() {
 	const router = useRouter()
+	const { requireAuth } = useAuthGate()
 	const [open, setOpen] = React.useState(false)
 	const lines = useCartStore((s) => s.lines)
 	const count = useCartCount()
@@ -124,7 +126,7 @@ export function FoodCartSheet() {
 							</p>
 							<Button
 								className="w-full bg-vm-tangerine font-semibold text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
-								onClick={() => { setOpen(false); router.push("/food-checkout") }}
+								onClick={() => requireAuth(() => { setOpen(false); router.push("/food-checkout") })}
 							>
 								Proceed to Checkout
 								<ArrowRight className="ml-2 h-4 w-4" />

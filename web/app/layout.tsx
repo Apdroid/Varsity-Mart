@@ -9,6 +9,7 @@ import { DownloadAppCard } from "@/components/global/download-app-card";
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/providers/query-provider";
 import { AuthProvider } from "@/providers/auth-provider";
+import { AuthGateProvider } from "@/providers/auth-gate-provider";
 import { CampusProvider } from "@/providers/campus-provider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ProfileGate } from "@/components/global/profile-gate";
@@ -46,6 +47,7 @@ export default function RootLayout({
 			<body>
 				<QueryProvider>
 					<AuthProvider>
+						<AuthGateProvider>
 						<CampusProvider>
 							<GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
 								<TooltipProvider>
@@ -62,6 +64,7 @@ export default function RootLayout({
 								</TooltipProvider>
 							</GoogleOAuthProvider>
 						</CampusProvider>
+						</AuthGateProvider>
 					</AuthProvider>
 				</QueryProvider>
 			</body>

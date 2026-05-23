@@ -72,6 +72,7 @@ import { cn } from "@/lib/utils";
 const CartSheet = dynamic(() => import("@/components/cart/cart-sheet").then(m => m.CartSheet), { ssr: false })
 const FoodCartSheet = dynamic(() => import("@/components/cart/food-cart-sheet").then(m => m.FoodCartSheet), { ssr: false })
 import { useAuth } from "@/providers/auth-provider";
+import { useAuthGate } from "@/providers/auth-gate-provider";
 import { useNotifications } from "@/hooks/queries/use-user";
 import { useRouter, usePathname } from "next/navigation";
 import { startTransition, useCallback, useEffect, useRef, useState } from "react";
@@ -456,7 +457,7 @@ function AnnouncementBar() {
 ----------------------------------------------------------- */
 function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void }) {
 	const router = useRouter()
-	const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth()
+	const { user, isAuthenticated, isLoading: authLoading } = useAuth()
 	const shouldLoadNotifications = isAuthenticated && !authLoading
 	const { data: notificationsData, isLoading: notificationsLoading } = useNotifications(1, 8, false, {
 		enabled: shouldLoadNotifications,
@@ -465,8 +466,6 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 	const [desktopCategory, setDesktopCategory] = useState("All Categories")
 	const [isDesktopFocused, setIsDesktopFocused] = useState(false)
 	const [desktopRecentSearches, setDesktopRecentSearches] = useState<string[]>([])
-	const [isLoggingOut, setIsLoggingOut] = useState(false)
-
 	useEffect(() => {
 		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setDesktopRecentSearches(loadRecentSearches())
@@ -481,11 +480,7 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 	const unreadCount = notifications.filter((notification) => !notification.isRead).length
 	const unreadCountLabel = unreadCount > 99 ? "99+" : unreadCount
 
-	const handleLogout = async () => {
-		setIsLoggingOut(true)
-		await logout()
-		router.push("/")
-	}
+	const handleLogout = () => router.push("/logout")
 
 	const navigate = useCallback((url: string) => {
 		const targetUrl = new URL(url, window.location.origin)
@@ -520,12 +515,6 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 
 	return (
 		<div className=" bg-card">
-			{isLoggingOut && (
-				<div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4 bg-background/80 backdrop-blur-sm">
-					<Loader2 className="size-10 animate-spin text-primary" />
-					<p className="text-sm font-medium text-muted-foreground">Signing out…</p>
-				</div>
-			)}
 			<div className="vm-section  mx-auto flex h-18 items-center justify-between gap-2 px-3 md:h-20 md:gap-6 md:px-4">
 				{/* Mobile Navigation Menu */}
 				<Sheet>
@@ -614,7 +603,7 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 
 
 				{/* <ThemeToggleButton className="hidden h-10 w-10 sm:inline-flex" /> */}
-				<div className="flex gap-4">
+				<div className="flex gap-1.5 md:gap-4">
 					<FoodCartSheet />
 					<CartSheet />
 					{authLoading ? (
@@ -630,7 +619,7 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 								<DropdownMenuTrigger asChild>
 									<button
 										type="button"
-										className="relative h-10 w-10 items-center justify-center inline-flex"
+										className="relative h-10 w-10 items-center justify-center hidden md:inline-flex"
 										aria-label="Open notifications menu"
 									>
 										<BellIcon className="h-6 w-6" weight="regular" />
@@ -697,14 +686,17 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 								<DropdownMenuTrigger asChild className="">
 									<button
 										type="button"
-										className="h-10 w-10 items-center justify-center inline-flex"
+										className="relative h-10 w-10 items-center justify-center inline-flex"
 										aria-label="Open account menu"
 									>
-										<Avatar className={cn("h-10 w-10",
+										<Avatar className={cn("h-8 w-8 md:h-10 md:w-10",
 											"after:absolute after:bottom-0 after:left-2 after:right-2 after:h-0.5 after:rounded-full after:transition-colors")}>
 											<AvatarImage src={user.avatar || user.avatarUrl || user.profilePic} alt={displayName || "User"} />
 											<AvatarFallback className="text-[11px] font-semibold">{initials}</AvatarFallback>
 										</Avatar>
+										{unreadCount > 0 && (
+											<span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-vm-tangerine md:hidden" />
+										)}
 									</button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end" className="w-64 p-0">
@@ -851,6 +843,8 @@ function NavLink({ href, children, exact }: { href: string; children: React.Reac
 }
 
 function NavBar() {
+	const router = useRouter()
+	const { requireAuth } = useAuthGate()
 	return (
 		<div className="hidden bg-card pb-4 shadow-sm lg:block">
 			<div className="vm-section mx-auto flex h-12 items-center justify-between px-4">
@@ -926,13 +920,14 @@ function NavBar() {
 						<NavLink href="/help">Track Order</NavLink>
 
 						<NavigationMenuItem>
-							<NavigationMenuLink
-								href="/seller/start"
-								className="ml-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-vm-tangerine px-4 text-sm font-semibold text-white transition-opacity hover:border-2  hover:text-vm-tangerine"
+							<button
+								type="button"
+								onClick={() => requireAuth(() => router.push("/seller/start"))}
+								className="ml-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-vm-tangerine px-4 text-sm font-semibold text-white transition-opacity hover:border-2 hover:text-vm-tangerine"
 							>
 								Become a Seller
 								<CaretRightIcon className="h-3.5 w-3.5" />
-							</NavigationMenuLink>
+							</button>
 						</NavigationMenuItem>
 					</NavigationMenuList>
 				</NavigationMenu>
@@ -946,8 +941,9 @@ function NavBar() {
 ----------------------------------------------------------- */
 function MobileSearchBar({ hasStore }: { hasStore: boolean }) {
 	const sellerCtaLabel = hasStore ? "My Store" : "Become a Seller"
-	const sellerCtaHref = hasStore ? "/seller/store" : "/sell"
+	const sellerCtaHref = hasStore ? "/seller/store" : "/seller/start"
 	const router = useRouter()
+	const { requireAuth } = useAuthGate()
 	const pathname = usePathname()
 	const [mobileQuery, setMobileQuery] = useState("")
 	const [isMobileFocused, setIsMobileFocused] = useState(false)
@@ -992,7 +988,7 @@ function MobileSearchBar({ hasStore }: { hasStore: boolean }) {
 	return (
 		<div className="border-t border-border/40 bg-card px-3 pb-2 pt-1.5 md:hidden">
 			<div className="relative">
-				<div className="relative flex h-14 items-center overflow-hidden rounded-tl-full rounded-bl-full justify-between  transition-all ">
+				<div className="relative flex h-10 items-center overflow-hidden rounded-full transition-all">
 					<Input
 						placeholder="Search products, food, stores…"
 						value={mobileQuery}
@@ -1006,15 +1002,15 @@ function MobileSearchBar({ hasStore }: { hasStore: boolean }) {
 							}
 							if (event.key === "Escape") setIsMobileFocused(false)
 						}}
-						className="h-full border-0 bg-accent rounded-br-none rounded-tr-none  shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-graphite px-6 py-9"
+						className="h-full border-0 bg-accent rounded-r-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-graphite px-4"
 					/>
 					<button
 						type="button"
 						onClick={handleMobileSearch}
-						className="mr-1 flex h-full w-14 shrink-0 cursor-pointer items-center justify-center rounded-br-full rounded-tr-full bg-vm-tangerine text-white transition-opacity hover:opacity-90"
+						className="flex h-full w-10 shrink-0 cursor-pointer items-center justify-center rounded-r-full bg-vm-tangerine text-white transition-opacity hover:opacity-90"
 						aria-label="Search"
 					>
-						<MagnifyingGlassIcon className="h-4 w-4" />
+						<MagnifyingGlassIcon className="h-3.5 w-3.5" />
 					</button>
 				</div>
 				{isMobileFocused && (
@@ -1033,29 +1029,30 @@ function MobileSearchBar({ hasStore }: { hasStore: boolean }) {
 				)}
 			</div>
 
-			<div className="mt-1.5 flex w-full justify-between gap-1.5 overflow-x-auto pb-0.5 scrollbar-none [&::-webkit-scrollbar]:hidden">
-				<div className="left flex gap-1.5 mt-1.5">
-					{quickFilters.map(({ href, prefix, label }) => (
-						<Link
-							key={href}
-							href={href}
-							className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors hover:text-vm-tangerine ${pathname.startsWith(prefix) ? "text-vm-graphite dark:text-vm-tangerine font-semibold" : "text-foreground"}`}
-						>
-							{label}
-						</Link>
-					))}
-				</div>
-
-				<div className="flex items-center gap-0.5 sm:gap-1">
+			<div className="mt-2 flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-none [&::-webkit-scrollbar]:hidden">
+				{quickFilters.map(({ href, prefix, label }) => (
 					<Link
-						href={sellerCtaHref}
-						className="mr-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-vm-tangerine px-3 text-xs font-semibold text-white transition-opacity hover:opacity-90 md:hidden"
+						key={href}
+						href={href}
+						className={cn(
+							"shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors hover:text-vm-tangerine",
+							pathname.startsWith(prefix)
+								? "text-vm-graphite dark:text-vm-tangerine font-semibold"
+								: "text-foreground"
+						)}
 					>
-						{sellerCtaLabel}
-						<CaretRightIcon className="h-3 w-3" />
+						{label}
 					</Link>
-				</div>
-
+				))}
+				<div className="mx-1 h-3.5 w-px shrink-0 bg-border" />
+				<button
+					type="button"
+					onClick={() => requireAuth(() => router.push(sellerCtaHref))}
+					className="shrink-0 inline-flex items-center gap-1 rounded-full bg-vm-tangerine px-3 py-1 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+				>
+					{sellerCtaLabel}
+					<CaretRightIcon className="h-3 w-3" />
+				</button>
 			</div>
 
 		</div>

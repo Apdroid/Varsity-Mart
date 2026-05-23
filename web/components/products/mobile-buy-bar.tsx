@@ -33,7 +33,7 @@ export function MobileBuyBar({ price, title, stock, quantity, onQuantityChange, 
   return (
     <div
       className={cn(
-        "fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 px-4 py-3 backdrop-blur-md transition-transform duration-300 lg:hidden",
+        "fixed inset-x-0 bottom-0 z-50 border-t w-full border-border bg-background/95 px-4 py-3 backdrop-blur-md transition-transform duration-300 lg:hidden",
         actionsVisible ? "translate-y-full" : "translate-y-0"
       )}
     >
