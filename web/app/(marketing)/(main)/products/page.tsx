@@ -2,6 +2,8 @@ import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query
 import { ProductsView } from "./products-view"
 import { productsApi } from "@/lib/api/products"
 
+export const dynamic = "force-dynamic"
+
 export default async function ProductsPage() {
   const queryClient = new QueryClient()
 

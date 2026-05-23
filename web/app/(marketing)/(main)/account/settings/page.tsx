@@ -86,7 +86,13 @@ export default function SettingsPage() {
 
 	const onSubmit = async (data: ProfileFormData) => {
 		try {
-			await updateProfileMutation.mutateAsync(data)
+			const fd = new FormData()
+			fd.append("first_name", data.firstName)
+			fd.append("last_name", data.lastName)
+			fd.append("phone", data.phone)
+			fd.append("campus", data.campus)
+			if (data.bio) fd.append("bio", data.bio)
+			await updateProfileMutation.mutateAsync(fd)
 			await refreshUser()
 			toast.success("Profile updated successfully")
 		} catch {

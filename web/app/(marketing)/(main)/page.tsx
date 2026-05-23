@@ -6,6 +6,8 @@ import { restaurantsApi } from "@/lib/api/restaurants"
 import { storesApi } from "@/lib/api/stores"
 import { productsApi } from "@/lib/api/products"
 
+export const dynamic = "force-dynamic"
+
 export default async function Page() {
 	const queryClient = new QueryClient({
 		defaultOptions: { queries: { staleTime: 10 * 60 * 1000 } },

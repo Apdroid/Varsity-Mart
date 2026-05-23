@@ -256,13 +256,13 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 			return
 		}
 		try {
-			await updateProfileMutation.mutateAsync({
-				firstName: missing.firstName ? values.firstName.trim() : undefined,
-				lastName: missing.lastName ? values.lastName.trim() : undefined,
-				phone: missing.phone ? phone : undefined,
-				university: missing.university ? university : undefined,
-				campus: missing.campus ? campus : undefined,
-			})
+			const fd = new FormData()
+			if (missing.firstName) fd.append("first_name", values.firstName.trim())
+			if (missing.lastName) fd.append("last_name", values.lastName.trim())
+			if (missing.phone) fd.append("phone", phone)
+			if (missing.university) fd.append("university", university)
+			if (missing.campus) fd.append("campus", campus)
+			await updateProfileMutation.mutateAsync(fd)
 			await refreshUser()
 			toast.success("Profile completed successfully.")
 			router.push("/")
