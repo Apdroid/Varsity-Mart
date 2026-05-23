@@ -307,13 +307,15 @@ export interface CreateProductRequest {
 	title: string
 	description: string
 	price: number
-	originalPrice?: number
+	original_price: number
 	category: string
-	condition: ProductCondition
+	condition: "N" | "U"
 	location: string
-	quantity?: number
-	isNightShop?: boolean
-	tags?: string[]
+	stock?: number
+	delivery_options: string[]
+	specifications?: Array<{ key: string; value: string }>
+	is_night_shop?: boolean
+	images?: File[]
 	storeId?: string
 }
 
@@ -890,11 +892,11 @@ export interface SendMessageRequest {
 // Payment Types
 export interface PaymentMethod {
 	id: string
-	method_id:string
+	method_id: string
 	type: "momo" | "card" | "bank"
 	provider?: string
-	last4?:string
-	number:string
+	last4?: string
+	number: string
 	expiryMonth?: number
 	expiryYear?: number
 	isDefault: boolean

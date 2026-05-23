@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.varsitymart.org/v1"
+const API_BASE_URL =  "/api"
 
 export class ApiError extends Error { constructor(
 		public status: number,

@@ -1,0 +1,327 @@
+{
+  "count": 89,
+  "next": "https://api.varsitymart.org/v1/campuses/?page=2",
+  "previous": null,
+  "results": [
+    {
+      "id": "127e321a-1624-474f-ae01-c8cbf1ee8470",
+      "name": "Haatso",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "08adcfc2-f7f7-416a-a476-0e10f6fd8962",
+        "name": "Academic City University",
+        "short_name": "ACity",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.797721Z",
+        "updated_at": "2026-05-17T12:22:35.797730Z"
+      },
+      "created_at": "2026-05-17T12:22:35.801625Z",
+      "updated_at": "2026-05-17T12:22:35.801633Z"
+    },
+    {
+      "id": "c5f4df33-8efa-458c-9969-c222d7ce53a8",
+      "name": "Cantonments",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "1a7741b7-54c2-4b91-8ef1-0905d85d724f",
+        "name": "Accra Institute of Technology",
+        "short_name": "AIT",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.768353Z",
+        "updated_at": "2026-05-17T12:22:35.768364Z"
+      },
+      "created_at": "2026-05-17T12:22:35.772322Z",
+      "updated_at": "2026-05-17T12:22:35.772329Z"
+    },
+    {
+      "id": "776759d0-f030-45e9-ad47-cf3a2f0cb29f",
+      "name": "Accra",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "187e910c-d09c-445c-b47d-058b2ebeb867",
+        "name": "Accra Technical University",
+        "short_name": "ATU",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.499643Z",
+        "updated_at": "2026-05-17T12:22:35.499653Z"
+      },
+      "created_at": "2026-05-17T12:22:35.504047Z",
+      "updated_at": "2026-05-17T12:22:35.504054Z"
+    },
+    {
+      "id": "99ea5f5f-3e4f-4877-99ab-251daceca938",
+      "name": "Asante Mampong",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "4a4d9cf2-e113-482e-8ee6-cd0e13ad24e8",
+        "name": "Akenten Appiah-Menka University of Skills Training and Entrepreneurial Development",
+        "short_name": "AAMUSTED",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.333313Z",
+        "updated_at": "2026-05-17T12:22:35.333331Z"
+      },
+      "created_at": "2026-05-17T12:22:35.344084Z",
+      "updated_at": "2026-05-17T12:22:35.344097Z"
+    },
+    {
+      "id": "7b833a62-429c-4aa9-af85-0f80f49b1f69",
+      "name": "Kumasi",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "4a4d9cf2-e113-482e-8ee6-cd0e13ad24e8",
+        "name": "Akenten Appiah-Menka University of Skills Training and Entrepreneurial Development",
+        "short_name": "AAMUSTED",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.333313Z",
+        "updated_at": "2026-05-17T12:22:35.333331Z"
+      },
+      "created_at": "2026-05-17T12:22:35.337823Z",
+      "updated_at": "2026-05-17T12:22:35.337836Z"
+    },
+    {
+      "id": "eee8c603-0cd6-45e8-9837-80f56d14353c",
+      "name": "Koforidua",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "56253e79-a3eb-402a-a1bf-39be6d24a0b9",
+        "name": "All Nations University",
+        "short_name": "ANU",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.730879Z",
+        "updated_at": "2026-05-17T12:22:35.730886Z"
+      },
+      "created_at": "2026-05-17T12:22:35.735011Z",
+      "updated_at": "2026-05-17T12:22:35.735020Z"
+    },
+    {
+      "id": "844d70d6-4478-4fbe-a57f-50cc9fe84c76",
+      "name": "Berekuso",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "95e170cd-f427-4bcc-95dc-2787a3aa8c7e",
+        "name": "Ashesi University",
+        "short_name": "Ashesi",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.629928Z",
+        "updated_at": "2026-05-17T12:22:35.629936Z"
+      },
+      "created_at": "2026-05-17T12:22:35.633921Z",
+      "updated_at": "2026-05-17T12:22:35.633928Z"
+    },
+    {
+      "id": "0235ab02-ef9a-4d9d-8983-7038ba7b80d4",
+      "name": "Accra",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "22349395-031b-4e57-8ce3-d99035789f11",
+        "name": "BlueCrest University College",
+        "short_name": "BlueCrest",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.817920Z",
+        "updated_at": "2026-05-17T12:22:35.817929Z"
+      },
+      "created_at": "2026-05-17T12:22:35.822044Z",
+      "updated_at": "2026-05-17T12:22:35.822052Z"
+    },
+    {
+      "id": "17575602-2f82-47d3-b2d0-f13d07505d76",
+      "name": "Kumasi",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "22349395-031b-4e57-8ce3-d99035789f11",
+        "name": "BlueCrest University College",
+        "short_name": "BlueCrest",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.817920Z",
+        "updated_at": "2026-05-17T12:22:35.817929Z"
+      },
+      "created_at": "2026-05-17T12:22:35.827433Z",
+      "updated_at": "2026-05-17T12:22:35.827441Z"
+    },
+    {
+      "id": "c5ee61a7-7323-46a7-9774-1a4c8e9a529d",
+      "name": "Bolgatanga",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "c1410594-eecc-456e-b3b7-876796b1d3f8",
+        "name": "Bolgatanga Technical University",
+        "short_name": "BTU",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.579666Z",
+        "updated_at": "2026-05-17T12:22:35.579675Z"
+      },
+      "created_at": "2026-05-17T12:22:35.584717Z",
+      "updated_at": "2026-05-17T12:22:35.584726Z"
+    },
+    {
+      "id": "9b78cb7f-9237-44ea-be96-e5370497e85f",
+      "name": "Navrongo",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "1900c790-a32e-4a5b-9711-59981a4bb07a",
+        "name": "C. K. Tedam University of Technology and Applied Sciences",
+        "short_name": "CKT-UTAS",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.376229Z",
+        "updated_at": "2026-05-17T12:22:35.376244Z"
+      },
+      "created_at": "2026-05-17T12:22:35.380826Z",
+      "updated_at": "2026-05-17T12:22:35.380841Z"
+    },
+    {
+      "id": "cf625086-9cd6-4058-9134-0f9ec44a3442",
+      "name": "Cape Coast",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "7e36b304-c6f7-48a2-bfd2-a609f047958b",
+        "name": "Cape Coast Technical University",
+        "short_name": "CCTU",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.529070Z",
+        "updated_at": "2026-05-17T12:22:35.529078Z"
+      },
+      "created_at": "2026-05-17T12:22:35.533017Z",
+      "updated_at": "2026-05-17T12:22:35.533024Z"
+    },
+    {
+      "id": "7fe9e7ce-4bd4-4be9-b283-3dd3d30a352c",
+      "name": "Fiapre",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "675e9308-7a97-4b64-be68-6161f0af7385",
+        "name": "Catholic University of Ghana",
+        "short_name": "CUG",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.842095Z",
+        "updated_at": "2026-05-17T12:22:35.842103Z"
+      },
+      "created_at": "2026-05-17T12:22:35.846829Z",
+      "updated_at": "2026-05-17T12:22:35.846836Z"
+    },
+    {
+      "id": "6ec67405-c290-498b-95d1-807a018c7e60",
+      "name": "Christ Temple",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "4555e3dc-f980-400c-86b1-c88de2ed2408",
+        "name": "Central University",
+        "short_name": "Central",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.638830Z",
+        "updated_at": "2026-05-17T12:22:35.638837Z"
+      },
+      "created_at": "2026-05-17T12:22:35.652523Z",
+      "updated_at": "2026-05-17T12:22:35.652535Z"
+    },
+    {
+      "id": "19f14913-10f7-46fc-89a5-b6aa049dfdc0",
+      "name": "Kumasi",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "4555e3dc-f980-400c-86b1-c88de2ed2408",
+        "name": "Central University",
+        "short_name": "Central",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.638830Z",
+        "updated_at": "2026-05-17T12:22:35.638837Z"
+      },
+      "created_at": "2026-05-17T12:22:35.657941Z",
+      "updated_at": "2026-05-17T12:22:35.657950Z"
+    },
+    {
+      "id": "0fea8cf0-eb5b-4016-afa2-b02ff4b3660c",
+      "name": "Mataheko",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "4555e3dc-f980-400c-86b1-c88de2ed2408",
+        "name": "Central University",
+        "short_name": "Central",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.638830Z",
+        "updated_at": "2026-05-17T12:22:35.638837Z"
+      },
+      "created_at": "2026-05-17T12:22:35.647595Z",
+      "updated_at": "2026-05-17T12:22:35.647602Z"
+    },
+    {
+      "id": "77ab9c0f-c078-4f40-8310-d4a54f60d2fa",
+      "name": "Miotso",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "4555e3dc-f980-400c-86b1-c88de2ed2408",
+        "name": "Central University",
+        "short_name": "Central",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.638830Z",
+        "updated_at": "2026-05-17T12:22:35.638837Z"
+      },
+      "created_at": "2026-05-17T12:22:35.642603Z",
+      "updated_at": "2026-05-17T12:22:35.642610Z"
+    },
+    {
+      "id": "c50fb690-902c-4b2b-8b27-63ab6ea6e9a7",
+      "name": "Kumasi",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "57cef843-8f2e-448e-8f17-f7bc949684c9",
+        "name": "Christian Service University",
+        "short_name": "CSU",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.851832Z",
+        "updated_at": "2026-05-17T12:22:35.851840Z"
+      },
+      "created_at": "2026-05-17T12:22:35.855868Z",
+      "updated_at": "2026-05-17T12:22:35.855875Z"
+    },
+    {
+      "id": "34376c66-4811-43e0-b561-d3d53b08eaa4",
+      "name": "Kpong",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "b7c8f926-ae19-48c1-88a8-16dc57251cd7",
+        "name": "Ensign Global University",
+        "short_name": "Ensign",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.740271Z",
+        "updated_at": "2026-05-17T12:22:35.740279Z"
+      },
+      "created_at": "2026-05-17T12:22:35.744725Z",
+      "updated_at": "2026-05-17T12:22:35.744732Z"
+    },
+    {
+      "id": "64ec10f6-7042-4004-8a5a-e898d0aa2555",
+      "name": "Ho",
+      "short_name": "",
+      "is_active": true,
+      "university": {
+        "id": "8bfc4047-a245-48da-9b85-06db175938f0",
+        "name": "Evangelical Presbyterian University College",
+        "short_name": "EPUC",
+        "is_active": true,
+        "created_at": "2026-05-17T12:22:35.918983Z",
+        "updated_at": "2026-05-17T12:22:35.918996Z"
+      },
+      "created_at": "2026-05-17T12:22:35.923810Z",
+      "updated_at": "2026-05-17T12:22:35.923821Z"
+    }
+  ]
+}

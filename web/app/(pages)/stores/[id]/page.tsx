@@ -23,6 +23,7 @@ import { ProductCard } from "@/components/main/product-card"
 import { cn } from "@/lib/utils"
 import { useStore, useStoreProducts } from "@/hooks/queries/use-stores"
 import type { StoreDetail, Product as ApiProduct } from "@/lib/api/types"
+import { useStoreCategory } from "@/hooks/queries"
 
 function formatGHS(n: string | number) {
 	return new Intl.NumberFormat("en-GH", {
@@ -89,7 +90,7 @@ function StorePageSkeleton() {
 		<div className="min-h-svh pb-16">
 			<Skeleton className="h-52 w-full md:h-64" />
 			<div className="mx-auto max-w-5xl px-4">
-				<div className="relative -mt-14 rounded-2xl border bg-card px-5 py-5 shadow-md">
+				<div className="relative -mt-14 rounded-2xl bg-card px-5 py-5 shadow-md">
 					<div className="flex items-start gap-4">
 						<Skeleton className="h-20 w-20 shrink-0 rounded-xl" />
 						<div className="flex-1 space-y-2 pt-1">
@@ -120,6 +121,7 @@ function StoreHeader({ store }: { store: StoreDetail }) {
 	const openTime = formatTime(store.openingTime)
 	const closeTime = formatTime(store.closingTime)
 	const rating = parseFloat(store.rating)
+	const { data: category } = useStoreCategory(store.category);
 
 	return (
 		<div>
@@ -150,7 +152,7 @@ function StoreHeader({ store }: { store: StoreDetail }) {
 
 			{/* Info card */}
 			<div className="mx-auto max-w-5xl px-4">
-				<div className="relative -mt-14 rounded-2xl border border-border bg-card px-5 py-5 shadow-md">
+				<div className="relative -mt-14 rounded-2xl bg-card px-5 py-5 shadow-md">
 					<div className="flex items-start gap-4">
 						{/* Logo */}
 						<div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 border-background bg-muted shadow-sm">
@@ -186,7 +188,7 @@ function StoreHeader({ store }: { store: StoreDetail }) {
 								</Badge>
 							</div>
 
-							<p className="mt-0.5 text-sm text-muted-foreground">{store.category}</p>
+							<p className="mt-0.5 text-sm text-foreground bg-accent w-20  px-2 rounded-full">{category?.name}</p>
 
 							{store.description && (
 								<p className="mt-1.5 line-clamp-2 text-sm text-muted-foreground">
@@ -271,7 +273,7 @@ function StoreHeader({ store }: { store: StoreDetail }) {
 
 function OwnerCard({ store }: { store: StoreDetail }) {
 	return (
-		<div className="rounded-xl border border-border bg-card p-4">
+		<div className="rounded-xl  bg-card p-4">
 			<h2 className="mb-3 text-sm font-semibold text-foreground">Seller</h2>
 			<div className="flex items-center gap-3">
 				<div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted">
@@ -319,7 +321,7 @@ function ProductsSection({ storeId }: { storeId: string }) {
 
 	if (products.length === 0) {
 		return (
-			<div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border py-14 text-center">
+			<div className="flex flex-col items-center justify-center gap-3 rounded-xl   py-14 text-center">
 				<div className="grid h-14 w-14 place-items-center rounded-full bg-muted">
 					<Package className="h-6 w-6 text-muted-foreground" />
 				</div>
@@ -370,7 +372,6 @@ function ProductsSection({ storeId }: { storeId: string }) {
 export default function StoreDetailPage() {
 	const { id } = useParams<{ id: string }>()
 	const { data: store, isLoading, isError } = useStore(id)
-
 	if (isLoading) return <StorePageSkeleton />
 
 	if (isError || !store) {

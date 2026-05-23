@@ -49,30 +49,25 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/queries/use-products"
 import { useProductCategories } from "@/hooks/queries/use-categories"
-import type { ProductCondition } from "@/lib/api/types"
-
 // ── Schema ────────────────────────────────────────────────────────────────────
 
 const schema = z.object({
 	title: z.string().min(3, "Title must be at least 3 characters"),
 	description: z.string().min(10, "Description must be at least 10 characters"),
 	category: z.string().min(1, "Please select a category"),
-	condition: z.enum(["new", "like_new", "good", "fair", "poor"] as const),
+	condition: z.enum(["N", "U"] as const),
 	location: z.string().min(2, "Please enter a location"),
-	price: z.coerce.number().min(0.01, "Price must be greater than 0"),
-	originalPrice: z.coerce.number().optional(),
-	quantity: z.coerce.number().int().min(1).optional(),
-	isNightShop: z.boolean().default(false),
+	price: z.coerce.number().min(1, "Price must be at least 1"),
+	original_price: z.coerce.number().min(1, "Original price must be at least 1").optional(),
+	stock: z.coerce.number().int().min(0).optional(),
+	is_night_shop: z.boolean().default(false),
 })
 
 type FormData = z.infer<typeof schema>
 
-const CONDITIONS: { value: ProductCondition; label: string }[] = [
-	{ value: "new", label: "New" },
-	{ value: "like_new", label: "Like New" },
-	{ value: "good", label: "Good" },
-	{ value: "fair", label: "Fair" },
-	{ value: "poor", label: "Poor" },
+const CONDITIONS: { value: "N" | "U"; label: string }[] = [
+	{ value: "N", label: "New" },
+	{ value: "U", label: "Used" },
 ]
 
 // ── Loading skeleton ──────────────────────────────────────────────────────────
@@ -114,12 +109,12 @@ export default function EditProductPage() {
 			title: "",
 			description: "",
 			category: "",
-			condition: "new",
+			condition: "N",
 			location: "",
 			price: 0,
-			originalPrice: undefined,
-			quantity: undefined,
-			isNightShop: false,
+			original_price: undefined,
+			stock: undefined,
+			is_night_shop: false,
 		},
 	})
 
@@ -131,12 +126,12 @@ export default function EditProductPage() {
 			title: product.title,
 			description: product.description,
 			category: typeof product.category === "string" ? product.category : product.category.id,
-			condition: (product.condition as ProductCondition) ?? "new",
+			condition: (product.condition as "N" | "U") ?? "N",
 			location: product.location,
 			price: Number(product.price),
-			originalPrice: product.originalPrice ? Number(product.originalPrice) : undefined,
-			quantity: undefined,
-			isNightShop: product.isNightShop ?? false,
+			original_price: product.originalPrice ? Number(product.originalPrice) : undefined,
+			stock: (product as { stock?: number }).stock ?? undefined,
+			is_night_shop: product.isNightShop ?? false,
 		})
 	}, [product, reset])
 
@@ -148,12 +143,12 @@ export default function EditProductPage() {
 					title: values.title,
 					description: values.description,
 					price: values.price,
-					originalPrice: values.originalPrice || undefined,
+					original_price: values.original_price,
 					category: values.category,
-					condition: values.condition as ProductCondition,
+					condition: values.condition,
 					location: values.location,
-					quantity: values.quantity || undefined,
-					isNightShop: values.isNightShop,
+					stock: values.stock,
+					is_night_shop: values.is_night_shop,
 				},
 			})
 			toast.success("Product updated successfully.")
@@ -344,7 +339,7 @@ export default function EditProductPage() {
 									<FormControl>
 										<div className="relative">
 											<span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">GHS</span>
-											<Input type="number" min={0} step={0.01} className="pl-12" {...field} />
+											<Input type="number" min={1} step={0.01} className="pl-12" {...field} />
 										</div>
 									</FormControl>
 									<FormMessage />
@@ -354,7 +349,7 @@ export default function EditProductPage() {
 
 						<FormField
 							control={form.control}
-							name="originalPrice"
+							name="original_price"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>
@@ -364,7 +359,7 @@ export default function EditProductPage() {
 									<FormControl>
 										<div className="relative">
 											<span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">GHS</span>
-											<Input type="number" min={0} step={0.01} className="pl-12" placeholder="Strikethrough price" {...field} />
+											<Input type="number" min={1} step={0.01} className="pl-12" placeholder="Before discount" {...field} />
 										</div>
 									</FormControl>
 									<FormMessage />
@@ -375,18 +370,18 @@ export default function EditProductPage() {
 
 					<FormField
 						control={form.control}
-						name="quantity"
+						name="stock"
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>
 									<span className="flex items-center gap-1">
 										<Package className="h-3.5 w-3.5" />
-										Quantity in stock
+										Stock
 										<span className="ml-1 text-xs font-normal text-muted-foreground">(optional)</span>
 									</span>
 								</FormLabel>
 								<FormControl>
-									<Input type="number" min={1} step={1} placeholder="e.g. 5" {...field} />
+									<Input type="number" min={0} step={1} placeholder="0" {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -395,7 +390,7 @@ export default function EditProductPage() {
 
 					<FormField
 						control={form.control}
-						name="isNightShop"
+						name="is_night_shop"
 						render={({ field }) => (
 							<FormItem className="flex items-center justify-between rounded-xl border border-border p-4">
 								<div>

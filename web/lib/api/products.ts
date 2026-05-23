@@ -21,6 +21,28 @@ function buildQueryString(params: object): string {
   return query ? `?${query}` : ""
 }
 
+function buildProductFormData(data: Partial<CreateProductRequest>): FormData {
+  const fd = new FormData()
+  if (data.title !== undefined) fd.append("title", data.title)
+  if (data.description !== undefined) fd.append("description", data.description)
+  if (data.price !== undefined) fd.append("price", String(data.price))
+  if (data.original_price !== undefined) fd.append("original_price", String(data.original_price))
+  if (data.category !== undefined) fd.append("category", data.category)
+  if (data.condition !== undefined) fd.append("condition", data.condition)
+  if (data.location !== undefined) fd.append("location", data.location)
+  if (data.is_night_shop !== undefined) fd.append("is_night_shop", String(data.is_night_shop))
+  if (data.stock !== undefined) fd.append("stock", String(data.stock))
+  if (data.storeId !== undefined) fd.append("storeId", data.storeId)
+  if (data.delivery_options !== undefined) {
+    data.delivery_options.forEach((opt) => fd.append("delivery_options", opt))
+  }
+  if (data.specifications?.length) {
+    fd.append("specifications", JSON.stringify(data.specifications))
+  }
+  data.images?.forEach((file) => fd.append("images", file))
+  return fd
+}
+
 export const productsApi = {
   list: (filters?: ProductFilters) =>
     api.get<ProductsListResponse>(`/products/${buildQueryString(filters || {})}`),
@@ -38,10 +60,14 @@ export const productsApi = {
     api.get<ApiResponse<Product[]>>(`/products/trending/?limit=${limit}`),
 
   create: (data: CreateProductRequest) =>
-    api.post<ApiResponse<Product>>("/products/", data),
+    apiClientFormData<ApiResponse<Product>>("/products/", buildProductFormData(data)),
 
   update: (id: string, data: Partial<CreateProductRequest>) =>
-    api.patch<ApiResponse<Product>>(`/products/${id}/`, data),
+    apiClientFormData<ApiResponse<Product>>(
+      `/products/${id}/`,
+      buildProductFormData(data),
+      { method: "PATCH" }
+    ),
 
   delete: (id: string) =>
     api.delete<ApiResponse<{ success: boolean }>>(`/products/${id}/`),

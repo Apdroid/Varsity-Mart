@@ -334,8 +334,8 @@ export default function FoodCheckoutPage() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <span className="text-sm font-semibold">{title}</span>
-                            <span className={cn("shrink-0 text-xs font-bold", badgeClass)}>{badge}</span>
                           </div>
+                          <span className={cn("shrink-0 text-xs font-bold", badgeClass)}>{badge}</span>
                           <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{desc}</p>
                         </div>
                         {selected && (

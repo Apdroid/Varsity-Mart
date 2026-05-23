@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { useForm, type Resolver } from "react-hook-form"
+import { useForm, useFieldArray, type Resolver } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "sonner"
@@ -14,8 +14,10 @@ import {
 	Loader2,
 	MapPin,
 	Package,
+	Plus,
 	ShoppingBag,
 	Tag,
+	Trash2,
 	Upload,
 	X,
 } from "lucide-react"
@@ -40,39 +42,56 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
-import { useCreateProduct, useUploadProductImages } from "@/hooks/queries/use-products"
+import { Checkbox } from "@/components/ui/checkbox"
+import { useCreateProduct } from "@/hooks/queries/use-products"
 import { useProductCategories } from "@/hooks/queries/use-categories"
 import { useMyStore } from "@/hooks/queries/use-stores"
 import { cn } from "@/lib/utils"
-import type { ProductCondition } from "@/lib/api/types"
 
 // ── Schema ────────────────────────────────────────────────────────────────────
+
+const DELIVERY_OPTION_VALUES = ["campus_delivery", "meetup", "shipping"] as const
+type DeliveryOption = (typeof DELIVERY_OPTION_VALUES)[number]
 
 const schema = z.object({
 	title: z.string().min(3, "Title must be at least 3 characters"),
 	description: z.string().min(10, "Description must be at least 10 characters"),
 	category: z.string().min(1, "Please select a category"),
-	condition: z.enum(["new", "like_new", "good", "fair", "poor"] as const),
+	condition: z.enum(["N", "U"] as const),
 	location: z.string().min(2, "Please enter a location"),
-	price: z.coerce.number().min(0.01, "Price must be greater than 0"),
-	originalPrice: z.coerce.number().optional(),
-	quantity: z.coerce.number().int().min(1).optional(),
-	isNightShop: z.boolean().default(false),
+	price: z.coerce.number().min(1, "Price must be at least 1"),
+	original_price: z.coerce.number().min(1, "Original price must be at least 1"),
+	stock: z.coerce.number().int().min(0).default(0),
+	delivery_options: z
+		.array(z.enum(DELIVERY_OPTION_VALUES))
+		.min(1, "Select at least one delivery option"),
+	specifications: z
+		.array(
+			z.object({
+				key: z.string().min(1, "Name required"),
+				value: z.string().min(1, "Value required"),
+			})
+		)
+		.optional(),
+	is_night_shop: z.boolean().default(false),
 })
 
 type FormData = z.infer<typeof schema>
 
-const CONDITIONS: { value: ProductCondition; label: string }[] = [
-	{ value: "new", label: "New" },
-	{ value: "like_new", label: "Like New" },
-	{ value: "good", label: "Good" },
-	{ value: "fair", label: "Fair" },
-	{ value: "poor", label: "Poor" },
+const CONDITIONS: { value: "N" | "U"; label: string }[] = [
+	{ value: "N", label: "New" },
+	{ value: "U", label: "Used" },
+]
+
+const DELIVERY_OPTIONS: { value: DeliveryOption; label: string; description: string }[] = [
+	{ value: "campus_delivery", label: "Campus Delivery", description: "Delivered to buyer on campus" },
+	{ value: "meetup", label: "Meetup", description: "Meet at a public place" },
+	{ value: "shipping", label: "Shipping", description: "Ship via courier" },
 ]
 
 const STEP_FIELDS: (keyof FormData)[][] = [
 	["title", "description", "category", "condition", "location"],
-	["price", "originalPrice", "quantity"],
+	["price", "original_price", "stock", "delivery_options"],
 ]
 
 const STEPS = [
@@ -122,7 +141,8 @@ function StepProgress({ current, total }: { current: number; total: number }) {
 				})}
 			</div>
 			<p className="mt-4 text-center text-xs text-muted-foreground sm:hidden">
-				Step {current + 1} of {total} — <span className="font-medium text-foreground">{STEPS[current].label}</span>
+				Step {current + 1} of {total} —{" "}
+				<span className="font-medium text-foreground">{STEPS[current].label}</span>
 			</p>
 		</div>
 	)
@@ -140,7 +160,12 @@ function ImagePicker({ files, onChange }: { files: File[]; onChange: (files: Fil
 
 	function addFiles(added: FileList | null) {
 		if (!added) return
-		const next = [...files, ...Array.from(added)].slice(0, 6)
+		const all = Array.from(added)
+		const valid = all.filter((f) => f.size <= 10 * 1024 * 1024)
+		if (valid.length < all.length) {
+			toast.warning("Some images exceed 10 MB and were skipped")
+		}
+		const next = [...files, ...valid].slice(0, 10)
 		onChange(next)
 	}
 
@@ -152,11 +177,16 @@ function ImagePicker({ files, onChange }: { files: File[]; onChange: (files: Fil
 		<div className="space-y-3">
 			<div>
 				<p className="text-sm font-medium">Product images</p>
-				<p className="text-xs text-muted-foreground">Upload up to 6 photos — first image is the cover</p>
+				<p className="text-xs text-muted-foreground">
+					Up to 10 photos — first image is the cover. Max 10 MB each. JPEG, PNG, WebP or GIF.
+				</p>
 			</div>
 			<div className="grid grid-cols-3 gap-2">
 				{previews.map((src, idx) => (
-					<div key={src} className="group relative aspect-square overflow-hidden rounded-xl border border-border bg-muted">
+					<div
+						key={src}
+						className="group relative aspect-square overflow-hidden rounded-xl border border-border bg-muted"
+					>
 						<Image src={src} alt={`Image ${idx + 1}`} fill className="object-cover" />
 						{idx === 0 && (
 							<span className="absolute left-1 top-1 rounded bg-vm-tangerine px-1.5 py-0.5 text-[10px] font-semibold text-white">
@@ -172,7 +202,7 @@ function ImagePicker({ files, onChange }: { files: File[]; onChange: (files: Fil
 						</button>
 					</div>
 				))}
-				{files.length < 6 && (
+				{files.length < 10 && (
 					<button
 						type="button"
 						onClick={() => inputRef.current?.click()}
@@ -186,10 +216,13 @@ function ImagePicker({ files, onChange }: { files: File[]; onChange: (files: Fil
 			<input
 				ref={inputRef}
 				type="file"
-				accept="image/*"
+				accept="image/jpeg,image/png,image/webp,image/gif"
 				multiple
 				className="hidden"
-				onChange={(e) => { addFiles(e.target.files); e.target.value = "" }}
+				onChange={(e) => {
+					addFiles(e.target.files)
+					e.target.value = ""
+				}}
 			/>
 		</div>
 	)
@@ -235,7 +268,7 @@ function StepDetails({
 						<FormLabel>Description</FormLabel>
 						<FormControl>
 							<Textarea
-								placeholder="Describe your product — condition details, what's included, any defects…"
+								placeholder="Describe your product — what's included, any defects…"
 								className="min-h-28 resize-none"
 								{...field}
 							/>
@@ -261,7 +294,7 @@ function StepDetails({
 								</FormControl>
 								<SelectContent>
 									{(categories ?? []).map((cat) => (
-										<SelectItem key={cat.id} value={cat.id}>
+										<SelectItem key={cat.id} value={cat.name}>
 											{cat.name}
 										</SelectItem>
 									))}
@@ -331,6 +364,11 @@ function StepPricingPhotos({
 	images: File[]
 	onImagesChange: (files: File[]) => void
 }) {
+	const { fields, append, remove } = useFieldArray({
+		control: form.control,
+		name: "specifications",
+	})
+
 	return (
 		<div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
 			<div>
@@ -338,6 +376,7 @@ function StepPricingPhotos({
 				<p className="text-sm text-muted-foreground">Set your price and add product images.</p>
 			</div>
 
+			{/* Prices */}
 			<div className="grid gap-4 sm:grid-cols-2">
 				<FormField
 					control={form.control}
@@ -347,8 +386,10 @@ function StepPricingPhotos({
 							<FormLabel>Price (GHS)</FormLabel>
 							<FormControl>
 								<div className="relative">
-									<span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">GHS</span>
-									<Input type="number" min={0} step={0.01} className="pl-12" {...field} />
+									<span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+										GHS
+									</span>
+									<Input type="number" min={1} step={0.01} className="pl-12" {...field} />
 								</div>
 							</FormControl>
 							<FormMessage />
@@ -358,17 +399,23 @@ function StepPricingPhotos({
 
 				<FormField
 					control={form.control}
-					name="originalPrice"
+					name="original_price"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>
-								Original price
-								<span className="ml-1 text-xs font-normal text-muted-foreground">(optional)</span>
-							</FormLabel>
+							<FormLabel>Original price (GHS)</FormLabel>
 							<FormControl>
 								<div className="relative">
-									<span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">GHS</span>
-									<Input type="number" min={0} step={0.01} className="pl-12" placeholder="For strikethrough" {...field} />
+									<span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+										GHS
+									</span>
+									<Input
+										type="number"
+										min={1}
+										step={0.01}
+										className="pl-12"
+										placeholder="Before discount"
+										{...field}
+									/>
 								</div>
 							</FormControl>
 							<FormDescription>Shows a crossed-out original price</FormDescription>
@@ -378,38 +425,150 @@ function StepPricingPhotos({
 				/>
 			</div>
 
+			{/* Stock */}
 			<FormField
 				control={form.control}
-				name="quantity"
+				name="stock"
 				render={({ field }) => (
 					<FormItem>
 						<FormLabel>
 							<span className="flex items-center gap-1">
 								<Package className="h-3.5 w-3.5" />
-								Quantity in stock
-								<span className="ml-1 text-xs font-normal text-muted-foreground">(optional)</span>
+								Stock
 							</span>
 						</FormLabel>
 						<FormControl>
-							<Input type="number" min={1} step={1} placeholder="e.g. 5" {...field} />
+							<Input type="number" min={0} step={1} placeholder="0" {...field} />
 						</FormControl>
 						<FormMessage />
 					</FormItem>
 				)}
 			/>
 
+			{/* Delivery options */}
 			<FormField
 				control={form.control}
-				name="isNightShop"
-				render={({ field }) => (
-					<FormItem className="flex items-center justify-between rounded-xl border border-border p-4">
-						<div>
-							<FormLabel className="text-sm font-medium">Night Shop</FormLabel>
-							<p className="text-xs text-muted-foreground">List this product in the late-night shopping section</p>
+				name="delivery_options"
+				render={() => (
+					<FormItem>
+						<FormLabel>Delivery options</FormLabel>
+						<FormDescription>Select all ways buyers can receive this item.</FormDescription>
+						<div className="mt-2 space-y-2">
+							{DELIVERY_OPTIONS.map((option) => (
+								<FormField
+									key={option.value}
+									control={form.control}
+									name="delivery_options"
+									render={({ field }) => (
+										<FormItem className="flex flex-row items-start space-x-3 space-y-0">
+											<FormControl>
+												<div className="flex items-center gap-3">
+													<Checkbox
+														className="bg-accent border border-foreground rounded-sm"
+														checked={field.value?.includes(option.value)}
+														defaultChecked={true}
+														onCheckedChange={(checked) => {
+															const current = field.value ?? []
+															field.onChange(
+																checked
+																	? [...current, option.value]
+																	: current.filter((v) => v !== option.value)
+															)
+														}}
+													/>
+
+													<div className="leading-none">
+														<FormLabel className="font-medium">{option.label}</FormLabel>
+														<p className="text-xs text-muted-foreground">{option.description}</p>
+													</div>
+												</div>
+											</FormControl>
+										</FormItem>
+									)}
+								/>
+							))}
 						</div>
-						<FormControl>
-							<Switch checked={field.value} onCheckedChange={field.onChange} />
-						</FormControl>
+						<FormMessage />
+					</FormItem>
+				)}
+			/>
+
+			<Separator />
+
+			{/* Specifications */}
+			<div className="space-y-3">
+				<div>
+					<p className="text-sm font-medium">Specifications</p>
+					<p className="text-xs text-muted-foreground">
+						Optional. Add key details like storage, color, model, etc.
+					</p>
+				</div>
+				{fields.map((field, index) => (
+					<div key={field.id} className="flex gap-2">
+						<FormField
+							control={form.control}
+							name={`specifications.${index}.key`}
+							render={({ field }) => (
+								<FormItem className="flex-1">
+									<FormControl>
+										<Input placeholder="e.g. Storage" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name={`specifications.${index}.value`}
+							render={({ field }) => (
+								<FormItem className="flex-1">
+									<FormControl>
+										<Input placeholder="e.g. 256 GB" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<button
+							type="button"
+							onClick={() => remove(index)}
+							className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
+						>
+							<Trash2 className="h-4 w-4" />
+						</button>
+					</div>
+				))}
+				<Button
+					type="button"
+					variant="outline"
+					size="sm"
+					onClick={() => append({ key: "", value: "" })}
+					className="w-full"
+				>
+					<Plus className="mr-1.5 h-3.5 w-3.5" />
+					Add specification
+				</Button>
+			</div>
+
+			<Separator />
+
+			{/* Night Shop */}
+			<FormField
+				control={form.control}
+				name="is_night_shop"
+				render={({ field }) => (
+					<FormItem className="p-4">
+						<div className="flex flex-wrap justify-between">
+							<div>
+								<FormLabel className="text-sm font-medium">Night Shop</FormLabel>
+								<p className="text-xs text-muted-foreground">
+									List this product in the late-night shopping section
+								</p>
+							</div>
+							<FormControl>
+								<Switch checked={field.value} onCheckedChange={field.onChange} />
+							</FormControl>
+						</div>
 					</FormItem>
 				)}
 			/>
@@ -430,10 +589,7 @@ export default function AddProductPage() {
 
 	const { data: categories, isLoading: categoriesLoading } = useProductCategories()
 	const { data: store } = useMyStore()
-	const { mutateAsync: createProduct, isPending: creating } = useCreateProduct()
-	const { mutateAsync: uploadImages, isPending: uploading } = useUploadProductImages()
-
-	const isPending = creating || uploading
+	const { mutateAsync: createProduct, isPending } = useCreateProduct()
 
 	const form = useForm<FormData>({
 		resolver: zodResolver(schema) as Resolver<FormData>,
@@ -441,12 +597,14 @@ export default function AddProductPage() {
 			title: "",
 			description: "",
 			category: "",
-			condition: "new",
+			condition: "N",
 			location: "",
 			price: 0,
-			originalPrice: undefined,
-			quantity: undefined,
-			isNightShop: false,
+			original_price: 0,
+			stock: 0,
+			delivery_options: [],
+			specifications: [],
+			is_night_shop: false,
 		},
 	})
 
@@ -454,7 +612,7 @@ export default function AddProductPage() {
 
 	async function goNext() {
 		const fields = STEP_FIELDS[step]
-		const valid = fields.length === 0 || await form.trigger(fields)
+		const valid = fields.length === 0 || (await form.trigger(fields))
 		if (valid) {
 			setStep((s) => Math.min(s + 1, totalSteps - 1))
 			window.scrollTo({ top: 0, behavior: "smooth" })
@@ -468,24 +626,21 @@ export default function AddProductPage() {
 
 	async function onSubmit(values: FormData) {
 		try {
-			const res = await createProduct({
+			await createProduct({
 				title: values.title,
 				description: values.description,
 				price: values.price,
-				originalPrice: values.originalPrice || undefined,
+				original_price: values.original_price,
 				category: values.category,
-				condition: values.condition as ProductCondition,
+				condition: values.condition,
 				location: values.location,
-				quantity: values.quantity || undefined,
-				isNightShop: values.isNightShop,
+				stock: values.stock,
+				delivery_options: values.delivery_options,
+				specifications: values.specifications?.filter((s) => s.key && s.value),
+				is_night_shop: values.is_night_shop,
+				images,
 				storeId: store?.id,
 			})
-
-			const productId = (res as unknown as { data: { id: string } }).data?.id
-			if (productId && images.length > 0) {
-				await uploadImages({ productId, files: images })
-			}
-
 			toast.success("Product listed successfully!")
 			router.replace("/seller/store")
 		} catch {
@@ -517,7 +672,11 @@ export default function AddProductPage() {
 					}}
 				>
 					{step === 0 && (
-						<StepDetails form={form} categories={categories} categoriesLoading={categoriesLoading} />
+						<StepDetails
+							form={form}
+							categories={categories}
+							categoriesLoading={categoriesLoading}
+						/>
 					)}
 					{step === 1 && (
 						<StepPricingPhotos form={form} images={images} onImagesChange={setImages} />
@@ -525,7 +684,7 @@ export default function AddProductPage() {
 
 					<div className="mt-8 flex gap-3">
 						{step > 0 && (
-							<Button type="button" variant="outline" className="flex-1 h-11" onClick={goBack}>
+							<Button type="button" variant="outline" className="h-11 flex-1" onClick={goBack}>
 								<ArrowLeft className="mr-1.5 h-4 w-4" />
 								Back
 							</Button>
@@ -534,7 +693,7 @@ export default function AddProductPage() {
 						{step < totalSteps - 1 ? (
 							<Button
 								type="button"
-								className="flex-1 h-11 bg-vm-tangerine text-white hover:bg-vm-tangerine/90"
+								className="h-11 flex-1 bg-vm-tangerine text-white hover:bg-vm-tangerine/90"
 								onClick={goNext}
 							>
 								Continue
@@ -544,12 +703,12 @@ export default function AddProductPage() {
 							<Button
 								type="submit"
 								disabled={isPending}
-								className="flex-1 h-11 bg-vm-tangerine text-white hover:bg-vm-tangerine/90"
+								className="h-11 flex-1 bg-vm-tangerine text-white hover:bg-vm-tangerine/90"
 							>
 								{isPending ? (
 									<>
 										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-										{uploading ? "Uploading images…" : "Listing…"}
+										Listing…
 									</>
 								) : (
 									<>
