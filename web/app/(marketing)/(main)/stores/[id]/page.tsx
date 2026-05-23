@@ -129,7 +129,7 @@ function StoreHeader({ store }: { store: StoreDetail }) {
 			<div className="relative h-52 w-full overflow-hidden bg-muted md:h-64">
 				{ // store.banner ? (
 					<Image
-						src={store.banner || "https://placehold.net/800x600.png"}
+						src={store.banner || "https://placehold.co/800x400?text=VM"}
 						alt={store.storeName}
 						fill
 						className="object-cover"

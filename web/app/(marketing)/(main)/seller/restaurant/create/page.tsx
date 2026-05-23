@@ -10,6 +10,7 @@ import Image from "next/image"
 import {
 	ArrowLeft,
 	ArrowRight,
+	Building2,
 	Check,
 	Clock,
 	ImageIcon,
@@ -43,6 +44,9 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { useCreateRestaurant } from "@/hooks/queries/use-restaurants"
 import { useRestaurantCategories } from "@/hooks/queries/use-categories"
+import { useUniversities, useCampusesByUniversity } from "@/hooks/queries/use-campus"
+import { useAuth } from "@/providers/auth-provider"
+import type { University, Campus } from "@/lib/api/types"
 import { cn } from "@/lib/utils"
 
 // ── Schema ────────────────────────────────────────────────────────────────────
@@ -52,6 +56,7 @@ const schema = z.object({
 	description: z.string().min(10, "Description must be at least 10 characters"),
 	category: z.string().min(1, "Please select a category"),
 	location: z.string().min(2, "Please enter a location"),
+	campusId: z.string().min(1, "Please select a campus"),
 	deliveryFee: z.coerce.number().min(0, "Delivery fee cannot be negative"),
 	minOrder: z.coerce.number().min(1, "Minimum order must be at least 1"),
 	openingTime: z.string().min(1, "Opening time is required"),
@@ -63,7 +68,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 const STEP_FIELDS: (keyof FormData)[][] = [
-	["restaurantName", "description", "category", "location"],
+	["restaurantName", "description", "category", "location", "campusId"],
 	["deliveryFee", "minOrder"],
 	["openingTime", "closingTime", "deliveryTime", "phone"],
 	[],
@@ -203,10 +208,26 @@ function ImageUploadField({
 
 // ── Step 1: Restaurant info ───────────────────────────────────────────────────
 
-function StepBasicInfo({ form, categories, categoriesLoading }: {
+function StepBasicInfo({
+	form,
+	categories,
+	categoriesLoading,
+	universities,
+	universitiesLoading,
+	campuses,
+	campusesLoading,
+	selectedUniversityId,
+	onUniversityChange,
+}: {
 	form: ReturnType<typeof useForm<FormData>>
 	categories: { id: string; name: string }[] | undefined
 	categoriesLoading: boolean
+	universities: University[] | undefined
+	universitiesLoading: boolean
+	campuses: Campus[] | undefined
+	campusesLoading: boolean
+	selectedUniversityId: string
+	onUniversityChange: (id: string) => void
 }) {
 	return (
 		<div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
@@ -292,6 +313,77 @@ function StepBasicInfo({ form, categories, categoriesLoading }: {
 						</FormItem>
 					)}
 				/>
+			</div>
+
+			{/* University → Campus cascade */}
+			<div className="space-y-3 rounded-xl border border-border bg-muted/30 p-4">
+				<div className="flex items-center gap-1.5 text-sm font-medium">
+					<Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+					Campus availability
+				</div>
+				<p className="text-xs text-muted-foreground">
+					Choose which campus your restaurant serves. Defaults to your current campus.
+				</p>
+
+				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+					{/* University selector — local state only, not submitted */}
+					<div className="space-y-1.5">
+						<label className="text-sm font-medium">University</label>
+						<Select
+							value={selectedUniversityId}
+							onValueChange={onUniversityChange}
+						>
+							<SelectTrigger>
+								<SelectValue placeholder={universitiesLoading ? "Loading…" : "Select university"} />
+							</SelectTrigger>
+							<SelectContent>
+								{(universities ?? []).map((uni) => (
+									<SelectItem key={uni.id} value={uni.id}>
+										{uni.short_name ?? uni.name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
+
+					{/* Campus selector — submitted as campus_id */}
+					<FormField
+						control={form.control}
+						name="campusId"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Campus</FormLabel>
+								<Select
+									value={field.value}
+									onValueChange={field.onChange}
+									disabled={!selectedUniversityId || campusesLoading}
+								>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue
+												placeholder={
+													!selectedUniversityId
+														? "Select university first"
+														: campusesLoading
+															? "Loading…"
+															: "Select campus"
+												}
+											/>
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{(campuses ?? []).map((campus) => (
+											<SelectItem key={campus.id} value={campus.id}>
+												{campus.name}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+				</div>
 			</div>
 		</div>
 	)
@@ -473,12 +565,14 @@ function StepPhotos({
 	banner,
 	onLogoChange,
 	onBannerChange,
+	campuses,
 }: {
 	form: ReturnType<typeof useForm<FormData>>
 	logo: File | null
 	banner: File | null
 	onLogoChange: (f: File | null) => void
 	onBannerChange: (f: File | null) => void
+	campuses: Campus[] | undefined
 }) {
 	const values = form.getValues()
 
@@ -492,10 +586,13 @@ function StepPhotos({
 		return `${hour % 12 || 12}:${m} ${hour >= 12 ? "PM" : "AM"}`
 	}
 
+	const campusName = campuses?.find((c) => c.id === values.campusId)?.name
+
 	const rows: [string, string][] = [
 		["Restaurant", values.restaurantName],
 		["Category", values.category],
 		["Location", values.location],
+		...(campusName ? [["Campus", campusName] as [string, string]] : []),
 		["Delivery fee", Number(values.deliveryFee) === 0 ? "Free" : fmt(values.deliveryFee)],
 		["Min. order", fmt(values.minOrder)],
 		["Opens", formatTime(values.openingTime)],
@@ -548,11 +645,17 @@ function StepPhotos({
 
 export default function CreateRestaurantPage() {
 	const router = useRouter()
+	const { user } = useAuth()
 	const [step, setStep] = React.useState(0)
 	const [logo, setLogo] = React.useState<File | null>(null)
 	const [banner, setBanner] = React.useState<File | null>(null)
+	const [selectedUniversityId, setSelectedUniversityId] = React.useState(
+		user?.university?.id ?? ""
+	)
 
 	const { data: categories, isLoading: categoriesLoading } = useRestaurantCategories()
+	const { data: universities, isLoading: universitiesLoading } = useUniversities()
+	const { data: campuses, isLoading: campusesLoading } = useCampusesByUniversity(selectedUniversityId)
 
 	const { mutateAsync: createRestaurant, isPending } = useCreateRestaurant()
 
@@ -563,6 +666,7 @@ export default function CreateRestaurantPage() {
 			description: "",
 			category: "",
 			location: "",
+			campusId: user?.campus?.id ?? "",
 			deliveryFee: 0,
 			minOrder: 1,
 			openingTime: "",
@@ -572,7 +676,22 @@ export default function CreateRestaurantPage() {
 		},
 	})
 
+	React.useEffect(() => {
+		if (user?.university?.id && !selectedUniversityId) {
+			setSelectedUniversityId(user.university.id)
+		}
+		if (user?.campus?.id && !form.getValues("campusId")) {
+			form.setValue("campusId", user.campus.id)
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [user])
+
 	const totalSteps = STEPS.length
+
+	function handleUniversityChange(uniId: string) {
+		setSelectedUniversityId(uniId)
+		form.setValue("campusId", "", { shouldValidate: false })
+	}
 
 	async function goNext() {
 		const fields = STEP_FIELDS[step]
@@ -591,6 +710,7 @@ export default function CreateRestaurantPage() {
 				description: values.description,
 				category: values.category,
 				location: values.location,
+				campus: values.campusId,
 				deliveryFee: values.deliveryFee,
 				minOrder: values.minOrder,
 				openingTime: values.openingTime,
@@ -632,7 +752,17 @@ export default function CreateRestaurantPage() {
 					}}
 				>
 					{step === 0 && (
-						<StepBasicInfo form={form} categories={categories} categoriesLoading={categoriesLoading} />
+						<StepBasicInfo
+							form={form}
+							categories={categories}
+							categoriesLoading={categoriesLoading}
+							universities={universities}
+							universitiesLoading={universitiesLoading}
+							campuses={campuses}
+							campusesLoading={campusesLoading}
+							selectedUniversityId={selectedUniversityId}
+							onUniversityChange={handleUniversityChange}
+						/>
 					)}
 					{step === 1 && <StepPricing form={form} />}
 					{step === 2 && <StepHours form={form} />}
@@ -643,6 +773,7 @@ export default function CreateRestaurantPage() {
 							banner={banner}
 							onLogoChange={setLogo}
 							onBannerChange={setBanner}
+							campuses={campuses}
 						/>
 					)}
 

@@ -132,7 +132,7 @@ export function ProductCard({
 					{primary && (
 						<Image
 							fill
-							src={primary.url || primary.optimized_url || "https://placehold.net/800x600.png/"}
+							src={primary.url || primary.optimized_url || "https://placehold.co/600x600?text=VM"}
 							alt={product.title}
 							className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
 							loading="lazy"
@@ -246,7 +246,7 @@ export function ProductCard({
 					<Image
 						width={1200}
 						height={1200}
-						src={primary.url || primary.optimized_url || "https://placehold.net/800x600.png/"}
+						src={primary.url || primary.optimized_url || "https://placehold.co/600x600?text=VM"}
 						alt={product.title}
 						className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
 						loading="lazy"

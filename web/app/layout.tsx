@@ -48,22 +48,20 @@ export default function RootLayout({
 				<QueryProvider>
 					<AuthProvider>
 						<AuthGateProvider>
-						<CampusProvider>
-							<GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
-								<TooltipProvider>
-									<ThemeProvider>
-										<ProfileGate>
-											<main className="min-h-screen">
+							<CampusProvider>
+								<GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
+									<TooltipProvider>
+										<ThemeProvider>
+											<ProfileGate>
 												{children}
-											</main>
-										</ProfileGate>
-										<CampusPicker />
-										<DownloadAppCard />
-										<Toaster richColors theme="system" position="bottom-right" />
-									</ThemeProvider>
-								</TooltipProvider>
-							</GoogleOAuthProvider>
-						</CampusProvider>
+											</ProfileGate>
+											<CampusPicker />
+											<DownloadAppCard />
+											<Toaster richColors theme="system" position="bottom-right" />
+										</ThemeProvider>
+									</TooltipProvider>
+								</GoogleOAuthProvider>
+							</CampusProvider>
 						</AuthGateProvider>
 					</AuthProvider>
 				</QueryProvider>

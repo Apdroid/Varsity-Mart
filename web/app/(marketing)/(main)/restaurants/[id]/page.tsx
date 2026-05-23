@@ -62,7 +62,7 @@ function RestaurantHeader({ restaurant }: { restaurant: RestaurantDetail }) {
     <div>
       <div className="relative h-52 w-full overflow-hidden md:h-64">
         <Image
-          src={restaurant.banner || restaurant.logo || "/placeholder.jpg"}
+          src={restaurant.banner || restaurant.logo || "https://placehold.co/800x400?text=VM"}
           alt={restaurant.name}
           fill
           className="object-cover"

@@ -101,7 +101,7 @@ export function RestaurantCard({ restaurant, className }: RestaurantCardProps) {
 			{/* ─── Banner ───────────────────────────────────────── */}
 			<div className="relative aspect-video overflow-hidden rounded-lg bg-muted">
 				<Image
-					src={restaurant.banner || "https://placehold.net/800x600.png"}
+					src={restaurant.banner || "https://placehold.co/800x400?text=VM"}
 					fill
 					alt=""
 					className={cn(
