@@ -1,0 +1,180 @@
+meta {
+  name: Update Payment Method
+  type: http
+  seq: 7
+  tags: [
+    Payments
+  ]
+}
+
+patch {
+  url: {{baseUrl}}/v1/payments/methods/:methodId/
+  body: json
+  auth: apikey
+}
+
+params:path {
+  methodId: 
+}
+
+headers {
+  access_token: {{apiKey}}
+}
+
+auth:apikey {
+  key: access_token
+  value: {{apiKey}}
+  placement: header
+}
+
+body:json {
+  {
+    "is_default": false,
+    "provider": "",
+    "number": "",
+    "name": "",
+    "bank_code": ""
+  }
+}
+
+docs {
+  Partially update a payment method (e.g. set as default, update MoMo or bank details)
+}
+
+example {
+  name: 200 Response
+  description: Payment method updated
+  
+  request: {
+    url: {{baseUrl}}/v1/payments/methods/:methodId/
+    method: PATCH
+    mode: json
+    params:path: {
+      methodId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "is_default": false,
+        "provider": "",
+        "number": "",
+        "name": "",
+        "bank_code": ""
+      }
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+  
+      '''
+    }
+  }
+}
+
+example {
+  name: 400 Response
+  description: Validation error
+  
+  request: {
+    url: {{baseUrl}}/v1/payments/methods/:methodId/
+    method: PATCH
+    mode: json
+    params:path: {
+      methodId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "is_default": false,
+        "provider": "",
+        "number": "",
+        "name": "",
+        "bank_code": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 400
+      text: Bad Request
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}
+
+example {
+  name: 404 Response
+  description: Payment method not found
+  
+  request: {
+    url: {{baseUrl}}/v1/payments/methods/:methodId/
+    method: PATCH
+    mode: json
+    params:path: {
+      methodId: 
+    }
+  
+    headers: {
+      access_token: {{apiKey}}
+    }
+  
+    body:json: {
+      {
+        "is_default": false,
+        "provider": "",
+        "number": "",
+        "name": "",
+        "bank_code": ""
+      }
+    }
+  }
+  
+  response: {
+    headers: {
+      Content-Type: application/json
+    }
+  
+    status: {
+      code: 404
+      text: Not Found
+    }
+  
+    body: {
+      type: json
+      content: '''
+        {
+          "detail": ""
+        }
+      '''
+    }
+  }
+}

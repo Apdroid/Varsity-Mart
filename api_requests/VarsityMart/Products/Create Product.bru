@@ -9,12 +9,33 @@ meta {
 
 post {
   url: {{baseUrl}}/v1/products/
-  body: multipartForm
+  body: json
   auth: bearer
 }
 
 auth:bearer {
   token: {{token}}
+}
+
+body:json {
+  {
+    "title": "Cannon",
+    "description": "ekhafkjafbaenf",
+    "price": 500,
+    "original_price": 649.91,
+    "category": "Beauty & Personal Care",
+    "condition": "U",
+    "location": "Kumasi",
+    "stock": 5,
+    "delivery_options": [
+      "campus_delivery",
+      "meetup",
+      "shipping"
+    ],
+    "specifications": [],
+    "is_night_shop": true,
+    "storeId": "81a4c5bd-3321-4b65-8c50-d864b10e8e3e"
+  }
 }
 
 body:multipart-form {
