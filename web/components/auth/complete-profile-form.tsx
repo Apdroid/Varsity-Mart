@@ -18,8 +18,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select"
+import { useCampusesByUniversity, useUniversities } from "@/hooks/queries/use-campus"
 import { useUpdateProfile } from "@/hooks/queries/use-user"
-import { getUserLocationValue } from "@/lib/user-location"
 import { useAuth } from "@/providers/auth-provider"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
@@ -29,32 +29,14 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 
-const universities = [
-	"University of Ghana",
-	"KNUST",
-	"University of Cape Coast",
-	"Ashesi University",
-] as const
-
-const CAMPUS_MAP: Record<string, string[]> = {
-	"KNUST": ["Kumasi", "Obuasi"],
-	"University of Ghana": ["Legon Main", "Korle-bu", "Accra City", "Kumasi City", "Takoradi City"],
-	"University of Cape Coast": ["Cape Coast"],
-	"Ashesi University": ["Berekuso"],
-}
-
-function getCampuses(university?: string): string[] {
-	return CAMPUS_MAP[university ?? ""] ?? []
-}
-
 function hasValue(value?: string | null) {
 	return Boolean(value && value.trim().length > 0)
 }
 
 const schema = z.object({
 	phone: z.string().optional(),
-	university: z.string().optional(),
-	campus: z.string().optional(),
+	universityId: z.string().optional(),
+	campusId: z.string().optional(),
 })
 
 type FormData = z.infer<typeof schema>
@@ -63,51 +45,44 @@ export function CompleteProfileForm() {
 	const { user, refreshUser } = useAuth()
 	const router = useRouter()
 	const updateProfileMutation = useUpdateProfile()
-	const currentUniversity = getUserLocationValue(user?.university)
-	const currentCampus = getUserLocationValue(user?.campus)
+
+	const { data: universities = [], isLoading: loadingUniversities } = useUniversities()
 
 	const missing = useMemo(() => ({
 		phone: !hasValue(user?.phone),
-		university: !hasValue(currentUniversity),
-		campus: !hasValue(currentCampus),
-	}), [currentCampus, currentUniversity, user?.phone])
+		campus: !hasValue(user?.campus?.id),
+	}), [user?.phone, user?.campus?.id])
 
 	const form = useForm<FormData>({
 		resolver: zodResolver(schema),
 		mode: "onBlur",
 		defaultValues: {
 			phone: user?.phone || "",
-			university: currentUniversity || "KNUST",
-			campus: currentCampus || "Kumasi",
+			universityId: user?.university?.id || "",
+			campusId: user?.campus?.id || "",
 		},
 	})
 
-	const selectedUniversity = form.watch("university") ?? currentUniversity
-	const campusOptions = getCampuses(selectedUniversity)
+	const selectedUniversityId = form.watch("universityId") ?? ""
+	const { data: campuses = [], isLoading: loadingCampuses } = useCampusesByUniversity(selectedUniversityId)
 
 	const onSubmit = async (values: FormData) => {
 		const phone = values.phone?.trim() ?? ""
-		const university = values.university?.trim() ?? ""
-		const campus = values.campus?.trim() ?? ""
+		const campusId = values.campusId?.trim() ?? ""
 
 		if (missing.phone && phone.length < 8) {
 			form.setError("phone", { message: "Enter a valid phone number." })
 			return
 		}
-		if (missing.university && !university) {
-			form.setError("university", { message: "Select your university." })
-			return
-		}
-		if (missing.campus && !campus) {
-			form.setError("campus", { message: "Select your campus." })
+		if (missing.campus && !campusId) {
+			form.setError("campusId", { message: "Select your campus." })
 			return
 		}
 		try {
-			await updateProfileMutation.mutateAsync({
-				phone: missing.phone ? phone : undefined,
-				university: missing.university ? university : undefined,
-				campus: missing.campus ? campus : undefined,
-			})
+			const formData = new FormData()
+			if (missing.phone) formData.append("phone", phone)
+			if (missing.campus) formData.append("campus_id", campusId)
+			await updateProfileMutation.mutateAsync(formData)
 			await refreshUser()
 			toast.success("Profile completed!")
 			router.replace("/")
@@ -146,60 +121,69 @@ export function CompleteProfileForm() {
 					/>
 				)}
 
-				{missing.university && (
-					<FormField
-						control={form.control}
-						name="university"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>University</FormLabel>
-								<Select
-									value={field.value}
-									onValueChange={(val) => {
-										field.onChange(val)
-										form.setValue("campus", "")
-									}}
-								>
-									<FormControl>
-										<SelectTrigger className="h-auto w-full rounded-full px-6 py-6">
-											<SelectValue placeholder="Select university" />
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{universities.map((u) => (
-											<SelectItem key={u} value={u}>{u}</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				)}
-
 				{missing.campus && (
-					<FormField
-						control={form.control}
-						name="campus"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Campus</FormLabel>
-								<Select value={field.value} onValueChange={field.onChange}>
-									<FormControl>
-										<SelectTrigger className="h-auto w-full rounded-full px-6 py-6">
-											<SelectValue placeholder="Select campus" />
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent>
-										{campusOptions.map((c) => (
-											<SelectItem key={c} value={c} >{c}</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+					<>
+						<FormField
+							control={form.control}
+							name="universityId"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>University</FormLabel>
+									<Select
+										value={field.value}
+										onValueChange={(val) => {
+											field.onChange(val)
+											form.setValue("campusId", "")
+										}}
+										disabled={loadingUniversities}
+									>
+										<FormControl>
+											<SelectTrigger className="h-auto w-full rounded-full px-6 py-6">
+												<SelectValue placeholder={loadingUniversities ? "Loading..." : "Select university"} />
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent>
+											{universities.map((u) => (
+												<SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="campusId"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Campus</FormLabel>
+									<Select
+										value={field.value}
+										onValueChange={field.onChange}
+										disabled={!selectedUniversityId || loadingCampuses}
+									>
+										<FormControl>
+											<SelectTrigger className="h-auto w-full rounded-full px-6 py-6">
+												<SelectValue placeholder={
+													!selectedUniversityId ? "Select a university first" :
+													loadingCampuses ? "Loading..." :
+													"Select campus"
+												} />
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent>
+											{campuses.map((c) => (
+												<SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
 				)}
 
 				<Button

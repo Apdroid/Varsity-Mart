@@ -35,7 +35,7 @@ export function ShopByStoreSection({
 				<div className="flex items-center gap-3 lg:hidden">
 					<div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg  bg-muted">
 						<Image
-							src={store.logo}
+							src={store.logo || ""}
 							alt={store.name}
 							width={48}
 							height={48}
@@ -83,7 +83,7 @@ export function ShopByStoreSection({
 					<div className="rounded-lg  bg-card p-5">
 						<div className="relative mb-4 h-16 w-16 overflow-hidden rounded-lg border border-border bg-muted">
 							<Image
-								src={store.logo}
+								src={store.logo || ""}
 								alt={store.name}
 								width={64}
 								height={64}
