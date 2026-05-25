@@ -22,17 +22,20 @@ const PROFILE_BYPASS_PATHS = [
 ]
 
 export function ProfileGate({ children }: { children: ReactNode }) {
-	const { isAuthenticated, isLoading, needsProfileCompletion } = useAuth()
+	const { isAuthenticated, isLoading, needsProfileCompletion, needsVerification } = useAuth()
 	const router = useRouter()
 	const pathname = usePathname()
 
 	useEffect(() => {
 		if (isLoading) return
 
-		// Redirect authenticated users away from auth-only pages
+		// Redirect authenticated users away from auth-only pages.
+		// Exception: a freshly-registered user is authenticated but still needs
+		// email verification, so they must be allowed to stay on /verify-email.
 		if (isAuthenticated) {
 			const onAuthPage = AUTH_ONLY_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))
-			if (onAuthPage) {
+			const isVerifyPage = pathname === "/verify-email" || pathname.startsWith("/verify-email/")
+			if (onAuthPage && !(isVerifyPage && needsVerification)) {
 				router.replace("/")
 				return
 			}

@@ -26,6 +26,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select"
+import { useUniversities, useCampusesByUniversity } from "@/hooks/queries/use-campus"
 import { cn } from "@/lib/utils"
 import { registerSchema, type RegisterSchema } from "@/lib/validation/auth"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -33,48 +34,15 @@ import { Google } from "@lobehub/icons"
 import { ArrowLeft, Loader2, Mail } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useMemo, useState, type ComponentProps } from "react"
+import { useState, type ComponentProps } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { useAuth } from "@/providers/auth-provider"
 import { getGoogleIdToken } from "@/lib/auth/google"
-import { useUpdateProfile } from "@/hooks/queries/use-user"
-import type { User } from "@/lib/api/types"
-import { getUserLocationValue } from "@/lib/user-location"
-
-const universities = [
-	"University of Ghana",
-	"KNUST",
-	"University of Cape Coast",
-	"Ashesi University",
-] as const
-
-const CAMPUS_MAP: Record<string, string[]> = {
-	"KNUST": ["Kumasi", "Obuasi"],
-	"University of Ghana": ["Legon Main", "Korle-bu", "Accra City", "Kumasi City", "Takoradi City"],
-	"University of Cape Coast": ["Cape Coast"],
-	"Ashesi University": ["Berekuso"],
-}
-
-function getCampuses(university: string): string[] {
-	return CAMPUS_MAP[university] ?? []
-}
 
 const STEP1_FIELDS: (keyof RegisterSchema)[] = ["firstName", "lastName", "email", "password"]
 
-type RegisterMode = "choice" | "email" | "google-complete"
-
-type GoogleCompletionFormData = {
-	firstName: string
-	lastName: string
-	phone: string
-	university: string
-	campus: string
-}
-
-function hasValue(value?: string | null) {
-	return Boolean(value && value.trim().length > 0)
-}
+type RegisterMode = "choice" | "email"
 
 function getPasswordStrength(password: string) {
 	if (!password) return { score: 0, label: "", color: "" }
@@ -92,29 +60,16 @@ function getPasswordStrength(password: string) {
 	return { score, ...(levels[score - 1] ?? { label: "", color: "" }) }
 }
 
-function getMissingFlags(user: User | null) {
-	const university = getUserLocationValue(user?.university)
-	const campus = getUserLocationValue(user?.campus)
-
-	return {
-		firstName: !hasValue(user?.firstName),
-		lastName: !hasValue(user?.lastName),
-		phone: !hasValue(user?.phone),
-		university: !hasValue(university),
-		campus: !hasValue(campus),
-	}
-}
-
 export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 	const [mode, setMode] = useState<RegisterMode>("choice")
 	const [step, setStep] = useState(1)
 	const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false)
-	const [googleUser, setGoogleUser] = useState<User | null>(null)
 	const router = useRouter()
-	const { register, googleLogin, refreshUser } = useAuth()
-	const updateProfileMutation = useUpdateProfile()
+	const { register, googleLogin } = useAuth()
 
-	const manualForm = useForm<RegisterSchema>({
+	const { data: universities = [], isLoading: universitiesLoading } = useUniversities()
+
+	const form = useForm<RegisterSchema>({
 		resolver: zodResolver(registerSchema),
 		mode: "onBlur",
 		defaultValues: {
@@ -123,36 +78,22 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 			email: "",
 			phone: "",
 			password: "",
-			university: "University of Ghana",
-			campus: "Legon Main",
+			universityId: "",
+			campusId: "",
 			agreeToTerms: false,
 			authMethod: "credentials",
 			profilePic: "string",
 		},
 	})
 
-	const googleCompletionForm = useForm<GoogleCompletionFormData>({
-		mode: "onBlur",
-		defaultValues: {
-			firstName: "",
-			lastName: "",
-			phone: "",
-			university: "University of Ghana",
-			campus: "Legon Main",
-		},
-	})
-
-	const missing = useMemo(() => getMissingFlags(googleUser), [googleUser])
-	const manualErrors = manualForm.formState.errors
-	const manualIsSubmitting = manualForm.formState.isSubmitting
-	const password = manualForm.watch("password")
-	const manualUniversity = manualForm.watch("university")
-	const googleUniversity = googleCompletionForm.watch("university")
-	const manualCampuses = getCampuses(manualUniversity)
-	const googleCampuses = getCampuses(googleUniversity)
+	const { errors, isSubmitting } = form.formState
+	const password = form.watch("password")
+	const universityId = form.watch("universityId")
 	const { score, label, color } = getPasswordStrength(password)
 
-	const handleManualSubmit = async (values: RegisterSchema) => {
+	const { data: campuses = [], isLoading: campusesLoading } = useCampusesByUniversity(universityId)
+
+	const handleSubmit = async (values: RegisterSchema) => {
 		const result = await register({
 			firstName: values.firstName,
 			lastName: values.lastName,
@@ -160,8 +101,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 			phone: values.phone,
 			password: values.password,
 			confirmPassword: values.password,
-			university: values.university,
-			campus: values.campus,
+			campus_id: values.campusId,
 			agreeToTerms: values.agreeToTerms,
 			authMethod: values.authMethod,
 			profilePic: values.profilePic,
@@ -171,11 +111,21 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 			router.push("/verify-email")
 			return
 		}
-		toast.error(result.error || "Registration failed")
+		
+		// Check if it's an email already exists error
+		if (result.error?.includes("email already exists")) {
+			form.setError("email", {
+				type: "manual",
+				message: result.error
+			})
+			setStep(1)
+		} else {
+			toast.error(result.error || "Registration failed")
+		}
 	}
 
 	const handleNext = async () => {
-		const valid = await manualForm.trigger(STEP1_FIELDS)
+		const valid = await form.trigger(STEP1_FIELDS)
 		if (valid) setStep(2)
 	}
 
@@ -195,79 +145,19 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 				return
 			}
 
-			const user = result.user ?? null
-			setGoogleUser(user)
-			const universityValue = getUserLocationValue(user?.university)
-			const campusValue = getUserLocationValue(user?.campus)
-			googleCompletionForm.reset({
-				firstName: user?.firstName || "",
-				lastName: user?.lastName || "",
-				phone: user?.phone || "",
-				university: universityValue || "University of Ghana",
-				campus: campusValue || "Legon Main",
-			})
-
-			const requiredMissing = getMissingFlags(user)
-			const needsCompletion =
-				result.profileComplete === false ||
-				requiredMissing.firstName ||
-				requiredMissing.lastName ||
-				requiredMissing.phone ||
-				requiredMissing.university ||
-				requiredMissing.campus
-
-			if (!needsCompletion) {
-				toast.success("Account ready! Signed in with Google.")
-				router.push("/")
+			if (result.profileComplete === false) {
+				toast.message("Almost done — complete your missing details.")
+				router.push("/complete-profile")
 				return
 			}
 
-			setMode("google-complete")
-			toast.message("Almost done — complete your missing details.")
+			toast.success("Account ready! Signed in with Google.")
+			router.push("/")
 		} catch (err) {
 			const message = err instanceof Error ? err.message : "Google sign-up failed"
 			toast.error(message)
 		} finally {
 			setIsGoogleSubmitting(false)
-		}
-	}
-
-	const handleGoogleCompletionSubmit = async (values: GoogleCompletionFormData) => {
-		if (!googleUser) {
-			toast.error("Google session not found. Please continue with Google again.")
-			setMode("choice")
-			return
-		}
-
-		const phone = values.phone.trim()
-		const university = values.university.trim()
-		const campus = values.campus.trim()
-
-		if (missing.phone && phone.length < 8) {
-			googleCompletionForm.setError("phone", { message: "Enter a valid phone number." })
-			return
-		}
-		if (missing.university && !university) {
-			googleCompletionForm.setError("university", { message: "Select your university." })
-			return
-		}
-		if (missing.campus && !campus) {
-			googleCompletionForm.setError("campus", { message: "Select your campus." })
-			return
-		}
-		try {
-			const fd = new FormData()
-			if (missing.firstName) fd.append("first_name", values.firstName.trim())
-			if (missing.lastName) fd.append("last_name", values.lastName.trim())
-			if (missing.phone) fd.append("phone", phone)
-			if (missing.university) fd.append("university", university)
-			if (missing.campus) fd.append("campus", campus)
-			await updateProfileMutation.mutateAsync(fd)
-			await refreshUser()
-			toast.success("Profile completed successfully.")
-			router.push("/")
-		} catch {
-			toast.error("Failed to complete profile")
 		}
 	}
 
@@ -311,131 +201,6 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 						</Link>
 					</FieldDescription>
 				</div>
-			) : mode === "google-complete" ? (
-				<Form {...googleCompletionForm}>
-					<form
-						onSubmit={googleCompletionForm.handleSubmit(handleGoogleCompletionSubmit)}
-						noValidate
-						className="mt-6 animate-in fade-in slide-in-from-bottom-2 duration-200"
-					>
-						<FieldGroup>
-							<button
-								type="button"
-								onClick={() => setMode("choice")}
-								className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-							>
-								<ArrowLeft className="h-3.5 w-3.5" />
-								Back
-							</button>
-							{missing.firstName && (
-								<FormField
-									control={googleCompletionForm.control}
-									name="firstName"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>First name</FormLabel>
-											<FormControl>
-												<Input autoFocus className="rounded-full p-6" {...field} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							)}
-							{missing.lastName && (
-								<FormField
-									control={googleCompletionForm.control}
-									name="lastName"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Last name</FormLabel>
-											<FormControl>
-												<Input className="rounded-full p-6" {...field} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							)}
-							{missing.phone && (
-								<FormField
-									control={googleCompletionForm.control}
-									name="phone"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Phone number</FormLabel>
-											<FormControl>
-												<Input type="tel" placeholder="+233201234567" className="rounded-full p-6" {...field} />
-											</FormControl>
-											<FormDescription>Used for delivery updates and order contact.</FormDescription>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							)}
-							{missing.university && (
-								<FormField
-									control={googleCompletionForm.control}
-									name="university"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>University</FormLabel>
-											<Select
-												value={field.value}
-												onValueChange={(val) => {
-													field.onChange(val)
-													googleCompletionForm.setValue("campus", "")
-												}}
-											>
-												<FormControl>
-													<SelectTrigger className="h-auto w-full rounded-full px-6 py-4">
-														<SelectValue placeholder="Select university" />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{universities.map((u) => (
-														<SelectItem key={u} value={u}>{u}</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							)}
-							{missing.campus && (
-								<FormField
-									control={googleCompletionForm.control}
-									name="campus"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Campus</FormLabel>
-											<Select value={field.value} onValueChange={field.onChange}>
-												<FormControl>
-													<SelectTrigger className="h-auto w-full rounded-full px-6 py-4">
-														<SelectValue placeholder="Select campus" />
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													{googleCampuses.map((c) => (
-														<SelectItem key={c} value={c}>{c}</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							)}
-							<FormItem>
-								<Button type="submit" disabled={updateProfileMutation.isPending} className="p-6 text-base rounded-full">
-									{updateProfileMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-									Complete profile
-								</Button>
-							</FormItem>
-						</FieldGroup>
-					</form>
-				</Form>
 			) : (
 				<>
 					<div className="mt-4 flex gap-1.5">
@@ -453,9 +218,9 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 						Step {step} of 2 — {step === 1 ? "Personal info" : "Campus details"}
 					</p>
 
-					<Form {...manualForm}>
+					<Form {...form}>
 						<form
-							onSubmit={manualForm.handleSubmit(handleManualSubmit)}
+							onSubmit={form.handleSubmit(handleSubmit)}
 							noValidate
 							className="mt-4"
 						>
@@ -474,10 +239,10 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 											Sign up with email
 										</FieldSeparator>
 										<FormField
-											control={manualForm.control}
+											control={form.control}
 											name="firstName"
 											render={({ field }) => (
-												<FormItem data-invalid={!!manualErrors.firstName}>
+												<FormItem data-invalid={!!errors.firstName}>
 													<FormLabel>First name</FormLabel>
 													<FormControl>
 														<Input
@@ -494,10 +259,10 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 											)}
 										/>
 										<FormField
-											control={manualForm.control}
+											control={form.control}
 											name="lastName"
 											render={({ field }) => (
-												<FormItem data-invalid={!!manualErrors.lastName}>
+												<FormItem data-invalid={!!errors.lastName}>
 													<FormLabel>Last name</FormLabel>
 													<FormControl>
 														<Input
@@ -513,10 +278,10 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 											)}
 										/>
 										<FormField
-											control={manualForm.control}
+											control={form.control}
 											name="email"
 											render={({ field }) => (
-												<FormItem data-invalid={!!manualErrors.email}>
+												<FormItem data-invalid={!!errors.email}>
 													<FormLabel>Email address</FormLabel>
 													<FormControl>
 														<Input
@@ -532,10 +297,10 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 											)}
 										/>
 										<FormField
-											control={manualForm.control}
+											control={form.control}
 											name="password"
 											render={({ field }) => (
-												<FormItem data-invalid={!!manualErrors.password}>
+												<FormItem data-invalid={!!errors.password}>
 													<FormLabel>Password</FormLabel>
 													<FormControl>
 														<PasswordInput
@@ -585,10 +350,10 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 											Back
 										</button>
 										<FormField
-											control={manualForm.control}
+											control={form.control}
 											name="phone"
 											render={({ field }) => (
-												<FormItem data-invalid={!!manualErrors.phone}>
+												<FormItem data-invalid={!!errors.phone}>
 													<FormLabel>Phone number</FormLabel>
 													<FormControl>
 														<Input
@@ -606,26 +371,26 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 											)}
 										/>
 										<FormField
-											control={manualForm.control}
-											name="university"
+											control={form.control}
+											name="universityId"
 											render={({ field }) => (
-												<FormItem data-invalid={!!manualErrors.university}>
+												<FormItem data-invalid={!!errors.universityId}>
 													<FormLabel>University</FormLabel>
 													<Select
 														value={field.value}
 														onValueChange={(val) => {
 															field.onChange(val)
-															manualForm.setValue("campus", "")
+															form.setValue("campusId", "")
 														}}
 													>
 														<FormControl>
 															<SelectTrigger className="h-auto w-full rounded-full px-6 py-4">
-																<SelectValue placeholder="Select university" />
+																<SelectValue placeholder={universitiesLoading ? "Loading…" : "Select university"} />
 															</SelectTrigger>
 														</FormControl>
 														<SelectContent>
 															{universities.map((u) => (
-																<SelectItem key={u} value={u}>{u}</SelectItem>
+																<SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
 															))}
 														</SelectContent>
 													</Select>
@@ -634,20 +399,24 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 											)}
 										/>
 										<FormField
-											control={manualForm.control}
-											name="campus"
+											control={form.control}
+											name="campusId"
 											render={({ field }) => (
-												<FormItem data-invalid={!!manualErrors.campus}>
+												<FormItem data-invalid={!!errors.campusId}>
 													<FormLabel>Campus</FormLabel>
-													<Select value={field.value} onValueChange={field.onChange}>
+													<Select
+														value={field.value}
+														onValueChange={field.onChange}
+														disabled={!universityId || campusesLoading}
+													>
 														<FormControl>
 															<SelectTrigger className="h-auto w-full rounded-full px-6 py-4">
-																<SelectValue placeholder="Select campus" />
+																<SelectValue placeholder={campusesLoading ? "Loading…" : "Select campus"} />
 															</SelectTrigger>
 														</FormControl>
 														<SelectContent>
-															{manualCampuses.map((c) => (
-																<SelectItem key={c} value={c}>{c}</SelectItem>
+															{campuses.map((c) => (
+																<SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
 															))}
 														</SelectContent>
 													</Select>
@@ -656,7 +425,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 											)}
 										/>
 										<FormField
-											control={manualForm.control}
+											control={form.control}
 											name="agreeToTerms"
 											render={({ field }) => (
 												<FormItem className="flex-row items-start gap-3 rounded-lg px-4 py-3">
@@ -686,10 +455,10 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 										<FormItem>
 											<Button
 												type="submit"
-												disabled={manualIsSubmitting}
+												disabled={isSubmitting}
 												className="text-md p-6"
 											>
-												{manualIsSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+												{isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
 												Create account
 											</Button>
 										</FormItem>

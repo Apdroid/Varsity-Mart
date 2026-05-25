@@ -107,6 +107,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		} catch (err) {
 			if (err instanceof ApiError) {
 				const errorData = err.data as { message?: string; detail?: string; errors?: Record<string, string[]> }
+				
+				// Check for email already exists error
+				if (errorData?.errors?.email) {
+					const emailError = errorData.errors.email[0]
+					if (emailError?.toLowerCase().includes("already exists") || emailError?.toLowerCase().includes("already registered")) {
+						return { success: false, error: "User with that email already exists" }
+					}
+				}
+				
 				const message = errorData?.message || errorData?.detail || "Registration failed"
 				return { success: false, error: message }
 			}

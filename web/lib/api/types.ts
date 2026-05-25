@@ -196,8 +196,7 @@ export interface RegisterRequest {
 	confirmPassword: string
 	studentId?: string
 	isStudent?: boolean
-	university: string
-	campus: string
+	campus_id: string
 	agreeToTerms: boolean
 	authMethod?: AuthMethod
 	profilePic?: string
@@ -1041,3 +1040,5 @@ export interface VerifyPaymentResponse {
 	transaction_id: string
 	paid_at: string
 }
+
+console.log("hi")

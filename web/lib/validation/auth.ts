@@ -20,8 +20,8 @@ export const registerSchema = z.object({
   email: emailSchema,
   phone: phoneSchema,
   password: passwordSchema,
-  university: z.string().min(2, "Select your university."),
-  campus: z.string().min(2, "Select your campus."),
+  universityId: z.string().min(1, "Select your university."),
+  campusId: z.string().min(1, "Select your campus."),
   agreeToTerms: z
     .boolean()
     .refine((v) => v, { message: "You must agree to the terms and privacy policy." }),

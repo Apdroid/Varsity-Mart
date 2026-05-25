@@ -109,7 +109,7 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 						type="button"
 						onClick={handleGoogleSignIn}
 						disabled={isGoogleSubmitting}
-						className="bg-vm-platinum border-border  gap-4 p-6  rounded-full"
+						className="bg-vm-platinum border-black border-2  gap-4 p-6  rounded-full"
 					>
 						{isGoogleSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Google.Color size={40} />}
 						<span>Continue with Google</span>
