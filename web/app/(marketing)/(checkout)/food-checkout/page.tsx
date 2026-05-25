@@ -394,7 +394,7 @@ export default function FoodCheckoutPage() {
                 </div>
               )}
 
-              {/* Step 3 — Payment */}
+              {/* Step 2/3 — Payment */}
               <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
                 <StepHeader step={deliveryMethod === "campus_delivery" ? 3 : 2} label="Payment Method" />
 
@@ -490,6 +490,7 @@ export default function FoodCheckoutPage() {
                   </div>
                 )}
               </div>
+
 
               {/* Mobile submit */}
               <div className="lg:hidden">

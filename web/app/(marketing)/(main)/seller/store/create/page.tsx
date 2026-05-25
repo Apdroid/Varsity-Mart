@@ -547,8 +547,9 @@ function ReviewSummary({
 
 export default function CreateStorePage() {
 	const router = useRouter()
-	const { refreshUser } = useAuth()
+	const { refreshUser, user, isLoading: authLoading, isAuthenticated } = useAuth()
 	const createStore = useCreateStore()
+
 	const { data: categories, isLoading: categoriesLoading } = useStoreCategories()
 
 	const [step, setStep] = React.useState(0)
@@ -572,6 +573,25 @@ export default function CreateStorePage() {
 		},
 		mode: "onTouched",
 	})
+
+	React.useEffect(() => {
+		if (authLoading) return
+		if (!isAuthenticated) {
+			router.replace("/login?next=/seller/store/create")
+			return
+		}
+		if (user?.kycStatus !== "approved") {
+			router.replace("/seller/kyc")
+		}
+	}, [authLoading, isAuthenticated, user, router])
+
+	if (authLoading || !isAuthenticated || user?.kycStatus !== "approved") {
+		return (
+			<div className="flex min-h-[60vh] items-center justify-center">
+				<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+			</div>
+		)
+	}
 
 	const goNext = async () => {
 		const fields = STEP_FIELDS[step]

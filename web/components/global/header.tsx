@@ -77,6 +77,9 @@ import { useNotifications } from "@/hooks/queries/use-user";
 import { useRouter, usePathname } from "next/navigation";
 import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { CampusSelector } from "./campus-selector";
+import { UnauthUserMenu } from "./unauth-user-menu";
+import { Button } from "@/components/ui/button";
 
 function useScrollDirection() {
 	const [hidden, setHidden] = useState(false)
@@ -515,7 +518,7 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 
 	return (
 		<div className=" bg-card">
-			<div className="vm-section  mx-auto flex h-18 items-center justify-between gap-2 px-3 md:h-20 md:gap-6 md:px-4">
+			<div className="vm-section mx-auto flex h-18 items-center justify-between gap-2 px-3 md:h-16 md:gap-4 md:px-4">
 				{/* Mobile Navigation Menu */}
 				<Sheet>
 					<SheetTrigger asChild>
@@ -542,16 +545,16 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 					</SheetContent>
 				</Sheet>
 
-
 				<Link href="/" className="shrink-0">
-					<Logo variant="header" className="w-32 md:w-auto" />
+					<Logo variant="header" className="w-28 md:w-auto" />
 				</Link>
 
-				<div className="relative hidden flex-1 md:block">
-					<div className="relative flex h-11 w-full items-center overflow-hidden rounded-full bg-accent transition-all focus-within:bg-background focus-within:shadow-sm">
-						<MagnifyingGlassIcon className="ml-4 h-4 w-4 shrink-0 text-muted-foreground" />
+				{/* Compact Search Bar */}
+				<div className="relative hidden flex-1 md:block md:max-w-2xl">
+					<div className="relative flex h-10 w-full items-center overflow-hidden rounded-full bg-accent transition-all focus-within:bg-background focus-within:shadow-sm">
+						<MagnifyingGlassIcon className="ml-3 h-4 w-4 shrink-0 text-muted-foreground" />
 						<Input
-							placeholder="Search for jollof, hoodies, textbooks…"
+							placeholder="Search…"
 							value={desktopQuery}
 							onChange={(event) => setDesktopQuery(event.target.value)}
 							onFocus={() => setIsDesktopFocused(true)}
@@ -563,15 +566,15 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 								}
 								if (event.key === "Escape") setIsDesktopFocused(false)
 							}}
-							className="h-full border-0 bg-inherit shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-graphite"
+							className="h-full flex-1 border-0 bg-inherit text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-graphite"
 						/>
 						<Select value={desktopCategory} onValueChange={setDesktopCategory}>
-							<SelectTrigger className="h-full w-38.75 border-0 bg-transparent text-sm shadow-none focus:ring-0 focus:ring-offset-0 dark:bg-inherit">
+							<SelectTrigger className="h-full w-32 border-0 bg-transparent text-xs shadow-none focus:ring-0 focus:ring-offset-0 dark:bg-inherit">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent align="end">
 								{searchCategories.map((c) => (
-									<SelectItem key={c} value={c}>
+									<SelectItem key={c} value={c} className="text-xs">
 										{c}
 									</SelectItem>
 								))}
@@ -580,7 +583,7 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 						<button
 							type="button"
 							onClick={handleDesktopSearch}
-							className="ml-1 mr-1.5 flex h-8 shrink-0 cursor-pointer items-center rounded-full bg-vm-tangerine px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+							className="ml-1 mr-1 flex h-7 shrink-0 cursor-pointer items-center rounded-full bg-vm-tangerine px-3 text-xs font-semibold text-white transition-opacity hover:opacity-90"
 						>
 							Search
 						</button>
@@ -601,11 +604,18 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 					)}
 				</div>
 
+				{/* Campus Selector - Hidden on Mobile */}
+
 
 				{/* <ThemeToggleButton className="hidden h-10 w-10 sm:inline-flex" /> */}
 				<div className="flex gap-1.5 md:gap-4">
+
+							<div className="hidden lg:flex">
+								<CampusSelector />
+							</div>
 					<FoodCartSheet />
 					<CartSheet />
+
 					{authLoading ? (
 						<div
 							className="h-10 w-10 items-center justify-center inline-flex"
@@ -727,7 +737,8 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 										{!user.hasStore && !user.hasRestaurant ? (
 											<DropdownMenuItem asChild className="text-base">
 												<Link href="/seller/start">
-													<StorefrontIcon className="mr-2.5 size-5" />
+
+															<StorefrontIcon className="mr-2.5 size-5" />
 													Start Selling
 												</Link>
 											</DropdownMenuItem>
@@ -773,21 +784,17 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 							</DropdownMenu>
 						</>
 					) : (
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<Link
-									href="/login"
-									aria-label="Sign in"
-									className="h-10 w-10 items-center justify-center inline-flex"
-								>
-									<UserCircleIcon className="h-7 w-7" weight="regular" />
-								</Link>
-							</TooltipTrigger>
-							<TooltipContent side="bottom">
-								<p>Sign in to buy and sell</p>
-							</TooltipContent>
-						</Tooltip>
+						<>
+							<UnauthUserMenu />
+							<Button
+								asChild
+								className="hidden sm:inline-flex h-10 rounded-full bg-vm-tangerine hover:bg-vm-tangerine/90 px-6"
+							>
+								<Link href="/register">Create Account</Link>
+							</Button>
+						</>
 					)}
+
 
 					{/*
 					<Tooltip>
@@ -832,8 +839,8 @@ function NavLink({ href, children, exact }: { href: string; children: React.Reac
 					"relative inline-flex h-10 items-center px-3 hover:bg-none text-sm font-medium transition-colors hover:text-vm-tangerine",
 					"after:absolute after:bottom-0 after:left-2 after:right-2 after:h-0.5 after:rounded-full after:transition-colors",
 					isActive
-						? "text-foreground font-semibold after:bg-vm-tangerine"
-						: "text-foreground/60 after:bg-transparent"
+						? "text-foreground font-bold after:bg-vm-tangerine"
+						: "text-foreground after:bg-transparent"
 				)}
 			>
 				{children}
@@ -842,9 +849,11 @@ function NavLink({ href, children, exact }: { href: string; children: React.Reac
 	)
 }
 
-function NavBar() {
+function NavBar({ hasStore }: { hasStore: boolean }) {
 	const router = useRouter()
 	const { requireAuth } = useAuthGate()
+	const sellerCtaLabel = hasStore ? "My Store" : "Become a Seller"
+	const sellerCtaHref = hasStore ? "/seller/store" : "/seller/start"
 	return (
 		<div className="hidden bg-card pb-4 shadow-sm lg:block">
 			<div className="vm-section mx-auto flex h-12 items-center justify-between px-4">
@@ -855,6 +864,16 @@ function NavBar() {
 						<NavLink href="/products">Products</NavLink>
 						<NavLink href="/restaurants">Food</NavLink>
 						<NavLink href="/stores">Stores & Vendors</NavLink>
+						<NavigationMenuItem>
+							<button
+								type="button"
+								onClick={() => requireAuth(() => router.push(sellerCtaHref))}
+								className="ml-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-vm-tangerine px-4 text-sm font-semibold text-white hover:border-2 hover:border-vm-tangerine hover:bg-accent hover:text-foreground transition-all ease-linear dark:hover:text-vm-tangerine"
+							>
+								{sellerCtaLabel}
+								<CaretRightIcon className="h-3.5 w-3.5" />
+							</button>
+						</NavigationMenuItem>
 					</NavigationMenuList>
 				</NavigationMenu>
 
@@ -862,7 +881,7 @@ function NavBar() {
 				<NavigationMenu>
 					<NavigationMenuList className="gap-0">
 						<NavigationMenuItem>
-							<NavigationMenuTrigger className="h-10 bg-transparent text-sm font-medium text-foreground/60 hover:text-foreground data-[state=open]:text-foreground">
+							<NavigationMenuTrigger className="h-10 bg-transparent text-sm font-medium text-foreground hover:text-foreground data-[state=open]:text-foreground">
 								Shop
 							</NavigationMenuTrigger>
 							<NavigationMenuContent>
@@ -888,9 +907,8 @@ function NavBar() {
 								</div>
 							</NavigationMenuContent>
 						</NavigationMenuItem>
-
 						<NavigationMenuItem>
-							<NavigationMenuTrigger className="h-10 bg-transparent text-sm font-medium text-foreground/60 hover:text-foreground data-[state=open]:text-foreground">
+							<NavigationMenuTrigger className="h-10 bg-transparent text-sm font-medium text-foreground hover:text-foreground data-[state=open]:text-foreground">
 								Food Court
 							</NavigationMenuTrigger>
 							<NavigationMenuContent>
@@ -919,16 +937,6 @@ function NavBar() {
 
 						<NavLink href="/help">Track Order</NavLink>
 
-						<NavigationMenuItem>
-							<button
-								type="button"
-								onClick={() => requireAuth(() => router.push("/seller/start"))}
-								className="ml-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-vm-tangerine px-4 text-sm font-semibold text-white transition-opacity hover:border-2 hover:text-vm-tangerine"
-							>
-								Become a Seller
-								<CaretRightIcon className="h-3.5 w-3.5" />
-							</button>
-						</NavigationMenuItem>
 					</NavigationMenuList>
 				</NavigationMenu>
 			</div>
@@ -1072,13 +1080,13 @@ export default function VarsityMartHeader() {
 	return (
 		<>
 			<header
-				className={`sticky top-0 z-50 w-full  transition-transform duration-300 will-change-transform ${headerHidden ? "-translate-y-full" : "translate-y-0"
+				className={`sticky top-0 z-50 w-full   transition-transform duration-300 will-change-transform ${headerHidden ? "-translate-y-full" : "translate-y-0"
 					}`}
 			>
 				{/* <AnnouncementBar /> */}
 				<MainBar checkHasStore={handleStore} />
 				<MobileSearchBar hasStore={hasStore} />
-				<NavBar />
+				<NavBar hasStore={hasStore} />
 			</header>
 		</>
 	)

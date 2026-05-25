@@ -70,7 +70,7 @@ export function ProductGallery({ images, title, views }: Props) {
 				onClick={() => openLightbox(selected)}
 			>
 				<SafeImage
-					src={current.url}
+					src={current.optimized_url || current.url}
 					alt={title}
 					className="h-full w-full object-cover object-center transition-transform duration-300 hover:scale-105"
 				/>
@@ -105,7 +105,7 @@ export function ProductGallery({ images, title, views }: Props) {
 							)}
 						>
 							<SafeImage
-								src={img.url}
+								src={img.optimized_url || img.url}
 								alt={`Image ${i + 1}`}
 								className="h-full w-full object-cover"
 							/>
@@ -116,10 +116,10 @@ export function ProductGallery({ images, title, views }: Props) {
 
 			{/* Lightbox */}
 			<Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-				<DialogContent className="max-w-3xl border-0 bg-black/95 p-0">
-					<div className="relative flex items-center justify-center">
+				<DialogContent className=" max-w-7xl border-0 bg-black/95 p-0">
+					<div className="relative  flex items-center justify-center">
 						<SafeImage
-							src={images[lightboxIndex]?.url ?? ""}
+							src={(images[lightboxIndex]?.optimized_url || images[lightboxIndex]?.url) ?? ""}
 							alt={`${title} — image ${lightboxIndex + 1}`}
 							className="max-h-[80vh] w-full object-contain"
 						/>
@@ -142,10 +142,6 @@ export function ProductGallery({ images, title, views }: Props) {
 								</button>
 							</>
 						)}
-
-						<DialogClose className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-white/20 text-white backdrop-blur-sm hover:bg-white/40">
-							<X className="h-4 w-4" />
-						</DialogClose>
 
 						<div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs text-white">
 							{lightboxIndex + 1} / {images.length}

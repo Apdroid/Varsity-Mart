@@ -314,7 +314,7 @@ export function ProductDetailView({ product, related, sellerProducts, reviews }:
 				{/* Hero grid — 3 columns: gallery | meta | buy box */}
 				<div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
 					{/* Col 1 — gallery */}
-					<div className="lg:col-span-5">
+					<div className="lg:col-span-4">
 						<ProductGallery
 							images={product.images}
 							title={product.title}
@@ -330,7 +330,7 @@ export function ProductDetailView({ product, related, sellerProducts, reviews }:
 					</div>
 
 					{/* Col 3 — buy box */}
-					<div className="lg:col-span-3">
+					<div className="lg:col-span-4">
 						<div className=" lg:top-20">
 							<BuyBox
 								product={product}
@@ -361,7 +361,7 @@ export function ProductDetailView({ product, related, sellerProducts, reviews }:
 							store={product.store}
 							productId={product.id}
 							productTitle={product.title}
-							productImage={product.images?.[0]?.thumbnail_url}
+							productImage={product.images?.[0]?.optimized_url || product.images?.[0]?.url}
 							productPrice={product.price}
 						/>
 					</div>

@@ -102,6 +102,7 @@ export default function SellerPayoutsPage() {
   const {
     data: balance,
     isLoading: balanceLoading,
+    isFetching: balanceFetching,
     isError: balanceError,
     refetch: refetchBalance,
   } = useEscrowBalance()
@@ -168,10 +169,11 @@ export default function SellerPayoutsPage() {
           <Button
             variant="outline"
             size="sm"
-            className="mt-3 gap-1.5"
+            className="mt-3 gap-1.5 vm-button"
             onClick={() => refetchBalance()}
+            disabled={balanceFetching}
           >
-            <RefreshCw className="h-3.5 w-3.5" />
+            <RefreshCw className={cn("h-3.5 w-3.5", balanceFetching && "animate-spin")} />
             Retry
           </Button>
         </div>

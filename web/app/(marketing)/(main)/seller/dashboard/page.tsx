@@ -78,7 +78,7 @@ function productStatusStyle(status: string) {
 function ProductRow({ product }: { product: Product }) {
 	const [deleteOpen, setDeleteOpen] = useState(false)
 	const { mutateAsync: deleteProduct, isPending: deleting } = useDeleteProduct()
-	const thumbnail = product.images?.[0]?.thumbnail_url
+	const thumbnail = product.images?.[0]?.optimized_url || product.images?.[0]?.url
 
 	async function handleDelete() {
 		try {

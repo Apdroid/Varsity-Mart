@@ -645,7 +645,8 @@ function StepPhotos({
 
 export default function CreateRestaurantPage() {
 	const router = useRouter()
-	const { user } = useAuth()
+	const { user, isLoading: authLoading, isAuthenticated } = useAuth()
+
 	const [step, setStep] = React.useState(0)
 	const [logo, setLogo] = React.useState<File | null>(null)
 	const [banner, setBanner] = React.useState<File | null>(null)
@@ -675,6 +676,25 @@ export default function CreateRestaurantPage() {
 			phone: "",
 		},
 	})
+
+	React.useEffect(() => {
+		if (authLoading) return
+		if (!isAuthenticated) {
+			router.replace("/login?next=/seller/restaurant/create")
+			return
+		}
+		if (user?.kycStatus !== "approved") {
+			router.replace("/seller/kyc")
+		}
+	}, [authLoading, isAuthenticated, user, router])
+
+	if (authLoading || !isAuthenticated || user?.kycStatus !== "approved") {
+		return (
+			<div className="flex min-h-[60vh] items-center justify-center">
+				<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+			</div>
+		)
+	}
 
 	React.useEffect(() => {
 		if (user?.university?.id && !selectedUniversityId) {

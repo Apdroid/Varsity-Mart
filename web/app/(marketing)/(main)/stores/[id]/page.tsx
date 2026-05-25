@@ -126,13 +126,13 @@ function StoreHeader({ store }: { store: StoreDetail }) {
 	return (
 		<div>
 			{/* Banner */}
-			<div className="relative h-52 w-full overflow-hidden bg-muted md:h-64">
+			<div className="relative h-52 w-full max-w-7xl mx-auto my-0 overflow-hidden bg-muted md:h-64">
 				{ // store.banner ? (
 					<Image
 						src={store.banner || "https://placehold.co/800x400?text=VM"}
 						alt={store.storeName}
-						fill
-						className="object-cover"
+						width={1200}
+						height={1200}
 						priority
 					/>
 					// ) : (
@@ -188,7 +188,7 @@ function StoreHeader({ store }: { store: StoreDetail }) {
 								</Badge>
 							</div>
 
-							<p className="mt-0.5 text-sm text-foreground bg-accent w-20  px-2 rounded-full">{category?.name}</p>
+							<p className="mt-0.5 text-sm text-vm-tangerine   px-2 rounded-full">{category?.name}</p>
 
 							{store.description && (
 								<p className="mt-1.5 line-clamp-2 text-sm text-muted-foreground">

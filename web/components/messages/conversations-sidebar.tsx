@@ -191,7 +191,6 @@ export function ConversationsSidebar() {
 							Home
 						</Link>
 					</Button>
-					<Logo variant="header" className="h-5 w-auto" />
 					<Button
 						variant="ghost"
 						size="icon"

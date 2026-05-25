@@ -2,6 +2,7 @@ import { api } from "./client"
 import type {
 	ApiResponse,
 	AuthStatus,
+	BecomeSellerStatus,
 	ForgotPasswordRequest,
 	GoogleLoginRequest,
 	LoginRequest,
@@ -50,6 +51,9 @@ export const authApi = {
 
 	getSellerStatus: () =>
 		api.get<ApiResponse<SellerStatus>>("/auth/seller-status/"),
+
+	getKycStatus: () =>
+		api.get<BecomeSellerStatus>("/auth/become-a-seller/"),
 
 	becomeASeller: (data: FormData) =>
 		apiClientFormData<ApiResponse<{ message: string }>>(

@@ -988,6 +988,15 @@ export interface KycApplication {
 	reviewedAt?: string
 }
 
+export interface BecomeSellerStatus {
+	kyc_status: KycStatus
+	has_store: boolean
+	has_restaurant: boolean
+	seller_type: "products" | "food" | null
+	submitted_at: string | null
+	rejection_reason?: string | null
+}
+
 // Escrow Types
 export interface EscrowBalance {
 	available: number

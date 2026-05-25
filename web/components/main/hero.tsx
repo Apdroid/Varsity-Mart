@@ -485,7 +485,7 @@ export default function VarsityMartHeroBento() {
 
 	const slides = React.useMemo(() => fallbackSlides.map((slide, i) => {
 		if (i === 0) {
-			const img = featuredProducts?.[0]?.images?.[0]?.url
+			const img = featuredProducts?.[0]?.images?.[0]?.optimized_url || featuredProducts?.[0]?.images?.[0]?.url
 			return img ? { ...slide, image: img } : slide
 		}
 		if (i === 1) {
