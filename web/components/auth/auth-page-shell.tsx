@@ -23,7 +23,7 @@ export function AuthPageShell({ children }: AuthPageShellProps) {
 				{/* Image Section - Hidden on Mobile */}
 				<div className="hidden lg:flex lg:w-1/2 bg-muted">
 					<Image
-						src="/auth-hero.png"
+						src="/user.webp"
 						alt="Varsity Mart"
 						width={1080}
 						height={1440}
