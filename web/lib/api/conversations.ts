@@ -20,7 +20,7 @@ export const conversationsApi = {
 		api.get<MessageListResponse>(`/conversations/${conversationId}/messages/?page=${page}&limit=${limit}`),
 
 	send: (conversationId: string, data: SendMessageRequest) =>
-		api.post<ApiResponse<Message>>(`/conversations/${conversationId}/messages/`, data),
+		api.post<ApiResponse<Message>>(`/conversations/${conversationId}/send_message/`, data),
 
 	markRead: (conversationId: string) =>
 		api.post<ApiResponse<{ success: boolean }>>(`/conversations/${conversationId}/read/`),

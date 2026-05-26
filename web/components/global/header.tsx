@@ -610,9 +610,9 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 				{/* <ThemeToggleButton className="hidden h-10 w-10 sm:inline-flex" /> */}
 				<div className="flex gap-1.5 md:gap-4">
 
-							<div className="hidden lg:flex">
-								<CampusSelector />
-							</div>
+					<div className="hidden lg:flex">
+						<CampusSelector />
+					</div>
 					<FoodCartSheet />
 					<CartSheet />
 
@@ -738,7 +738,7 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 											<DropdownMenuItem asChild className="text-base">
 												<Link href="/seller/start">
 
-															<StorefrontIcon className="mr-2.5 size-5" />
+													<StorefrontIcon className="mr-2.5 size-5" />
 													Start Selling
 												</Link>
 											</DropdownMenuItem>
@@ -862,7 +862,7 @@ function NavBar({ hasStore }: { hasStore: boolean }) {
 					<NavigationMenuList className="gap-3">
 						<NavLink href="/" exact>Home</NavLink>
 						<NavLink href="/products">Products</NavLink>
-						<NavLink href="/restaurants">Food</NavLink>
+						<NavLink href="/restaurants">Restaurants</NavLink>
 						<NavLink href="/stores">Stores & Vendors</NavLink>
 						<NavigationMenuItem>
 							<button

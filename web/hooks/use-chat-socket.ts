@@ -1,12 +1,25 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { conversationsApi } from "@/lib/api/conversations"
 import type { Message as ApiMessage } from "@/lib/api/types"
 
-const rawBase = process.env.NEXT_PUBLIC_WS_URL || "wss://api.varsitymart.org"
-// Ensure we use the WebSocket scheme
-const WS_BASE = rawBase.replace(/^https:\/\//, "wss://").replace(/^http:\/\//, "ws://")
+function getBrowserWsBase() {
+	if (typeof window === "undefined") return "wss://api.varsitymart.org"
+	const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
+	return `${protocol}//${window.location.host}`
+}
+
+function getWsBase() {
+	const rawBase = process.env.NEXT_PUBLIC_WS_URL?.trim()
+	if (!rawBase || rawBase.startsWith("/")) return getBrowserWsBase()
+	if (/^wss?:\/\//.test(rawBase)) return rawBase
+	if (/^https?:\/\//.test(rawBase)) {
+		return rawBase.replace(/^https:\/\//, "wss://").replace(/^http:\/\//, "ws://")
+	}
+	return `wss://${rawBase}`
+}
 
 export interface ChatMessage {
 	id: string
@@ -88,6 +101,12 @@ interface ReadReceiptEvent {
 	read_at: string
 }
 
+interface ErrorEvent {
+	type: "error"
+	code: string
+	message: string
+}
+
 type ServerEvent =
 	| ConversationMessagesEvent
 	| ChatMessageEvent
@@ -96,6 +115,10 @@ type ServerEvent =
 	| PresenceStateEvent
 	| DeliveryReceiptEvent
 	| ReadReceiptEvent
+	| ErrorEvent
+
+// Error codes that mean "stop retrying, no credentials will ever be valid here"
+const FATAL_ERROR_CODES = new Set(["AUTHENTICATION_FAILED", "PERMISSION_DENIED", "FORBIDDEN"])
 
 // ── Transform helpers ──────────────────────────────────────────────────────────
 
@@ -142,10 +165,10 @@ function fromApiMessage(msg: ApiMessage): ChatMessage {
 }
 
 function mergeMessages(existing: ChatMessage[], incoming: ChatMessage[]) {
-	const mergedById = new Map(existing.map((message) => [message.id, message]))
-	for (const message of incoming) {
-		const previous = mergedById.get(message.id)
-		mergedById.set(message.id, previous ? { ...previous, ...message } : message)
+	const mergedById = new Map(existing.map((m) => [m.id, m]))
+	for (const m of incoming) {
+		const previous = mergedById.get(m.id)
+		mergedById.set(m.id, previous ? { ...previous, ...m } : m)
 	}
 	return [...mergedById.values()].sort(
 		(a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
@@ -179,7 +202,26 @@ interface UseChatSocketReturn {
 const MAX_RECONNECT_ATTEMPTS = 5
 const BASE_DELAY_MS = 1000
 const MAX_DELAY_MS = 30000
-const HTTP_POLL_INTERVAL_MS = 5000
+
+// Adaptive poll interval — slower for idle conversations, faster for active ones.
+// Returns ms, or false to pause. Called by React Query after every fetch.
+function pollIntervalForMessages(messages: ChatMessage[] | undefined): number {
+	if (!messages || messages.length === 0) return 10_000
+	const latestMs = messages.reduce(
+		(max, m) => Math.max(max, new Date(m.timestamp).getTime()),
+		0
+	)
+	const ageSeconds = (Date.now() - latestMs) / 1000
+	if (ageSeconds < 30) return 3_000      // active — someone just sent something
+	if (ageSeconds < 120) return 8_000     // recent
+	if (ageSeconds < 600) return 20_000    // quiet
+	return 60_000                          // idle (>10 min)
+}
+
+// Single source of truth for this conversation's messages.
+// WS events and HTTP polls both write into the cache under this key.
+const chatMessagesKey = (conversationId: string) =>
+	["chat", conversationId, "messages"] as const
 
 export function useChatSocket({
 	conversationId,
@@ -190,13 +232,15 @@ export function useChatSocket({
 	onReadReceipt,
 	onDeliveryReceipt,
 }: UseChatSocketOptions): UseChatSocketReturn {
+	const queryClient = useQueryClient()
 	const wsRef = useRef<WebSocket | null>(null)
 	const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-	const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
 	const attemptRef = useRef(0)
 	const unmountedRef = useRef(false)
-	const messagesRef = useRef<ChatMessage[]>([])
+	// Set when the server sends a fatal error (e.g. AUTHENTICATION_FAILED).
+	// Prevents the reconnect loop from churning against credentials that won't work.
+	const fatalErrorRef = useRef(false)
 
 	// Keep callback refs stable so changing them doesn't reconnect
 	const onMessageRef = useRef(onMessage)
@@ -210,56 +254,61 @@ export function useChatSocket({
 	useEffect(() => { onReadReceiptRef.current = onReadReceipt }, [onReadReceipt])
 	useEffect(() => { onDeliveryReceiptRef.current = onDeliveryReceipt }, [onDeliveryReceipt])
 
-	const [messages, setMessages] = useState<ChatMessage[]>([])
 	const [isConnected, setIsConnected] = useState(false)
 	const [isConnecting, setIsConnecting] = useState(false)
 	const [usingHttpFallback, setUsingHttpFallback] = useState(false)
 	const [otherUserOnline, setOtherUserOnline] = useState(false)
 	const [otherUserTyping, setOtherUserTyping] = useState(false)
-	useEffect(() => {
-		messagesRef.current = messages
-	}, [messages])
 
-	// Expose a ref to sendRaw so emitters can access current socket without captures
+	// React Query owns the messages array. WS events feed it via setQueryData;
+	// HTTP polling kicks in only when usingHttpFallback flips on.
+	// structuralSharing (default) means refetches that produce equal data
+	// keep the same array reference — no re-render unless something actually changed.
+	const messagesQuery = useQuery({
+		queryKey: chatMessagesKey(conversationId),
+		queryFn: async () => {
+			const response = await conversationsApi.messages(conversationId, 1, 100)
+			return response.results.messages.map(fromApiMessage)
+		},
+		enabled: Boolean(conversationId && currentUserId) && usingHttpFallback,
+		// Function form: RQ calls this with the current query state after each fetch
+		// and reschedules accordingly. Idle convos drop to 1 poll/min.
+		refetchInterval: (query) =>
+			usingHttpFallback ? pollIntervalForMessages(query.state.data) : false,
+		refetchIntervalInBackground: false,
+		// Refetch immediately when the user comes back to the tab — feels instant
+		// even though polling is slow while they were away.
+		refetchOnWindowFocus: true,
+		staleTime: 0,
+	})
+
+	// In fallback mode, the connection state the UI cares about is "can I send?".
+	// That's a function of whether the HTTP path is working, not whether the WS is.
+	// Mirror the query's success/loading into the public isConnected/isConnecting.
+	useEffect(() => {
+		if (!usingHttpFallback) return
+		setIsConnected(messagesQuery.isSuccess)
+		setIsConnecting(messagesQuery.isPending)
+	}, [usingHttpFallback, messagesQuery.isSuccess, messagesQuery.isPending])
+
+	// In fallback mode, when a poll surfaces unread messages from the other user,
+	// mark them read via the same /api route. Fires only when data reference
+	// actually changes (structural sharing), so quiet polls don't trigger it.
+	useEffect(() => {
+		if (!usingHttpFallback || !messagesQuery.data) return
+		const hasUnreadFromOther = messagesQuery.data.some(
+			(m) => m.senderId !== currentUserId && !m.isRead
+		)
+		if (hasUnreadFromOther) {
+			conversationsApi.markRead(conversationId).catch(() => { /* swallow */ })
+		}
+	}, [messagesQuery.data, usingHttpFallback, currentUserId, conversationId])
+
 	const sendRaw = useCallback((payload: object) => {
 		if (wsRef.current?.readyState === WebSocket.OPEN) {
 			wsRef.current.send(JSON.stringify(payload))
 		}
 	}, [])
-
-	const syncMessagesFromHttp = useCallback(async () => {
-		try {
-			const response = await conversationsApi.messages(conversationId, 1, 100)
-			const incoming = response.results.messages.map(fromApiMessage)
-			const previous = messagesRef.current
-			const previousIds = new Set(previous.map((message) => message.id))
-			const merged = mergeMessages(previous, incoming)
-
-			if (!unmountedRef.current) {
-				setMessages(merged)
-				setIsConnected(true)
-				setIsConnecting(false)
-			}
-
-			for (const message of incoming) {
-				if (!previousIds.has(message.id) && message.senderId !== currentUserId) {
-					onMessageRef.current?.(message)
-				}
-			}
-
-			const unreadFromOtherUser = incoming
-				.filter((message) => message.senderId !== currentUserId && !message.isRead)
-				.map((message) => message.id)
-			if (unreadFromOtherUser.length > 0) {
-				await conversationsApi.markRead(conversationId)
-			}
-		} catch {
-			if (!unmountedRef.current) {
-				setIsConnected(false)
-				setIsConnecting(false)
-			}
-		}
-	}, [conversationId, currentUserId])
 
 	useEffect(() => {
 		unmountedRef.current = false
@@ -270,7 +319,7 @@ export function useChatSocket({
 			setIsConnecting(true)
 			setIsConnected(false)
 
-			const ws = new WebSocket(`${WS_BASE}/ws/chat/${conversationId}/`)
+			const ws = new WebSocket(`${getWsBase()}/ws/chat/${conversationId}/`)
 			wsRef.current = ws
 
 			ws.onopen = () => {
@@ -279,23 +328,25 @@ export function useChatSocket({
 				setUsingHttpFallback(false)
 				setIsConnected(true)
 				setIsConnecting(false)
-				// Ask the server for current presence of all users already in the room.
-				// This ensures we see the other user as online even if they connected first.
 				ws.send(JSON.stringify({ type: "get_presence" }))
 			}
 
 			ws.onclose = (event) => {
 				setIsConnected(false)
 				if (unmountedRef.current) return
+				if (fatalErrorRef.current) {
+					// Hand off to HTTP fallback — the useEffect watching query state
+					// will now own isConnected/isConnecting. Don't preset them here.
+					setUsingHttpFallback(true)
+					return
+				}
 				const exhaustedReconnects = attemptRef.current >= MAX_RECONNECT_ATTEMPTS
-				// 1000 = normal close (intentional close) — don't retry
 				if (event.code === 1000) {
 					setIsConnecting(false)
 					return
 				}
 				if (exhaustedReconnects) {
 					setUsingHttpFallback(true)
-					setIsConnecting(true)
 					return
 				}
 				const delay = Math.min(BASE_DELAY_MS * 2 ** attemptRef.current, MAX_DELAY_MS)
@@ -305,7 +356,6 @@ export function useChatSocket({
 			}
 
 			ws.onerror = () => {
-				// onerror is always followed by onclose, so reconnection is handled there
 				setIsConnecting(false)
 			}
 
@@ -317,16 +367,18 @@ export function useChatSocket({
 					return
 				}
 
+				const key = chatMessagesKey(conversationId)
+
 				switch (data.type) {
 					case "conversation_messages":
-						setMessages(data.messages.map(fromInitial))
+						queryClient.setQueryData<ChatMessage[]>(key, data.messages.map(fromInitial))
 						break
 
 					case "chat_message": {
 						const msg = fromIncoming(data)
-						setMessages((prev) => {
-							if (prev.some((m) => m.id === msg.id)) return prev
-							return [...prev, msg]
+						queryClient.setQueryData<ChatMessage[]>(key, (old = []) => {
+							if (old.some((m) => m.id === msg.id)) return old
+							return [...old, msg]
 						})
 						onMessageRef.current?.(msg)
 						if (data.sender_id !== currentUserId) {
@@ -346,7 +398,6 @@ export function useChatSocket({
 						break
 
 					case "presence_state":
-						// Response to our get_presence ping — set initial online state for all other users
 						for (const u of data.users) {
 							if (u.user_id !== currentUserId) {
 								setOtherUserOnline(u.is_online)
@@ -367,19 +418,27 @@ export function useChatSocket({
 						break
 
 					case "delivery_receipt":
-						setMessages((prev) =>
-							prev.map((m) => m.id === data.message_id ? { ...m, deliveredAt: data.delivered_at } : m)
+						queryClient.setQueryData<ChatMessage[]>(key, (old = []) =>
+							old.map((m) => m.id === data.message_id ? { ...m, deliveredAt: data.delivered_at } : m)
 						)
 						onDeliveryReceiptRef.current?.(data.message_id, data.delivered_at)
 						break
 
 					case "read_receipt":
-						setMessages((prev) =>
-							prev.map((m) =>
+						queryClient.setQueryData<ChatMessage[]>(key, (old = []) =>
+							old.map((m) =>
 								data.message_ids.includes(m.id) ? { ...m, isRead: true, readAt: data.read_at } : m
 							)
 						)
 						onReadReceiptRef.current?.(data.message_ids, data.read_at)
+						break
+
+					case "error":
+						if (FATAL_ERROR_CODES.has(data.code)) {
+							fatalErrorRef.current = true
+							if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
+							ws.close(1000, `fatal: ${data.code}`)
+						}
 						break
 				}
 			}
@@ -391,25 +450,12 @@ export function useChatSocket({
 			unmountedRef.current = true
 			if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
 			if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
-			if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
 			wsRef.current?.close(1000, "unmount")
 			wsRef.current = null
 			setIsConnected(false)
 			setIsConnecting(false)
 		}
-	}, [conversationId, currentUserId, sendRaw, usingHttpFallback])
-
-	useEffect(() => {
-		if (!conversationId || !currentUserId || !usingHttpFallback) return
-		void syncMessagesFromHttp()
-		pollIntervalRef.current = setInterval(() => {
-			void syncMessagesFromHttp()
-		}, HTTP_POLL_INTERVAL_MS)
-
-		return () => {
-			if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
-		}
-	}, [conversationId, currentUserId, syncMessagesFromHttp, usingHttpFallback])
+	}, [conversationId, currentUserId, sendRaw, usingHttpFallback, queryClient])
 
 	const sendMessage = useCallback((text: string) => {
 		const trimmedText = text.trim()
@@ -419,7 +465,10 @@ export function useChatSocket({
 				.send(conversationId, { text: trimmedText })
 				.then((response) => {
 					const nextMessage = fromApiMessage(response.data)
-					setMessages((previous) => mergeMessages(previous, [nextMessage]))
+					queryClient.setQueryData<ChatMessage[]>(
+						chatMessagesKey(conversationId),
+						(old = []) => mergeMessages(old, [nextMessage])
+					)
 					setIsConnected(true)
 					setIsConnecting(false)
 				})
@@ -429,7 +478,7 @@ export function useChatSocket({
 			return
 		}
 		sendRaw({ type: "chat_message", text: trimmedText })
-	}, [conversationId, sendRaw, usingHttpFallback])
+	}, [conversationId, sendRaw, usingHttpFallback, queryClient])
 
 	const sendTyping = useCallback((isTyping: boolean) => {
 		if (usingHttpFallback) return
@@ -449,14 +498,14 @@ export function useChatSocket({
 
 	const reconnect = useCallback(() => {
 		if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
-		if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
 		attemptRef.current = 0
+		fatalErrorRef.current = false
 		setUsingHttpFallback(false)
 		wsRef.current?.close(1000, "manual reconnect")
 	}, [])
 
 	return {
-		messages,
+		messages: messagesQuery.data ?? [],
 		isConnected,
 		isConnecting,
 		otherUserOnline,
