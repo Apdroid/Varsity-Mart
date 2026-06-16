@@ -496,18 +496,18 @@ const features = [
 
 function FeaturesStrip() {
 	return (
-		<div className="mt-6 grid grid-cols-2  overflow-hidden rounded-md bg-border md:grid-cols-4">
+		<div className="mt-6 grid grid-cols-2 overflow-hidden rounded-md bg-border md:grid-cols-4">
 			{features.map(({ icon: Icon, title, subtitle }) => (
 				<div
 					key={title}
-					className="flex items-center gap-3 bg-card px-5 py-5 transition-colors hover:bg-muted/40"
+					className="flex items-center gap-2.5 bg-card px-3.5 py-4 transition-colors hover:bg-muted/40 sm:gap-3 sm:px-5 sm:py-5"
 				>
-					<div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl  border-2 border-accent ">
-						<Icon className="h-5 w-5 text-vm-tangerine" />
+					<div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border-2 border-accent sm:h-10 sm:w-10">
+						<Icon className="h-4 w-4 text-vm-tangerine sm:h-5 sm:w-5" />
 					</div>
 					<div className="min-w-0">
-						<div className="text-sm font-semibold text-foreground">{title}</div>
-						<div className="truncate text-xs text-muted-foreground">{subtitle}</div>
+						<div className="text-[13px] font-semibold leading-tight text-foreground sm:text-sm">{title}</div>
+						<div className="truncate text-[11px] text-muted-foreground sm:text-xs">{subtitle}</div>
 					</div>
 				</div>
 			))}
@@ -545,17 +545,12 @@ export default function VarsityMartHeroBento() {
 			{/* Mobile: app-style carousel + featured card grid */}
 			<div className="px-4 pt-4 pb-2 lg:hidden">
 				<MobileHeroCarousel slides={slides} />
-				<div className="mt-3 grid gap-3">
+				<div className="mt-3 grid grid-cols-2 gap-3">
 					<div className="h-32">
-						<LiveRestaurantPromo restaurant={promoRestaurant} />
+						<LiveStorePromo store={promoStore} />
 					</div>
-					<div className="grid grid-cols-2 gap-3">
-						<div className="h-32">
-							<LiveStorePromo store={promoStore} />
-						</div>
-						<div className="h-32">
-							<LiveProductPromo product={promoProduct} />
-						</div>
+					<div className="h-32">
+						<LiveProductPromo product={promoProduct} />
 					</div>
 				</div>
 			</div>
