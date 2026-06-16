@@ -132,6 +132,7 @@ export function ProductCard({
 					{primary && (
 						<Image
 							fill
+							sizes="(max-width: 640px) 144px, 160px"
 							src={primary.optimized_url || primary.url || "https://placehold.co/600x600?text=VM"}
 							alt={product.title}
 							className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"

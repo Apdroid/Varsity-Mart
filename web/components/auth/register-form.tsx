@@ -375,7 +375,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 											name="universityId"
 											render={({ field }) => (
 												<FormItem data-invalid={!!errors.universityId}>
-													<FormLabel>University</FormLabel>
+													<FormLabel>Institution</FormLabel>
 													<Select
 														value={field.value}
 														onValueChange={(val) => {
@@ -385,7 +385,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 													>
 														<FormControl>
 															<SelectTrigger className="h-auto w-full rounded-full px-6 py-4">
-																<SelectValue placeholder={universitiesLoading ? "Loading…" : "Select university"} />
+																<SelectValue placeholder={universitiesLoading ? "Loading…" : "Select institution"} />
 															</SelectTrigger>
 														</FormControl>
 														<SelectContent>

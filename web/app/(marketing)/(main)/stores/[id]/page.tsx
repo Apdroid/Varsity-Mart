@@ -20,6 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/components/main/product-card"
+import { StoreReviewsSection } from "@/components/stores/store-reviews-section"
 import { cn } from "@/lib/utils"
 import { useStore, useStoreProducts } from "@/hooks/queries/use-stores"
 import type { StoreDetail, Product as ApiProduct } from "@/lib/api/types"
@@ -407,6 +408,8 @@ export default function StoreDetailPage() {
 					</h2>
 					<ProductsSection storeId={id} />
 				</div>
+
+				<StoreReviewsSection storeId={id} />
 			</div>
 		</main>
 	)

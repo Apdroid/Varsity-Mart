@@ -39,6 +39,8 @@ type FilterSidebarProps = {
   categoryOptions: CategoryOption[]
   conditionOptions: ConditionOption[]
   className?: string
+  /** Show the Type segmented control. Defaults to true. */
+  showType?: boolean
 }
 
 export function FilterSidebar({
@@ -49,12 +51,14 @@ export function FilterSidebar({
   categoryOptions,
   conditionOptions,
   className,
+  showType = true,
 }: FilterSidebarProps) {
   const { type } = filters
   const showCategories = type === "all" || type === "products"
-  const showPrice = type === "products"
+  const showPrice = type === "products" || type === "food"
   const showCondition = type === "products"
   const showAvailability = type === "stores" || type === "food"
+  const priceLabel = type === "food" ? "Budget" : "Price Range"
 
   return (
     <aside className={cn("rounded-lg bg-card p-4", className)}>
@@ -62,25 +66,27 @@ export function FilterSidebar({
         type="multiple"
         defaultValue={["type", "categories", "price", "condition", "rating", "availability"]}
       >
-        <AccordionItem value="type" className="border-b border-border/50">
-          <AccordionTrigger className="py-2.5 text-sm font-semibold hover:no-underline">
-            Type
-          </AccordionTrigger>
-          <AccordionContent className="pb-3">
-            <TypeSegmentedControl
-              value={type}
-              onChange={(newType) =>
-                onChange({
-                  type: newType,
-                  category: "all",
-                  conditions: [],
-                  openNow: false,
-                  freeDelivery: false,
-                })
-              }
-            />
-          </AccordionContent>
-        </AccordionItem>
+        {showType && (
+          <AccordionItem value="type" className="border-b border-border/50">
+            <AccordionTrigger className="py-2.5 text-sm font-semibold hover:no-underline">
+              Type
+            </AccordionTrigger>
+            <AccordionContent className="pb-3">
+              <TypeSegmentedControl
+                value={type}
+                onChange={(newType) =>
+                  onChange({
+                    type: newType,
+                    category: "all",
+                    conditions: [],
+                    openNow: false,
+                    freeDelivery: false,
+                  })
+                }
+              />
+            </AccordionContent>
+          </AccordionItem>
+        )}
 
         {showCategories && (
           <AccordionItem value="categories" className="border-b border-border/50">
@@ -100,7 +106,7 @@ export function FilterSidebar({
         {showPrice && (
           <AccordionItem value="price" className="border-b border-border/50">
             <AccordionTrigger className="py-2.5 text-sm font-semibold hover:no-underline">
-              Price Range
+              {priceLabel}
             </AccordionTrigger>
             <AccordionContent className="pb-3">
               <PriceRangeFilter

@@ -15,10 +15,11 @@ export function UnauthUserMenu() {
 			<DropdownMenuTrigger asChild>
 				<button
 					type="button"
-					className="h-10 w-10 items-center justify-center inline-flex hover:bg-muted rounded-full transition"
+					className="h-10 items-center justify-center gap-1.5 px-2 inline-flex hover:bg-muted rounded-full transition"
 					aria-label="Account menu"
 				>
 					<UserCircleIcon className="h-7 w-7" weight="regular" />
+					<span className="hidden text-sm font-medium sm:inline">Sign in</span>
 				</button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-72 p-0">

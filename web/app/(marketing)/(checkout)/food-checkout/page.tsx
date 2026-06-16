@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -121,6 +121,14 @@ export default function FoodCheckoutPage() {
   const [momoNumber, setMomoNumber] = useState("")
   const [momoProvider, setMomoProvider] = useState("mtn")
 
+  const addressRef = useRef<HTMLInputElement>(null)
+  const momoNumberRef = useRef<HTMLInputElement>(null)
+
+  const focusField = (ref: React.RefObject<HTMLInputElement | null>) => {
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+    ref.current?.focus({ preventScroll: true })
+  }
+
   const restaurantDeliveryFee = restaurant?.deliveryFee ? Number(restaurant.deliveryFee) : 5
   const deliveryFee = deliveryMethod === "campus_delivery" ? restaurantDeliveryFee : 0
   const serviceFee = Math.round(subtotal * 0.02 * 100) / 100
@@ -135,6 +143,15 @@ export default function FoodCheckoutPage() {
     }
   }, [lines.length, authLoading, isAuthenticated, router])
 
+  // Autofocus the first input once the form is ready
+  useEffect(() => {
+    if (!authLoading && isAuthenticated && lines.length > 0) {
+      addressRef.current?.focus({ preventScroll: true })
+    }
+    // run once the form becomes visible
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, isAuthenticated])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -142,6 +159,7 @@ export default function FoodCheckoutPage() {
 
     if (deliveryMethod === "campus_delivery" && !deliveryAddress.trim()) {
       toast.error("Please enter a delivery address")
+      focusField(addressRef)
       return
     }
     if (deliveryMethod === "campus_delivery" && belowMinOrder) {
@@ -150,6 +168,7 @@ export default function FoodCheckoutPage() {
     }
     if (paymentMethod === "momo" && !momoNumber.trim()) {
       toast.error("Please enter your mobile money number")
+      focusField(momoNumberRef)
       return
     }
 
@@ -369,6 +388,7 @@ export default function FoodCheckoutPage() {
                         Delivery Address
                       </Label>
                       <Input
+                        ref={addressRef}
                         id="address"
                         placeholder="e.g., Room 205, Unity Hall, KNUST"
                         value={deliveryAddress}
@@ -478,6 +498,7 @@ export default function FoodCheckoutPage() {
                           +233
                         </span>
                         <Input
+                          ref={momoNumberRef}
                           id="momoNumber"
                           type="tel"
                           placeholder="20 123 4567"

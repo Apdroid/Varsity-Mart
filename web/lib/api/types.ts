@@ -391,6 +391,8 @@ export interface CreateStoreRequest {
 	description: string
 	category: string
 	location: string
+	universityId?: string
+	campusId?: string
 	deliveryFee: number
 	minOrder: number
 	phone?: string

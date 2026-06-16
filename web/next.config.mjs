@@ -1,21 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-	async rewrites() {
-		const backendUrl = process.env.API_BASE_URL
-		if (!backendUrl) {
-			throw new Error("Backend URL Not Set");
-		}
-		return [
-			{
-				source: '/api/:path*/',
-				destination: `${backendUrl}/:path*/`,
-			},
-			{
-				source: '/api/:path*',
-				destination: `${backendUrl}/:path*/`,
-			},
-		];
-	},
 	images: {
 		remotePatterns: [
 			{

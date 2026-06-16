@@ -77,14 +77,14 @@ export function CampusPicker() {
 								type="button"
 								onClick={handleBack}
 								className="mr-1 grid h-7 w-7 shrink-0 place-items-center rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-								aria-label="Back to university selection"
+								aria-label="Back to institution selection"
 							>
 								<ArrowLeftIcon className="h-4 w-4" />
 							</button>
 						)}
 						<MapPinIcon className="h-5 w-5 shrink-0 text-vm-tangerine" />
 						<DialogTitle className="text-base">
-							{step === "university" ? "Select your university" : selectedUniversity!.name}
+							{step === "university" ? "Select your institution" : selectedUniversity!.name}
 						</DialogTitle>
 					</div>
 					<DialogDescription className="text-left text-xs mt-1">
@@ -96,7 +96,7 @@ export function CampusPicker() {
 					{/* Step pills */}
 					<div className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
 						<span className={cn("transition-colors", step === "university" ? "font-semibold text-vm-tangerine" : "")}>
-							University
+							Institution
 						</span>
 						<CaretRightIcon className="h-3 w-3" />
 						<span className={cn("transition-colors", step === "campus" ? "font-semibold text-vm-tangerine" : "")}>
@@ -112,7 +112,7 @@ export function CampusPicker() {
 							<MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 							<Input
 								autoFocus
-								placeholder="Search universities…"
+								placeholder="Search institutions…"
 								value={uniSearch}
 								onChange={(e) => setUniSearch(e.target.value)}
 								className="pl-9 text-sm"
@@ -130,7 +130,7 @@ export function CampusPicker() {
 							</div>
 						) : filteredUniversities.length === 0 ? (
 							<p className="py-12 text-center text-sm text-muted-foreground">
-								No universities match &ldquo;{uniSearch}&rdquo;
+								No institutions match &ldquo;{uniSearch}&rdquo;
 							</p>
 						) : (
 							<ul className="divide-y divide-foreground/6">

@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils"
 import { useFeaturedProducts } from "@/hooks/queries/use-products"
 import { useFeaturedStores } from "@/hooks/queries/use-stores"
 import { useRestaurants } from "@/hooks/queries/use-restaurants"
-import type { RestaurantListItem, StoreListItem } from "@/lib/api/types"
+import type { Product, RestaurantListItem, StoreListItem } from "@/lib/api/types"
 
 type Slide = {
 	eyebrow: string
@@ -75,8 +75,32 @@ const fallbackSlides: Slide[] = [
 	},
 ]
 
+const FALLBACK_RESTAURANT_IMAGE = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=500&fit=crop"
+const FALLBACK_STORE_IMAGE = "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=400&fit=crop"
+const FALLBACK_PRODUCT_IMAGE = "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop"
+
+function formatGHS(value: string | number) {
+	const n = typeof value === "string" ? parseFloat(value) : value
+	if (Number.isNaN(n)) return ""
+	return new Intl.NumberFormat("en-GH", {
+		style: "currency",
+		currency: "GHS",
+		maximumFractionDigits: 0,
+	}).format(n)
+}
+
+function productImage(product: Product | undefined) {
+	return (
+		product?.images?.[0]?.optimized_url ||
+		product?.images?.[0]?.url ||
+		FALLBACK_PRODUCT_IMAGE
+	)
+}
+
 /* -----------------------------------------------------------
-	 Hero slider — left 2/3 of bento
+	 Hero showcase — large immersive card, left 3/5 of bento.
+	 Full-bleed rotating imagery with overlaid badge + copy,
+	 styled in the warm VM palette (tangerine glow, not neon).
 ----------------------------------------------------------- */
 function HeroSlider({ slides }: { slides: Slide[] }) {
 	const [index, setIndex] = React.useState(0)
@@ -88,98 +112,86 @@ function HeroSlider({ slides }: { slides: Slide[] }) {
 			setIndex((i) => (i + 1) % slides.length)
 		}, 6000)
 		return () => clearInterval(id)
-	}, [paused])
+	}, [paused, slides.length])
 
 	const go = (dir: 1 | -1) =>
 		setIndex((i) => (i + dir + slides.length) % slides.length)
 
 	return (
 		<div
-			className="group relative overflow-hidden rounded-2xl"
+			className="group relative h-full min-h-[480px] overflow-hidden rounded-2xl bg-vm-graphite"
 			onMouseEnter={() => setPaused(true)}
 			onMouseLeave={() => setPaused(false)}
 		>
-			{/* Slides */}
-			<div className="relative h-105 md:h-115">
-				{slides.map((slide, i) => (
-					<div
-						key={slide.title}
-						className={cn(
-							"absolute inset-0 transition-opacity duration-700 ease-out",
-							slide.bgClass,
-							i === index ? "opacity-100" : "pointer-events-none opacity-0"
-						)}
-						aria-hidden={i !== index}
-					>
-						<div className="grid h-full grid-cols-1 md:grid-cols-2">
-							{/* Copy */}
-							<div className="flex flex-col justify-center px-8 py-10 md:px-12">
-								<span
-									className="mb-3 text-xs text-vm-graphite font-semibold uppercase tracking-[0.2em]"
-								>
-									{slide.eyebrow}
-								</span>
-								<h2
-									className="text-2xl font-black text-vm-graphite leading-[1.05] tracking-tight md:text-2xl lg:text-4xl "
-								>
-									{slide.title}
-									<br />
-									<span className="text-vm-tangerine text-3xl">
-										{slide.highlight}
-									</span>
-								</h2>
-								<p
-									className="mt-4 text-lg leading-tight font-semibold text-vm-graphite md:text-xl"
-								>
-									{slide.subtitle}
-								</p>
-								<p className="mt-2 max-w-xs text-sm text-black opacity-85">
-									{slide.description}
-								</p>
-								<Button
-									asChild
-									className="mt-6 h-11 w-fit rounded-full bg-vm-graphite px-6 text-sm font-semibold text-white shadow-sm hover:opacity-90"
-								>
-									<Link href={slide.ctaHref}>
-										{slide.cta}
-										<ArrowRight className="ml-2 h-4 w-4" />
-									</Link>
-								</Button>
-							</div>
+			{slides.map((slide, i) => (
+				<div
+					key={slide.title}
+					className={cn(
+						"absolute inset-0 transition-opacity duration-700 ease-out",
+						i === index ? "opacity-100" : "pointer-events-none opacity-0"
+					)}
+					aria-hidden={i !== index}
+				>
+					{/* Full-bleed image */}
+					<Image
+						src={slide.image}
+						fill
+						sizes="(min-width: 1024px) 55vw, 100vw"
+						alt=""
+						priority={i === 0}
+						className="object-cover object-center transition-transform duration-[6000ms] ease-out group-hover:scale-105"
+					/>
 
-							{/* Image */}
-							<div className="relative hidden md:block">
-								<Image
-									src={slide.image}
-									width={1200}
-									height={1200}
-									alt=""
-									className="absolute inset-0 h-full w-full object-cover object-center"
-								/>
-							</div>
-						</div>
+					{/* Warm gradient for legibility + soft tangerine glow accent */}
+					<div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/10" />
+					<div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-vm-tangerine/30 blur-3xl" />
+
+					{/* Copy overlay */}
+					<div className="absolute inset-x-0 bottom-0 p-8 md:p-10">
+						<span className="inline-block rounded-full bg-vm-tangerine px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-white shadow-sm">
+							{slide.eyebrow}
+						</span>
+						<h2 className="mt-4 text-4xl font-black leading-[1.02] tracking-tight text-white lg:text-5xl">
+							{slide.title}{" "}
+							<span className="text-vm-tangerine">{slide.highlight}</span>
+						</h2>
+						<p className="mt-3 text-lg font-semibold text-white/90 md:text-xl">
+							{slide.subtitle}
+						</p>
+						<p className="mt-1 max-w-md text-sm text-white/65">
+							{slide.description}
+						</p>
+						<Button
+							asChild
+							className="mt-6 h-11 w-fit rounded-full bg-white px-6 text-sm font-semibold text-vm-graphite shadow-sm hover:bg-white/90"
+						>
+							<Link href={slide.ctaHref}>
+								{slide.cta}
+								<ArrowRight className="ml-2 h-4 w-4" />
+							</Link>
+						</Button>
 					</div>
-				))}
-			</div>
+				</div>
+			))}
 
 			{/* Prev / Next */}
 			<button
 				onClick={() => go(-1)}
 				aria-label="Previous slide"
-				className="absolute left-1 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/80 text-black opacity-0 shadow-md backdrop-blur-sm transition hover:bg-white group-hover:opacity-100"
+				className="absolute left-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/15 text-white opacity-0 shadow-md backdrop-blur-sm transition hover:bg-white/30 group-hover:opacity-100"
 			>
 				<ChevronLeft className="h-5 w-5" />
 			</button>
 			<button
 				onClick={() => go(1)}
 				aria-label="Next slide"
-				className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/80 text-black opacity-0 shadow-md backdrop-blur-sm transition hover:bg-white group-hover:opacity-100"
+				className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/15 text-white opacity-0 shadow-md backdrop-blur-sm transition hover:bg-white/30 group-hover:opacity-100"
 			>
 				<ChevronRight className="h-5 w-5" />
 			</button>
 
 			{/* Dots */}
-			<div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-2">
+			<div className="absolute bottom-5 right-8 flex items-center gap-2 md:right-10">
 				{slides.map((_, i) => (
 					<button
 						key={i}
@@ -187,7 +199,7 @@ function HeroSlider({ slides }: { slides: Slide[] }) {
 						aria-label={`Go to slide ${i + 1}`}
 						className={cn(
 							"h-1.5 rounded-full transition-all duration-300",
-							i === index ? "w-7 bg-vm-graphite" : "w-1.5 bg-foreground/30 hover:bg-foreground/50"
+							i === index ? "w-7 bg-white" : "w-1.5 bg-white/40 hover:bg-white/70"
 						)}
 					/>
 				))}
@@ -218,23 +230,20 @@ function MobileHeroCarousel({ slides }: { slides: Slide[] }) {
 		<div className="space-y-3">
 			<Carousel setApi={setApi} opts={{ loop: true }} className="w-full">
 				<CarouselContent className="ml-0 gap-4" >
-					{slides.map((slide) => (
+					{slides.map((slide, i) => (
 						<CarouselItem key={slide.title} className="pl-0">
-							<div
-								className={cn(
-									"relative h-75 w-full overflow-hidden rounded-2xl",
-									slide.bgClass
-								)}
-							>
+							<div className="relative h-75 w-full overflow-hidden rounded-2xl bg-vm-graphite">
 								<Image
 									src={slide.image}
-									width={1200}
-									height={1200}
+									fill
+									sizes="100vw"
 									alt=""
-									className="absolute inset-0 h-full w-full object-cover object-center"
+									priority={i === 0}
+									className="object-cover object-center"
 								/>
 								{/* Bottom gradient */}
-								<div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/25 to-transparent" />
+								<div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/30 to-transparent" />
+								<div className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-vm-tangerine/30 blur-3xl" />
 
 								{/* Slide content */}
 								<div className="absolute inset-x-0 bottom-0 p-5">
@@ -243,7 +252,7 @@ function MobileHeroCarousel({ slides }: { slides: Slide[] }) {
 									</span>
 									<h2 className="mt-2 text-2xl font-black leading-tight text-white">
 										{slide.title}{" "}
-										<span className="text-white">{slide.highlight}</span>
+										<span className="text-vm-tangerine">{slide.highlight}</span>
 									</h2>
 									<p className="mt-1 line-clamp-1 text-xs text-white/70">
 										{slide.description}
@@ -282,12 +291,9 @@ function MobileHeroCarousel({ slides }: { slides: Slide[] }) {
 }
 
 /* -----------------------------------------------------------
-	 Live restaurant promo — right column, top slot
-	 Full-bleed banner: works regardless of image aspect ratio
+	 Live restaurant promo — right column, wide top slot.
+	 Full-bleed banner: works regardless of image aspect ratio.
 ----------------------------------------------------------- */
-const FALLBACK_RESTAURANT_IMAGE = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=500&fit=crop"
-const FALLBACK_STORE_IMAGE = "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=400&fit=crop"
-
 function LiveRestaurantPromo({ restaurant }: { restaurant: RestaurantListItem | undefined }) {
 	const href = restaurant ? `/restaurants/${restaurant.id}` : "/restaurants"
 	const bannerImage = restaurant?.banner || FALLBACK_RESTAURANT_IMAGE
@@ -295,7 +301,7 @@ function LiveRestaurantPromo({ restaurant }: { restaurant: RestaurantListItem | 
 	return (
 		<Link
 			href={href}
-			className="group/card relative flex h-full overflow-hidden rounded-2xl transition-transform duration-300 hover:-translate-y-0.5"
+			className="group/card relative flex h-full overflow-hidden rounded-2xl bg-vm-graphite transition-transform duration-300 hover:-translate-y-0.5"
 		>
 			<Image
 				src={bannerImage}
@@ -318,7 +324,7 @@ function LiveRestaurantPromo({ restaurant }: { restaurant: RestaurantListItem | 
 				<div className="mb-1.5 flex items-center gap-2">
 					{restaurant?.logo && (
 						<div className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full ring-1 ring-white/30">
-							<Image src={restaurant.logo} alt="" fill className="object-cover" />
+							<Image src={restaurant.logo} alt="" fill sizes="24px" className="object-cover" />
 						</div>
 					)}
 					<span className={cn(
@@ -357,10 +363,9 @@ function LiveRestaurantPromo({ restaurant }: { restaurant: RestaurantListItem | 
 }
 
 /* -----------------------------------------------------------
-	 Live store promo — right column, bottom slot
-	 StoreListItem has no banner — logo floats as a decorative
-	 background element behind a left-to-right gradient so text
-	 stays readable without a separate panel.
+	 Live store promo — right column, small bottom-left slot.
+	 StoreListItem has no banner — render a compact branded card
+	 in the warm VM palette with the logo as an avatar.
 ----------------------------------------------------------- */
 function LiveStorePromo({ store }: { store: StoreListItem | undefined }) {
 	const href = store ? `/stores/${store.id}` : "/stores"
@@ -369,59 +374,94 @@ function LiveStorePromo({ store }: { store: StoreListItem | undefined }) {
 	return (
 		<Link
 			href={href}
-			className="group/card relative flex h-full overflow-hidden rounded-2xl bg-[#f5e9dd] transition-transform duration-300 hover:-translate-y-0.5"
+			className="group/card relative flex h-full flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-[#f5e9dd] to-[#ecdcc9] p-3.5 transition-transform duration-300 hover:-translate-y-0.5"
 		>
-			{/* Logo as decorative background — object-contain so it's never cropped */}
-			<div className="absolute inset-y-0 right-0 flex w-1/2 items-center justify-end pr-6">
-				<div className="relative h-28 w-28 transition-transform duration-500 group-hover/card:scale-105">
-					<Image
-						src={logo}
-						alt=""
-						fill
-						sizes="112px"
-						className="object-contain drop-shadow-sm"
-					/>
+			{/* Soft tangerine glow accent */}
+			<div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-vm-tangerine/20 blur-2xl" />
+
+			<div className="relative flex items-start justify-between">
+				<span className="inline-block rounded-full bg-vm-graphite px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white">
+					Top Store
+				</span>
+				<div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 ring-white/70">
+					<Image src={logo} alt="" fill sizes="40px" className="object-cover" />
 				</div>
 			</div>
 
-			{/* Gradient masks the logo edge so text reads cleanly */}
-			<div className="absolute inset-0 bg-gradient-to-r from-[#f5e9dd] from-50% via-[#f5e9dd]/80 to-transparent" />
-
-			{/* Content layer */}
-			<div className="relative flex flex-col justify-center px-5 py-4">
-				<span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-vm-graphite/60">
-					Top Stores
-				</span>
-
+			<div className="relative">
 				{store ? (
 					<>
-						<div className="mt-1.5 flex items-center gap-1.5">
+						<div className="mb-0.5 flex items-center gap-1.5">
 							<span className={cn("h-1.5 w-1.5 rounded-full", store.isOpen ? "bg-green-500" : "bg-rose-400")} />
 							<span className="text-[10px] font-medium text-vm-graphite/60">
 								{store.isOpen ? "Open now" : "Closed"}
 							</span>
 						</div>
-						<h3 className="mt-0.5 line-clamp-1 text-lg font-bold leading-tight tracking-tight text-vm-graphite">
+						<h3 className="line-clamp-1 text-sm font-bold leading-tight tracking-tight text-vm-graphite">
 							{store.name}
 						</h3>
-						<p className="text-xs text-vm-graphite/55">{store.category}</p>
-						<div className="mt-1.5 flex items-center gap-2.5">
+						<div className="mt-1 flex items-center gap-2">
 							<div className="flex items-center gap-1">
 								<Star className="h-3 w-3 fill-vm-tangerine text-vm-tangerine" />
 								<span className="text-xs font-semibold text-vm-graphite">{store.rating}</span>
 							</div>
 							<div className="flex items-center gap-1">
 								<Package className="h-3 w-3 text-vm-graphite/50" />
-								<span className="text-xs text-vm-graphite/55">{store.totalProducts} items</span>
+								<span className="text-[11px] text-vm-graphite/55">{store.totalProducts}</span>
 							</div>
 						</div>
 					</>
 				) : (
-					<h3 className="mt-1.5 text-lg font-bold tracking-tight text-vm-graphite">Vendor Spotlight</h3>
+					<h3 className="text-sm font-bold tracking-tight text-vm-graphite">Vendor Spotlight</h3>
 				)}
 
-				<span className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-semibold text-vm-tangerine transition-all group-hover/card:gap-2">
-					Browse Store <ArrowRight className="h-3 w-3" />
+				<span className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-semibold text-vm-tangerine transition-all group-hover/card:gap-2">
+					Browse <ArrowRight className="h-3 w-3" />
+				</span>
+			</div>
+		</Link>
+	)
+}
+
+/* -----------------------------------------------------------
+	 Live product promo — right column, small bottom-right slot.
+	 Full-bleed product image with overlaid title + price.
+----------------------------------------------------------- */
+function LiveProductPromo({ product }: { product: Product | undefined }) {
+	const href = product ? `/products/${product.id}` : "/products"
+
+	return (
+		<Link
+			href={href}
+			className="group/card relative flex h-full overflow-hidden rounded-2xl bg-vm-graphite transition-transform duration-300 hover:-translate-y-0.5"
+		>
+			<Image
+				src={productImage(product)}
+				alt={product?.title ?? "Product"}
+				fill
+				sizes="20vw"
+				className="object-cover object-center transition-transform duration-500 group-hover/card:scale-105"
+			/>
+			<div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+
+			{/* Badge */}
+			<div className="absolute left-3 top-3">
+				<span className="inline-block rounded-full bg-vm-tangerine px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white shadow-sm">
+					Trending
+				</span>
+			</div>
+
+			<div className="absolute inset-x-0 bottom-0 p-3">
+				<h3 className="line-clamp-1 text-sm font-bold leading-tight text-white">
+					{product?.title ?? "Top Products"}
+				</h3>
+				{product && (
+					<p className="mt-0.5 text-xs font-bold text-vm-tangerine">
+						{formatGHS(product.price)}
+					</p>
+				)}
+				<span className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-semibold text-white/70 transition-all group-hover/card:gap-2 group-hover/card:text-white">
+					Shop now <ArrowRight className="h-3 w-3" />
 				</span>
 			</div>
 		</Link>
@@ -476,7 +516,7 @@ function FeaturesStrip() {
 }
 
 /* -----------------------------------------------------------
-	 Composed bento
+	 Composed bento — large showcase + featured card grid
 ----------------------------------------------------------- */
 export default function VarsityMartHeroBento() {
 	const { data: featuredProducts } = useFeaturedProducts()
@@ -496,25 +536,45 @@ export default function VarsityMartHeroBento() {
 		return img ? { ...slide, image: img } : slide
 	}), [featuredProducts, featuredStores, restaurantsData])
 
+	const promoRestaurant = restaurantsData?.restaurants?.[0]
+	const promoStore = featuredStores?.[0]
+	const promoProduct = featuredProducts?.[0]
+
 	return (
 		<section>
-			{/* Mobile: app-style carousel */}
+			{/* Mobile: app-style carousel + featured card grid */}
 			<div className="px-4 pt-4 pb-2 lg:hidden">
 				<MobileHeroCarousel slides={slides} />
+				<div className="mt-3 grid gap-3">
+					<div className="h-32">
+						<LiveRestaurantPromo restaurant={promoRestaurant} />
+					</div>
+					<div className="grid grid-cols-2 gap-3">
+						<div className="h-32">
+							<LiveStorePromo store={promoStore} />
+						</div>
+						<div className="h-32">
+							<LiveProductPromo product={promoProduct} />
+						</div>
+					</div>
+				</div>
 			</div>
 
-			{/* Desktop: bento grid — 3:2 ratio gives right cards enough room */}
+			{/* Desktop: bento grid — large showcase (3/5) + featured grid (2/5) */}
 			<div className="vm-section mx-auto hidden px-4 py-6 lg:block">
 				<div className="grid grid-cols-5 gap-4">
-					{/* Slider — spans 3 of 5 columns */}
+					{/* Showcase — spans 3 of 5 columns */}
 					<div className="col-span-3">
 						<HeroSlider slides={slides} />
 					</div>
 
-					{/* Right column — 2 live promo cards, spans 2 of 5 */}
-					<div className="col-span-2 grid grid-rows-2 gap-4">
-						<LiveRestaurantPromo restaurant={restaurantsData?.restaurants?.[0]} />
-						<LiveStorePromo store={featuredStores?.[0]} />
+					{/* Right column — wide promo on top, two small below */}
+					<div className="col-span-2 grid grid-rows-[1.15fr_1fr] gap-4">
+						<LiveRestaurantPromo restaurant={promoRestaurant} />
+						<div className="grid grid-cols-2 gap-4">
+							<LiveStorePromo store={promoStore} />
+							<LiveProductPromo product={promoProduct} />
+						</div>
 					</div>
 				</div>
 			</div>

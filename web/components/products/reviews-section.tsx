@@ -3,7 +3,6 @@
 import * as React from "react"
 import { MessageSquareOff, Star } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import {
 	Select,
@@ -15,13 +14,11 @@ import {
 import { RatingDistribution } from "./rating-distribution"
 import { ReviewCard } from "./review-card"
 import type { Review } from "@/components/products/product-detail-view"
-import type { ProductSeller } from "@/components/main/product-card"
 import { cn } from "@/lib/utils"
 import { ComponentProps } from "react"
 
 type Props = {
 	productId: string
-	seller: ProductSeller
 	allReviews: Review[]
 }
 
@@ -93,7 +90,7 @@ function TabPanel({ reviews }: TabPanelProps) {
 					</Select>
 				</div>
 			</div>
-			<div>
+			<div className="max-h-[480px] overflow-y-auto pr-1">
 				{sorted.map((review, i) => (
 					<React.Fragment key={review.id}>
 						<ReviewCard review={review} />
@@ -105,40 +102,20 @@ function TabPanel({ reviews }: TabPanelProps) {
 	)
 }
 
-export function ReviewsSection({ productId, seller, allReviews, className }: Props & ComponentProps<"div">) {
+export function ReviewsSection({ productId, allReviews, className }: Props & ComponentProps<"div">) {
 	const productReviews = allReviews.filter((r) => r.productId === productId)
-	const storeReviews = allReviews.filter((r) => r.storeId === seller.id)
 
 	return (
 		<section className={cn(className)}>
-			<h2 className="mb-6 text-xl font-bold font-heading">Reviews</h2>
-			<Tabs defaultValue="product">
-				<TabsList className="mb-6  h-10 rounded-full bg-muted py-5">
-					<TabsTrigger value="product" className="rounded-md border-border px-5 py-5 text-sm font-medium">
-						Product Reviews
-						{productReviews.length > 0 && (
-							<span className="ml-1.5 rounded-full bg-vm-tangerine px-1.5 py-0.5 text-[10px] font-bold text-white">
-								{productReviews.length}
-							</span>
-						)}
-					</TabsTrigger>
-					<TabsTrigger value="store" className="rounded-md px-5 py-5  text-sm font-medium">
-						Store Reviews
-						{storeReviews.length > 0 && (
-							<span className="ml-1.5 rounded-full bg-vm-tangerine px-1.5 py-0.5 text-[10px] font-bold text-white">
-								{storeReviews.length}
-							</span>
-						)}
-					</TabsTrigger>
-				</TabsList>
-
-				<TabsContent value="product">
-					<TabPanel reviews={productReviews} />
-				</TabsContent>
-				<TabsContent value="store">
-					<TabPanel reviews={storeReviews} />
-				</TabsContent>
-			</Tabs>
+			<h2 className="mb-6 text-xl font-bold font-heading">
+				Reviews
+				{productReviews.length > 0 && (
+					<span className="ml-2 text-base font-normal text-muted-foreground">
+						({productReviews.length})
+					</span>
+				)}
+			</h2>
+			<TabPanel reviews={productReviews} />
 		</section>
 	)
 }

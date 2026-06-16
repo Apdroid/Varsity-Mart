@@ -43,6 +43,8 @@ export const storesApi = {
     formData.append("description", data.description)
     formData.append("category", data.category)
     formData.append("location", data.location)
+    if (data.universityId) formData.append("universityId", data.universityId)
+    if (data.campusId) formData.append("campusId", data.campusId)
     formData.append("deliveryFee", String(data.deliveryFee))
     formData.append("minOrder", String(data.minOrder))
     if (data.phone) formData.append("phone", data.phone)

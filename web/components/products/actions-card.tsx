@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { Tag, Heart } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -116,6 +117,7 @@ export function ActionsCard({ productId, price, stock, title, quantity }: Props)
 
   const { mutate: addToCart, isPending } = useAddToCart()
   const { requireAuth } = useAuthGate()
+  const router = useRouter()
 
   const handleAddToCart = () => {
     requireAuth(() =>
@@ -125,7 +127,7 @@ export function ActionsCard({ productId, price, stock, title, quantity }: Props)
           onSuccess: () =>
             toast.success(quantity > 1 ? `${quantity} items added to cart` : "Added to cart", {
               description: title,
-              action: { label: "View Cart", onClick: () => {} },
+              action: { label: "View Cart", onClick: () => router.push("/cart") },
             }),
           onError: () => toast.error("Failed to add to cart"),
         }

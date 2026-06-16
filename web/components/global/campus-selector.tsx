@@ -19,7 +19,7 @@ export function CampusSelector() {
 	const [selectedUniversityId, setSelectedUniversityId] = useState(universityId || "")
 	const { data: campuses = [] } = useCampusesByUniversity(selectedUniversityId || "")
 	const selectedUniversity = universities.find(u => u.id === selectedUniversityId || u.id === universityId)
-	const displayUniversityName = selectedUniversity?.short_name || universityName || "Select University"
+	const displayUniversityName = selectedUniversity?.short_name || universityName || "Select Institution"
 
 	const normalizedQuery = query.trim().toLowerCase()
 	const filteredUniversities = normalizedQuery
@@ -84,8 +84,8 @@ export function CampusSelector() {
 								type="text"
 								value={query}
 								onChange={(event) => setQuery(event.target.value)}
-								placeholder={selectedUniversityId ? "Search campuses" : "Search universities"}
-								aria-label={selectedUniversityId ? "Search campuses" : "Search universities"}
+								placeholder={selectedUniversityId ? "Search campuses" : "Search institutions"}
+								aria-label={selectedUniversityId ? "Search campuses" : "Search institutions"}
 								className="w-full rounded-md bg-muted px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
 							/>
 						</div>
@@ -126,7 +126,7 @@ export function CampusSelector() {
 							) : (
 								<>
 									<div className="px-3 py-2 text-xs font-semibold text-muted-foreground border-b">
-										Universities
+										Institutions
 									</div>
 									{filteredUniversities.length > 0 ? (
 										filteredUniversities.map((u) => (
@@ -143,7 +143,7 @@ export function CampusSelector() {
 											</button>
 										))
 									) : (
-										<div className="px-3 py-3 text-sm text-muted-foreground">No universities found.</div>
+										<div className="px-3 py-3 text-sm text-muted-foreground">No institutions found.</div>
 									)}
 								</>
 							)}

@@ -13,7 +13,17 @@ type Props = {
 	views: number
 }
 
-function SafeImage({ src, alt, className }: { src: string; alt: string; className?: string }) {
+function SafeImage({
+	src,
+	alt,
+	className,
+	priority,
+}: {
+	src: string
+	alt: string
+	className?: string
+	priority?: boolean
+}) {
 	const [error, setError] = React.useState(false)
 
 	if (error) {
@@ -32,6 +42,7 @@ function SafeImage({ src, alt, className }: { src: string; alt: string; classNam
 			src={src}
 			alt={alt}
 			className={className}
+			priority={priority}
 			onError={() => setError(true)}
 		/>
 	)
@@ -72,6 +83,7 @@ export function ProductGallery({ images, title, views }: Props) {
 				<SafeImage
 					src={current.optimized_url || current.url}
 					alt={title}
+					priority
 					className="h-full w-full object-cover object-center transition-transform duration-300 hover:scale-105"
 				/>
 

@@ -40,8 +40,11 @@ import {
 	SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { TimePicker } from "@/components/ui/time-picker"
 import { useCreateStore } from "@/hooks/queries/use-stores"
 import { useStoreCategories } from "@/hooks/queries/use-categories"
+import { useUniversities, useCampusesByUniversity } from "@/hooks/queries/use-campus"
+import { useCampus } from "@/providers/campus-provider"
 import { useAuth } from "@/providers/auth-provider"
 import { cn } from "@/lib/utils"
 
@@ -51,6 +54,8 @@ const schema = z.object({
 	storeName: z.string().min(2, "Store name must be at least 2 characters"),
 	description: z.string().min(10, "Description must be at least 10 characters"),
 	category: z.string().min(1, "Please select a category"),
+	universityId: z.string().min(1, "Please select an institution"),
+	campusId: z.string().min(1, "Please select a campus"),
 	location: z.string().min(2, "Please enter a location"),
 	deliveryFee: z.coerce.number().min(0, "Delivery fee cannot be negative"),
 	minOrder: z.coerce.number().min(1, "Minimum order must be at least 1"),
@@ -63,7 +68,7 @@ type FormData = z.infer<typeof schema>
 
 // Fields that belong to each step (for per-step validation)
 const STEP_FIELDS: (keyof FormData)[][] = [
-	["storeName", "description", "category", "location"],
+	["storeName", "description", "category", "universityId", "campusId", "location"],
 	["deliveryFee", "minOrder"],
 	["openingTime", "closingTime", "phone"],
 	[], // images step — no schema fields, just file state
@@ -215,6 +220,10 @@ function StepBasicInfo({ form, categories, categoriesLoading }: {
 	categories: { id: string; name: string }[] | undefined
 	categoriesLoading: boolean
 }) {
+	const universityId = form.watch("universityId")
+	const { data: universities, isLoading: universitiesLoading } = useUniversities()
+	const { data: campuses, isLoading: campusesLoading } = useCampusesByUniversity(universityId)
+
 	return (
 		<div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
 			<div>
@@ -255,23 +264,55 @@ function StepBasicInfo({ form, categories, categoriesLoading }: {
 				)}
 			/>
 
+			<FormField
+				control={form.control}
+				name="category"
+				render={({ field }) => (
+					<FormItem>
+						<FormLabel>Category</FormLabel>
+						<Select value={field.value} onValueChange={field.onChange}>
+							<FormControl>
+								<SelectTrigger className="w-full">
+									<SelectValue placeholder={categoriesLoading ? "Loading…" : "Select"} />
+								</SelectTrigger>
+							</FormControl>
+							<SelectContent>
+								{(categories ?? []).map((cat) => (
+									<SelectItem key={cat.id} value={cat.id}>
+										{cat.name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						<FormMessage />
+					</FormItem>
+				)}
+			/>
+
 			<div className="grid grid-cols-2 gap-4">
 				<FormField
 					control={form.control}
-					name="category"
+					name="universityId"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Category</FormLabel>
-							<Select value={field.value} onValueChange={field.onChange}>
+							<FormLabel>Institution</FormLabel>
+							<Select
+								value={field.value}
+								onValueChange={(v) => {
+									field.onChange(v)
+									// Campus belongs to a university — clear it when the university changes
+									form.setValue("campusId", "", { shouldValidate: false })
+								}}
+							>
 								<FormControl>
-									<SelectTrigger>
-										<SelectValue placeholder={categoriesLoading ? "Loading…" : "Select"} />
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder={universitiesLoading ? "Loading…" : "Select"} />
 									</SelectTrigger>
 								</FormControl>
 								<SelectContent>
-									{(categories ?? []).map((cat) => (
-										<SelectItem key={cat.id} value={cat.id}>
-											{cat.name}
+									{(universities ?? []).map((uni) => (
+										<SelectItem key={uni.id} value={uni.id}>
+											{uni.name}
 										</SelectItem>
 									))}
 								</SelectContent>
@@ -283,23 +324,61 @@ function StepBasicInfo({ form, categories, categoriesLoading }: {
 
 				<FormField
 					control={form.control}
-					name="location"
+					name="campusId"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>
-								<span className="flex items-center gap-1">
-									<MapPin className="h-3.5 w-3.5" />
-									Location
-								</span>
-							</FormLabel>
-							<FormControl>
-								<Input placeholder="e.g. Main Campus" {...field} />
-							</FormControl>
+							<FormLabel>Campus</FormLabel>
+							<Select
+								value={field.value}
+								onValueChange={field.onChange}
+								disabled={!universityId || campusesLoading}
+							>
+								<FormControl>
+									<SelectTrigger className="w-full">
+										<SelectValue
+											placeholder={
+												!universityId
+													? "Select an institution first"
+													: campusesLoading
+														? "Loading…"
+														: "Select"
+											}
+										/>
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent>
+									{(campuses ?? []).map((campus) => (
+										<SelectItem key={campus.id} value={campus.id}>
+											{campus.name}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
 							<FormMessage />
 						</FormItem>
 					)}
 				/>
 			</div>
+
+			<FormField
+				control={form.control}
+				name="location"
+				render={({ field }) => (
+					<FormItem>
+						<FormLabel>
+							<span className="flex items-center gap-1">
+								<MapPin className="h-3.5 w-3.5" />
+								Location
+							</span>
+						</FormLabel>
+						<FormControl>
+							<Input placeholder="e.g. Unity Hall annex, near the main gate" {...field} />
+						</FormControl>
+						<FormDescription>A landmark or street so customers can find you</FormDescription>
+						<FormMessage />
+					</FormItem>
+				)}
+			/>
 		</div>
 	)
 }
@@ -407,7 +486,7 @@ function StepHours({ form }: { form: ReturnType<typeof useForm<FormData>> }) {
 								</span>
 							</FormLabel>
 							<FormControl>
-								<Input type="time" {...field} />
+								<TimePicker value={field.value} onChange={field.onChange} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -425,7 +504,7 @@ function StepHours({ form }: { form: ReturnType<typeof useForm<FormData>> }) {
 								</span>
 							</FormLabel>
 							<FormControl>
-								<Input type="time" {...field} />
+								<TimePicker value={field.value} onChange={field.onChange} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -509,6 +588,11 @@ function ReviewSummary({
 }) {
 	const categoryName = categories?.find((c) => c.id === values.category)?.name ?? values.category
 
+	const { data: universities } = useUniversities()
+	const { data: campuses } = useCampusesByUniversity(values.universityId)
+	const universityName = universities?.find((u) => u.id === values.universityId)?.name ?? "—"
+	const campusName = campuses?.find((c) => c.id === values.campusId)?.name ?? "—"
+
 	function fmt(time?: string) {
 		if (!time) return "—"
 		const [h, m] = time.split(":")
@@ -519,6 +603,8 @@ function ReviewSummary({
 	const rows = [
 		{ label: "Store name", value: values.storeName },
 		{ label: "Category", value: categoryName },
+		{ label: "Institution", value: universityName },
+		{ label: "Campus", value: campusName },
 		{ label: "Location", value: values.location },
 		{
 			label: "Delivery fee",
@@ -549,6 +635,7 @@ export default function CreateStorePage() {
 	const router = useRouter()
 	const { refreshUser, user, isLoading: authLoading, isAuthenticated } = useAuth()
 	const createStore = useCreateStore()
+	const { universityId: defaultUniversityId, campusId: defaultCampusId } = useCampus()
 
 	const { data: categories, isLoading: categoriesLoading } = useStoreCategories()
 
@@ -564,6 +651,8 @@ export default function CreateStorePage() {
 			storeName: "",
 			description: "",
 			category: "",
+			universityId: defaultUniversityId ?? "",
+			campusId: defaultCampusId ?? "",
 			location: "",
 			deliveryFee: 5,
 			minOrder: 10,

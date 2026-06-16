@@ -328,13 +328,13 @@ function StepBasicInfo({
 				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 					{/* University selector — local state only, not submitted */}
 					<div className="space-y-1.5">
-						<label className="text-sm font-medium">University</label>
+						<label className="text-sm font-medium">Institution</label>
 						<Select
 							value={selectedUniversityId}
 							onValueChange={onUniversityChange}
 						>
 							<SelectTrigger>
-								<SelectValue placeholder={universitiesLoading ? "Loading…" : "Select university"} />
+								<SelectValue placeholder={universitiesLoading ? "Loading…" : "Select institution"} />
 							</SelectTrigger>
 							<SelectContent>
 								{(universities ?? []).map((uni) => (
@@ -363,7 +363,7 @@ function StepBasicInfo({
 											<SelectValue
 												placeholder={
 													!selectedUniversityId
-														? "Select university first"
+														? "Select institution first"
 														: campusesLoading
 															? "Loading…"
 															: "Select campus"

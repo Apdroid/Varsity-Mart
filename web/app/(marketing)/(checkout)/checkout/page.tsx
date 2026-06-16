@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -84,7 +84,24 @@ export default function CheckoutPage() {
 	const [momoNumber, setMomoNumber] = useState("")
 	const [momoProvider, setMomoProvider] = useState<MomoProvider>("mtn")
 
+	const addressRef = useRef<HTMLInputElement>(null)
+	const momoNumberRef = useRef<HTMLInputElement>(null)
+
+	const focusField = (ref: React.RefObject<HTMLInputElement | null>) => {
+		ref.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+		ref.current?.focus({ preventScroll: true })
+	}
+
 	const items = cart?.items ?? []
+	const itemCount = items.length
+
+	// Autofocus the first input once the form is ready
+	useEffect(() => {
+		if (!authLoading && !cartLoading && isAuthenticated && itemCount > 0) {
+			addressRef.current?.focus({ preventScroll: true })
+		}
+	}, [authLoading, cartLoading, isAuthenticated, itemCount])
+
 	const subtotal = cart?.total ?? 0
 	const deliveryFee = deliveryMethod === "campus_delivery" ? 5 : 0
 	const serviceFee = Math.round(subtotal * 0.02 * 100) / 100
@@ -94,10 +111,10 @@ export default function CheckoutPage() {
 		e.preventDefault()
 		if (items.length === 0) { toast.error("Your cart is empty"); return }
 		if (deliveryMethod === "campus_delivery" && !deliveryAddress.trim()) {
-			toast.error("Please enter a delivery address"); return
+			toast.error("Please enter a delivery address"); focusField(addressRef); return
 		}
 		if (paymentMethod === "momo" && !momoNumber.trim()) {
-			toast.error("Please enter your mobile money number"); return
+			toast.error("Please enter your mobile money number"); focusField(momoNumberRef); return
 		}
 		try {
 			const result = await createOrderMutation.mutateAsync({
@@ -280,6 +297,7 @@ export default function CheckoutPage() {
 												Delivery Address
 											</Label>
 											<Input
+												ref={addressRef}
 												id="address"
 												placeholder="e.g., Room 205, Unity Hall, KNUST"
 												value={deliveryAddress}
@@ -391,6 +409,7 @@ export default function CheckoutPage() {
 													+233
 												</span>
 												<Input
+													ref={momoNumberRef}
 													id="momoNumber"
 													type="tel"
 													placeholder="20 123 4567"

@@ -128,7 +128,7 @@ export function CompleteProfileForm() {
 							name="universityId"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>University</FormLabel>
+									<FormLabel>Institution</FormLabel>
 									<Select
 										value={field.value}
 										onValueChange={(val) => {
@@ -139,7 +139,7 @@ export function CompleteProfileForm() {
 									>
 										<FormControl>
 											<SelectTrigger className="h-auto w-full rounded-full px-6 py-6">
-												<SelectValue placeholder={loadingUniversities ? "Loading..." : "Select university"} />
+												<SelectValue placeholder={loadingUniversities ? "Loading..." : "Select institution"} />
 											</SelectTrigger>
 										</FormControl>
 										<SelectContent>
@@ -167,7 +167,7 @@ export function CompleteProfileForm() {
 										<FormControl>
 											<SelectTrigger className="h-auto w-full rounded-full px-6 py-6">
 												<SelectValue placeholder={
-													!selectedUniversityId ? "Select a university first" :
+													!selectedUniversityId ? "Select an institution first" :
 													loadingCampuses ? "Loading..." :
 													"Select campus"
 												} />

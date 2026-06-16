@@ -1,4 +1,4 @@
-import { Open_Sans, Plus_Jakarta_Sans } from "next/font/google"
+import { Inter, Plus_Jakarta_Sans } from "next/font/google"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
 import "./globals.css"
@@ -16,11 +16,11 @@ import { ProfileGate } from "@/components/global/profile-gate";
 import { CampusPicker } from "@/components/global/campus-picker";
 
 
-const fontSans = Plus_Jakarta_Sans({
+const fontHeading = Plus_Jakarta_Sans({
 	subsets: ["latin"],
 	variable: "--font-jarkata",
 })
-const fontMono = Open_Sans({
+const fontBody = Inter({
 	subsets: ["latin"],
 	variable: "--font-inter",
 })
@@ -42,7 +42,7 @@ export default function RootLayout({
 		<html
 			lang="en"
 			suppressHydrationWarning
-			className={cn("antialiased ", fontSans.variable, fontMono.variable)}
+			className={cn("antialiased ", fontHeading.variable, fontBody.variable)}
 		>
 			<body>
 				<QueryProvider>
@@ -57,7 +57,7 @@ export default function RootLayout({
 											</ProfileGate>
 											<CampusPicker />
 											<DownloadAppCard />
-											<Toaster richColors theme="system" position="bottom-right" />
+											<Toaster richColors theme="light" position="bottom-right" />
 										</ThemeProvider>
 									</TooltipProvider>
 								</GoogleOAuthProvider>

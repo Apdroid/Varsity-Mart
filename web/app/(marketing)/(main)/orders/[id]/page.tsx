@@ -5,6 +5,17 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Check, Clock, Loader2, MapPin, Package, Phone, Truck } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useAuth } from "@/providers/auth-provider"
@@ -114,7 +125,6 @@ function OrderContent({ id }: { id: string }) {
   }
 
   const handleCancel = async () => {
-    if (!confirm("Are you sure you want to cancel this order?")) return
     try {
       await cancelOrderMutation.mutateAsync({ orderId: order.id })
       toast.success("Order cancelled")
@@ -142,14 +152,34 @@ function OrderContent({ id }: { id: string }) {
             <p className="text-muted-foreground">Placed on {formatDate(order.created_at || order.createdAt || "")}</p>
           </div>
           {canCancel && (
-            <Button
-              variant="outline"
-              className="text-destructive hover:bg-destructive/10"
-              onClick={handleCancel}
-              disabled={cancelOrderMutation.isPending}
-            >
-              Cancel Order
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="text-destructive hover:bg-destructive/10"
+                  disabled={cancelOrderMutation.isPending}
+                >
+                  Cancel Order
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Cancel this order?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will cancel order #{order.order_number || order.orderNumber}. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Keep order</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleCancel}
+                    className="bg-destructive text-white hover:bg-destructive/90"
+                  >
+                    Cancel order
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
         </div>
 

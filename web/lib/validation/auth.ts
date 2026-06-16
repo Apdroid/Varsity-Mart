@@ -20,7 +20,7 @@ export const registerSchema = z.object({
   email: emailSchema,
   phone: phoneSchema,
   password: passwordSchema,
-  universityId: z.string().min(1, "Select your university."),
+  universityId: z.string().min(1, "Select your institution."),
   campusId: z.string().min(1, "Select your campus."),
   agreeToTerms: z
     .boolean()

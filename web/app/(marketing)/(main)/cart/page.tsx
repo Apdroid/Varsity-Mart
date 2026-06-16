@@ -136,7 +136,7 @@ function CartItemRow({ item }: { item: NormalizedCartItem }) {
               type="button"
               onClick={decrement}
               disabled={isBusy}
-              className="flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground"
+              className="flex h-6 w-6 items-center justify-center rounded-full text-vm-tangerine transition-colors hover:bg-vm-tangerine/10 disabled:text-muted-foreground/40 disabled:hover:bg-transparent"
               aria-label="Decrease quantity"
             >
               <Minus className="h-3 w-3" />
@@ -148,7 +148,12 @@ function CartItemRow({ item }: { item: NormalizedCartItem }) {
               type="button"
               onClick={increment}
               disabled={isBusy || !item.inStock}
-              className="flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+              className={cn(
+                "flex h-6 w-6 items-center justify-center rounded-full transition-colors",
+                item.inStock
+                  ? "text-vm-tangerine hover:bg-vm-tangerine/10"
+                  : "text-muted-foreground/40 cursor-not-allowed"
+              )}
               aria-label="Increase quantity"
             >
               <Plus className="h-3 w-3" />

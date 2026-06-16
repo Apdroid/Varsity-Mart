@@ -19,6 +19,8 @@ import { useAuth } from "@/providers/auth-provider"
 import { useCart, useRemoveFromCart, useUpdateCartItem } from "@/hooks/queries/use-cart"
 import { toast } from "sonner"
 import { ShoppingCartIcon } from "@phosphor-icons/react"
+import { cn } from "@/lib/utils"
+import { qtyButtonClass } from "@/components/restaurants/quantity-stepper"
 
 function formatGHS(amount: number) {
 	return new Intl.NumberFormat("en-GH", {
@@ -65,14 +67,17 @@ export function CartSheet() {
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger asChild>
 				<button type="button"
-					className="relative h-10 w-10 inline-flex items-center justify-center"
+					className="h-10 inline-flex items-center justify-center gap-1.5 px-1"
 					aria-label="Cart">
-					<ShoppingCartIcon className="w-7 h-7" weight="regular" />
-					{!authLoading && itemCount > 0 && (
-						<Badge className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-2 border-background bg-vm-tangerine p-0 text-[10px] font-bold leading-none text-white">
-							{itemCount}
-						</Badge>
-					)}
+					<span className="relative inline-flex">
+						<ShoppingCartIcon className="w-7 h-7" weight="regular" />
+						{!authLoading && itemCount > 0 && (
+							<Badge className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-2 border-background bg-vm-tangerine p-0 text-[10px] font-bold leading-none text-white">
+								{itemCount}
+							</Badge>
+						)}
+					</span>
+					<span className="hidden text-sm font-medium sm:inline">Cart</span>
 				</button>
 			</SheetTrigger>
 
@@ -154,7 +159,7 @@ export function CartSheet() {
 											<div className="flex min-w-0 flex-1 flex-col justify-between">
 												<div className="flex items-start justify-between gap-2">
 													<div className="min-w-0">
-														<p className="truncate text-sm font-medium leading-snug">
+														<p className="truncate max-w-50 text-sm font-medium leading-snug">
 															{item.name}
 														</p>
 														<p className="text-xs text-muted-foreground">
@@ -164,7 +169,7 @@ export function CartSheet() {
 													<button
 														type="button"
 														onClick={() => removeItem(item.id)}
-														className="shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+														className="shrink-0 rounded-md p-1 text-destructive transition-colors hover:bg-destructive/10 hover:text-destructive"
 													>
 														<Trash2 className="h-3.5 w-3.5" />
 													</button>
@@ -180,7 +185,7 @@ export function CartSheet() {
 															type="button"
 															onClick={() => updateQty(item.id, item.quantity - 1)}
 															disabled={item.quantity <= 1 || updateCartItem.isPending}
-															className="grid h-8 w-8 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
+															className={cn(qtyButtonClass(item.quantity > 1), "h-8 w-8")}
 														>
 															<Minus className="h-4 w-4" />
 														</button>
@@ -190,8 +195,8 @@ export function CartSheet() {
 														<button
 															type="button"
 															onClick={() => updateQty(item.id, item.quantity + 1)}
-															disabled={updateCartItem.isPending}
-															className="grid h-8 w-8 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
+															disabled={!item.inStock || updateCartItem.isPending}
+															className={cn(qtyButtonClass(!!item.inStock), "h-8 w-8")}
 														>
 															<Plus className="h-4 w-4" />
 														</button>

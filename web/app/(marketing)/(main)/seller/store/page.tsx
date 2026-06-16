@@ -247,7 +247,7 @@ function NoStore() {
 			</div>
 			<h1 className="text-xl font-bold">You don&apos;t have a store yet</h1>
 			<p className="mt-2 text-sm text-muted-foreground">
-				Create your campus store and start selling products to students across your university.
+				Create your campus store and start selling products to students across your institution.
 			</p>
 			<Button
 				className="mt-6 bg-vm-tangerine text-white hover:bg-vm-tangerine/90 rounded-full px-8"

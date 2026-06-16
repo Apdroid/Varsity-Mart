@@ -84,10 +84,10 @@ function groupMessagesByDate(messages: ChatMessage[]) {
 // ── Message status icon ────────────────────────────────────────────────────────
 function MessageStatus({ message, inBubble }: { message: ChatMessage; inBubble?: boolean }) {
 	if (message.isRead)
-		return <CheckCheck className={cn("h-3.5 w-3.5", inBubble ? "text-vm-tangerine-foreground" : "text-vm-tangerine")} />
+		return <CheckCheck className={cn("h-3 w-3", inBubble ? "text-vm-tangerine-foreground" : "text-vm-tangerine")} />
 	if (message.deliveredAt)
-		return <CheckCheck className={cn("h-3.5 w-3.5", inBubble ? "text-vm-tangerine-foreground/70" : "text-muted-foreground/60")} />
-	return <Check className={cn("h-3.5 w-3.5", inBubble ? "text-vm-tangerine-foreground/50" : "text-muted-foreground/40")} />
+		return <CheckCheck className={cn("h-3 w-3", inBubble ? "text-vm-tangerine-foreground/70" : "text-muted-foreground/60")} />
+	return <Check className={cn("h-3 w-3", inBubble ? "text-vm-tangerine-foreground/50" : "text-muted-foreground/40")} />
 }
 
 // ── Single message bubble ──────────────────────────────────────────────────────
@@ -124,39 +124,42 @@ function MessageBubble({
 				</div>
 			)}
 
-			<div className={cn("flex max-w-[72%]", isOwn && "justify-end")}>
-				{/* Bubble — hover tooltip shows full date+time */}
+			<div className={cn("flex min-w-0 max-w-[75%]", isOwn && "justify-end")}>
+				{/* Bubble — slim, content-width, with the timestamp inlined after the text.
+				    Short messages stay compact; long ones wrap and the meta trails the last line. */}
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<div
 							className={cn(
-								"cursor-default select-text rounded-2xl px-3.5 pt-2.5 pb-2",
+								"w-fit max-w-full cursor-default select-text rounded-[1.1rem] px-2.5 py-1 shadow-sm",
 								isOwn
 									? cn(
-											"bg-vm-tangerine text-vm-tangerine-foreground",
-											!isFirstInGroup && "rounded-tr-sm",
-											!isLastInGroup && "rounded-br-sm"
+											"bg-gradient-to-br from-vm-tangerine to-vm-tangerine/85 text-vm-tangerine-foreground",
+											!isFirstInGroup && "rounded-tr-md",
+											!isLastInGroup && "rounded-br-md"
 										)
 									: cn(
 											"bg-muted text-foreground",
-											!isFirstInGroup && "rounded-tl-sm",
-											!isLastInGroup && "rounded-bl-sm"
+											!isFirstInGroup && "rounded-tl-md",
+											!isLastInGroup && "rounded-bl-md"
 										)
 							)}
 						>
-							<p className="text-sm leading-relaxed whitespace-pre-wrap break-words">{message.text}</p>
+							<span className="text-[13px] leading-[1.3] whitespace-pre-wrap break-words">
+								{message.text}
+							</span>
 
-							{/* Time + status — shown on every message so the sender always knows status */}
-							<div className={cn(
-								"mt-1 flex items-center justify-end gap-1",
-								isOwn ? "text-vm-tangerine-foreground/70" : "text-muted-foreground"
-							)}>
-								{message.flagged && (
-									<span className="text-[10px] text-destructive">Flagged</span>
+							{/* Time + status — inline so the bubble hugs the text */}
+							<span
+								className={cn(
+									"ml-1 inline-flex translate-y-[2px] select-none items-center gap-0.5 align-baseline text-[9px] tabular-nums",
+									isOwn ? "text-vm-tangerine-foreground/75" : "text-muted-foreground/70"
 								)}
-								<span className="text-[10px]">{formatTime(message.timestamp)}</span>
+							>
+								{message.flagged && <Flag className="h-2.5 w-2.5 text-destructive" />}
+								{formatTime(message.timestamp)}
 								{isOwn && <MessageStatus message={message} inBubble />}
-							</div>
+							</span>
 						</div>
 					</TooltipTrigger>
 					<TooltipContent side={isOwn ? "left" : "right"} className="text-xs">
@@ -192,7 +195,7 @@ function MessageBubble({
 function TypingIndicator({ name }: { name: string }) {
 	return (
 		<div className="flex items-end gap-2 pl-9">
-			<div className="flex items-center gap-1 rounded-2xl rounded-bl-sm bg-muted px-3.5 py-2.5">
+			<div className="flex items-center gap-1 rounded-2xl rounded-bl-md bg-muted px-3 py-2 shadow-sm">
 				<span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:-0.3s]" />
 				<span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:-0.15s]" />
 				<span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60" />
@@ -444,7 +447,10 @@ function ConversationContent({ conversationId }: { conversationId: string }) {
 
 				{/* ── Messages — relative wrapper keeps jump button fixed in viewport ── */}
 				<div className="relative min-h-0 flex-1">
-					<div ref={scrollRef} className="absolute inset-0 overflow-y-auto px-4 py-4">
+					<div
+						ref={scrollRef}
+						className="absolute inset-0 overflow-y-auto bg-gradient-to-b from-vm-tangerine/5 via-background to-background px-4 py-4"
+					>
 						{messages.length === 0 && !isConnecting ? (
 							<div className="flex h-full flex-col items-center justify-center gap-2 text-center">
 								<Avatar className="size-14">
@@ -478,12 +484,12 @@ function ConversationContent({ conversationId }: { conversationId: string }) {
 								)}
 							</div>
 						) : (
-							<div className="space-y-5">
+							<div className="space-y-4">
 								{Array.from(messageGroups.entries()).map(([dateKey, msgs]) => (
 									<div key={dateKey}>
 										{/* Date divider */}
 										<div className="mb-3 flex justify-center">
-											<span className="rounded-full bg-muted px-3 py-0.5 text-[11px] text-muted-foreground">
+											<span className="rounded-full border border-border/60 bg-background/70 px-3 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground backdrop-blur-sm">
 												{formatDate(msgs[0].timestamp)}
 											</span>
 										</div>
@@ -501,7 +507,7 @@ function ConversationContent({ conversationId }: { conversationId: string }) {
 												return (
 													<div
 														key={msg.id}
-														className={isFirstInGroup ? "mt-3 first:mt-0" : "mt-0.5"}
+														className={isFirstInGroup ? "mt-2 first:mt-0" : "mt-px"}
 													>
 														<MessageBubble
 															message={msg}

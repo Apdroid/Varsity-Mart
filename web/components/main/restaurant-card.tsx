@@ -104,6 +104,7 @@ export function RestaurantCard({ restaurant, className }: RestaurantCardProps) {
 					src={restaurant.banner || "https://placehold.co/800x400?text=VM"}
 					fill
 					alt=""
+					sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
 					className={cn(
 						"object-cover transition-all duration-700 ease-out group-hover:scale-105",
 						!restaurant.isOpen && "grayscale"

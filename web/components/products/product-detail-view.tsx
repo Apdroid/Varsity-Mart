@@ -349,7 +349,6 @@ export function ProductDetailView({ product, related, sellerProducts, reviews }:
 					<ReviewsSection
 						className="col-span-3"
 						productId={product.id}
-						seller={product.seller}
 						allReviews={reviews}
 					/>
 

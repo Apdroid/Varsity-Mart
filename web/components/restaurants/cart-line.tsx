@@ -5,6 +5,7 @@ import { Minus, Plus, Trash2 } from "lucide-react"
 import { useCartStore } from "@/store/cart-store"
 import type { CartLine as CartLineType } from "@/store/cart-store"
 import { cn } from "@/lib/utils"
+import { qtyButtonClass } from "@/components/restaurants/quantity-stepper"
 
 type Props = {
   line: CartLineType
@@ -77,10 +78,8 @@ export function CartLine({ line }: Props) {
             <button
               type="button"
               onClick={() => updateQty(line.lineId, -1)}
-              className={cn(
-                "grid h-6 w-6 place-items-center rounded-full border border-border transition-colors",
-                "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
+              disabled={line.quantity <= 1}
+              className={cn(qtyButtonClass(line.quantity > 1), "h-6 w-6")}
             >
               <Minus className="h-3 w-3" />
             </button>
@@ -88,10 +87,7 @@ export function CartLine({ line }: Props) {
             <button
               type="button"
               onClick={() => updateQty(line.lineId, 1)}
-              className={cn(
-                "grid h-6 w-6 place-items-center rounded-full border border-border transition-colors",
-                "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
+              className={cn(qtyButtonClass(true), "h-6 w-6")}
             >
               <Plus className="h-3 w-3" />
             </button>
