@@ -19,6 +19,15 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import PasswordInput from "@/components/ui/password-input"
+import { PhoneInput } from "@/components/ui/phone-input"
+import {
+	Combobox,
+	ComboboxContent,
+	ComboboxEmpty,
+	ComboboxInput,
+	ComboboxItem,
+	ComboboxList,
+} from "@/components/ui/combobox"
 import {
 	Select,
 	SelectContent,
@@ -109,7 +118,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 		if (result.success) {
 			toast.success("Account created! Please check your email to verify your account.")
 			router.push("/verify-email")
-			return
+			return;
 		}
 		
 		// Check if it's an email already exists error
@@ -356,13 +365,16 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 												<FormItem data-invalid={!!errors.phone}>
 													<FormLabel>Phone number</FormLabel>
 													<FormControl>
-														<Input
-															type="tel"
-															placeholder="+233201234567"
+														<PhoneInput
+															defaultCountry="GH"
+															placeholder="20 123 4567"
 															autoFocus
-															autoComplete="tel"
-															className="p-6 rounded-full"
-															{...field}
+															className="h-auto rounded-full px-6 py-3"
+															value={field.value}
+															onChange={field.onChange}
+															onBlur={field.onBlur}
+															name={field.name}
+															ref={field.ref}
 														/>
 													</FormControl>
 													<FormDescription>Include country code for delivery contact.</FormDescription>
@@ -376,24 +388,37 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 											render={({ field }) => (
 												<FormItem data-invalid={!!errors.universityId}>
 													<FormLabel>Institution</FormLabel>
-													<Select
-														value={field.value}
+													<Combobox
+														items={universities.map((u) => u.id)}
+														value={field.value || null}
 														onValueChange={(val) => {
-															field.onChange(val)
+															field.onChange(val ?? "")
 															form.setValue("campusId", "")
 														}}
+														itemToStringLabel={(id) =>
+															universities.find((u) => u.id === id)?.name ?? ""
+														}
 													>
 														<FormControl>
-															<SelectTrigger className="h-auto w-full rounded-full px-6 py-4">
-																<SelectValue placeholder={universitiesLoading ? "Loading…" : "Select institution"} />
-															</SelectTrigger>
+															<ComboboxInput
+																placeholder={universitiesLoading ? "Loading…" : "Search institution"}
+																disabled={universitiesLoading}
+																showClear={!!field.value}
+																className="h-auto w-full rounded-full px-3 py-2.5"
+																onBlur={field.onBlur}
+															/>
 														</FormControl>
-														<SelectContent>
-															{universities.map((u) => (
-																<SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
+														<ComboboxContent>
+															<ComboboxEmpty>No institution found.</ComboboxEmpty>
+															<ComboboxList>
+																{(id: string) => (
+																	<ComboboxItem key={id} value={id}>
+																		{universities.find((u) => u.id === id)?.name}
+																	</ComboboxItem>
+																)}
+															</ComboboxList>
+														</ComboboxContent>
+													</Combobox>
 													<FormMessage />
 												</FormItem>
 											)}
