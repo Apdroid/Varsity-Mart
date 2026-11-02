@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils";
-import { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DownloadAppCard } from "@/components/global/download-app-card";
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/providers/query-provider";
@@ -29,7 +29,20 @@ export const metadata: Metadata = {
 	title: {
 		default: "VarsityMart | University Marketplace",
 		template: "%s | Varsity Mart"
-	}
+	},
+	applicationName: "VarsityMart",
+	appleWebApp: {
+		capable: true,
+		title: "VarsityMart",
+		statusBarStyle: "default",
+	},
+	icons: {
+		apple: "/icons/apple-touch-icon.png",
+	},
+}
+
+export const viewport: Viewport = {
+	themeColor: "#F27640",
 }
 
 
