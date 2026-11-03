@@ -254,8 +254,8 @@ export function useChatSocket({
 	useEffect(() => { onReadReceiptRef.current = onReadReceipt }, [onReadReceipt])
 	useEffect(() => { onDeliveryReceiptRef.current = onDeliveryReceipt }, [onDeliveryReceipt])
 
-	const [isConnected, setIsConnected] = useState(false)
-	const [isConnecting, setIsConnecting] = useState(false)
+	const [wsConnected, setWsConnected] = useState(false)
+	const [wsConnecting, setWsConnecting] = useState(false)
 	const [usingHttpFallback, setUsingHttpFallback] = useState(false)
 	const [otherUserOnline, setOtherUserOnline] = useState(false)
 	const [otherUserTyping, setOtherUserTyping] = useState(false)
@@ -283,13 +283,10 @@ export function useChatSocket({
 	})
 
 	// In fallback mode, the connection state the UI cares about is "can I send?".
-	// That's a function of whether the HTTP path is working, not whether the WS is.
-	// Mirror the query's success/loading into the public isConnected/isConnecting.
-	useEffect(() => {
-		if (!usingHttpFallback) return
-		setIsConnected(messagesQuery.isSuccess)
-		setIsConnecting(messagesQuery.isPending)
-	}, [usingHttpFallback, messagesQuery.isSuccess, messagesQuery.isPending])
+	// That's a function of whether the HTTP path is working, not whether the WS is,
+	// so derive the public flags from the query instead of mirroring them into state.
+	const isConnected = usingHttpFallback ? messagesQuery.isSuccess : wsConnected
+	const isConnecting = usingHttpFallback ? messagesQuery.isPending : wsConnecting
 
 	// In fallback mode, when a poll surfaces unread messages from the other user,
 	// mark them read via the same /api route. Fires only when data reference
@@ -316,8 +313,8 @@ export function useChatSocket({
 
 		function connect() {
 			if (unmountedRef.current) return
-			setIsConnecting(true)
-			setIsConnected(false)
+			setWsConnecting(true)
+			setWsConnected(false)
 
 			const ws = new WebSocket(`${getWsBase()}/ws/chat/${conversationId}/`)
 			wsRef.current = ws
@@ -326,13 +323,13 @@ export function useChatSocket({
 				if (unmountedRef.current) { ws.close(); return }
 				attemptRef.current = 0
 				setUsingHttpFallback(false)
-				setIsConnected(true)
-				setIsConnecting(false)
+				setWsConnected(true)
+				setWsConnecting(false)
 				ws.send(JSON.stringify({ type: "get_presence" }))
 			}
 
 			ws.onclose = (event) => {
-				setIsConnected(false)
+				setWsConnected(false)
 				if (unmountedRef.current) return
 				if (fatalErrorRef.current) {
 					// Hand off to HTTP fallback — the useEffect watching query state
@@ -342,7 +339,7 @@ export function useChatSocket({
 				}
 				const exhaustedReconnects = attemptRef.current >= MAX_RECONNECT_ATTEMPTS
 				if (event.code === 1000) {
-					setIsConnecting(false)
+					setWsConnecting(false)
 					return
 				}
 				if (exhaustedReconnects) {
@@ -351,12 +348,12 @@ export function useChatSocket({
 				}
 				const delay = Math.min(BASE_DELAY_MS * 2 ** attemptRef.current, MAX_DELAY_MS)
 				attemptRef.current += 1
-				setIsConnecting(true)
+				setWsConnecting(true)
 				reconnectTimeoutRef.current = setTimeout(connect, delay)
 			}
 
 			ws.onerror = () => {
-				setIsConnecting(false)
+				setWsConnecting(false)
 			}
 
 			ws.onmessage = (event) => {
@@ -452,8 +449,8 @@ export function useChatSocket({
 			if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
 			wsRef.current?.close(1000, "unmount")
 			wsRef.current = null
-			setIsConnected(false)
-			setIsConnecting(false)
+			setWsConnected(false)
+			setWsConnecting(false)
 		}
 	}, [conversationId, currentUserId, sendRaw, usingHttpFallback, queryClient])
 
@@ -469,11 +466,11 @@ export function useChatSocket({
 						chatMessagesKey(conversationId),
 						(old = []) => mergeMessages(old, [nextMessage])
 					)
-					setIsConnected(true)
-					setIsConnecting(false)
+					setWsConnected(true)
+					setWsConnecting(false)
 				})
 				.catch(() => {
-					setIsConnected(false)
+					setWsConnected(false)
 				})
 			return
 		}
@@ -489,7 +486,7 @@ export function useChatSocket({
 		if (messageIds.length === 0) return
 		if (usingHttpFallback) {
 			void conversationsApi.markRead(conversationId).catch(() => {
-				setIsConnected(false)
+				setWsConnected(false)
 			})
 			return
 		}

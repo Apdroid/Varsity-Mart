@@ -26,13 +26,8 @@ import {
 	StorefrontIcon,
 	BellIcon,
 } from "@phosphor-icons/react"
-import { Clock, Loader2, MessageCircleIcon, Monitor, Moon, Sun } from "lucide-react"
+import { Clock, Loader2, MessageCircleIcon, Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"

@@ -8,7 +8,7 @@ const AUTH_ONLY_PATHS = [
 	"/login",
 	"/register",
 	"/forgot",
-	"/reset",
+	"/reset-password",
 	"/verify-email",
 ]
 
@@ -16,7 +16,7 @@ const PROFILE_BYPASS_PATHS = [
 	"/login",
 	"/register",
 	"/forgot",
-	"/reset",
+	"/reset-password",
 	"/verify-email",
 	"/complete-profile",
 ]

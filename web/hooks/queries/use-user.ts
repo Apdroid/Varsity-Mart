@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { usersApi, notificationsApi, type UpdateProfileRequest } from "@/lib/api/users"
+import { usersApi, notificationsApi } from "@/lib/api/users"
 
 export const userKeys = {
   all: ["users"] as const,

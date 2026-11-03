@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Camera, ChevronLeft, ChevronRight, X, Eye } from "lucide-react"
-import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog"
+import { Camera, ChevronLeft, ChevronRight, Eye } from "lucide-react"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 import type { ProductImage } from "@/components/main/product-card"
 import Image from "next/image"

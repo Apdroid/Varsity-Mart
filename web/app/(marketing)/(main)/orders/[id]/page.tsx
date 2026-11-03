@@ -3,7 +3,7 @@
 import { use } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Check, Clock, Loader2, MapPin, Package, Phone, Truck } from "lucide-react"
+import { ArrowLeft, Check, Clock, Loader2, MapPin, Package, Truck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   AlertDialog,

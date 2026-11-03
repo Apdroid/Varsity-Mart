@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Loader2, MessageSquareOff, Star } from "lucide-react"
+import { Loader2, MessageSquareOff } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import {
 	Select,

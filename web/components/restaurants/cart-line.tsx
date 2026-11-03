@@ -59,7 +59,7 @@ export function CartLine({ line }: Props) {
             <CustomizationSummary line={line} />
             {line.notes && (
               <p className="mt-0.5 text-xs italic text-muted-foreground line-clamp-1">
-                "{line.notes}"
+                &ldquo;{line.notes}&rdquo;
               </p>
             )}
           </div>

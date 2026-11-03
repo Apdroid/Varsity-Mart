@@ -103,10 +103,10 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 	const universityId = form.watch("universityId")
 
 	// Editing a field means the user is responding to the error: clear it.
-	useEffect(() => {
-		const subscription = form.watch(() => setFormError(null))
-		return () => subscription.unsubscribe()
-	}, [form])
+	useEffect(
+		() => form.subscribe({ formState: { values: true }, callback: () => setFormError(null) }),
+		[form]
+	)
 	const { score, label, color } = getPasswordStrength(password)
 
 	const { data: campuses = [], isLoading: campusesLoading } = useCampusesByUniversity(universityId)

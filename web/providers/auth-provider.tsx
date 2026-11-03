@@ -74,7 +74,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		}
 	}, [])
 
+	// Session bootstrap on mount: syncs React state with the server-side session.
 	useEffect(() => {
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		checkAuth()
 	}, [checkAuth])
 

@@ -9,10 +9,10 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
-import { MapPinIcon, CaretDownIcon, ArrowRightIcon, ArrowLeftIcon } from "@phosphor-icons/react"
+import { MapPinIcon, CaretDownIcon, ArrowLeftIcon } from "@phosphor-icons/react"
 
 export function CampusSelector() {
-	const { universityId, campusId, universityName, campusName, saveGuestSelection, isFromProfile } = useCampus()
+	const { universityId, campusId, universityName, saveGuestSelection, isFromProfile } = useCampus()
 	const { data: universities = [] } = useUniversities()
 	const [isOpen, setIsOpen] = useState(false)
 	const [query, setQuery] = useState("")

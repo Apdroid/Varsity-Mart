@@ -688,14 +688,6 @@ export default function CreateRestaurantPage() {
 		}
 	}, [authLoading, isAuthenticated, user, router])
 
-	if (authLoading || !isAuthenticated || user?.kycStatus !== "approved") {
-		return (
-			<div className="flex min-h-[60vh] items-center justify-center">
-				<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-			</div>
-		)
-	}
-
 	React.useEffect(() => {
 		if (user?.university?.id && !selectedUniversityId) {
 			setSelectedUniversityId(user.university.id)
@@ -705,6 +697,14 @@ export default function CreateRestaurantPage() {
 		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user])
+
+	if (authLoading || !isAuthenticated || user?.kycStatus !== "approved") {
+		return (
+			<div className="flex min-h-[60vh] items-center justify-center">
+				<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+			</div>
+		)
+	}
 
 	const totalSteps = STEPS.length
 

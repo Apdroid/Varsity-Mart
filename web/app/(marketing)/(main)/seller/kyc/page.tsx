@@ -62,7 +62,7 @@ function PendingScreen({
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold font-heading">Application under review</h1>
         <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto">
-          Your identity verification is being reviewed by our team. We'll reach out once it's complete.
+          Your identity verification is being reviewed by our team. We&apos;ll reach out once it&apos;s complete.
         </p>
       </div>
 
@@ -115,7 +115,7 @@ function PendingScreen({
 
       {/* Notice */}
       <div className="rounded-xl border border-amber-500  px-4 py-3 text-sm text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
-        We'll send you a notification once your review is complete. You can continue shopping on VarsityMart in the meantime.
+        We&apos;ll send you a notification once your review is complete. You can continue shopping on VarsityMart in the meantime.
       </div>
 
       <div className="mt-6 flex flex-col gap-3">
@@ -157,7 +157,7 @@ function RejectedScreen({
 
       <h1 className="text-2xl font-bold font-heading">Verification unsuccessful</h1>
       <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto">
-        We couldn't verify your identity with the documents provided.
+        We couldn&apos;t verify your identity with the documents provided.
       </p>
 
       {reason && (

@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils"
-import { Card, CardContent } from "@/components/ui/card"
 import { FieldDescription } from "@/components/ui/field"
 import Link from "next/link"
 import type { ComponentProps, ReactNode } from "react"

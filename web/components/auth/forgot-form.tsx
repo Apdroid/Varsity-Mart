@@ -37,10 +37,10 @@ export function ForgotForm({ className, ...props }: ComponentProps<"div">) {
   const { errors, isSubmitting } = form.formState
 
   // Editing a field means the user is responding to the error: clear it.
-  useEffect(() => {
-    const subscription = form.watch(() => setFormError(null))
-    return () => subscription.unsubscribe()
-  }, [form])
+  useEffect(
+    () => form.subscribe({ formState: { values: true }, callback: () => setFormError(null) }),
+    [form]
+  )
 
   const onSubmit = async (data: ForgotSchema) => {
     setFormError(null)

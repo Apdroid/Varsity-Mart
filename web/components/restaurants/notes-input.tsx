@@ -40,7 +40,7 @@ export function NotesInput({
         )}
       />
       <p className="text-xs text-muted-foreground">
-        Notes are read by the seller — they'll do their best to accommodate you.
+        Notes are read by the seller — they&apos;ll do their best to accommodate you.
       </p>
     </div>
   )

@@ -6,7 +6,6 @@ import type {
   StoreFilters,
   StoresListResponse,
   FeaturedResponse,
-  Product,
   ProductsListResponse,
   ReviewsResponse,
   CreateStoreRequest,

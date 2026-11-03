@@ -40,34 +40,40 @@ const CampusContext = createContext<CampusContextValue | null>(null)
 export function CampusProvider({ children }: { children: ReactNode }) {
 	const { user, isAuthenticated, isLoading } = useAuth()
 	const [guestSelection, setGuestSelection] = useState<GuestCampusSelection | null>(null)
-	const [showPicker, setShowPicker] = useState(false)
+	const [pickerOpen, setPickerOpen] = useState(false)
+	// Set when the guest closes the picker without choosing, so the auto-prompt stays dismissed.
+	const [promptDismissed, setPromptDismissed] = useState(false)
 	const [hydrated, setHydrated] = useState(false)
 
-	// Hydrate from localStorage once on mount
+	// Hydrate from localStorage once on mount. It has to happen after mount so the
+	// server render and first client render match; this is a one-time read of an external store.
 	useEffect(() => {
 		try {
 			const raw = localStorage.getItem(STORAGE_KEY)
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			if (raw) setGuestSelection(JSON.parse(raw) as GuestCampusSelection)
 		} catch {}
 		setHydrated(true)
 	}, [])
 
-	// Prompt guests who haven't chosen a campus yet
-	useEffect(() => {
-		if (!hydrated || isLoading) return
-		if (!isAuthenticated && !guestSelection) {
-			setShowPicker(true)
-		}
-	}, [hydrated, isLoading, isAuthenticated, guestSelection])
+	// Prompt guests who haven't chosen a campus yet (derived, so no effect is needed)
+	const shouldPrompt = hydrated && !isLoading && !isAuthenticated && !guestSelection && !promptDismissed
+	const showPicker = pickerOpen || shouldPrompt
 
 	const saveGuestSelection = useCallback((selection: GuestCampusSelection) => {
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(selection))
 		setGuestSelection(selection)
-		setShowPicker(false)
+		setPickerOpen(false)
 	}, [])
 
-	const openPicker = useCallback(() => setShowPicker(true), [])
-	const closePicker = useCallback(() => setShowPicker(false), [])
+	const openPicker = useCallback(() => {
+		setPromptDismissed(false)
+		setPickerOpen(true)
+	}, [])
+	const closePicker = useCallback(() => {
+		setPickerOpen(false)
+		setPromptDismissed(true)
+	}, [])
 
 	const isFromProfile = isAuthenticated && !!user
 	const isReady = hydrated && !isLoading

@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Bell, CreditCard, LogOut, Package, Settings, ShoppingBag, Store, ChevronRight, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -47,6 +46,7 @@ export default function AccountPage() {
 	const { user, isLoading, isAuthenticated, logout } = useAuth()
 	const { data: ordersData } = useMyOrders({ limit: 3 })
 	const { data: foodOrdersData } = useMyFoodOrders({ limit: 3 })
+	const [isLoggingOut, setIsLoggingOut] = useState(false)
 
 	const recentOrders = ordersData?.data?.orders || []
 	const recentFoodOrders = foodOrdersData?.data?.orders || []
@@ -73,7 +73,6 @@ export default function AccountPage() {
 		...(user.hasRestaurant ? [{ href: "/restaurant/dashboard", icon: ShoppingBag, label: "Restaurant Dashboard", description: "Manage your restaurant" }] : []),
 	]
 
-	const [isLoggingOut, setIsLoggingOut] = useState(false)
 
 	const handleLogout = async () => {
 		setIsLoggingOut(true)
