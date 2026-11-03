@@ -11,7 +11,7 @@ import {
 } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { authApi } from "@/lib/api/auth"
-import { getUserLocationValue } from "@/lib/user-location"
+import { needsProfileCompletion as needsProfileCompletionFor } from "@/lib/auth/profile"
 import type {
 	LoginRequest,
 	RegisterRequest,
@@ -43,13 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const [isLoading, setIsLoading] = useState(true)
 	const [needsVerification, setNeedsVerification] = useState(false)
 
-	const needsProfileCompletion = useMemo(() => {
-		if (!user) return false
-		const university = getUserLocationValue(user.university)
-		const campus = getUserLocationValue(user.campus)
-
-		return !user.phone?.trim() || !university.trim() || !campus.trim()
-	}, [user])
+	const needsProfileCompletion = useMemo(() => needsProfileCompletionFor(user), [user])
 
 	const checkAuth = useCallback(async () => {
 		try {

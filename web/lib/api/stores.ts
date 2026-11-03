@@ -11,17 +11,7 @@ import type {
   CreateStoreRequest,
   CreateReviewRequest,
 } from "./types"
-
-function buildQueryString(params: object): string {
-  const searchParams = new URLSearchParams()
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      searchParams.append(key, String(value))
-    }
-  })
-  const query = searchParams.toString()
-  return query ? `?${query}` : ""
-}
+import { buildQueryString } from "./query-string"
 
 export const storesApi = {
   list: (filters?: StoreFilters) =>
