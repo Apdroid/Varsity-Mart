@@ -56,9 +56,6 @@ export const productsApi = {
   featured: (limit = 10, campus?: string) =>
     api.get<ApiResponse<Product[]>>(`/products/featured/${buildQueryString({ limit, campus })}`),
 
-  trending: (limit = 10) =>
-    api.get<ApiResponse<Product[]>>(`/products/trending/?limit=${limit}`),
-
   create: (data: CreateProductRequest) =>
     apiClientFormData<ApiResponse<Product>>("/products/", buildProductFormData(data)),
 
@@ -75,20 +72,21 @@ export const productsApi = {
   like: (id: string) =>
     api.post<ApiResponse<{ liked: boolean; likes: number }>>(`/products/${id}/like/`),
 
+  // The API exposes a single toggle endpoint: POST likes, and POST again unlikes.
   unlike: (id: string) =>
-    api.delete<ApiResponse<{ liked: boolean; likes: number }>>(`/products/${id}/like/`),
+    api.post<ApiResponse<{ liked: boolean; likes: number }>>(`/products/${id}/like/`),
 
   uploadImages: (productId: string, files: File[]) => {
     const formData = new FormData()
     files.forEach((file) => formData.append("images", file))
     return apiClientFormData<ApiResponse<{ imageIds: string[] }>>(
-      `/products/${productId}/images/`,
+      `/products/${productId}/upload_images/`,
       formData
     )
   },
 
-  deleteImage: (productId: string, imageId: string) =>
-    api.delete<ApiResponse<{ success: boolean }>>(`/products/${productId}/images/${imageId}/`),
+  deleteImage: (imageId: string) =>
+    api.delete<ApiResponse<{ success: boolean }>>(`/product-images/${imageId}/`),
 
   reviews: (productId: string, page = 1, limit = 10) =>
     api.get<ReviewsResponse>(`/products/${productId}/reviews/?page=${page}&limit=${limit}`),

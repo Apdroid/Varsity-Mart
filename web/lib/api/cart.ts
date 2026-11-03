@@ -9,7 +9,7 @@ import type {
 
 export const cartApi = {
   get: () =>
-    api.get<ApiResponse<Cart>>("/cart"),
+    api.get<ApiResponse<Cart>>("/cart/"),
 
   add: (data: AddToCartRequest) =>
     api.post<ApiResponse<CartItem>>("/cart/add/", {items:[data]}),

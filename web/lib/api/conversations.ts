@@ -23,7 +23,7 @@ export const conversationsApi = {
 		api.post<ApiResponse<Message>>(`/conversations/${conversationId}/send_message/`, data),
 
 	markRead: (conversationId: string) =>
-		api.post<ApiResponse<{ success: boolean }>>(`/conversations/${conversationId}/read/`),
+		api.post<ApiResponse<{ success: boolean }>>(`/conversations/${conversationId}/mark_read/`),
 
 	report: (messageId: string, reason: string) =>
 		api.post<ApiResponse<{ reportId: string }>>(`/messages/${messageId}/report/`, { reason }),

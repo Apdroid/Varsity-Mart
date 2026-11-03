@@ -15,7 +15,7 @@ export const categoriesApi = {
 		api.get<DRFPaginatedList<StoreCategory>>("/store-categories/"),
 
 	storeCategory: (id: string) =>
-		api.get<StoreCategory>(`/store-categories/${id}`),
+		api.get<StoreCategory>(`/store-categories/${id}/`),
 
 	restaurantCategories: () =>
 		api.get<CategoriesResponse<RestaurantCategory>>("/restaurant-categories/"),

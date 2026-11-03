@@ -55,7 +55,7 @@ export const ordersApi = {
 
 export const foodOrdersApi = {
   myOrders: (filters?: OrderFilters) =>
-    api.get<ApiResponse<{ orders: FoodOrder[]; total: number }>>(`/food-orders/my-orders${buildQueryString(filters || {})}/`),
+    api.get<ApiResponse<{ orders: FoodOrder[]; total: number }>>(`/food-orders/my-orders/${buildQueryString(filters || {})}`),
 
   get: (orderId: string) =>
     api.get<ApiResponse<FoodOrder>>(`/food-orders/${orderId}/`),
@@ -73,13 +73,13 @@ export const foodOrdersApi = {
     }>>("/food-orders/", data),
 
   updateStatus: (orderId: string, status: string, estimatedDeliveryTime?: string) =>
-    api.patch<ApiResponse<FoodOrder>>(`/food-orders/${orderId}/status`, { status, estimatedDeliveryTime }),
+    api.patch<ApiResponse<FoodOrder>>(`/food-orders/${orderId}/status/`, { status, estimatedDeliveryTime }),
 
   confirmDelivery: (orderId: string) =>
-    api.post<ApiResponse<FoodOrder>>(`/food-orders/${orderId}/confirm-delivery`),
+    api.post<ApiResponse<FoodOrder>>(`/food-orders/${orderId}/confirm-delivery/`),
 
   rate: (orderId: string, data: RateFoodOrderRequest) =>
-    api.post<ApiResponse<{ reviewId: string }>>(`/food-orders/${orderId}/rate`, data),
+    api.post<ApiResponse<{ reviewId: string }>>(`/food-orders/${orderId}/rate/`, data),
 
   restaurantOrders: (filters?: OrderFilters) =>
     api.get<ApiResponse<{ orders: FoodOrder[]; total: number }>>(`/food-orders/restaurant-orders${buildQueryString(filters || {})}`),

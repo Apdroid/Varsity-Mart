@@ -14,7 +14,6 @@ export const productKeys = {
   myProducts: (filters?: ProductFilters) => [...productKeys.all, "my", filters] as const,
   featured: (limit?: number, campus?: string) =>
     [...productKeys.all, "featured", limit ?? null, campus ?? null] as const,
-  trending: () => [...productKeys.all, "trending"] as const,
   reviews: (productId: string, page?: number) => [...productKeys.all, productId, "reviews", page] as const,
 }
 
@@ -70,16 +69,6 @@ export function useFeaturedProducts(limit = 12) {
     enabled: ready,
   })
   return withScopeLoading(query, ready)
-}
-
-export function useTrendingProducts(limit = 12) {
-  return useQuery({
-    queryKey: productKeys.trending(),
-    queryFn: async () => {
-      const response = await productsApi.trending(limit)
-      return response.data
-    },
-  })
 }
 
 export function useProductReviews(productId: string, page = 1, limit = 10) {
