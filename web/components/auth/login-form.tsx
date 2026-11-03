@@ -19,15 +19,18 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { GoogleLogin } from "@react-oauth/google"
 import type { ComponentProps } from "react"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { FormError } from "@/components/auth/form-error"
 import PasswordInput from "../ui/password-input"
 import { useAuth } from "@/providers/auth-provider"
 
 export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 	const [emailMode, setEmailMode] = useState(false)
 	const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false)
+	// Shown inline beside the form so it lands where the user is already looking.
+	const [formError, setFormError] = useState<string | null>(null)
 	const googleBtnRef = useRef<HTMLDivElement>(null)
 	const router = useRouter()
 	const { googleLogin, login } = useAuth()
@@ -42,13 +45,20 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 	})
 	const { errors, isSubmitting } = form.formState
 
+	// Editing a field means the user is responding to the error: clear it.
+	useEffect(() => {
+		const subscription = form.watch(() => setFormError(null))
+		return () => subscription.unsubscribe()
+	}, [form])
+
 	const onSubmit = async (data: LoginSchema) => {
+		setFormError(null)
 		const result = await login(data)
 		if (result.success) {
 			toast.success("Welcome back!")
 			router.push("/")
 		} else {
-			toast.error(result.error || "Login failed")
+			setFormError(result.error || "Login failed. Check your email and password and try again.")
 		}
 	}
 
@@ -61,7 +71,7 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 		try {
 			const result = await googleLogin(credential)
 			if (!result.success) {
-				toast.error(result.error || "Google sign-in failed")
+				setFormError(result.error || "Google sign-in failed. Please try again.")
 				return
 			}
 			toast.success("Signed in with Google")
@@ -71,8 +81,7 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 			}
 			router.push("/")
 		} catch (err) {
-			const message = err instanceof Error ? err.message : "Google sign-in failed"
-			toast.error(message)
+			setFormError(err instanceof Error ? err.message : "Google sign-in failed. Please try again.")
 		} finally {
 			setIsGoogleSubmitting(false)
 		}
@@ -99,11 +108,12 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 								if (res.credential) handleGoogleSuccess(res.credential)
 							}}
 							onError={() => {
-								toast.error("Google sign-in failed")
+								setFormError("Google sign-in failed. Please try again.")
 								setIsGoogleSubmitting(false)
 							}}
 						/>
 					</div>
+					<FormError message={formError} />
 					<Button
 						variant="outline"
 						type="button"
@@ -185,6 +195,7 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
 									</FormItem>
 								)}
 							/>
+							<FormError message={formError} />
 							<FormItem>
 								<Button
 									type="submit"

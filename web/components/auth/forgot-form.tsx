@@ -19,12 +19,14 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
 import type { ComponentProps } from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { FormError } from "@/components/auth/form-error"
 
 export function ForgotForm({ className, ...props }: ComponentProps<"div">) {
   const [emailSent, setEmailSent] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
   const form = useForm<ForgotSchema>({
     resolver: zodResolver(forgotSchema),
     mode: "onBlur",
@@ -34,7 +36,14 @@ export function ForgotForm({ className, ...props }: ComponentProps<"div">) {
   })
   const { errors, isSubmitting } = form.formState
 
+  // Editing a field means the user is responding to the error: clear it.
+  useEffect(() => {
+    const subscription = form.watch(() => setFormError(null))
+    return () => subscription.unsubscribe()
+  }, [form])
+
   const onSubmit = async (data: ForgotSchema) => {
+    setFormError(null)
     try {
       await authApi.forgotPassword({ email: data.email })
       setEmailSent(true)
@@ -42,9 +51,9 @@ export function ForgotForm({ className, ...props }: ComponentProps<"div">) {
     } catch (err) {
       if (err instanceof ApiError) {
         const errorData = err.data as { message?: string; detail?: string }
-        toast.error(errorData?.message || errorData?.detail || "Failed to send reset link")
+        setFormError(errorData?.message || errorData?.detail || "Failed to send reset link")
       } else {
-        toast.error("An unexpected error occurred")
+        setFormError("An unexpected error occurred. Please try again.")
       }
     }
   }
@@ -124,6 +133,7 @@ export function ForgotForm({ className, ...props }: ComponentProps<"div">) {
                 </FormItem>
               )}
             />
+            <FormError message={formError} />
             <FormItem>
               <Button
                 type="submit"

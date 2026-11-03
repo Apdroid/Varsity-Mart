@@ -24,9 +24,10 @@ import { useAuth } from "@/providers/auth-provider"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { FormError } from "@/components/auth/form-error"
 import { z } from "zod"
 
 function hasValue(value?: string | null) {
@@ -45,6 +46,7 @@ export function CompleteProfileForm() {
 	const { user, refreshUser } = useAuth()
 	const router = useRouter()
 	const updateProfileMutation = useUpdateProfile()
+	const [formError, setFormError] = useState<string | null>(null)
 
 	const { data: universities = [], isLoading: loadingUniversities } = useUniversities()
 
@@ -67,6 +69,7 @@ export function CompleteProfileForm() {
 	const { data: campuses = [], isLoading: loadingCampuses } = useCampusesByUniversity(selectedUniversityId)
 
 	const onSubmit = async (values: FormData) => {
+		setFormError(null)
 		const phone = values.phone?.trim() ?? ""
 		const campusId = values.campusId?.trim() ?? ""
 
@@ -87,7 +90,7 @@ export function CompleteProfileForm() {
 			toast.success("Profile completed!")
 			router.replace("/")
 		} catch {
-			toast.error("Failed to save your details. Please try again.")
+			setFormError("Failed to save your details. Please try again.")
 		}
 	}
 
@@ -185,6 +188,8 @@ export function CompleteProfileForm() {
 						/>
 					</>
 				)}
+
+				<FormError message={formError} className="mt-6" />
 
 				<Button
 					type="submit"

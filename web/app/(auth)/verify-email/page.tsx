@@ -9,6 +9,7 @@ import { Loader2, Mail } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
+import { FormError } from "@/components/auth/form-error"
 
 const RESEND_COOLDOWN = 60
 
@@ -18,6 +19,7 @@ export default function VerifyEmailPage() {
 	const [code, setCode] = useState("")
 	const [isVerifying, setIsVerifying] = useState(false)
 	const [isResending, setIsResending] = useState(false)
+	const [formError, setFormError] = useState<string | null>(null)
 	const [cooldown, setCooldown] = useState(0)
 	const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -43,8 +45,9 @@ export default function VerifyEmailPage() {
 
 	const handleVerify = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
+		setFormError(null)
 		if (code.length < 6) {
-			toast.error("Please enter the full 6-digit code")
+			setFormError("Please enter the full 6-digit code")
 			return
 		}
 		setIsVerifying(true)
@@ -54,7 +57,7 @@ export default function VerifyEmailPage() {
 			toast.success("Email verified! Welcome aboard.")
 			router.replace("/")
 		} else {
-			toast.error(result.error || "Verification failed. Check the code and try again.")
+			setFormError(result.error || "Verification failed. Check the code and try again.")
 		}
 	}
 
@@ -67,7 +70,7 @@ export default function VerifyEmailPage() {
 			toast.success("A new code has been sent to your email.")
 			startCooldown()
 		} else {
-			toast.error(result.error || "Failed to resend code. Please try again.")
+			setFormError(result.error || "Failed to resend code. Please try again.")
 		}
 	}
 
@@ -97,11 +100,16 @@ export default function VerifyEmailPage() {
 						maxLength={6}
 						placeholder="000000"
 						value={code}
-						onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+						onChange={(e) => {
+							setFormError(null)
+							setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+						}}
 						className="h-14 text-center text-2xl font-mono tracking-[0.5em] rounded-2xl"
 						autoFocus
 						autoComplete="one-time-code"
 					/>
+
+					<FormError message={formError} />
 
 					<Button
 						type="submit"

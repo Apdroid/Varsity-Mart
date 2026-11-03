@@ -19,9 +19,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import type { ComponentProps } from "react"
+import { useEffect, useState, type ComponentProps } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { FormError } from "@/components/auth/form-error"
 
 export function ResetForm({ className, ...props }: ComponentProps<"div">) {
   const router = useRouter()
@@ -36,11 +37,19 @@ export function ResetForm({ className, ...props }: ComponentProps<"div">) {
       confirmPassword: "",
     },
   })
+  const [formError, setFormError] = useState<string | null>(null)
   const { errors, isSubmitting } = form.formState
 
+  // Editing a field means the user is responding to the error: clear it.
+  useEffect(() => {
+    const subscription = form.watch(() => setFormError(null))
+    return () => subscription.unsubscribe()
+  }, [form])
+
   const onSubmit = async (data: ResetSchema) => {
+    setFormError(null)
     if (!token) {
-      toast.error("Invalid or missing reset token")
+      setFormError("This reset link is invalid or has expired. Request a new one.")
       return
     }
 
@@ -55,9 +64,9 @@ export function ResetForm({ className, ...props }: ComponentProps<"div">) {
     } catch (err) {
       if (err instanceof ApiError) {
         const errorData = err.data as { message?: string; detail?: string }
-        toast.error(errorData?.message || errorData?.detail || "Failed to reset password")
+        setFormError(errorData?.message || errorData?.detail || "Failed to reset password")
       } else {
-        toast.error("An unexpected error occurred")
+        setFormError("An unexpected error occurred. Please try again.")
       }
     }
   }
@@ -143,6 +152,7 @@ export function ResetForm({ className, ...props }: ComponentProps<"div">) {
                 </FormItem>
               )}
             />
+            <FormError message={formError} />
             <FormItem>
               <Button
                 type="submit"

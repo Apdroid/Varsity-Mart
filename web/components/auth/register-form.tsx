@@ -43,9 +43,10 @@ import { Google } from "@lobehub/icons"
 import { ArrowLeft, Loader2, Mail } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState, type ComponentProps } from "react"
+import { useEffect, useState, type ComponentProps } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { FormError } from "@/components/auth/form-error"
 import { useAuth } from "@/providers/auth-provider"
 import { getGoogleIdToken } from "@/lib/auth/google"
 
@@ -73,6 +74,8 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 	const [mode, setMode] = useState<RegisterMode>("choice")
 	const [step, setStep] = useState(1)
 	const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false)
+	// Shown inline beside the form so it lands where the user is already looking.
+	const [formError, setFormError] = useState<string | null>(null)
 	const router = useRouter()
 	const { register, googleLogin } = useAuth()
 
@@ -98,11 +101,18 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 	const { errors, isSubmitting } = form.formState
 	const password = form.watch("password")
 	const universityId = form.watch("universityId")
+
+	// Editing a field means the user is responding to the error: clear it.
+	useEffect(() => {
+		const subscription = form.watch(() => setFormError(null))
+		return () => subscription.unsubscribe()
+	}, [form])
 	const { score, label, color } = getPasswordStrength(password)
 
 	const { data: campuses = [], isLoading: campusesLoading } = useCampusesByUniversity(universityId)
 
 	const handleSubmit = async (values: RegisterSchema) => {
+		setFormError(null)
 		const result = await register({
 			firstName: values.firstName,
 			lastName: values.lastName,
@@ -129,7 +139,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 			})
 			setStep(1)
 		} else {
-			toast.error(result.error || "Registration failed")
+			setFormError(result.error || "Registration failed. Please try again.")
 		}
 	}
 
@@ -141,7 +151,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 	const handleGoogleContinue = async () => {
 		const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 		if (!clientId) {
-			toast.error("Google sign-in is not configured")
+			setFormError("Google sign-in is not configured")
 			return
 		}
 
@@ -150,7 +160,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 			const idToken = await getGoogleIdToken(clientId)
 			const result = await googleLogin(idToken)
 			if (!result.success) {
-				toast.error(result.error || "Google sign-up failed")
+				setFormError(result.error || "Google sign-up failed. Please try again.")
 				return
 			}
 
@@ -163,8 +173,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 			toast.success("Account ready! Signed in with Google.")
 			router.push("/")
 		} catch (err) {
-			const message = err instanceof Error ? err.message : "Google sign-up failed"
-			toast.error(message)
+			setFormError(err instanceof Error ? err.message : "Google sign-up failed. Please try again.")
 		} finally {
 			setIsGoogleSubmitting(false)
 		}
@@ -185,6 +194,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 		>
 			{mode === "choice" ? (
 				<div className="mt-6 flex animate-in fade-in flex-col gap-4 duration-200">
+					<FormError message={formError} />
 					<Button
 						variant="outline"
 						type="button"
@@ -477,6 +487,7 @@ export function RegisterForm({ className, ...props }: ComponentProps<"div">) {
 												</FormItem>
 											)}
 										/>
+										<FormError message={formError} />
 										<FormItem>
 											<Button
 												type="submit"
