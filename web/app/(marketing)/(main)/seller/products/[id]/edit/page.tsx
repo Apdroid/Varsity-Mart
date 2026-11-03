@@ -407,7 +407,7 @@ export default function EditProductPage() {
 					<Button
 						type="submit"
 						disabled={updating}
-						className="w-full h-11 bg-vm-tangerine text-white hover:bg-vm-tangerine/90"
+						className="w-full h-11 bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
 					>
 						{updating ? (
 							<>

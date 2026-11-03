@@ -396,7 +396,7 @@ function AnnouncementBar() {
 			<div className="vm-section mx-auto flex h-9 items-center justify-between px-4">
 				<div className="flex items-center gap-4">
 					<Badge
-						className="h-5 gap-1 rounded-sm border-0 px-1.5 font-bold uppercase tracking-wide bg-vm-tangerine text-white"
+						className="h-5 gap-1 rounded-sm border-0 px-1.5 font-bold uppercase tracking-wide bg-vm-tangerine text-vm-tangerine-foreground"
 					>
 						<FireIcon className="h-3 w-3" />
 						Hot
@@ -578,7 +578,7 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 						<button
 							type="button"
 							onClick={handleDesktopSearch}
-							className="ml-1 mr-1 flex h-7 shrink-0 cursor-pointer items-center rounded-full bg-vm-tangerine px-3 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+							className="ml-1 mr-1 flex h-7 shrink-0 cursor-pointer items-center rounded-full bg-vm-tangerine px-3 text-xs font-semibold text-vm-tangerine-foreground transition-opacity hover:opacity-90"
 						>
 							Search
 						</button>
@@ -629,7 +629,7 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 									>
 										<BellIcon className="h-6 w-6" weight="regular" />
 										{unreadCount > 0 && (
-											<Badge className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-0 bg-vm-tangerine px-1.5 text-[10px] font-bold leading-none text-white">
+											<Badge className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-0 bg-vm-tangerine px-1.5 text-[10px] font-bold leading-none text-vm-tangerine-foreground">
 												{unreadCountLabel}
 											</Badge>
 										)}
@@ -802,7 +802,7 @@ function MainBar({ checkHasStore }: { checkHasStore: (hasStore: boolean) => void
 								<HeartIcon className="h-7 w-7" weight="regular" />
 								{wishlistCount > 0 && (
 									<Badge
-										className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-2 border-background bg-vm-tangerine p-0 text-[10px] font-bold leading-none text-white"
+										className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-2 border-background bg-vm-tangerine p-0 text-[10px] font-bold leading-none text-vm-tangerine-foreground"
 									>
 										{wishlistCount}
 									</Badge>
@@ -863,7 +863,7 @@ function NavBar({ hasStore }: { hasStore: boolean }) {
 							<button
 								type="button"
 								onClick={() => requireAuth(() => router.push(sellerCtaHref))}
-								className="ml-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-vm-tangerine px-4 text-sm font-semibold text-white hover:border-2 hover:border-vm-tangerine hover:bg-accent hover:text-foreground transition-all ease-linear dark:hover:text-vm-tangerine"
+								className="ml-1 inline-flex h-8 items-center gap-1.5 rounded-full bg-vm-tangerine px-4 text-sm font-semibold text-vm-tangerine-foreground hover:border-2 hover:border-vm-tangerine hover:bg-accent hover:text-foreground transition-all ease-linear dark:hover:text-vm-tangerine"
 							>
 								{sellerCtaLabel}
 								<CaretRightIcon className="h-3.5 w-3.5" />
@@ -1010,7 +1010,7 @@ function MobileSearchBar({ hasStore }: { hasStore: boolean }) {
 					<button
 						type="button"
 						onClick={handleMobileSearch}
-						className="flex h-full w-10 shrink-0 cursor-pointer items-center justify-center rounded-r-full bg-vm-tangerine text-white transition-opacity hover:opacity-90"
+						className="flex h-full w-10 shrink-0 cursor-pointer items-center justify-center rounded-r-full bg-vm-tangerine text-vm-tangerine-foreground transition-opacity hover:opacity-90"
 						aria-label="Search"
 					>
 						<MagnifyingGlassIcon className="h-3.5 w-3.5" />
@@ -1051,7 +1051,7 @@ function MobileSearchBar({ hasStore }: { hasStore: boolean }) {
 				<button
 					type="button"
 					onClick={() => requireAuth(() => router.push(sellerCtaHref))}
-					className="shrink-0 inline-flex items-center gap-1 rounded-full bg-vm-tangerine px-3 py-1 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+					className="shrink-0 inline-flex items-center gap-1 rounded-full bg-vm-tangerine px-3 py-1 text-xs font-semibold text-vm-tangerine-foreground transition-opacity hover:opacity-90"
 				>
 					{sellerCtaLabel}
 					<CaretRightIcon className="h-3 w-3" />

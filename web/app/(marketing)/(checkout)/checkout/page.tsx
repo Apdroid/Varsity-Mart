@@ -42,7 +42,7 @@ function formatGHS(n: number) {
 function StepHeader({ step, label }: { step: number; label: string }) {
 	return (
 		<div className="mb-5 flex items-center gap-3">
-			<div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-vm-tangerine text-xs font-bold text-white">
+			<div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-vm-tangerine text-xs font-bold text-vm-tangerine-foreground">
 				{step}
 			</div>
 			<h2 className="text-base font-semibold">{label}</h2>
@@ -194,7 +194,7 @@ export default function CheckoutPage() {
 			type="submit"
 			disabled={createOrderMutation.isPending}
 			className={cn(
-				"w-full rounded-full bg-vm-tangerine py-6 text-base font-semibold text-white hover:bg-vm-tangerine/90",
+				"w-full rounded-full bg-vm-tangerine py-6 text-base font-semibold text-vm-tangerine-foreground hover:bg-vm-tangerine/90",
 				className
 			)}
 		>
@@ -464,7 +464,7 @@ export default function CheckoutPage() {
 														<ImageIcon className="h-5 w-5 text-muted-foreground/50" />
 													</div>
 												)}
-												<span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-background bg-vm-tangerine text-[10px] font-bold text-white">
+												<span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-background bg-vm-tangerine text-[10px] font-bold text-vm-tangerine-foreground">
 													{item.quantity}
 												</span>
 											</div>

@@ -6,7 +6,8 @@
 
 :root {
 	--vm-tangerine: oklch(69.3% 0.1738 39.7);
-	--vm-tangerine-foreground: oklch(0.98 0.016 73.684);
+	/* Graphite on the orange: ~6.8:1. White on it was ~2.8:1, below WCAG AA. */
+	--vm-tangerine-foreground: oklch(0.139 0 0);
 	--vm-graphite: oklch(0.139 0 0);
 	--vm-graphite-foreground: oklch(0.985 0 0);
 	--vm-platinum: oklch(0.967 0.001 286.375);
@@ -18,7 +19,7 @@
 	--popover: oklch(1 0 0);
 	--popover-foreground: oklch(0.145 0 0);
 	--primary: oklch(0.702 0.165 41.116);
-	--primary-foreground: oklch(0.98 0.016 73.684);
+	--primary-foreground: oklch(0.139 0 0);
 	--secondary: oklch(0.967 0.001 286.375);
 	--secondary-foreground: oklch(0.21 0.006 285.885);
 	--muted: oklch(0.97 0 0);

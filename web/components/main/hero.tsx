@@ -14,11 +14,14 @@ import {
 	Star,
 	Clock,
 	Package,
+	Pause,
+	Play,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel"
 import { cn } from "@/lib/utils"
+import { usePrefersReducedMotion } from "@/hooks/use-reduced-motion"
 import { useFeaturedProducts } from "@/hooks/queries/use-products"
 import { useFeaturedStores } from "@/hooks/queries/use-stores"
 import { useRestaurants } from "@/hooks/queries/use-restaurants"
@@ -97,6 +100,35 @@ function productImage(product: Product | undefined) {
 	)
 }
 
+/** Pause/play control for auto-advancing slideshows (WCAG 2.2.2). */
+function AutoplayToggle({
+	paused,
+	onToggle,
+	tone = "light",
+}: {
+	paused: boolean
+	onToggle: () => void
+	tone?: "light" | "dark"
+}) {
+	const Icon = paused ? Play : Pause
+	return (
+		<button
+			type="button"
+			onClick={onToggle}
+			aria-label={paused ? "Play slideshow" : "Pause slideshow"}
+			aria-pressed={paused}
+			className={cn(
+				"grid h-7 w-7 place-items-center rounded-full transition",
+				tone === "light"
+					? "bg-white/15 text-white hover:bg-white/30"
+					: "bg-muted text-vm-graphite hover:bg-border"
+			)}
+		>
+			<Icon className="h-3.5 w-3.5" aria-hidden="true" />
+		</button>
+	)
+}
+
 /* -----------------------------------------------------------
 	 Hero showcase — large immersive card, left 3/5 of bento.
 	 Full-bleed rotating imagery with overlaid badge + copy,
@@ -104,15 +136,20 @@ function productImage(product: Product | undefined) {
 ----------------------------------------------------------- */
 function HeroSlider({ slides }: { slides: Slide[] }) {
 	const [index, setIndex] = React.useState(0)
-	const [paused, setPaused] = React.useState(false)
+	// Autoplay stops while hovered or focused, when the user pauses it,
+	// and never runs for people who prefer reduced motion.
+	const [interacting, setInteracting] = React.useState(false)
+	const [userPaused, setUserPaused] = React.useState(false)
+	const reducedMotion = usePrefersReducedMotion()
+	const autoplay = !reducedMotion && !userPaused && !interacting
 
 	React.useEffect(() => {
-		if (paused) return
+		if (!autoplay) return
 		const id = setInterval(() => {
 			setIndex((i) => (i + 1) % slides.length)
 		}, 6000)
 		return () => clearInterval(id)
-	}, [paused, slides.length])
+	}, [autoplay, slides.length])
 
 	const go = (dir: 1 | -1) =>
 		setIndex((i) => (i + dir + slides.length) % slides.length)
@@ -120,8 +157,10 @@ function HeroSlider({ slides }: { slides: Slide[] }) {
 	return (
 		<div
 			className="group relative h-full min-h-[480px] overflow-hidden rounded-2xl bg-vm-graphite"
-			onMouseEnter={() => setPaused(true)}
-			onMouseLeave={() => setPaused(false)}
+			onMouseEnter={() => setInteracting(true)}
+			onMouseLeave={() => setInteracting(false)}
+			onFocus={() => setInteracting(true)}
+			onBlur={() => setInteracting(false)}
 		>
 			{slides.map((slide, i) => (
 				<div
@@ -148,7 +187,7 @@ function HeroSlider({ slides }: { slides: Slide[] }) {
 
 					{/* Copy overlay */}
 					<div className="absolute inset-x-0 bottom-0 p-8 md:p-10">
-						<span className="inline-block rounded-full bg-vm-tangerine px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-white shadow-sm">
+						<span className="inline-block rounded-full bg-vm-tangerine px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-vm-tangerine-foreground shadow-sm">
 							{slide.eyebrow}
 						</span>
 						<h2 className="mt-4 text-4xl font-black leading-[1.02] tracking-tight text-white lg:text-5xl">
@@ -192,6 +231,9 @@ function HeroSlider({ slides }: { slides: Slide[] }) {
 
 			{/* Dots */}
 			<div className="absolute bottom-5 right-8 flex items-center gap-2 md:right-10">
+				{!reducedMotion && (
+					<AutoplayToggle paused={userPaused} onToggle={() => setUserPaused((v) => !v)} />
+				)}
 				{slides.map((_, i) => (
 					<button
 						key={i}
@@ -214,6 +256,8 @@ function HeroSlider({ slides }: { slides: Slide[] }) {
 function MobileHeroCarousel({ slides }: { slides: Slide[] }) {
 	const [api, setApi] = React.useState<CarouselApi>()
 	const [current, setCurrent] = React.useState(0)
+	const [userPaused, setUserPaused] = React.useState(false)
+	const reducedMotion = usePrefersReducedMotion()
 
 	React.useEffect(() => {
 		if (!api) return
@@ -221,10 +265,10 @@ function MobileHeroCarousel({ slides }: { slides: Slide[] }) {
 	}, [api])
 
 	React.useEffect(() => {
-		if (!api) return
+		if (!api || reducedMotion || userPaused) return
 		const id = setInterval(() => api.scrollNext(), 5000)
 		return () => clearInterval(id)
-	}, [api])
+	}, [api, reducedMotion, userPaused])
 
 	return (
 		<div className="space-y-3">
@@ -247,7 +291,7 @@ function MobileHeroCarousel({ slides }: { slides: Slide[] }) {
 
 								{/* Slide content */}
 								<div className="absolute inset-x-0 bottom-0 p-5">
-									<span className="inline-block rounded-full bg-vm-tangerine px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white">
+									<span className="inline-block rounded-full bg-vm-tangerine px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-vm-tangerine-foreground">
 										{slide.eyebrow}
 									</span>
 									<h2 className="mt-2 text-2xl font-black leading-tight text-white">
@@ -272,7 +316,14 @@ function MobileHeroCarousel({ slides }: { slides: Slide[] }) {
 			</Carousel>
 
 			{/* Dot indicators */}
-			<div className="flex justify-center gap-1.5">
+			<div className="flex items-center justify-center gap-1.5">
+				{!reducedMotion && (
+					<AutoplayToggle
+						tone="dark"
+						paused={userPaused}
+						onToggle={() => setUserPaused((v) => !v)}
+					/>
+				)}
 				{slides.map((_, i) => (
 					<button
 						key={i}
@@ -314,7 +365,7 @@ function LiveRestaurantPromo({ restaurant }: { restaurant: RestaurantListItem | 
 
 			{/* Badge */}
 			<div className="absolute left-4 top-4">
-				<span className="inline-block rounded-full bg-vm-tangerine px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm">
+				<span className="inline-block rounded-full bg-vm-tangerine px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-vm-tangerine-foreground shadow-sm">
 					Restaurant Rush
 				</span>
 			</div>
@@ -446,7 +497,7 @@ function LiveProductPromo({ product }: { product: Product | undefined }) {
 
 			{/* Badge */}
 			<div className="absolute left-3 top-3">
-				<span className="inline-block rounded-full bg-vm-tangerine px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white shadow-sm">
+				<span className="inline-block rounded-full bg-vm-tangerine px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-vm-tangerine-foreground shadow-sm">
 					Trending
 				</span>
 			</div>

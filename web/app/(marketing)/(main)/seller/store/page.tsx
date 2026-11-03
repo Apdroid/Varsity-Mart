@@ -226,7 +226,7 @@ function StoreView({ store }: { store: StoreDetail }) {
 						View public page
 					</Link>
 				</Button>
-				<Button asChild className="h-11 bg-vm-tangerine text-white hover:bg-vm-tangerine/90">
+				<Button asChild className="h-11 bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90">
 					<Link href="/seller/products/add">
 						<Plus className="mr-1.5 h-4 w-4" />
 						Add product
@@ -250,7 +250,7 @@ function NoStore() {
 				Create your campus store and start selling products to students across your institution.
 			</p>
 			<Button
-				className="mt-6 bg-vm-tangerine text-white hover:bg-vm-tangerine/90 rounded-full px-8"
+				className="mt-6 bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90 rounded-full px-8"
 				onClick={() => router.push("/seller/store/create")}
 			>
 				Open a store

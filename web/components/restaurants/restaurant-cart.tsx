@@ -119,7 +119,7 @@ export function RestaurantCart() {
 						<h2 className="text-base font-bold">
 							Your Order
 							{count > 0 && (
-								<span className="ml-2 rounded-full bg-vm-tangerine px-2 py-0.5 text-xs font-bold text-white">
+								<span className="ml-2 rounded-full bg-vm-tangerine px-2 py-0.5 text-xs font-bold text-vm-tangerine-foreground">
 									{count}
 								</span>
 							)}
@@ -170,7 +170,7 @@ export function RestaurantCart() {
 							<DrawerTitle className="text-base font-bold">
 								Your Order
 								{count > 0 && (
-									<span className="ml-2 rounded-full bg-vm-tangerine px-2 py-0.5 text-xs font-bold text-white">
+									<span className="ml-2 rounded-full bg-vm-tangerine px-2 py-0.5 text-xs font-bold text-vm-tangerine-foreground">
 										{count}
 									</span>
 								)}

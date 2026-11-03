@@ -299,7 +299,7 @@ export default function CartPage() {
             <Button
               disabled={clearing || isCartMutating}
               onClick={() => router.push("/checkout")}
-              className="mt-5 w-full h-11 bg-vm-tangerine text-white hover:bg-vm-tangerine/90"
+              className="mt-5 w-full h-11 bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
             >
               <Lock className="h-4 w-4 mr-2" />
               Proceed to Checkout

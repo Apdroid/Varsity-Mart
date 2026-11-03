@@ -205,7 +205,7 @@ function RestaurantView({ restaurant }: { restaurant: RestaurantDetail }) {
 						View public page
 					</Link>
 				</Button>
-				<Button asChild className="h-11 bg-vm-tangerine text-white hover:bg-vm-tangerine/90">
+				<Button asChild className="h-11 bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90">
 					<Link href="/seller/menu/add">
 						<Plus className="mr-1.5 h-4 w-4" />
 						Add menu item
@@ -230,7 +230,7 @@ function NoRestaurant() {
 				Open your campus restaurant and start taking food orders from students.
 			</p>
 			<Button
-				className="mt-6 bg-vm-tangerine text-white hover:bg-vm-tangerine/90 rounded-full px-8"
+				className="mt-6 bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90 rounded-full px-8"
 				onClick={() => router.push("/seller/restaurant/create")}
 			>
 				Open a restaurant

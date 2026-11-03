@@ -92,7 +92,7 @@ export default function VarsityMartFooter() {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="grid h-9 w-9 place-items-center hover:bg-vm-tangerine rounded-full border border-white/15 text-white/80 transition hover:border-transparent hover:text-white"
+                  className="grid h-9 w-9 place-items-center hover:bg-vm-tangerine rounded-full border border-white/15 text-white/80 transition hover:border-transparent hover:text-vm-tangerine-foreground"
                 >
                   <Icon className="h-4 w-4" />
                 </Link>

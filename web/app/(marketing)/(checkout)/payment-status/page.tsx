@@ -54,7 +54,7 @@ export default function PaymentVerifyPage() {
 					<h1 className="text-xl font-bold">Payment could not be verified</h1>
 					<p className="mt-2 text-sm text-muted-foreground">{message}</p>
 					<div className="mt-6 flex flex-col gap-2">
-						<Button asChild className="w-full rounded-full bg-vm-tangerine text-white hover:bg-vm-tangerine/90">
+						<Button asChild className="w-full rounded-full bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90">
 							<Link href="/checkout">Try again</Link>
 						</Button>
 						<Button asChild variant="outline" className="w-full rounded-full">
@@ -89,7 +89,7 @@ export default function PaymentVerifyPage() {
 				</div>
 
 				<div className="mt-6 flex flex-col gap-2">
-					<Button asChild className="w-full rounded-full bg-vm-tangerine text-white hover:bg-vm-tangerine/90">
+					<Button asChild className="w-full rounded-full bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90">
 						<Link href="/account/orders">
 							View your order
 						</Link>

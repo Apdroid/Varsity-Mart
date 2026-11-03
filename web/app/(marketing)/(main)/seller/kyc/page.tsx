@@ -179,7 +179,7 @@ function RejectedScreen({
       </div>
 
       <Button
-        className="mt-6 w-full bg-vm-tangerine text-white hover:bg-vm-tangerine/90 font-semibold"
+        className="mt-6 w-full bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90 font-semibold"
         onClick={onResubmit}
       >
         Try again
@@ -471,7 +471,7 @@ function KycForm() {
           <Button
             type="button"
             disabled={!sellerType}
-            className="flex-1 bg-vm-tangerine text-white hover:bg-vm-tangerine/90 font-semibold"
+            className="flex-1 bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90 font-semibold"
             onClick={() => setStep(1)}
           >
             Continue
@@ -481,7 +481,7 @@ function KycForm() {
           <Button
             type="button"
             disabled={!documentType || !docFile || !selfieFile || isPending}
-            className="flex-1 bg-vm-tangerine text-white hover:bg-vm-tangerine/90 font-semibold"
+            className="flex-1 bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90 font-semibold"
             onClick={handleSubmit}
           >
             {isPending ? (

@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+	experimental: {
+		// Both icon packages are imported from their barrel file in ~115 places.
+		optimizePackageImports: ["lucide-react", "@phosphor-icons/react"],
+	},
 	images: {
 		remotePatterns: [
 			{

@@ -150,7 +150,7 @@ function CustomizationBody({
             <button
               type="button"
               onClick={handleAdd}
-              className="flex flex-1 items-center justify-between rounded-xl bg-vm-tangerine px-4 py-3 font-semibold text-white transition-opacity hover:opacity-90"
+              className="flex flex-1 items-center justify-between rounded-xl bg-vm-tangerine px-4 py-3 font-semibold text-vm-tangerine-foreground transition-opacity hover:opacity-90"
             >
               <span>Add to cart</span>
               <span>{formatGHS(item.price * qty)}</span>

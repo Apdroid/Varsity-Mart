@@ -103,7 +103,7 @@ function StepProgress({ current, total }: { current: number; total: number }) {
 								className={cn(
 									"flex h-9 w-9 items-center justify-center rounded-full border-2 transition-all duration-300",
 									done
-										? "border-vm-tangerine bg-vm-tangerine text-white"
+										? "border-vm-tangerine bg-vm-tangerine text-vm-tangerine-foreground"
 										: active
 											? "border-vm-tangerine bg-background text-vm-tangerine"
 											: "border-border bg-background text-muted-foreground"
@@ -804,7 +804,7 @@ export default function CreateRestaurantPage() {
 						{step < totalSteps - 1 ? (
 							<Button
 								type="button"
-								className="flex-1 h-11 bg-vm-tangerine text-white hover:bg-vm-tangerine/90"
+								className="flex-1 h-11 bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
 								onClick={goNext}
 							>
 								Continue
@@ -814,7 +814,7 @@ export default function CreateRestaurantPage() {
 							<Button
 								type="submit"
 								disabled={isPending}
-								className="flex-1 h-11 bg-vm-tangerine text-white hover:bg-vm-tangerine/90"
+								className="flex-1 h-11 bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
 							>
 								{isPending ? (
 									<>

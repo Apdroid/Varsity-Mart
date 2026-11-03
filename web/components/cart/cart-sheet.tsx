@@ -72,7 +72,7 @@ export function CartSheet() {
 					<span className="relative inline-flex">
 						<ShoppingCartIcon className="w-7 h-7" weight="regular" />
 						{!authLoading && itemCount > 0 && (
-							<Badge className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-2 border-background bg-vm-tangerine p-0 text-[10px] font-bold leading-none text-white">
+							<Badge className="absolute -right-0.5 -top-0.5 h-5 min-w-5 rounded-full border-2 border-background bg-vm-tangerine p-0 text-[10px] font-bold leading-none text-vm-tangerine-foreground">
 								{itemCount}
 							</Badge>
 						)}
@@ -86,7 +86,7 @@ export function CartSheet() {
 					<SheetTitle className="flex items-center gap-2 text-base">
 						Your Cart
 						{itemCount > 0 && (
-							<Badge className="h-5 rounded-full bg-vm-tangerine px-1.5 text-[10px] font-bold text-white">
+							<Badge className="h-5 rounded-full bg-vm-tangerine px-1.5 text-[10px] font-bold text-vm-tangerine-foreground">
 								{itemCount}
 							</Badge>
 						)}

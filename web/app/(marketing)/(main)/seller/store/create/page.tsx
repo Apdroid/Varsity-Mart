@@ -108,7 +108,7 @@ function StepProgress({ current, total }: { current: number; total: number }) {
 								className={cn(
 									"flex h-9 w-9 items-center justify-center rounded-full border-2 transition-all duration-300",
 									done
-										? "border-vm-tangerine bg-vm-tangerine text-white"
+										? "border-vm-tangerine bg-vm-tangerine text-vm-tangerine-foreground"
 										: active
 											? "border-vm-tangerine bg-background text-vm-tangerine"
 											: "border-border bg-background text-muted-foreground"
@@ -782,7 +782,7 @@ export default function CreateStorePage() {
 							<Button
 								type="submit"
 								disabled={createStore.isPending}
-								className="flex-1 bg-vm-tangerine text-white hover:bg-vm-tangerine/90 font-semibold"
+								className="flex-1 bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90 font-semibold"
 							>
 								{createStore.isPending ? (
 									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -795,7 +795,7 @@ export default function CreateStorePage() {
 							<Button
 								type="button"
 								onClick={goNext}
-								className="flex-1 bg-vm-tangerine text-white hover:bg-vm-tangerine/90 font-semibold"
+								className="flex-1 bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90 font-semibold"
 							>
 								Continue
 								<ArrowRight className="ml-1.5 h-4 w-4" />

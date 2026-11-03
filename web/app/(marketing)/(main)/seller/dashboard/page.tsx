@@ -282,7 +282,7 @@ export default function SellerDashboardPage() {
 					</p>
 					<Button
 						asChild
-						className="mt-6 w-full bg-vm-tangerine text-white hover:bg-vm-tangerine/90"
+						className="mt-6 w-full bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
 					>
 						<Link href="/seller/create-store">Create Your Store</Link>
 					</Button>
@@ -320,7 +320,7 @@ export default function SellerDashboardPage() {
 					</Button>
 					<Button
 						size="sm"
-						className="bg-vm-tangerine text-white hover:bg-vm-tangerine/90"
+						className="bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
 						asChild
 					>
 						<Link href="/seller/products/add">Add Product</Link>
@@ -428,7 +428,7 @@ export default function SellerDashboardPage() {
 									<Button
 										asChild
 										size="sm"
-										className="mt-3 bg-vm-tangerine text-white hover:bg-vm-tangerine/90"
+										className="mt-3 bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
 									>
 										<Link href="/seller/products/add">Add your first product</Link>
 									</Button>
@@ -454,7 +454,7 @@ export default function SellerDashboardPage() {
 							</div>
 							<Button
 								size="sm"
-								className="bg-vm-tangerine text-white hover:bg-vm-tangerine/90"
+								className="bg-vm-tangerine text-vm-tangerine-foreground hover:bg-vm-tangerine/90"
 							>
 								Renew Subscription
 							</Button>

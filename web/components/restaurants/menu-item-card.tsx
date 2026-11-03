@@ -95,7 +95,7 @@ export function MenuItemCard({ item, restaurant }: Props) {
             <button
               type="button"
               onClick={handleAdd}
-              className="flex items-center gap-1 rounded-full bg-vm-tangerine px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-vm-tangerine/90 active:scale-95"
+              className="flex items-center gap-1 rounded-full bg-vm-tangerine px-3 py-1.5 text-xs font-semibold text-vm-tangerine-foreground transition-all hover:bg-vm-tangerine/90 active:scale-95"
             >
               <Plus className="h-3.5 w-3.5" />
               Add
