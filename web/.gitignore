@@ -35,3 +35,11 @@ pnpm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# editor / AI tooling local state
+.idea/
+.junie/
+.remember/
+
+# TypeScript incremental build info
+*.tsbuildinfo
