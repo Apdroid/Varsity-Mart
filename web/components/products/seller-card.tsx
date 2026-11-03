@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useIsMobile } from "@/hooks/use-mobile"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -23,18 +24,6 @@ import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { useStartConversation } from "@/hooks/queries/use-conversations"
 import type { ProductSeller } from "@/components/main/product-card"
-
-function useIsMobile() {
-	const [isMobile, setIsMobile] = React.useState(false)
-	React.useEffect(() => {
-		const mq = window.matchMedia("(max-width: 767px)")
-		setIsMobile(mq.matches)
-		const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
-		mq.addEventListener("change", handler)
-		return () => mq.removeEventListener("change", handler)
-	}, [])
-	return isMobile
-}
 
 type Props = {
 	seller: ProductSeller
@@ -113,6 +102,7 @@ function ComposeDialog({
 	// Reset draft and refocus when dialog opens
 	React.useEffect(() => {
 		if (open) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setText("")
 			setTimeout(() => textareaRef.current?.focus(), 50)
 		}

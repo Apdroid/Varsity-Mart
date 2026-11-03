@@ -15,6 +15,8 @@ export function DownloadAppCard() {
 			const hasSeen = localStorage.getItem(STORAGE_KEY)
 			if (hasSeen) return
 			localStorage.setItem(STORAGE_KEY, "1")
+			// One-time read of localStorage after mount (it is unavailable during SSR).
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setIsVisible(true)
 		} catch {
 			setIsVisible(true)

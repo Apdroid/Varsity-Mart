@@ -46,7 +46,7 @@ export function ProfileGate({ children }: { children: ReactNode }) {
 		const bypassed = PROFILE_BYPASS_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))
 		if (bypassed) return
 		router.replace("/complete-profile")
-	}, [isLoading, isAuthenticated, needsProfileCompletion, pathname, router])
+	}, [isLoading, isAuthenticated, needsProfileCompletion, needsVerification, pathname, router])
 
 	return <>{children}</>
 }

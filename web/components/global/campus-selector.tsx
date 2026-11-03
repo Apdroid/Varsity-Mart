@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useCampus } from "@/providers/campus-provider"
 import { useCampusesByUniversity, useUniversities } from "@/hooks/queries/use-campus"
 import {
@@ -16,7 +16,9 @@ export function CampusSelector() {
 	const { data: universities = [] } = useUniversities()
 	const [isOpen, setIsOpen] = useState(false)
 	const [query, setQuery] = useState("")
-	const [selectedUniversityId, setSelectedUniversityId] = useState(universityId || "")
+	// The institution the user is browsing; until they pick one, follow the saved campus selection.
+	const [pickedUniversityId, setSelectedUniversityId] = useState<string | null>(null)
+	const selectedUniversityId = pickedUniversityId ?? universityId ?? ""
 	const { data: campuses = [] } = useCampusesByUniversity(selectedUniversityId || "")
 	const selectedUniversity = universities.find(u => u.id === selectedUniversityId || u.id === universityId)
 	const displayUniversityName = selectedUniversity?.short_name || universityName || "Select Institution"
@@ -32,12 +34,6 @@ export function CampusSelector() {
 	const filteredCampuses = normalizedQuery
 		? campuses.filter(c => c.name?.toLowerCase().includes(normalizedQuery))
 		: campuses
-
-	useEffect(() => {
-		if (universityId) {
-			setSelectedUniversityId(universityId)
-		}
-	}, [universityId])
 
 	const handleUniversityChange = (newUnivId: string) => {
 		setSelectedUniversityId(newUnivId)

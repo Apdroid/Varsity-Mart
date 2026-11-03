@@ -144,15 +144,11 @@ export default function RestaurantPage() {
   const { data: restaurant, isLoading: restaurantLoading, error } = useRestaurant(params.id)
   const { data: categories = [], isLoading: menuLoading } = useMenuItems(params.id)
 
-  const [activeCategoryId, setActiveCategoryId] = React.useState<string>("")
+  // The user's pick; until they pick one, the first category is active.
+  const [pickedCategoryId, setActiveCategoryId] = React.useState<string>("")
+  const activeCategoryId = pickedCategoryId || categories[0]?.id || ""
   const [activeFilter, setActiveFilter] = React.useState<FilterKey>("all")
   const tabsRef = React.useRef<HTMLDivElement>(null)
-
-  React.useEffect(() => {
-    if (categories.length > 0 && !activeCategoryId) {
-      setActiveCategoryId(categories[0].id)
-    }
-  }, [categories, activeCategoryId])
 
   if (restaurantLoading) {
     return (

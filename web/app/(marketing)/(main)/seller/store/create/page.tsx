@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useObjectUrl } from "@/hooks/use-object-url"
 import { useRouter } from "next/navigation"
 import { useForm, type Resolver } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -152,14 +153,7 @@ function ImageUploadField({
 	onChange: (file: File | null) => void
 }) {
 	const inputRef = React.useRef<HTMLInputElement>(null)
-	const [preview, setPreview] = React.useState<string | null>(null)
-
-	React.useEffect(() => {
-		if (!value) { setPreview(null); return }
-		const url = URL.createObjectURL(value)
-		setPreview(url)
-		return () => URL.revokeObjectURL(url)
-	}, [value])
+	const preview = useObjectUrl(value)
 
 	return (
 		<div className="space-y-2">

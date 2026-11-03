@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useObjectUrl } from "@/hooks/use-object-url"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { toast } from "sonner"
@@ -202,17 +203,7 @@ function DocUploadField({
   onChange: (f: File | null) => void
 }) {
   const inputRef = React.useRef<HTMLInputElement>(null)
-  const [preview, setPreview] = React.useState<string | null>(null)
-
-  React.useEffect(() => {
-    if (!value) {
-      setPreview(null)
-      return
-    }
-    const url = URL.createObjectURL(value)
-    setPreview(url)
-    return () => URL.revokeObjectURL(url)
-  }, [value])
+  const preview = useObjectUrl(value)
 
   return (
     <div className="space-y-2">

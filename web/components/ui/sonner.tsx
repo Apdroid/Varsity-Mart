@@ -3,15 +3,11 @@
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 import { CheckCircleIcon, InfoIcon, WarningIcon, XCircleIcon, SpinnerIcon } from "@phosphor-icons/react"
-import { useEffect, useState } from "react"
+import { useHydrated } from "@/hooks/use-hydrated"
 
 const Toaster = ({ ...props }: ToasterProps) => {
 	const { theme } = useTheme()
-	const [mounted, setMounted] = useState(false)
-
-	useEffect(() => {
-		setMounted(true)
-	}, [])
+	const mounted = useHydrated()
 
 	if (!mounted) return null
 

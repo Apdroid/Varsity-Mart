@@ -24,6 +24,8 @@ export function RecentlyViewed({ currentProductId }: Props) {
   React.useEffect(() => {
     try {
       const stored: Product[] = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")
+      // Reads localStorage, which is unavailable during SSR, so it must happen after mount.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setProducts(stored.filter((p) => p.id !== currentProductId).slice(0, 4))
     } catch {}
   }, [currentProductId])
