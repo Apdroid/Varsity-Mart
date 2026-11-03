@@ -11,7 +11,7 @@ export default async function StoresPage() {
 
   await Promise.allSettled([
     queryClient.prefetchQuery({
-      queryKey: ["stores", "featured"],
+      queryKey: ["stores", "featured", 3, null],
       queryFn: async () => {
         const response = await storesApi.featured(3)
         return response.data

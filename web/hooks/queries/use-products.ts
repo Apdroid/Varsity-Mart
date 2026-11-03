@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { productsApi } from "@/lib/api/products"
+import { useCampusScope, scopeFilters, withScopeLoading } from "@/hooks/use-campus-scope"
 import type { CreateProductRequest, ProductFilters, CreateReviewRequest } from "@/lib/api/types"
 
 export const productKeys = {
@@ -11,22 +12,27 @@ export const productKeys = {
   details: () => [...productKeys.all, "detail"] as const,
   detail: (id: string) => [...productKeys.details(), id] as const,
   myProducts: (filters?: ProductFilters) => [...productKeys.all, "my", filters] as const,
-  featured: () => [...productKeys.all, "featured"] as const,
+  featured: (limit?: number, campus?: string) =>
+    [...productKeys.all, "featured", limit ?? null, campus ?? null] as const,
   trending: () => [...productKeys.all, "trending"] as const,
   reviews: (productId: string, page?: number) => [...productKeys.all, productId, "reviews", page] as const,
 }
 
 export function useProducts(filters?: ProductFilters) {
-  return useQuery({
-    queryKey: productKeys.list(filters || {}),
+  const { campus, ready } = useCampusScope()
+  const scoped = scopeFilters(filters, campus)
+  const query = useQuery({
+    queryKey: productKeys.list(scoped),
     queryFn: async () => {
-      const response = await productsApi.list(filters)
+      const response = await productsApi.list(scoped)
       return {
         products: response.data.products,
         pagination: response.data.pagination,
       }
     },
+    enabled: ready,
   })
+  return withScopeLoading(query, ready)
 }
 
 export function useProduct(id: string) {
@@ -54,13 +60,16 @@ export function useMyProducts(filters?: ProductFilters) {
 }
 
 export function useFeaturedProducts(limit = 12) {
-  return useQuery({
-    queryKey: productKeys.featured(),
+  const { campus, ready } = useCampusScope()
+  const query = useQuery({
+    queryKey: productKeys.featured(limit, campus),
     queryFn: async () => {
-      const response = await productsApi.featured(limit)
+      const response = await productsApi.featured(limit, campus)
       return response.data
     },
+    enabled: ready,
   })
+  return withScopeLoading(query, ready)
 }
 
 export function useTrendingProducts(limit = 12) {

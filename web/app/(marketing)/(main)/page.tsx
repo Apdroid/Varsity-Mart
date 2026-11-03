@@ -15,7 +15,7 @@ export default async function Page() {
 
 	await Promise.allSettled([
 		queryClient.prefetchQuery({
-			queryKey: ["restaurants", "featured"],
+			queryKey: ["restaurants", "featured", 6, null],
 			queryFn: async () => {
 				const response = await restaurantsApi.featured(6)
 				return response.data
@@ -32,14 +32,14 @@ export default async function Page() {
 			},
 		}),
 		queryClient.prefetchQuery({
-			queryKey: ["stores", "featured"],
+			queryKey: ["stores", "featured", 6, null],
 			queryFn: async () => {
 				const response = await storesApi.featured(6)
 				return response.data
 			},
 		}),
 		queryClient.prefetchQuery({
-			queryKey: ["products", "featured"],
+			queryKey: ["products", "featured", 12, null],
 			queryFn: async () => {
 				const response = await productsApi.featured(12)
 				return response.data

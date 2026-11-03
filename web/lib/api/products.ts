@@ -16,7 +16,7 @@ function buildQueryString(params: object): string {
     if (value !== undefined && value !== null && value !== "") {
       searchParams.append(key, String(value))
     }
-  })
+   })
   const query = searchParams.toString()
   return query ? `?${query}` : ""
 }
@@ -53,8 +53,8 @@ export const productsApi = {
   myProducts: (filters?: ProductFilters) =>
     api.get<ProductsListResponse>(`/products/my-products/${buildQueryString(filters || {})}`),
 
-  featured: (limit = 10) =>
-    api.get<ApiResponse<Product[]>>(`/products/featured/?limit=${limit}`),
+  featured: (limit = 10, campus?: string) =>
+    api.get<ApiResponse<Product[]>>(`/products/featured/${buildQueryString({ limit, campus })}`),
 
   trending: (limit = 10) =>
     api.get<ApiResponse<Product[]>>(`/products/trending/?limit=${limit}`),

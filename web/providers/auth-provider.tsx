@@ -9,6 +9,7 @@ import {
 	useState,
 	type ReactNode,
 } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import { authApi } from "@/lib/api/auth"
 import { getUserLocationValue } from "@/lib/user-location"
 import type {
@@ -37,6 +38,7 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+	const queryClient = useQueryClient()
 	const [user, setUser] = useState<User | null>(null)
 	const [isLoading, setIsLoading] = useState(true)
 	const [needsVerification, setNeedsVerification] = useState(false)
@@ -80,6 +82,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		try {
 			const response = await authApi.login(data)
 			if (response.success && response.data.user) {
+				// New identity: drop anything cached for the previous user/guest.
+				queryClient.clear()
 				setUser(response.data.user)
 				setNeedsVerification(!response.data.user.isVerified)
 				return { success: true }
@@ -93,12 +97,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			}
 			return { success: false, error: "An unexpected error occurred" }
 		}
-	}, [])
+	}, [queryClient])
 
 	const register = useCallback(async (data: RegisterRequest) => {
 		try {
 			const response = await authApi.register(data)
 			if (response.success && response.data.user) {
+				queryClient.clear()
 				setUser(response.data.user)
 				setNeedsVerification(true)
 				return { success: true }
@@ -121,21 +126,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			}
 			return { success: false, error: "An unexpected error occurred" }
 		}
-	}, [])
+	}, [queryClient])
 
 	const logout = useCallback(async () => {
 		try {
 			await authApi.logout()
 		} finally {
+			// Never leave the previous user's cart, chats or notifications in memory.
+			queryClient.clear()
 			setUser(null)
 			setNeedsVerification(false)
 		}
-	}, [])
+	}, [queryClient])
 
 	const googleLogin = useCallback(async (idToken: string) => {
 		try {
 			const response = await authApi.googleLogin({ id_token: idToken })
 			if (response.success && response.data.user) {
+				queryClient.clear()
 				setUser(response.data.user)
 				setNeedsVerification(false)
 				return {
@@ -154,7 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			}
 			return { success: false, error: "An unexpected error occurred" }
 		}
-	}, [])
+	}, [queryClient])
 
 	const verifyEmail = useCallback(async (data: VerifyEmailRequest) => {
 		try {

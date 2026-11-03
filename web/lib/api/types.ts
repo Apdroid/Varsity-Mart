@@ -329,6 +329,8 @@ export interface ProductFilters {
 	search?: string
 	sellerId?: string
 	storeId?: string
+	/** Campus UUID or name. Scopes listings to a campus. */
+	campus?: string
 }
 
 // Product Category (full)
@@ -409,6 +411,8 @@ export interface StoreFilters {
 	category?: string
 	search?: string
 	sortBy?: "popular" | "newest"
+	/** Campus UUID or name. Scopes listings to a campus. */
+	campus?: string
 }
 
 // Restaurant Types - Match actual API
@@ -492,6 +496,8 @@ export interface RestaurantFilters {
 	cuisineType?: string
 	isOpen?: boolean
 	sortBy?: "popular" | "newest" | "rating"
+	/** Campus UUID or name. Scopes listings to a campus. */
+	campus?: string
 }
 
 export interface RestaurantWithMenu {

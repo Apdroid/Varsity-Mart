@@ -2,6 +2,7 @@
 
 import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { storesApi } from "@/lib/api/stores"
+import { useCampusScope, scopeFilters, withScopeLoading } from "@/hooks/use-campus-scope"
 import type { CreateStoreRequest, StoreFilters, CreateReviewRequest } from "@/lib/api/types"
 
 export const storeKeys = {
@@ -10,17 +11,20 @@ export const storeKeys = {
   list: (filters: StoreFilters) => [...storeKeys.lists(), filters] as const,
   details: () => [...storeKeys.all, "detail"] as const,
   detail: (id: string) => [...storeKeys.details(), id] as const,
-  featured: () => [...storeKeys.all, "featured"] as const,
+  featured: (limit?: number, campus?: string) =>
+    [...storeKeys.all, "featured", limit ?? null, campus ?? null] as const,
   myStore: () => [...storeKeys.all, "my"] as const,
   products: (storeId: string, page?: number) => [...storeKeys.all, storeId, "products", page] as const,
   reviews: (storeId: string, page?: number) => [...storeKeys.all, storeId, "reviews", page] as const,
 }
 
 export function useStores(filters?: StoreFilters) {
-  return useQuery({
-    queryKey: storeKeys.list(filters || {}),
+  const { campus, ready } = useCampusScope()
+  const scoped = scopeFilters(filters, campus)
+  const query = useQuery({
+    queryKey: storeKeys.list(scoped),
     queryFn: async () => {
-      const response = await storesApi.list(filters)
+      const response = await storesApi.list(scoped)
       return {
         stores: response.data.stores,
         pagination: response.data.pagination,
@@ -28,7 +32,9 @@ export function useStores(filters?: StoreFilters) {
     },
     staleTime: 10 * 60 * 1000,
     placeholderData: keepPreviousData,
+    enabled: ready,
   })
+  return withScopeLoading(query, ready)
 }
 
 export function useStore(id: string) {
@@ -44,14 +50,17 @@ export function useStore(id: string) {
 }
 
 export function useFeaturedStores(limit = 10) {
-  return useQuery({
-    queryKey: storeKeys.featured(),
+  const { campus, ready } = useCampusScope()
+  const query = useQuery({
+    queryKey: storeKeys.featured(limit, campus),
     queryFn: async () => {
-      const response = await storesApi.featured(limit)
+      const response = await storesApi.featured(limit, campus)
       return response.data
     },
     staleTime: 10 * 60 * 1000,
+    enabled: ready,
   })
+  return withScopeLoading(query, ready)
 }
 
 export function useMyStore() {

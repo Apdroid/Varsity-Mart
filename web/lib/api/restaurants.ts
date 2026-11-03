@@ -77,8 +77,8 @@ export const restaurantsApi = {
 	get: (id: string) =>
 		api.get<ApiResponse<RestaurantDetail>>(`/restaurants/${id}/`),
 
-	featured: (limit = 10) =>
-		api.get<FeaturedResponse<RestaurantListItem>>(`/restaurants/featured/?limit=${limit}`),
+	featured: (limit = 10, campus?: string) =>
+		api.get<FeaturedResponse<RestaurantListItem>>(`/restaurants/featured/${buildQueryString({ limit, campus })}`),
 
 	myRestaurant: () =>
 		api.get<ApiResponse<RestaurantDetail>>("/restaurants/my-restaurant/"),

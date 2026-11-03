@@ -3,6 +3,7 @@
 import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { restaurantsApi } from "@/lib/api/restaurants"
 import type { CreateRestaurantRequest } from "@/lib/api/restaurants"
+import { useCampusScope, scopeFilters, withScopeLoading } from "@/hooks/use-campus-scope"
 import type { RestaurantFilters, CreateReviewRequest } from "@/lib/api/types"
 
 interface CreateMenuItemRequest {
@@ -23,7 +24,8 @@ export const restaurantKeys = {
   list: (filters: RestaurantFilters) => [...restaurantKeys.lists(), filters] as const,
   details: () => [...restaurantKeys.all, "detail"] as const,
   detail: (id: string) => [...restaurantKeys.details(), id] as const,
-  featured: () => [...restaurantKeys.all, "featured"] as const,
+  featured: (limit?: number, campus?: string) =>
+    [...restaurantKeys.all, "featured", limit ?? null, campus ?? null] as const,
   myRestaurant: () => [...restaurantKeys.all, "my"] as const,
   dashboard: () => [...restaurantKeys.all, "dashboard"] as const,
   menuItems: (restaurantId: string, page?: number) => [...restaurantKeys.all, restaurantId, "menu", page] as const,
@@ -32,10 +34,12 @@ export const restaurantKeys = {
 }
 
 export function useRestaurants(filters?: RestaurantFilters) {
-  return useQuery({
-    queryKey: restaurantKeys.list(filters || {}),
+  const { campus, ready } = useCampusScope()
+  const scoped = scopeFilters(filters, campus)
+  const query = useQuery({
+    queryKey: restaurantKeys.list(scoped),
     queryFn: async () => {
-      const response = await restaurantsApi.list(filters)
+      const response = await restaurantsApi.list(scoped)
       return {
         restaurants: response.data.restaurants,
         pagination: response.data.pagination,
@@ -43,7 +47,9 @@ export function useRestaurants(filters?: RestaurantFilters) {
     },
     staleTime: 10 * 60 * 1000,
     placeholderData: keepPreviousData,
+    enabled: ready,
   })
+  return withScopeLoading(query, ready)
 }
 
 export function useRestaurant(id: string) {
@@ -59,14 +65,17 @@ export function useRestaurant(id: string) {
 }
 
 export function useFeaturedRestaurants(limit = 10) {
-  return useQuery({
-    queryKey: restaurantKeys.featured(),
+  const { campus, ready } = useCampusScope()
+  const query = useQuery({
+    queryKey: restaurantKeys.featured(limit, campus),
     queryFn: async () => {
-      const response = await restaurantsApi.featured(limit)
+      const response = await restaurantsApi.featured(limit, campus)
       return response.data
     },
     staleTime: 10 * 60 * 1000,
+    enabled: ready,
   })
+  return withScopeLoading(query, ready)
 }
 
 export function useMyRestaurant() {

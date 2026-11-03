@@ -6,6 +6,7 @@ import {
 	useState,
 	useEffect,
 	useCallback,
+	useMemo,
 	type ReactNode,
 } from "react"
 import { useAuth } from "@/providers/auth-provider"
@@ -26,6 +27,8 @@ interface CampusContextValue {
 	campusName: string | null
 	/** True when the values come from the signed-in user's profile */
 	isFromProfile: boolean
+	/** False until auth and the guest's stored selection have both resolved */
+	isReady: boolean
 	showPicker: boolean
 	openPicker: () => void
 	closePicker: () => void
@@ -67,26 +70,31 @@ export function CampusProvider({ children }: { children: ReactNode }) {
 	const closePicker = useCallback(() => setShowPicker(false), [])
 
 	const isFromProfile = isAuthenticated && !!user
+	const isReady = hydrated && !isLoading
 
-	const value: CampusContextValue = {
-		universityId: isFromProfile
-			? (user!.university?.id ?? null)
-			: (guestSelection?.universityId ?? null),
-		universityName: isFromProfile
-			? (user!.university?.name ?? null)
-			: (guestSelection?.universityName ?? null),
-		campusId: isFromProfile
-			? (user!.campus?.id ?? null)
-			: (guestSelection?.campusId ?? null),
-		campusName: isFromProfile
-			? (user!.campus?.name ?? null)
-			: (guestSelection?.campusName ?? null),
-		isFromProfile,
-		showPicker,
-		openPicker,
-		closePicker,
-		saveGuestSelection,
-	}
+	const value = useMemo<CampusContextValue>(
+		() => ({
+			universityId: isFromProfile
+				? (user!.university?.id ?? null)
+				: (guestSelection?.universityId ?? null),
+			universityName: isFromProfile
+				? (user!.university?.name ?? null)
+				: (guestSelection?.universityName ?? null),
+			campusId: isFromProfile
+				? (user!.campus?.id ?? null)
+				: (guestSelection?.campusId ?? null),
+			campusName: isFromProfile
+				? (user!.campus?.name ?? null)
+				: (guestSelection?.campusName ?? null),
+			isFromProfile,
+			isReady,
+			showPicker,
+			openPicker,
+			closePicker,
+			saveGuestSelection,
+		}),
+		[user, guestSelection, isFromProfile, isReady, showPicker, openPicker, closePicker, saveGuestSelection]
+	)
 
 	return (
 		<CampusContext.Provider value={value}>

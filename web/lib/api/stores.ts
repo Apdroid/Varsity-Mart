@@ -31,8 +31,8 @@ export const storesApi = {
   get: (id: string) =>
     api.get<ApiResponse<StoreDetail>>(`/stores/${id}/`),
 
-  featured: (limit = 10) =>
-    api.get<FeaturedResponse<StoreListItem>>(`/stores/featured/?limit=${limit}`),
+  featured: (limit = 10, campus?: string) =>
+    api.get<FeaturedResponse<StoreListItem>>(`/stores/featured/${buildQueryString({ limit, campus })}`),
 
   myStore: () =>
     api.get<ApiResponse<StoreDetail>>("/stores/my-store/"),
