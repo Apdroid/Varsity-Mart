@@ -22,7 +22,7 @@ import type { ComponentProps } from "react"
 import { useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { FormError } from "@/components/auth/form-error"
+import { FormError } from "@/components/ui/form-error"
 import PasswordInput from "../ui/password-input"
 import { useAuth } from "@/providers/auth-provider"
 

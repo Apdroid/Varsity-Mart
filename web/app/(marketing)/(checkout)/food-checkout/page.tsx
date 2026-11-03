@@ -29,6 +29,7 @@ import { useCreateFoodOrder } from "@/hooks/queries/use-orders"
 import { useRestaurant } from "@/hooks/queries/use-restaurants"
 import { useAuth } from "@/providers/auth-provider"
 import { toast } from "sonner"
+import { FormError } from "@/components/ui/form-error"
 import { cn } from "@/lib/utils"
 import type { CartLine } from "@/store/cart-store"
 import type { CreateFoodOrderRequest } from "@/lib/api/types"
@@ -108,6 +109,8 @@ export default function FoodCheckoutPage() {
   const clearCart = useCartStore((s) => s.clearCart)
   const subtotal = useCartTotal()
   const createFoodOrder = useCreateFoodOrder()
+  // Shown right above the Place Order button, where the user is looking after pressing it.
+  const [formError, setFormError] = useState<string | null>(null)
 
   const restaurantId = lines[0]?.restaurantId ?? ""
   const restaurantName = lines[0]?.restaurantName ?? "Restaurant"
@@ -154,20 +157,21 @@ export default function FoodCheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setFormError(null)
 
     if (lines.length === 0) return
 
     if (deliveryMethod === "campus_delivery" && !deliveryAddress.trim()) {
-      toast.error("Please enter a delivery address")
+      setFormError("Please enter a delivery address")
       focusField(addressRef)
       return
     }
     if (deliveryMethod === "campus_delivery" && belowMinOrder) {
-      toast.error(`Minimum order for delivery is ${formatGHS(minOrder)}`)
+      setFormError(`Minimum order for delivery is ${formatGHS(minOrder)}`)
       return
     }
     if (paymentMethod === "momo" && !momoNumber.trim()) {
-      toast.error("Please enter your mobile money number")
+      setFormError("Please enter your mobile money number")
       focusField(momoNumberRef)
       return
     }
@@ -205,7 +209,7 @@ export default function FoodCheckoutPage() {
         router.push(`/food-orders/${result.data?.orderId}`)
       }
     } catch {
-      toast.error("Failed to place order. Please try again.")
+      setFormError("Failed to place order. Please try again.")
     }
   }
 
@@ -238,7 +242,9 @@ export default function FoodCheckoutPage() {
 
   if (lines.length === 0) return null
 
-  const SubmitButton = ({ className }: { className?: string }) => (
+  const renderSubmitButton = ({ className }: { className?: string } = {}) => (
+    <>
+    <FormError message={formError} className="mb-3" />
     <Button
       type="submit"
       disabled={createFoodOrder.isPending || belowMinOrder}
@@ -254,6 +260,7 @@ export default function FoodCheckoutPage() {
       )}
       Place Order · {formatGHS(total)}
     </Button>
+    </>
   )
 
   return (
@@ -515,7 +522,7 @@ export default function FoodCheckoutPage() {
 
               {/* Mobile submit */}
               <div className="lg:hidden">
-                <SubmitButton />
+                {renderSubmitButton()}
               </div>
             </div>
 
@@ -604,7 +611,7 @@ export default function FoodCheckoutPage() {
 
                 {/* Desktop submit */}
                 <div className="mt-5 hidden lg:block">
-                  <SubmitButton />
+                  {renderSubmitButton()}
                 </div>
 
                 {/* Trust badge */}

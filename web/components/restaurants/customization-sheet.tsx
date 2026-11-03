@@ -60,7 +60,7 @@ function CustomizationBody({
 
   const showHalal = item.tags.includes("halal")
 
-  const DietaryBadges = () => (
+  const renderDietaryBadges = () => (
     <div className="flex flex-wrap gap-1.5">
       {item.isVegetarian && (
         <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600">
@@ -88,7 +88,7 @@ function CustomizationBody({
           )}
         </div>
         <div className="min-h-0 space-y-3 overflow-y-auto p-5">
-          <DietaryBadges />
+          {renderDietaryBadges()}
           <h2 className="text-xl font-bold leading-tight">{item.name}</h2>
           <p className="text-sm text-muted-foreground">{item.description}</p>
           {item.spicyLevel > 0 && (
@@ -129,7 +129,7 @@ function CustomizationBody({
         <ScrollArea className="min-h-0 flex-1">
           <div className="space-y-5 px-5 py-4 md:space-y-6 md:px-6">
             <div className="md:hidden">
-              <DietaryBadges />
+              {renderDietaryBadges()}
               <h2 className="mt-1.5 text-lg font-bold leading-snug">{item.name}</h2>
               <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
               {item.spicyLevel > 0 && (

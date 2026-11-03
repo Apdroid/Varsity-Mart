@@ -70,7 +70,7 @@ export default function RootLayout({
 											</ProfileGate>
 											<CampusPicker />
 											<DownloadAppCard />
-											<Toaster richColors theme="light" position="bottom-right" />
+											<Toaster richColors theme="light" position="top-center" duration={6000} closeButton />
 										</ThemeProvider>
 									</TooltipProvider>
 								</GoogleOAuthProvider>

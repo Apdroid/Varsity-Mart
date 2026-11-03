@@ -46,7 +46,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState, type ComponentProps } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { FormError } from "@/components/auth/form-error"
+import { FormError } from "@/components/ui/form-error"
 import { useAuth } from "@/providers/auth-provider"
 import { getGoogleIdToken } from "@/lib/auth/google"
 

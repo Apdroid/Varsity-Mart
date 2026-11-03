@@ -192,7 +192,7 @@ function SearchPageClient() {
 
 	const popularProducts = (popularProductsData?.products || []).map(mapApiProductToCard)
 
-	const MobileFilterTrigger = () => (
+	const renderMobileFilterTrigger = () => (
 		<div className="lg:hidden">
 			<Sheet open={isMobileFiltersOpen} onOpenChange={setIsMobileFiltersOpen}>
 				<SheetTrigger asChild>
@@ -245,12 +245,12 @@ function SearchPageClient() {
 						<div className="min-w-0 flex-1 space-y-4">
 							{isLoading || (isFetching && !searchData) ? (
 								<>
-									<MobileFilterTrigger />
+									{renderMobileFilterTrigger()}
 									<SkeletonGrid type={filters.type} />
 								</>
 							) : totalCount === 0 ? (
 								<>
-									<MobileFilterTrigger />
+									{renderMobileFilterTrigger()}
 									<SearchNoResults
 										query={query}
 										popularProducts={popularProducts}
@@ -261,7 +261,7 @@ function SearchPageClient() {
 							) : (
 								<div className={cn("transition-opacity duration-200", isFetching && "opacity-50 pointer-events-none")}>
 									<div className="flex flex-wrap items-center gap-3">
-										<MobileFilterTrigger />
+										{renderMobileFilterTrigger()}
 										<div className="min-w-0 flex-1">
 											<SearchUtilityBar
 												query={query}

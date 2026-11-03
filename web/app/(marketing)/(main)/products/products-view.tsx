@@ -198,7 +198,7 @@ function ProductsPageContent() {
 		conditionOptions: [],
 	}
 
-	const MobileFilterTrigger = () => (
+	const renderMobileFilterTrigger = () => (
 		<div className="lg:hidden">
 			<Sheet open={isMobileFiltersOpen} onOpenChange={setIsMobileFiltersOpen}>
 				<SheetTrigger asChild>
@@ -253,7 +253,7 @@ function ProductsPageContent() {
 				<div className="min-w-0 flex-1 space-y-4">
 					{/* Search bar + mobile filter trigger */}
 					<div className="flex-col md:block  items-center gap-6">
-						<MobileFilterTrigger />
+						{renderMobileFilterTrigger()}
 						<form onSubmit={handleSearch} className="flex flex-1 gap-2">
 							<div className="relative flex-1">
 								<MagnifierIcon

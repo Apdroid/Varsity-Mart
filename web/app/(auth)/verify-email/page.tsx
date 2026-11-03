@@ -9,7 +9,7 @@ import { Loader2, Mail } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
-import { FormError } from "@/components/auth/form-error"
+import { FormError } from "@/components/ui/form-error"
 
 const RESEND_COOLDOWN = 60
 

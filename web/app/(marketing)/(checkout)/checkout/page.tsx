@@ -28,6 +28,7 @@ import { useCart } from "@/hooks/queries/use-cart"
 import { useCreateOrder } from "@/hooks/queries/use-orders"
 import { useAuth } from "@/providers/auth-provider"
 import { toast } from "sonner"
+import { FormError } from "@/components/ui/form-error"
 import { cn } from "@/lib/utils"
 
 function formatGHS(n: number) {
@@ -106,15 +107,18 @@ export default function CheckoutPage() {
 	const deliveryFee = deliveryMethod === "campus_delivery" ? 5 : 0
 	const serviceFee = Math.round(subtotal * 0.02 * 100) / 100
 	const total = subtotal + deliveryFee + serviceFee
+	// Shown right above the Place Order button, where the user is looking after pressing it.
+	const [formError, setFormError] = useState<string | null>(null)
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		if (items.length === 0) { toast.error("Your cart is empty"); return }
+		setFormError(null)
+		if (items.length === 0) { setFormError("Your cart is empty"); return }
 		if (deliveryMethod === "campus_delivery" && !deliveryAddress.trim()) {
-			toast.error("Please enter a delivery address"); focusField(addressRef); return
+			setFormError("Please enter a delivery address"); focusField(addressRef); return
 		}
 		if (paymentMethod === "momo" && !momoNumber.trim()) {
-			toast.error("Please enter your mobile money number"); focusField(momoNumberRef); return
+			setFormError("Please enter your mobile money number"); focusField(momoNumberRef); return
 		}
 		try {
 			const result = await createOrderMutation.mutateAsync({
@@ -133,7 +137,7 @@ export default function CheckoutPage() {
 				router.push(`/orders/${result.data?.orderId}`)
 			}
 		} catch {
-			toast.error("Failed to place order. Please try again.")
+			setFormError("Failed to place order. Please try again.")
 		}
 	}
 
@@ -183,7 +187,9 @@ export default function CheckoutPage() {
 		)
 	}
 
-	const SubmitButton = ({ className }: { className?: string }) => (
+	const renderSubmitButton = ({ className }: { className?: string } = {}) => (
+		<>
+		<FormError message={formError} className="mb-3" />
 		<Button
 			type="submit"
 			disabled={createOrderMutation.isPending}
@@ -199,6 +205,7 @@ export default function CheckoutPage() {
 			)}
 			Place Order · {formatGHS(total)}
 		</Button>
+		</>
 	)
 
 	return (
@@ -425,7 +432,7 @@ export default function CheckoutPage() {
 
 							{/* Mobile submit */}
 							<div className="lg:hidden">
-								<SubmitButton />
+								{renderSubmitButton()}
 							</div>
 						</div>
 
@@ -501,7 +508,7 @@ export default function CheckoutPage() {
 
 								{/* Desktop submit */}
 								<div className="mt-5 hidden lg:block">
-									<SubmitButton />
+									{renderSubmitButton()}
 								</div>
 
 								{/* Trust badge */}
