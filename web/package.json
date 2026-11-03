@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "gen:api": "openapi-typescript openapi/varsitymart_api.json -o lib/api/schema.d.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "sync:api": "curl -fsS --max-time 120 \"https://api.varsitymart.org/schema/?format=json&lang=en\" -o openapi/varsitymart_api.json && bun run gen:api"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
